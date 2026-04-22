@@ -1,0 +1,25 @@
+{
+  "name": "claudeforge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "dev:server": "npm run dev --workspace @claudeforge/server",
+    "dev:bot": "npm run dev --workspace @claudeforge/bot",
+    "dev:web": "npm run dev --workspace @claudeforge/web",
+    "lint": "turbo run lint",
+    "test": "node --import tsx --test packages/server/test/*.test.ts packages/bot/test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "turbo": "^2.5.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  },
+  "packageManager": "npm@10.9.2"
+}

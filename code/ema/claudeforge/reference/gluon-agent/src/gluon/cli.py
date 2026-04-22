@@ -1,0 +1,3285 @@
+"""CLI interface for Gluon Agent."""
+
+import os
+from pathlib import Path
+from typing import Annotated, Any
+
+import anyio
+import typer
+from dotenv import load_dotenv
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
+from gluon import __version__
+from gluon.agent import AgentMessage, AgentResult, GluonAgent
+from gluon.cleanup import LogCleanupService
+from gluon.core import (
+    Orchestrator,
+    ProjectExistsError,
+    ProjectNotFoundError,
+    WorkspaceExistsError,
+    WorkspaceNotFoundError,
+)
+from gluon.git_manager import GitManager
+from gluon.models import CircuitState, RunStatus
+from gluon.models_config import MODEL_ALIASES, ModelTier, describe_models
+from gluon.runner import RunHealth, TaskRunner, assess_run_health, format_duration, format_run_status
+from gluon.store import GluonStore
+
+# Load environment variables from .env files (in order of precedence)
+# Later files override earlier ones
+load_dotenv(Path.home() / ".gluon" / ".env")  # Global config
+load_dotenv(".env")  # Project .env
+load_dotenv(".env.local")  # Local overrides (highest priority)
+
+app = typer.Typer(
+    name="gluon",
+    help="AI orchestrator for managing multiple Claude Code agents across projects.",
+    no_args_is_help=True,
+)
+
+project_app = typer.Typer(help="Manage projects")
+app.add_typer(project_app, name="project")
+
+workspace_app = typer.Typer(help="Manage workspaces")
+app.add_typer(workspace_app, name="workspace")
+
+git_app = typer.Typer(help="Git operations for projects")
+app.add_typer(git_app, name="git")
+
+mcp_app = typer.Typer(help="MCP server diagnostics")
+app.add_typer(mcp_app, name="mcp")
+
+webhook_app = typer.Typer(help="Webhook configuration")
+app.add_typer(webhook_app, name="webhook")
+
+ralph_app = typer.Typer(help="Ralph loop commands")
+app.add_typer(ralph_app, name="ralph")
+
+supervision_app = typer.Typer(help="Supervision and auto-resume commands")
+app.add_typer(supervision_app, name="supervision")
+
+doctor_app = typer.Typer(help="System health diagnostics")
+app.add_typer(doctor_app, name="doctor")
+
+chain_app = typer.Typer(help="Task chain management")
+app.add_typer(chain_app, name="chain")
+
+supervisor_app = typer.Typer(help="Supervisor daemon management")
+app.add_typer(supervisor_app, name="supervisor")
+
+console = Console()
+
+
+def get_orchestrator() -> Orchestrator:
+    """Get orchestrator instance."""
+    return Orchestrator()
+
+
+# ========== Project Commands ==========
+
+
+@project_app.command("add")
+def project_add(
+    name: Annotated[str, typer.Argument(help="Unique name for the project")],
+    path: Annotated[Path, typer.Argument(help="Path to project directory")],
+):
+    """Register a new project."""
+    orchestrator = get_orchestrator()
+
+    try:
+        project = orchestrator.register_project(name, path)
+        console.print(f"[green]✓[/green] Project '{project.name}' registered")
+        console.print(f"  Path: {project.path}")
+        console.print(f"  ID: {project.id}")
+    except ProjectExistsError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+    except ValueError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+
+@project_app.command("list")
+def project_list():
+    """List all registered projects."""
+    orchestrator = get_orchestrator()
+    projects = orchestrator.list_projects()
+
+    if not projects:
+        console.print("[dim]No projects registered.[/dim]")
+        console.print("Use 'gluon project add <name> <path>' to register a project.")
+        return
+
+    table = Table(title="Projects")
+    table.add_column("Name", style="cyan")
+    table.add_column("Path")
+    table.add_column("Sessions", justify="right")
+    table.add_column("ID", style="dim")
+
+    for project in projects:
+        sessions = orchestrator.list_sessions(project.name)
+        table.add_row(
+            project.name,
+            str(project.path),
+            str(len(sessions)),
+            project.id[:8],
+        )
+
+    console.print(table)
+
+
+@project_app.command("remove")
+def project_remove(
+    name: Annotated[str, typer.Argument(help="Project name or ID")],
+    force: Annotated[bool, typer.Option("--force", "-f", help="Skip confirmation")] = False,
+):
+    """Remove a project and all its sessions."""
+    orchestrator = get_orchestrator()
+
+    try:
+        project = orchestrator.get_project(name)
+    except ProjectNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    if not force:
+        confirm = typer.confirm(f"Remove project '{project.name}' and all its sessions?")
+        if not confirm:
+            console.print("Cancelled.")
+            raise typer.Exit(0)
+
+    if orchestrator.remove_project(name):
+        console.print(f"[green]✓[/green] Project '{project.name}' removed")
+    else:
+        console.print("[red]Error:[/red] Failed to remove project")
+        raise typer.Exit(1)
+
+
+# ========== Workspace Commands ==========
+
+
+@workspace_app.command("add")
+def workspace_add(
+    name: Annotated[str, typer.Argument(help="Unique name for the workspace")],
+    path: Annotated[Path, typer.Argument(help="Path to workspace directory")],
+    no_scan: Annotated[bool, typer.Option("--no-scan", help="Don't auto-scan for projects")] = False,
+):
+    """Register a new workspace and scan for projects."""
+    orchestrator = get_orchestrator()
+
+    try:
+        workspace, projects = orchestrator.register_workspace(name, path, auto_scan=not no_scan)
+        console.print(f"[green]✓[/green] Workspace '{workspace.name}' registered")
+        console.print(f"  Path: {workspace.path}")
+        console.print(f"  ID: {workspace.id}")
+
+        if projects:
+            console.print(f"\n[bold]Discovered {len(projects)} project(s):[/bold]")
+            for p in projects:
+                console.print(f"  • {p.name}")
+        elif not no_scan:
+            console.print(
+                "\n[dim]No projects discovered. Projects need markers like "
+                "package.json, pyproject.toml, .git, etc.[/dim]"
+            )
+
+    except WorkspaceExistsError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+    except ValueError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+
+@workspace_app.command("list")
+def workspace_list():
+    """List all registered workspaces."""
+    orchestrator = get_orchestrator()
+    workspaces = orchestrator.list_workspaces()
+
+    if not workspaces:
+        console.print("[dim]No workspaces registered.[/dim]")
+        console.print("Use 'gluon workspace add <name> <path>' to register a workspace.")
+        return
+
+    table = Table(title="Workspaces")
+    table.add_column("Name", style="cyan")
+    table.add_column("Path")
+    table.add_column("Projects", justify="right")
+    table.add_column("Auto-discover")
+    table.add_column("ID", style="dim")
+
+    for ws in workspaces:
+        projects = orchestrator.list_workspace_projects(ws.name)
+        table.add_row(
+            ws.name,
+            str(ws.path),
+            str(len(projects)),
+            "Yes" if ws.auto_discover else "No",
+            ws.id[:8],
+        )
+
+    console.print(table)
+
+
+@workspace_app.command("remove")
+def workspace_remove(
+    name: Annotated[str, typer.Argument(help="Workspace name or ID")],
+    force: Annotated[bool, typer.Option("--force", "-f", help="Skip confirmation")] = False,
+    with_projects: Annotated[bool, typer.Option("--with-projects", help="Also remove all projects")] = False,
+):
+    """Remove a workspace."""
+    orchestrator = get_orchestrator()
+
+    try:
+        workspace = orchestrator.get_workspace(name)
+    except WorkspaceNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    projects = orchestrator.list_workspace_projects(name)
+    msg = f"Remove workspace '{workspace.name}'?"
+    if with_projects and projects:
+        msg += f" This will also remove {len(projects)} project(s)."
+
+    if not force:
+        confirm = typer.confirm(msg)
+        if not confirm:
+            console.print("Cancelled.")
+            raise typer.Exit(0)
+
+    if orchestrator.remove_workspace(name, remove_projects=with_projects):
+        console.print(f"[green]✓[/green] Workspace '{workspace.name}' removed")
+        if with_projects and projects:
+            console.print(f"  Also removed {len(projects)} project(s)")
+    else:
+        console.print("[red]Error:[/red] Failed to remove workspace")
+        raise typer.Exit(1)
+
+
+@workspace_app.command("scan")
+def workspace_scan(
+    name: Annotated[str | None, typer.Argument(help="Workspace name (optional, scans all if not specified)")] = None,
+):
+    """Scan workspace(s) for new projects."""
+    orchestrator = get_orchestrator()
+
+    if name:
+        try:
+            new_projects = orchestrator.scan_workspace(name)
+            if new_projects:
+                console.print(f"[green]✓[/green] Found {len(new_projects)} new project(s) in '{name}':")
+                for p in new_projects:
+                    console.print(f"  • {p.name}")
+            else:
+                console.print(f"[dim]No new projects found in '{name}'[/dim]")
+        except WorkspaceNotFoundError as e:
+            console.print(f"[red]Error:[/red] {e}")
+            raise typer.Exit(1)
+    else:
+        results = orchestrator.refresh_all_workspaces()
+        if results:
+            total = sum(len(p) for p in results.values())
+            console.print(f"[green]✓[/green] Found {total} new project(s):")
+            for ws_name, projects in results.items():
+                console.print(f"\n[bold]{ws_name}:[/bold]")
+                for p in projects:
+                    console.print(f"  • {p.name}")
+        else:
+            console.print("[dim]No new projects found in any workspace[/dim]")
+
+
+@workspace_app.command("projects")
+def workspace_projects(
+    name: Annotated[str, typer.Argument(help="Workspace name or ID")],
+):
+    """List all projects in a workspace."""
+    orchestrator = get_orchestrator()
+
+    try:
+        workspace = orchestrator.get_workspace(name)
+        projects = orchestrator.list_workspace_projects(name)
+    except WorkspaceNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    if not projects:
+        console.print(f"[dim]No projects in workspace '{workspace.name}'.[/dim]")
+        console.print("Use 'gluon workspace scan' to discover projects.")
+        return
+
+    table = Table(title=f"Projects in '{workspace.name}'")
+    table.add_column("Name", style="cyan")
+    table.add_column("Path")
+    table.add_column("Sessions", justify="right")
+
+    for p in projects:
+        sessions = orchestrator.list_sessions(p.name)
+        table.add_row(p.name, str(p.path), str(len(sessions)))
+
+    console.print(table)
+
+
+# ========== Git Commands ==========
+
+
+@git_app.command("status")
+def git_status(
+    project: Annotated[str | None, typer.Argument(help="Project name (optional, shows all if not specified)")] = None,
+):
+    """Show git status for project(s)."""
+    store = GluonStore()
+    git_manager = GitManager(store=store)
+    orchestrator = get_orchestrator()
+
+    if project:
+        try:
+            proj = orchestrator.get_project(project)
+            projects = [proj]
+        except ProjectNotFoundError as e:
+            console.print(f"[red]Error:[/red] {e}")
+            raise typer.Exit(1)
+    else:
+        projects = orchestrator.list_projects()
+
+    if not projects:
+        console.print("[dim]No projects registered.[/dim]")
+        return
+
+    table = Table(title="Git Status")
+    table.add_column("Project", style="cyan")
+    table.add_column("Branch")
+    table.add_column("Remote")
+    table.add_column("Status")
+    table.add_column("Ahead/Behind")
+    table.add_column("Last Fetch", style="dim")
+
+    for proj in projects:
+        status = git_manager.get_cached_status(proj)
+
+        if not status or not status.is_git_repo:
+            table.add_row(proj.name, "-", "-", "[dim]Not a git repo[/dim]", "-", "-")
+            continue
+
+        # Status indicator
+        if status.is_diverged:
+            status_text = "[red]Diverged[/red]"
+        elif status.has_uncommitted:
+            status_text = f"[yellow]{status.uncommitted_count} uncommitted[/yellow]"
+        elif status.is_clean:
+            status_text = "[green]Clean[/green]"
+        else:
+            status_text = "[yellow]Changes pending[/yellow]"
+
+        # Ahead/behind
+        ahead_behind = ""
+        if status.commits_ahead > 0:
+            ahead_behind += f"[green]+{status.commits_ahead}[/green]"
+        if status.commits_behind > 0:
+            if ahead_behind:
+                ahead_behind += "/"
+            ahead_behind += f"[yellow]-{status.commits_behind}[/yellow]"
+        if not ahead_behind:
+            ahead_behind = "[dim]-[/dim]"
+
+        # Last fetch time
+        last_fetch = "-"
+        if status.last_fetch_at:
+            last_fetch = status.last_fetch_at.strftime("%Y-%m-%d %H:%M")
+
+        table.add_row(
+            proj.name,
+            status.branch or "-",
+            status.remote or "-",
+            status_text,
+            ahead_behind,
+            last_fetch,
+        )
+
+    console.print(table)
+
+
+@git_app.command("fetch")
+def git_fetch(
+    project: Annotated[str | None, typer.Argument(help="Project name (optional, fetches all if not specified)")] = None,
+):
+    """Fetch latest changes from remote for project(s)."""
+    store = GluonStore()
+    git_manager = GitManager(store=store)
+    orchestrator = get_orchestrator()
+
+    if project:
+        try:
+            proj = orchestrator.get_project(project)
+            projects = [proj]
+        except ProjectNotFoundError as e:
+            console.print(f"[red]Error:[/red] {e}")
+            raise typer.Exit(1)
+    else:
+        projects = orchestrator.list_projects()
+
+    if not projects:
+        console.print("[dim]No projects registered.[/dim]")
+        return
+
+    async def _fetch():
+        for proj in projects:
+            console.print(f"Fetching {proj.name}...", end=" ")
+            status = await git_manager.refresh_status(proj)
+
+            if not status.is_git_repo:
+                console.print("[dim]skipped (not a git repo)[/dim]")
+                continue
+
+            if status.is_diverged:
+                console.print(f"[red]diverged[/red] ({status.commits_ahead} ahead, {status.commits_behind} behind)")
+            elif status.commits_behind > 0:
+                console.print(f"[yellow]{status.commits_behind} commits behind[/yellow]")
+            elif status.commits_ahead > 0:
+                console.print(f"[green]{status.commits_ahead} commits ahead[/green]")
+            else:
+                console.print("[green]up to date[/green]")
+
+    anyio.run(_fetch)
+
+
+@git_app.command("sync")
+def git_sync(
+    project: Annotated[str, typer.Argument(help="Project name")],
+):
+    """Sync a project: commit uncommitted changes, fetch, and fast-forward."""
+    store = GluonStore()
+    git_manager = GitManager(store=store)
+    orchestrator = get_orchestrator()
+
+    try:
+        proj = orchestrator.get_project(project)
+    except ProjectNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    async def _sync():
+        console.print(f"Syncing {proj.name}...")
+        result = await git_manager.pre_task_sync(proj)
+
+        if not result.success:
+            console.print(f"[red]Error:[/red] {result.error}")
+            raise typer.Exit(1)
+
+        if result.action == "none":
+            console.print(f"[green]✓[/green] {result.message}")
+        else:
+            console.print(f"[green]✓[/green] {result.message}")
+            if result.files_committed > 0:
+                console.print(f"  Committed {result.files_committed} files")
+            if result.commits_pulled > 0:
+                console.print(f"  Pulled {result.commits_pulled} commits")
+
+    anyio.run(_sync)
+
+
+@git_app.command("push")
+def git_push(
+    project: Annotated[str, typer.Argument(help="Project name")],
+    message: Annotated[str | None, typer.Option("--message", "-m", help="Commit message")] = None,
+):
+    """Commit any uncommitted changes and push to remote."""
+    store = GluonStore()
+    git_manager = GitManager(store=store)
+    orchestrator = get_orchestrator()
+
+    try:
+        proj = orchestrator.get_project(project)
+    except ProjectNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    async def _push():
+        console.print(f"Pushing {proj.name}...")
+        commit_msg = message or "gluon: manual push"
+        result = await git_manager.post_task_sync(proj, commit_msg)
+
+        if not result.success:
+            console.print(f"[red]Error:[/red] {result.error}")
+            raise typer.Exit(1)
+
+        if result.action == "none":
+            console.print(f"[green]✓[/green] {result.message}")
+        else:
+            console.print(f"[green]✓[/green] {result.message}")
+            if result.files_committed > 0:
+                console.print(f"  Committed {result.files_committed} files")
+            if result.commits_pushed > 0:
+                console.print("  Pushed to remote")
+
+    anyio.run(_push)
+
+
+# ========== MCP Commands ==========
+
+
+@mcp_app.command("status")
+def mcp_status(
+    project: Annotated[str | None, typer.Argument(help="Optional project name to check project-level config")] = None,
+):
+    """
+    Show MCP server configuration and test connectivity.
+
+    Checks which MCP config file would be used and tests each server's reachability.
+    """
+    import json
+    import urllib.error
+    import urllib.request
+
+    from gluon.agent import find_mcp_config
+
+    # Determine working directory
+    working_dir = None
+    if project:
+        orchestrator = get_orchestrator()
+        try:
+            proj = orchestrator.get_project(project)
+            working_dir = proj.expanded_path
+            console.print(f"[dim]Project:[/dim] {project} ({working_dir})")
+        except ProjectNotFoundError:
+            console.print(f"[yellow]Warning:[/yellow] Project '{project}' not found, using global config")
+
+    # Find MCP config
+    mcp_path = find_mcp_config(working_dir)
+
+    if not mcp_path:
+        console.print("[yellow]No MCP configuration found.[/yellow]")
+        console.print("\nExpected locations:")
+        console.print("  • Project: .mcp.json (in project directory)")
+        console.print("  • Global: ~/.claude/.mcp.json")
+        raise typer.Exit(1)
+
+    console.print(f"\n[bold]MCP Config:[/bold] {mcp_path}")
+
+    # Load and display config
+    try:
+        with open(mcp_path) as f:
+            config = json.load(f)
+    except json.JSONDecodeError as e:
+        console.print(f"[red]Error parsing MCP config:[/red] {e}")
+        raise typer.Exit(1)
+
+    servers = config.get("mcpServers", {})
+    if not servers:
+        console.print("[yellow]No MCP servers configured.[/yellow]")
+        raise typer.Exit(0)
+
+    # Create table for results
+    table = Table(title="MCP Servers")
+    table.add_column("Server", style="cyan")
+    table.add_column("Type", style="dim")
+    table.add_column("URL/Command")
+    table.add_column("Status")
+
+    for name, server in servers.items():
+        server_type = server.get("type", "stdio")
+        url = server.get("url", "")
+        command = server.get("command", "")
+
+        # Test connectivity for HTTP/SSE servers
+        status = "[dim]—[/dim]"
+        if server_type in ("http", "sse") and url:
+            try:
+                headers = server.get("headers", {})
+                req = urllib.request.Request(url, headers=headers, method="POST")
+                # Send minimal MCP request
+                req.add_header("Content-Type", "application/json")
+                data = json.dumps({"jsonrpc": "2.0", "method": "initialize", "id": 1}).encode()
+                with urllib.request.urlopen(req, data=data, timeout=5) as resp:
+                    status = f"[green]✓ OK ({resp.status})[/green]"
+            except urllib.error.HTTPError as e:
+                if e.code in (400, 405, 406):
+                    # Server responded, just doesn't like our request format
+                    status = "[green]✓ Reachable[/green]"
+                else:
+                    status = f"[yellow]HTTP {e.code}[/yellow]"
+            except urllib.error.URLError as e:
+                reason = str(e.reason)
+                if "Connection refused" in reason:
+                    status = "[red]✗ Connection refused[/red]"
+                elif "Name or service not known" in reason or "nodename nor servname" in reason:
+                    status = "[red]✗ Host not found[/red]"
+                else:
+                    status = f"[red]✗ {reason[:30]}[/red]"
+            except Exception as e:
+                status = f"[red]✗ {str(e)[:30]}[/red]"
+        elif server_type == "stdio":
+            status = "[dim]stdio (not tested)[/dim]"
+
+        # Add row
+        location = url if url else command
+        table.add_row(name, server_type, location, status)
+
+    console.print(table)
+
+    # Show tips for common issues
+    console.print("\n[bold]Tips:[/bold]")
+    console.print(
+        "  • For services on your Mac, use [cyan]host.docker.internal[/cyan] instead of [cyan]localhost[/cyan]"
+    )
+    console.print("  • Project-level [cyan].mcp.json[/cyan] overrides global config")
+    console.print("  • Run [cyan]gluon mcp status <project>[/cyan] to check project-specific config")
+
+
+# ========== Webhook Commands ==========
+
+
+@webhook_app.command("list")
+def webhook_list():
+    """List all configured webhooks."""
+    store = GluonStore()
+    configs = store.list_webhook_configs(enabled_only=False)
+
+    if not configs:
+        console.print("[dim]No webhooks configured.[/dim]")
+        console.print("Use 'gluon webhook add' to configure a webhook.")
+        return
+
+    # Build project lookup
+    project_lookup: dict[str, str] = {}
+    for p in store.list_projects():
+        project_lookup[p.id] = p.name
+
+    table = Table(title="Webhooks")
+    table.add_column("ID", style="dim")
+    table.add_column("Handler", style="cyan")
+    table.add_column("Project")
+    table.add_column("Events")
+    table.add_column("Enabled")
+
+    for config in configs:
+        project_name = project_lookup.get(config.project_id, "All") if config.project_id else "All"
+        events_str = ", ".join(config.events) if config.events else "All"
+        enabled = "[green]Yes[/green]" if config.enabled else "[red]No[/red]"
+
+        table.add_row(
+            config.id[:8],
+            config.handler,
+            project_name,
+            events_str,
+            enabled,
+        )
+
+    console.print(table)
+
+
+@webhook_app.command("add")
+def webhook_add(
+    handler: Annotated[str, typer.Option("--handler", "-h", help="Webhook handler")] = "github",
+    project: Annotated[str | None, typer.Option("--project", "-p", help="Project name")] = None,
+    events: Annotated[str | None, typer.Option("--events", "-e", help="Event types")] = None,
+    branches: Annotated[str | None, typer.Option("--branches", "-b", help="Branch filter")] = None,
+    ignore_branches: Annotated[str | None, typer.Option("--ignore-branches", help="Branches to ignore")] = None,
+    secret: Annotated[str | None, typer.Option("--secret", "-s", help="Webhook secret")] = None,
+):
+    """
+    Add a new webhook configuration.
+
+    Example:
+        gluon webhook add --handler github --project myapp --events push,pull_request
+    """
+    import secrets as secrets_module
+
+    from gluon.models import WebhookConfig
+
+    store = GluonStore()
+
+    # Resolve project if provided
+    project_id = None
+    if project:
+        proj = store.get_project_by_name(project)
+        if not proj:
+            console.print(f"[red]Error:[/red] Project not found: {project}")
+            raise typer.Exit(1)
+        project_id = proj.id
+
+    # Parse event list
+    events_list = [e.strip() for e in events.split(",")] if events else []
+
+    # Parse branch filters
+    branches_list = [b.strip() for b in branches.split(",")] if branches else None
+    ignore_branches_list = [b.strip() for b in ignore_branches.split(",")] if ignore_branches else None
+
+    # Generate secret if not provided
+    secret_key = secret or secrets_module.token_hex(32)
+
+    config = WebhookConfig(
+        handler=handler,
+        project_id=project_id,
+        secret_key=secret_key,
+        events=events_list,
+        branches=branches_list,
+        ignore_branches=ignore_branches_list,
+    )
+
+    store.create_webhook_config(config)
+
+    console.print("[green]✓[/green] Webhook created")
+    console.print(f"  ID: {config.id[:8]}")
+    console.print(f"  Handler: {handler}")
+    console.print(f"  Project: {project or 'All'}")
+    console.print(f"  Events: {', '.join(events_list) if events_list else 'All'}")
+    console.print()
+    console.print("[bold]Configure in GitHub:[/bold]")
+    console.print("  Webhook URL: https://your-gluon-server/api/webhooks/github")
+    console.print(f"  Secret: {secret_key}")
+    console.print()
+    console.print("[dim]Tip: Set GITHUB_WEBHOOK_SECRET env var if using a single secret for all webhooks.[/dim]")
+
+
+@webhook_app.command("remove")
+def webhook_remove(
+    webhook_id: Annotated[str, typer.Argument(help="Webhook ID (use 'gluon webhook list' to see IDs)")],
+    force: Annotated[bool, typer.Option("--force", "-f", help="Skip confirmation")] = False,
+):
+    """Remove a webhook configuration."""
+    store = GluonStore()
+
+    # Find webhook by ID prefix
+    config = store.get_webhook_config(webhook_id)
+    if not config:
+        # Try partial ID match
+        configs = store.list_webhook_configs(enabled_only=False)
+        for c in configs:
+            if c.id.startswith(webhook_id):
+                config = c
+                break
+
+    if not config:
+        console.print(f"[red]Error:[/red] Webhook not found: {webhook_id}")
+        raise typer.Exit(1)
+
+    if not force:
+        confirm = typer.confirm(f"Remove webhook {config.id[:8]} ({config.handler})?")
+        if not confirm:
+            console.print("Cancelled.")
+            raise typer.Exit(0)
+
+    if store.delete_webhook_config(config.id):
+        console.print(f"[green]✓[/green] Webhook {config.id[:8]} removed")
+    else:
+        console.print("[red]Error:[/red] Failed to remove webhook")
+        raise typer.Exit(1)
+
+
+@webhook_app.command("enable")
+def webhook_enable(
+    webhook_id: Annotated[str, typer.Argument(help="Webhook ID")],
+):
+    """Enable a webhook."""
+    store = GluonStore()
+
+    config = store.get_webhook_config(webhook_id)
+    if not config:
+        # Try partial ID match
+        configs = store.list_webhook_configs(enabled_only=False)
+        for c in configs:
+            if c.id.startswith(webhook_id):
+                config = c
+                break
+
+    if not config:
+        console.print(f"[red]Error:[/red] Webhook not found: {webhook_id}")
+        raise typer.Exit(1)
+
+    config.enabled = True
+    store.update_webhook_config(config)
+    console.print(f"[green]✓[/green] Webhook {config.id[:8]} enabled")
+
+
+@webhook_app.command("disable")
+def webhook_disable(
+    webhook_id: Annotated[str, typer.Argument(help="Webhook ID")],
+):
+    """Disable a webhook."""
+    store = GluonStore()
+
+    config = store.get_webhook_config(webhook_id)
+    if not config:
+        # Try partial ID match
+        configs = store.list_webhook_configs(enabled_only=False)
+        for c in configs:
+            if c.id.startswith(webhook_id):
+                config = c
+                break
+
+    if not config:
+        console.print(f"[red]Error:[/red] Webhook not found: {webhook_id}")
+        raise typer.Exit(1)
+
+    config.enabled = False
+    store.update_webhook_config(config)
+    console.print(f"[yellow]✓[/yellow] Webhook {config.id[:8]} disabled")
+
+
+# ========== Execution Commands ==========
+
+
+@app.command("run")
+def run(
+    project: Annotated[str, typer.Argument(help="Project name or ID")],
+    prompt: Annotated[str, typer.Argument(help="Prompt for Claude")],
+    new_session: Annotated[bool, typer.Option("--new", "-n", help="Force new session")] = False,
+    quiet: Annotated[bool, typer.Option("--quiet", "-q", help="Only show final result")] = False,
+    model: Annotated[str | None, typer.Option("--model", "-m", help="Model: opus-4.6/opus-4.5/sonnet/haiku")] = None,
+    background: Annotated[bool, typer.Option("--background", "-b", help="Run in background")] = False,
+    worktree: Annotated[bool, typer.Option("--worktree", "-w", help="Execute in isolated Git worktree")] = False,
+    ralph: Annotated[bool, typer.Option("--ralph", "-r", help="Enable ralph loop mode")] = False,
+    max_loops: Annotated[int, typer.Option("--max-loops", help="Max loop iterations (ralph mode)")] = 50,
+    max_calls: Annotated[int, typer.Option("--max-calls", help="Max API calls per hour (ralph mode)")] = 100,
+    max_cost: Annotated[float | None, typer.Option("--max-cost", help="Max cost in USD (ralph mode)")] = None,
+    profile: Annotated[
+        str | None,
+        typer.Option("--profile", "-P", help="Task profile: quick/standard/deep/planning"),
+    ] = None,
+    thinking: Annotated[
+        str | None,
+        typer.Option("--thinking", help="Thinking budget: none/low/medium/high/ultrathink/adaptive"),
+    ] = None,
+    effort: Annotated[
+        str | None,
+        typer.Option("--effort", help="Reasoning effort: low/medium/high/max"),
+    ] = None,
+    planning: Annotated[bool, typer.Option("--planning", help="Force planning mode")] = False,
+    no_hydrate: Annotated[bool, typer.Option("--no-hydrate", help="Disable pre-hydration of project context")] = False,
+    no_validate: Annotated[
+        bool, typer.Option("--no-validate", help="Disable lint+test validation after completion")
+    ] = False,
+):
+    """Execute a task on a project.
+
+    Use --profile to select a task profile (quick/standard/deep/planning).
+    Use --ralph for autonomous loop mode that iterates until completion.
+
+    Profiles bundle model + thinking budget + cost limits:
+      quick    - Haiku, no thinking, $0.50 budget
+      standard - Sonnet, 10k thinking, $3 budget (default)
+      deep     - Opus, 32k thinking, $15 budget
+      planning - Opus, plan before executing
+    """
+    orchestrator = get_orchestrator()
+
+    try:
+        proj = orchestrator.get_project(project)
+    except ProjectNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    # Validate model if provided
+    model_tier: ModelTier | None = None
+    if model:
+        model_lower = model.lower()
+        if model_lower in MODEL_ALIASES:
+            model_tier = MODEL_ALIASES[model_lower]
+        else:
+            try:
+                model_tier = ModelTier(model_lower)
+            except ValueError:
+                console.print(f"[red]Error:[/red] Invalid model: {model}")
+                console.print(describe_models())
+                raise typer.Exit(1)
+
+    # Background execution mode
+    if background:
+        runner = TaskRunner()
+
+        async def _submit():
+            run_obj = await runner.submit(
+                proj.id,
+                prompt,
+                wait=False,
+                use_worktree=worktree,
+                model=model_tier.value if model_tier else None,
+                ralph_enabled=ralph,
+                max_loops=max_loops,
+                max_calls_per_hour=max_calls,
+                max_cost_usd=max_cost,
+                profile=profile,
+                thinking_budget=thinking,
+                force_planning=planning if planning else None,
+                effort=effort,
+                enable_prehydration=not no_hydrate,
+                blueprint_enabled=not no_validate,
+            )
+            console.print(f"[green]✓[/green] Task submitted: [cyan]{run_obj.id[:8]}[/cyan]")
+            console.print(f"  Project: {project}")
+            console.print(f"  Prompt: {prompt[:60]}{'...' if len(prompt) > 60 else ''}")
+            if profile:
+                console.print(f"  [blue]Profile:[/blue] {profile}")
+            if ralph:
+                console.print(f"  [blue]Ralph mode:[/blue] max {max_loops} loops, {max_calls} calls/hr")
+                if max_cost:
+                    console.print(f"  Cost cap: ${max_cost:.2f}")
+            if no_hydrate:
+                console.print("  [blue]Pre-hydration:[/blue] disabled")
+            if no_validate:
+                console.print("  [blue]Blueprint validation:[/blue] disabled")
+            console.print()
+            console.print("[dim]Use 'gluon runs' to check status[/dim]")
+            console.print(f"[dim]Use 'gluon logs {run_obj.id[:8]}' to view logs[/dim]")
+            if ralph:
+                console.print(f"[dim]Use 'gluon ralph status {run_obj.id[:8]}' for loop details[/dim]")
+
+        anyio.run(_submit)
+        return
+
+    # Foreground execution (existing behavior)
+    async def _run():
+        result: AgentResult | None = None
+
+        console.print(f"[bold]Running on project:[/bold] {project}")
+        console.print(f"[bold]Prompt:[/bold] {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+        if profile:
+            console.print(f"[bold]Profile:[/bold] {profile}")
+        if model_tier:
+            console.print(f"[bold]Model:[/bold] {model_tier.value}")
+        if thinking:
+            console.print(f"[bold]Thinking:[/bold] {thinking}")
+        if effort:
+            console.print(f"[bold]Effort:[/bold] {effort}")
+        if planning:
+            console.print("[bold]Planning:[/bold] enabled (plan before executing)")
+        if worktree:
+            console.print("[bold]Worktree:[/bold] enabled (isolated execution)")
+        console.print()
+
+        async for item in orchestrator.execute(
+            project,
+            prompt,
+            force_new_session=new_session,
+            model=model_tier,
+            use_worktree=worktree,
+            initiator="cli:foreground",
+            profile=profile,
+            thinking_budget=thinking,
+            force_planning=planning if planning else None,
+            effort=effort,
+        ):
+            if isinstance(item, AgentMessage):
+                if not quiet:
+                    _print_message(item)
+            elif isinstance(item, AgentResult):
+                result = item
+
+        if result:
+            console.print()
+            _print_result(result)
+
+    anyio.run(_run)
+
+
+@app.command("resume")
+def resume(
+    project: Annotated[str, typer.Argument(help="Project name or ID")],
+    prompt: Annotated[str | None, typer.Argument(help="Optional follow-up prompt")] = None,
+    quiet: Annotated[bool, typer.Option("--quiet", "-q", help="Only show final result")] = False,
+    model: Annotated[str | None, typer.Option("--model", "-m", help="Model: opus-4.6/opus-4.5/sonnet/haiku")] = None,
+):
+    """Resume the last session for a project."""
+    orchestrator = get_orchestrator()
+
+    try:
+        orchestrator.get_project(project)
+    except ProjectNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    # Validate model if provided
+    model_tier: ModelTier | None = None
+    if model:
+        model_lower = model.lower()
+        if model_lower in MODEL_ALIASES:
+            model_tier = MODEL_ALIASES[model_lower]
+        else:
+            try:
+                model_tier = ModelTier(model_lower)
+            except ValueError:
+                console.print(f"[red]Error:[/red] Invalid model: {model}")
+                console.print(describe_models())
+                raise typer.Exit(1)
+
+    async def _resume():
+        result: AgentResult | None = None
+
+        console.print(f"[bold]Resuming session for:[/bold] {project}")
+        if prompt:
+            console.print(f"[bold]Prompt:[/bold] {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+        if model_tier:
+            console.print(f"[bold]Model:[/bold] {model_tier.value}")
+        console.print()
+
+        try:
+            async for item in orchestrator.resume(project, prompt, model=model_tier):
+                if isinstance(item, AgentMessage):
+                    if not quiet:
+                        _print_message(item)
+                elif isinstance(item, AgentResult):
+                    result = item
+
+            if result:
+                console.print()
+                _print_result(result)
+
+        except ValueError as e:
+            console.print(f"[red]Error:[/red] {e}")
+            console.print("[dim]Tip: Use 'gluon run' to start a new session.[/dim]")
+            raise typer.Exit(1)
+
+    anyio.run(_resume)
+
+
+@app.command("recover")
+def recover(
+    run_id: Annotated[str, typer.Argument(help="Run ID to recover (full or short ID)")],
+    fresh: Annotated[bool, typer.Option("--fresh", help="Start completely fresh session")] = False,
+    wait: Annotated[bool, typer.Option("--wait", "-w", help="Wait for completion")] = True,
+):
+    """
+    Recover a run that failed due to context overflow.
+
+    Extracts progress from the failed run's logs and starts a fresh session
+    with a summary of completed work.
+
+    Example:
+        gluon recover 424b9a8e
+        gluon recover abc12345 --fresh
+    """
+    orchestrator = get_orchestrator()
+    runner = TaskRunner(store=orchestrator.store)
+
+    # Find the run
+    run = orchestrator.store.get_run_by_short_id(run_id)
+    if not run:
+        run = orchestrator.store.get_run(run_id)
+
+    if not run:
+        console.print(f"[red]Error:[/red] Run not found: {run_id}")
+        raise typer.Exit(1)
+
+    # Check if it looks like a context overflow failure
+    error_msg = (run.error_message or "").lower()
+    is_context_overflow = "context" in error_msg or "too long" in error_msg or "overflow" in error_msg
+
+    if not is_context_overflow and run.status != RunStatus.FAILED:
+        console.print(f"[yellow]Warning:[/yellow] Run {run.id[:8]} doesn't appear to have failed from context overflow")
+        console.print(f"[dim]Status: {run.status.value}, Error: {run.error_message or 'None'}[/dim]")
+
+    # Get project
+    project = orchestrator.store.get_project(run.project_id)
+    if not project:
+        console.print(f"[red]Error:[/red] Project not found for run: {run.project_id}")
+        raise typer.Exit(1)
+
+    console.print(f"[bold]Recovering run:[/bold] {run.id[:8]}")
+    console.print(f"[bold]Project:[/bold] {project.name}")
+    console.print(f"[bold]Original prompt:[/bold] {run.prompt[:80]}{'...' if len(run.prompt) > 80 else ''}")
+
+    if run.cost_usd:
+        console.print(f"[dim]Previous cost: ${run.cost_usd:.4f}[/dim]")
+
+    # Extract recovery state
+    recovery_state = runner._extract_recovery_state(run)
+    completed = recovery_state.get("completed_work", [])
+    console.print(f"[dim]Completed tasks found: {len(completed)}[/dim]")
+    if completed:
+        for task in completed[:5]:  # Show first 5
+            console.print(f"  [green]✓[/green] {task[:60]}{'...' if len(task) > 60 else ''}")
+        if len(completed) > 5:
+            console.print(f"  [dim]... and {len(completed) - 5} more[/dim]")
+
+    console.print()
+
+    async def _recover():
+        from gluon.models import utc_now
+
+        # Determine working directory
+        if run.worktree_path and Path(run.worktree_path).exists():
+            working_dir = Path(run.worktree_path)
+            console.print(f"[dim]Using worktree: {working_dir}[/dim]")
+        else:
+            working_dir = project.expanded_path
+
+        # Create recovery run or update existing
+        if fresh:
+            # Create new run linked to the failed one
+            new_run = orchestrator.store.create_run(
+                project_id=run.project_id,
+                prompt=f"[Recovery from {run.id[:8]}] {run.prompt}",
+                initiator="cli:recover",
+                use_worktree=run.use_worktree,
+                model=run.model,
+            )
+            new_run.recovery_from_run_id = run.id
+            new_run.recovery_count = 1
+            new_run.last_recovery_at = utc_now()
+            orchestrator.store.update_run(new_run)
+            console.print(f"[bold]New recovery run:[/bold] {new_run.id[:8]}")
+        else:
+            # Update existing run for in-place recovery
+            run.recovery_count += 1
+            run.last_recovery_at = utc_now()
+            run.status = RunStatus.RUNNING
+            orchestrator.store.update_run(run)
+
+        # Execute recovery
+        agent = GluonAgent(model=run.model) if run.model else GluonAgent()
+
+        console.print("[bold]Starting recovery...[/bold]\n")
+
+        result: AgentResult | None = None
+        async for item in agent.resume_with_fresh_context(
+            recovery_state=recovery_state,
+            working_dir=working_dir,
+        ):
+            if isinstance(item, AgentMessage):
+                _print_message(item)
+            elif isinstance(item, AgentResult):
+                result = item
+
+        if result:
+            console.print()
+            _print_result(result)
+
+            # Update run with result
+            target_run = orchestrator.store.get_run(new_run.id if fresh else run.id)
+            if target_run:
+                if result.claude_session_id:
+                    target_run.claude_session_id = result.claude_session_id
+                target_run.cost_usd = (target_run.cost_usd or 0) + (result.total_cost_usd or 0)
+                target_run.input_tokens = (target_run.input_tokens or 0) + (result.input_tokens or 0)
+                target_run.output_tokens = (target_run.output_tokens or 0) + (result.output_tokens or 0)
+                target_run.model_used = result.model_used
+
+                if result.success:
+                    target_run.status = RunStatus.REVIEW
+                else:
+                    target_run.mark_failed(result.error or "Recovery failed")
+
+                orchestrator.store.update_run(target_run)
+
+    anyio.run(_recover)
+
+
+# ========== Session Commands ==========
+
+
+@app.command("sessions")
+def sessions(
+    project: Annotated[str | None, typer.Argument(help="Project name (optional)")] = None,
+):
+    """List sessions for a project or all sessions."""
+    orchestrator = get_orchestrator()
+
+    try:
+        session_list = orchestrator.list_sessions(project)
+    except ProjectNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    if not session_list:
+        console.print("[dim]No sessions found.[/dim]")
+        return
+
+    # Build project lookup for showing project names when listing all sessions
+    project_lookup: dict[str, str] = {}
+    if not project:
+        for p in orchestrator.list_projects():
+            project_lookup[p.id] = p.name
+
+    table = Table(title=f"Sessions{f' for {project}' if project else ''}")
+    if not project:
+        table.add_column("Project", style="cyan")
+    table.add_column("ID", style="dim")
+    table.add_column("Status")
+    table.add_column("Turns", justify="right")
+    table.add_column("Cost", justify="right")
+    table.add_column("Last Prompt")
+    table.add_column("Updated")
+
+    for session in session_list:
+        status_color = {
+            "active": "green",
+            "paused": "yellow",
+            "completed": "blue",
+            "failed": "red",
+        }.get(session.status.value, "white")
+
+        row = []
+        if not project:
+            row.append(project_lookup.get(session.project_id, session.project_id[:8]))
+        row.extend(
+            [
+                session.id[:8],
+                f"[{status_color}]{session.status.value}[/{status_color}]",
+                str(session.total_turns),
+                f"${session.total_cost_usd:.4f}",
+                (session.last_prompt or "")[:40]
+                + ("..." if session.last_prompt and len(session.last_prompt) > 40 else ""),
+                session.updated_at.strftime("%Y-%m-%d %H:%M"),
+            ]
+        )
+
+        table.add_row(*row)
+
+    console.print(table)
+
+
+@app.command("session")
+def session_show(
+    session_id: Annotated[str, typer.Argument(help="Session ID (can use short prefix)")],
+):
+    """Show detail for a session including linked runs."""
+    store = GluonStore()
+
+    session = store.get_session_by_short_id(session_id) or store.get_session(session_id)
+    if not session:
+        console.print(f"[red]Error:[/red] Session not found: {session_id}")
+        raise typer.Exit(1)
+
+    project = store.get_project(session.project_id)
+    proj_name = project.name if project else session.project_id[:8]
+
+    status_color = {
+        "active": "green",
+        "paused": "yellow",
+        "completed": "blue",
+        "failed": "red",
+    }.get(session.status.value, "white")
+
+    console.print(
+        Panel.fit(
+            f"[bold]ID:[/bold] {session.id}\n"
+            f"[bold]Project:[/bold] {proj_name}\n"
+            f"[bold]Status:[/bold] [{status_color}]{session.status.value}[/{status_color}]\n"
+            f"[bold]Turns:[/bold] {session.total_turns}\n"
+            f"[bold]Cost:[/bold] ${session.total_cost_usd:.4f}\n"
+            f"[bold]Last Prompt:[/bold] {(session.last_prompt or '')[:80]}\n"
+            f"[bold]Created:[/bold] {session.created_at.strftime('%Y-%m-%d %H:%M')}\n"
+            f"[bold]Updated:[/bold] {session.updated_at.strftime('%Y-%m-%d %H:%M')}"
+            + (f"\n[bold]Claude Session:[/bold] {session.claude_session_id}" if session.claude_session_id else ""),
+            title="Session Detail",
+        )
+    )
+
+    # Show linked runs
+    if session.claude_session_id:
+        linked_runs = store.list_runs_by_claude_session(session.claude_session_id)
+        if linked_runs:
+            table = Table(title="Linked Runs")
+            table.add_column("ID", style="cyan")
+            table.add_column("Status")
+            table.add_column("Prompt")
+            table.add_column("Created", style="dim")
+
+            for run in linked_runs:
+                from gluon.runner import format_run_status
+
+                emoji, color = format_run_status(run.status, None)
+                table.add_row(
+                    run.id[:8],
+                    f"[{color}]{emoji} {run.status.value}[/{color}]",
+                    (run.prompt[:40] + "...") if len(run.prompt) > 40 else run.prompt,
+                    run.created_at.strftime("%Y-%m-%d %H:%M"),
+                )
+
+            console.print(table)
+
+
+@app.command("status")
+def status():
+    """Show overall status."""
+    orchestrator = get_orchestrator()
+    status_info = orchestrator.status()
+
+    console.print(
+        Panel.fit(
+            f"[bold]Projects:[/bold] {status_info['total_projects']}\n"
+            f"[bold]Active Sessions:[/bold] {status_info['active_sessions']}",
+            title="Gluon Status",
+        )
+    )
+
+    if status_info["projects"]:
+        table = Table()
+        table.add_column("Project")
+        table.add_column("Sessions", justify="right")
+
+        for p in status_info["projects"]:
+            table.add_row(p["name"], str(p["sessions"]))
+
+        console.print(table)
+
+
+# ========== Bot Commands ==========
+
+
+@app.command("bot")
+def bot(
+    token: Annotated[str | None, typer.Option("--token", "-t", help="Telegram bot token")] = None,
+    users: Annotated[str | None, typer.Option("--users", "-u", help="Comma-separated allowed user IDs")] = None,
+):
+    """
+    Run Telegram bot interface.
+
+    Set GLUON_TELEGRAM_TOKEN env var or use --token.
+    Set GLUON_TELEGRAM_USERS env var or use --users to restrict access.
+
+    To get a bot token:
+    1. Message @BotFather on Telegram
+    2. Send /newbot and follow instructions
+    3. Copy the token
+
+    To get your user ID:
+    1. Message @userinfobot on Telegram
+    2. It will reply with your user ID
+    """
+    import asyncio
+    from pathlib import Path
+
+    from dotenv import load_dotenv
+
+    from gluon.bot_core import GluonBotCore
+
+    # Load .env.local for AWS Bedrock configuration
+    env_path = Path(__file__).parent.parent / ".env.local"
+    if env_path.exists():
+        load_dotenv(env_path)
+
+    # Get token
+    bot_token = token or os.environ.get("GLUON_TELEGRAM_TOKEN")
+    if not bot_token:
+        console.print("[red]Error:[/red] Telegram bot token required.")
+        console.print("Set GLUON_TELEGRAM_TOKEN environment variable or use --token.")
+        raise typer.Exit(1)
+
+    # Get allowed users from env if not provided
+    allowed_users: list[int] | None = None
+    if users:
+        allowed_users = [int(u.strip()) for u in users.split(",") if u.strip()]
+    else:
+        users_env = os.environ.get("GLUON_TELEGRAM_USERS", "")
+        if users_env:
+            allowed_users = [int(u.strip()) for u in users_env.split(",") if u.strip()]
+
+    try:
+        console.print("[bold]Starting Gluon Telegram Bot (TelegramTransport)...[/bold]")
+        console.print("[dim]Press Ctrl+C to stop[/dim]")
+
+        bot_core = GluonBotCore()
+
+        async def _run_telegram():
+            from gluon.transport.telegram import TelegramTransport
+
+            transport = TelegramTransport(bot_token, bot_core, allowed_users)
+            bot_core.notifier.transports[transport.name] = transport
+            await transport.start()
+            try:
+                while True:
+                    await asyncio.sleep(1)
+            except asyncio.CancelledError:
+                pass
+
+        asyncio.run(_run_telegram())
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Bot stopped.[/yellow]")
+
+
+@app.command("discord")
+def discord_bot(
+    token: Annotated[str | None, typer.Option("--token", "-t", help="Discord bot token")] = None,
+    guild: Annotated[int | None, typer.Option("--guild", "-g", help="Discord guild (server) ID")] = None,
+    users: Annotated[str | None, typer.Option("--users", "-u", help="Comma-separated allowed user IDs")] = None,
+):
+    """
+    Run Discord bot interface.
+
+    Set GLUON_DISCORD_TOKEN env var or use --token.
+    Set GLUON_DISCORD_GUILD env var or use --guild.
+    Set GLUON_DISCORD_USERS env var or use --users to restrict access.
+
+    To create a Discord bot:
+    1. Go to https://discord.com/developers/applications
+    2. Create New Application and add a Bot
+    3. Copy the bot token
+    4. Enable MESSAGE CONTENT INTENT in Bot settings
+    5. Invite to your server with bot + applications.commands scopes
+
+    To get your user ID:
+    1. Enable Developer Mode in Discord settings
+    2. Right-click your name and Copy ID
+    """
+    import os
+
+    try:
+        from gluon.transport.discord import DiscordTransport
+
+        _ = DiscordTransport  # Verify import succeeded
+    except ImportError:
+        console.print("[red]Error:[/red] Discord support not installed.")
+        console.print("Install with: [cyan]pip install 'gluon-agent[discord]'[/cyan]")
+        raise typer.Exit(1)
+
+    from gluon.bot_core import GluonBotCore
+
+    # Get token
+    bot_token = token or os.environ.get("GLUON_DISCORD_TOKEN")
+    if not bot_token:
+        console.print("[red]Error:[/red] Discord bot token required.")
+        console.print("Set GLUON_DISCORD_TOKEN env var or use --token.")
+        raise typer.Exit(1)
+
+    # Get guild ID
+    guild_id = guild or int(os.environ.get("GLUON_DISCORD_GUILD", "0"))
+    if not guild_id:
+        console.print("[red]Error:[/red] Discord guild ID required.")
+        console.print("Set GLUON_DISCORD_GUILD env var or use --guild.")
+        raise typer.Exit(1)
+
+    # Get allowed users
+    allowed_users: list[int] | None = None
+    users_str = users or os.environ.get("GLUON_DISCORD_USERS", "")
+    if users_str:
+        allowed_users = [int(u.strip()) for u in users_str.split(",") if u.strip()]
+
+    try:
+        console.print("[bold]Starting Gluon Discord Bot...[/bold]")
+        console.print(f"[dim]Guild ID: {guild_id}[/dim]")
+        console.print("[dim]Press Ctrl+C to stop[/dim]")
+
+        bot_core = GluonBotCore()
+
+        async def _run_discord():
+            from gluon.transport.discord import DiscordTransport
+
+            transport = DiscordTransport(bot_token, guild_id, bot_core, allowed_users)
+            bot_core.notifier.transports[transport.name] = transport
+            await transport.start()
+
+        anyio.run(_run_discord)
+    except ValueError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Discord bot stopped.[/yellow]")
+
+
+@app.command("serve")
+def serve(
+    telegram: Annotated[bool, typer.Option("--telegram", help="Enable Telegram transport")] = False,
+    discord: Annotated[bool, typer.Option("--discord", help="Enable Discord transport")] = False,
+    web: Annotated[bool, typer.Option("--web", help="Enable web dashboard")] = False,
+    web_port: Annotated[int, typer.Option("--web-port", help="Web dashboard port")] = 45866,
+):
+    """
+    Run multiple bot transports concurrently.
+
+    Example: gluon serve --telegram --discord --web
+
+    Configure each transport with environment variables:
+    - Telegram: GLUON_TELEGRAM_TOKEN, GLUON_TELEGRAM_USERS
+    - Discord: GLUON_DISCORD_TOKEN, GLUON_DISCORD_GUILD, GLUON_DISCORD_USERS
+    - Web: GLUON_SSL_CERTFILE, GLUON_SSL_KEYFILE (optional, for HTTPS)
+    """
+    import os
+
+    if not telegram and not discord and not web:
+        console.print("[red]Error:[/red] At least one transport must be enabled.")
+        console.print("Use --telegram, --discord, and/or --web flags.")
+        raise typer.Exit(1)
+
+    from gluon.bot_core import GluonBotCore
+
+    # Create shared bot core
+    bot_core = GluonBotCore()
+    transports_to_run: list[tuple[str, Any]] = []
+
+    # Configure Telegram
+    if telegram:
+        telegram_token = os.environ.get("GLUON_TELEGRAM_TOKEN")
+        if not telegram_token:
+            console.print("[yellow]⚠[/yellow] Telegram skipped: GLUON_TELEGRAM_TOKEN not set")
+        else:
+            telegram_users_str = os.environ.get("GLUON_TELEGRAM_USERS", "")
+            telegram_users = (
+                [int(u.strip()) for u in telegram_users_str.split(",") if u.strip()] if telegram_users_str else None
+            )
+
+            from gluon.transport.telegram import TelegramTransport
+
+            tg_transport = TelegramTransport(telegram_token, bot_core, telegram_users)
+            transports_to_run.append(("Telegram", tg_transport))
+            console.print("[green]✓[/green] Telegram transport configured")
+
+    # Configure Discord
+    if discord:
+        try:
+            from gluon.transport.discord import DiscordTransport
+
+            _ = DiscordTransport  # Verify import succeeded
+        except ImportError:
+            console.print("[yellow]⚠[/yellow] Discord skipped: discord.py not installed")
+        else:
+            discord_token = os.environ.get("GLUON_DISCORD_TOKEN")
+            discord_guild_str = os.environ.get("GLUON_DISCORD_GUILD", "0")
+            discord_guild = int(discord_guild_str) if discord_guild_str.isdigit() else 0
+
+            if not discord_token:
+                console.print("[yellow]⚠[/yellow] Discord skipped: GLUON_DISCORD_TOKEN not set")
+            elif not discord_guild:
+                console.print("[yellow]⚠[/yellow] Discord skipped: GLUON_DISCORD_GUILD not set")
+            else:
+                discord_users_str = os.environ.get("GLUON_DISCORD_USERS", "")
+                discord_users = (
+                    [int(u.strip()) for u in discord_users_str.split(",") if u.strip()] if discord_users_str else None
+                )
+
+                from gluon.transport.discord import DiscordTransport
+
+                dc_transport = DiscordTransport(discord_token, discord_guild, bot_core, discord_users)
+                transports_to_run.append(("Discord", dc_transport))
+                console.print("[green]✓[/green] Discord transport configured")
+
+    # Configure Web dashboard
+    web_server = None
+    if web:
+        try:
+            import uvicorn
+
+            from gluon.web import create_app
+
+            web_app = create_app()
+
+            # Optional HTTPS via SSL certificates
+            ssl_certfile = os.environ.get("GLUON_SSL_CERTFILE")
+            ssl_keyfile = os.environ.get("GLUON_SSL_KEYFILE")
+
+            ssl_enabled = False
+            if ssl_certfile and ssl_keyfile:
+                cert_path = Path(ssl_certfile)
+                key_path = Path(ssl_keyfile)
+                if not cert_path.exists():
+                    console.print(f"[red]Error:[/red] SSL certificate not found: {ssl_certfile}")
+                    raise typer.Exit(1)
+                if not key_path.exists():
+                    console.print(f"[red]Error:[/red] SSL key not found: {ssl_keyfile}")
+                    raise typer.Exit(1)
+                ssl_enabled = True
+            elif ssl_certfile or ssl_keyfile:
+                console.print(
+                    "[yellow]⚠[/yellow] HTTPS skipped: both GLUON_SSL_CERTFILE and GLUON_SSL_KEYFILE must be set"
+                )
+
+            config_kwargs: dict[str, Any] = {
+                "host": "0.0.0.0",
+                "port": web_port,
+                "log_level": "warning",
+            }
+            if ssl_enabled:
+                config_kwargs["ssl_certfile"] = ssl_certfile
+                config_kwargs["ssl_keyfile"] = ssl_keyfile
+
+            web_server = uvicorn.Server(uvicorn.Config(web_app, **config_kwargs))
+            protocol = "HTTPS" if ssl_enabled else "HTTP"
+            console.print(f"[green]✓[/green] Web dashboard configured ({protocol}, port {web_port})")
+        except ImportError:
+            console.print("[red]Error:[/red] Web dashboard dependencies not installed.")
+            console.print("Install with: [cyan]pip install 'gluon-agent[web]'[/cyan]")
+            raise typer.Exit(1)
+
+    # Verify at least one service is configured
+    if not transports_to_run and not web_server:
+        console.print("[red]Error:[/red] No services configured.")
+        console.print("Check that required environment variables are set for your transports.")
+        raise typer.Exit(1)
+
+    # Register transports with notifier so run notifications can reach channels
+    for _, transport in transports_to_run:
+        bot_core.notifier.transports[transport.name] = transport
+
+    async def _run_all():
+        """Run all configured transports concurrently."""
+        import asyncio
+
+        service_count = len(transports_to_run) + (1 if web_server else 0)
+        console.print(f"\n[bold]Starting {service_count} service(s)...[/bold]")
+        console.print("[dim]Press Ctrl+C to stop[/dim]\n")
+
+        # Start git background sync once (shared across transports)
+        await bot_core.git_manager.start_background_sync()
+
+        try:
+            # Run all transports and web server concurrently
+            tasks = [transport.start() for _, transport in transports_to_run]
+            if web_server:
+                tasks.append(web_server.serve())
+            await asyncio.gather(*tasks)
+        except asyncio.CancelledError:
+            pass
+        finally:
+            # Stop git sync
+            await bot_core.git_manager.stop_background_sync()
+            # Stop web server
+            if web_server:
+                web_server.should_exit = True
+                console.print("[dim]Web dashboard stopped[/dim]")
+            # Stop all transports
+            for name, transport in transports_to_run:
+                try:
+                    await transport.stop()
+                    console.print(f"[dim]{name} stopped[/dim]")
+                except Exception as e:
+                    console.print(f"[yellow]Warning: {name} stop failed: {e}[/yellow]")
+
+    try:
+        anyio.run(_run_all)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]All transports stopped.[/yellow]")
+
+
+# ========== Background Run Commands ==========
+
+
+@app.command("runs")
+def runs(
+    project: Annotated[str | None, typer.Option("--project", "-p", help="Filter by project")] = None,
+    active: Annotated[bool, typer.Option("--active", "-a", help="Show only active runs")] = False,
+    limit: Annotated[int, typer.Option("--limit", "-l", help="Max number of runs")] = 20,
+):
+    """List background execution runs."""
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+
+    # Refresh status of active runs
+    runner.refresh_all_runs()
+
+    # Get project ID if name provided
+    project_id = None
+    if project:
+        orchestrator = get_orchestrator()
+        try:
+            proj = orchestrator.get_project(project)
+            project_id = proj.id
+        except ProjectNotFoundError as e:
+            console.print(f"[red]Error:[/red] {e}")
+            raise typer.Exit(1)
+
+    # Get runs
+    statuses = [RunStatus.PENDING, RunStatus.RUNNING] if active else None
+    runs_list = store.list_runs(project_id=project_id, statuses=statuses, limit=limit)
+
+    if not runs_list:
+        console.print("[dim]No runs found.[/dim]")
+        console.print("Use 'gluon run <project> <prompt> --background' to start a background task.")
+        return
+
+    # Build project lookup
+    projects = store.list_projects()
+    project_lookup = {p.id: p.name for p in projects}
+
+    table = Table(title="Execution Runs")
+    table.add_column("ID", style="cyan")
+    table.add_column("Status")
+    table.add_column("Health")
+    table.add_column("Project")
+    table.add_column("Prompt")
+    table.add_column("Duration")
+    table.add_column("Stop Reason", style="dim")
+    table.add_column("Created", style="dim")
+
+    log_path = runner.config.log_path
+    for run in runs_list:
+        # Assess health for running tasks
+        health: RunHealth | None = None
+        if run.status == RunStatus.RUNNING:
+            health = assess_run_health(run, log_path)
+
+        emoji, color = format_run_status(run.status, health)
+        duration = format_duration(run.duration_seconds)
+        proj_name = project_lookup.get(run.project_id, run.project_id[:8])
+
+        health_str = ""
+        if health and health != RunHealth.UNKNOWN:
+            health_color = {"healthy": "green", "slow": "yellow", "stalled": "red"}.get(health.value, "dim")
+            health_str = f"[{health_color}]{health.value}[/{health_color}]"
+
+        stop_reason = run.metadata.get("stop_reason", "") if run.metadata else ""
+        stop_reason_str = f"[yellow]{stop_reason}[/yellow]" if stop_reason == "max_turns" else stop_reason
+
+        table.add_row(
+            run.id[:8],
+            f"[{color}]{emoji} {run.status.value}[/{color}]",
+            health_str,
+            proj_name,
+            (run.prompt[:30] + "...") if len(run.prompt) > 30 else run.prompt,
+            duration,
+            stop_reason_str,
+            run.created_at.strftime("%Y-%m-%d %H:%M"),
+        )
+
+    console.print(table)
+
+    # Show active count
+    active_runs = store.list_active_runs()
+    if active_runs:
+        console.print(f"\n[bold]{len(active_runs)}[/bold] run(s) currently active")
+
+
+@app.command("logs")
+def logs(
+    run_id: Annotated[str, typer.Argument(help="Run ID (can use short prefix)")],
+    follow: Annotated[bool, typer.Option("--follow", "-f", help="Follow logs in real-time")] = False,
+    tail: Annotated[int | None, typer.Option("--tail", "-n", help="Show last N lines")] = None,
+    stream: Annotated[str, typer.Option("--stream", "-s", help="Log stream: stdout/stderr/messages")] = "stdout",
+):
+    """View logs for a background run."""
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+
+    # Find run by short ID
+    run = store.get_run_by_short_id(run_id) or store.get_run(run_id)
+    if not run:
+        console.print(f"[red]Error:[/red] Run not found: {run_id}")
+        raise typer.Exit(1)
+
+    # Get project name
+    project = store.get_project(run.project_id)
+    proj_name = project.name if project else run.project_id[:8]
+
+    emoji, color = format_run_status(run.status)
+    console.print(f"[bold]Run:[/bold] {run.id[:8]} [{color}]{emoji} {run.status.value}[/{color}]")
+    console.print(f"[bold]Project:[/bold] {proj_name}")
+    console.print(f"[bold]Prompt:[/bold] {run.prompt[:80]}{'...' if len(run.prompt) > 80 else ''}")
+    console.print()
+
+    if follow and run.is_active:
+        # Live tail
+        console.print(f"[dim]Following {stream} logs (Ctrl+C to stop)...[/dim]\n")
+
+        async def _tail():
+            try:
+                async for line in runner.tail_logs(run.id, stream=stream):
+                    console.print(line)
+            except KeyboardInterrupt:
+                pass
+
+        anyio.run(_tail)
+    else:
+        # Static view
+        logs_data = runner.get_logs(run.id, tail=tail)
+        content = logs_data.get(stream, "")
+
+        if not content:
+            console.print(f"[dim]No {stream} logs available.[/dim]")
+        else:
+            console.print(content)
+
+        if run.error_message:
+            console.print(f"\n[red]Error:[/red] {run.error_message}")
+
+
+@app.command("cancel")
+def cancel(
+    run_id: Annotated[str, typer.Argument(help="Run ID to cancel (can use short prefix)")],
+):
+    """Cancel a running background task."""
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+
+    # Find run by short ID
+    run = store.get_run_by_short_id(run_id) or store.get_run(run_id)
+    if not run:
+        console.print(f"[red]Error:[/red] Run not found: {run_id}")
+        raise typer.Exit(1)
+
+    if not run.is_active:
+        console.print(f"[yellow]Run {run.id[:8]} is not active (status: {run.status.value})[/yellow]")
+        return
+
+    async def _cancel():
+        success = await runner.cancel(run.id)
+        if success:
+            console.print(f"[green]✓[/green] Cancelled run {run.id[:8]}")
+        else:
+            console.print(f"[red]Failed to cancel run {run.id[:8]}[/red]")
+            console.print("[dim]Process may have already completed or is not accessible.[/dim]")
+
+    anyio.run(_cancel)
+
+
+# ========== Web Dashboard Commands ==========
+
+
+@app.command("web")
+def web(
+    host: Annotated[str, typer.Option("--host", "-h", help="Host to bind to")] = "0.0.0.0",
+    port: Annotated[int, typer.Option("--port", "-p", help="Port to listen on")] = 45866,
+    reload: Annotated[bool, typer.Option("--reload", "-r", help="Enable auto-reload for development")] = False,
+    no_browser: Annotated[bool, typer.Option("--no-browser", help="Don't open browser automatically")] = False,
+):
+    """
+    Start the Gluon web dashboard.
+
+    Opens a browser to the dashboard at http://localhost:45866
+
+    Install dependencies: pip install 'gluon-agent[web]'
+    """
+    try:
+        import uvicorn
+
+        from gluon.web import create_app
+    except ImportError:
+        console.print("[red]Error:[/red] Web dashboard dependencies not installed.")
+        console.print("Install with: [cyan]pip install 'gluon-agent[web]'[/cyan]")
+        raise typer.Exit(1)
+
+    console.print("[bold]Starting Gluon Web Dashboard...[/bold]")
+    console.print(f"[dim]URL: http://{host}:{port}[/dim]")
+    console.print("[dim]Press Ctrl+C to stop[/dim]")
+
+    # Open browser unless disabled
+    if not no_browser:
+        import webbrowser
+
+        webbrowser.open(f"http://{host}:{port}")
+
+    try:
+        # Create the app
+        app_instance = create_app()
+        uvicorn.run(app_instance, host=host, port=port, reload=reload, log_level="info")
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Web dashboard stopped.[/yellow]")
+
+
+# ========== Ralph Commands ==========
+
+
+@ralph_app.command("status")
+def ralph_status(
+    run_id: Annotated[str, typer.Argument(help="Run ID (can use short prefix)")],
+):
+    """Show ralph loop status for a run."""
+    store = GluonStore()
+
+    # Find run by short ID
+    run = store.get_run_by_short_id(run_id) or store.get_run(run_id)
+    if not run:
+        console.print(f"[red]Error:[/red] Run not found: {run_id}")
+        raise typer.Exit(1)
+
+    if not run.ralph_enabled:
+        console.print(f"[yellow]Run {run.id[:8]} is not a ralph mode run[/yellow]")
+        raise typer.Exit(0)
+
+    # Get project name
+    project = store.get_project(run.project_id)
+    proj_name = project.name if project else run.project_id[:8]
+
+    emoji, color = format_run_status(run.status)
+
+    # Circuit state styling
+    circuit_colors = {
+        CircuitState.CLOSED: "green",
+        CircuitState.HALF_OPEN: "yellow",
+        CircuitState.OPEN: "red",
+    }
+    circuit_color = circuit_colors.get(run.circuit_state, "white")
+
+    console.print(f"[bold]Ralph Run:[/bold] {run.id[:8]} [{color}]{emoji} {run.status.value}[/{color}]")
+    console.print(f"[bold]Project:[/bold] {proj_name}")
+    console.print(f"[bold]Prompt:[/bold] {run.prompt[:80]}{'...' if len(run.prompt) > 80 else ''}")
+    console.print()
+
+    # Loop progress
+    console.print(f"[bold]Loop Progress:[/bold] {run.loop_count}/{run.max_loops}")
+    console.print(f"[bold]Circuit State:[/bold] [{circuit_color}]{run.circuit_state.value}[/{circuit_color}]")
+
+    # Completion tracking
+    if run.completion_reason:
+        console.print(f"[bold]Completion:[/bold] {run.completion_reason}")
+    else:
+        console.print(f"[bold]Completion Signals:[/bold] {run.completion_signals}")
+        console.print(f"[bold]Test-Only Loops:[/bold] {run.test_only_loops}")
+
+    # Circuit breaker details
+    if run.consecutive_no_progress > 0:
+        console.print(f"[bold]No Progress:[/bold] {run.consecutive_no_progress} consecutive loops")
+    if run.consecutive_same_error > 0:
+        console.print(f"[bold]Same Error:[/bold] {run.consecutive_same_error} consecutive loops")
+
+    # Rate limiting
+    console.print()
+    console.print(f"[bold]API Calls:[/bold] {run.calls_this_hour}/{run.max_calls_per_hour} this hour")
+    if run.cost_usd:
+        cost_display = f"${run.cost_usd:.4f}"
+        if run.max_cost_usd:
+            cost_display += f" / ${run.max_cost_usd:.2f} cap"
+        console.print(f"[bold]Cost:[/bold] {cost_display}")
+
+
+@ralph_app.command("iterations")
+def ralph_iterations(
+    run_id: Annotated[str, typer.Argument(help="Run ID (can use short prefix)")],
+    limit: Annotated[int, typer.Option("--limit", "-l", help="Max iterations to show")] = 20,
+):
+    """Show iteration history for a ralph run."""
+    store = GluonStore()
+
+    # Find run by short ID
+    run = store.get_run_by_short_id(run_id) or store.get_run(run_id)
+    if not run:
+        console.print(f"[red]Error:[/red] Run not found: {run_id}")
+        raise typer.Exit(1)
+
+    if not run.ralph_enabled:
+        console.print(f"[yellow]Run {run.id[:8]} is not a ralph mode run[/yellow]")
+        raise typer.Exit(0)
+
+    iterations = store.list_ralph_iterations(run.id, limit=limit)
+
+    if not iterations:
+        console.print("[dim]No iterations recorded yet.[/dim]")
+        return
+
+    table = Table(title=f"Ralph Iterations for {run.id[:8]}")
+    table.add_column("#", justify="right", style="dim")
+    table.add_column("Status")
+    table.add_column("Files", justify="right")
+    table.add_column("Confidence", justify="right")
+    table.add_column("Cost", justify="right")
+    table.add_column("Duration")
+
+    for it in iterations:
+        # Status indicator
+        if it.has_errors:
+            status = "[red]Error[/red]"
+        elif it.has_completion_signal:
+            status = "[green]Done signal[/green]"
+        elif it.is_test_only:
+            status = "[yellow]Test only[/yellow]"
+        elif it.progress_detected:
+            status = "[green]Progress[/green]"
+        else:
+            status = "[dim]No change[/dim]"
+
+        # Duration
+        duration = "-"
+        if it.started_at and it.ended_at:
+            secs = (it.ended_at - it.started_at).total_seconds()
+            duration = f"{secs:.1f}s"
+
+        table.add_row(
+            str(it.loop_number),
+            status,
+            str(it.files_changed),
+            f"{it.confidence_score:.0f}%",
+            f"${it.cost_usd:.4f}",
+            duration,
+        )
+
+    console.print(table)
+
+    # Summary
+    total_cost = sum(it.cost_usd for it in iterations)
+    console.print(f"\n[bold]Total iterations:[/bold] {len(iterations)}")
+    console.print(f"[bold]Total cost:[/bold] ${total_cost:.4f}")
+
+
+@ralph_app.command("runs")
+def ralph_runs(
+    project: Annotated[str | None, typer.Option("--project", "-p", help="Filter by project")] = None,
+    active: Annotated[bool, typer.Option("--active", "-a", help="Show only active runs")] = False,
+    limit: Annotated[int, typer.Option("--limit", "-l", help="Max runs to show")] = 20,
+):
+    """List ralph-enabled runs."""
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+
+    # Refresh status of active runs
+    runner.refresh_all_runs()
+
+    # Get project ID if name provided
+    project_id = None
+    if project:
+        orchestrator = get_orchestrator()
+        try:
+            proj = orchestrator.get_project(project)
+            project_id = proj.id
+        except ProjectNotFoundError as e:
+            console.print(f"[red]Error:[/red] {e}")
+            raise typer.Exit(1)
+
+    # Get runs - filter for ralph_enabled
+    statuses = [RunStatus.PENDING, RunStatus.RUNNING] if active else None
+    all_runs = store.list_runs(project_id=project_id, statuses=statuses, limit=limit * 2)
+
+    # Filter to ralph runs only
+    ralph_runs = [r for r in all_runs if r.ralph_enabled][:limit]
+
+    if not ralph_runs:
+        console.print("[dim]No ralph runs found.[/dim]")
+        console.print("Use 'gluon run <project> <prompt> --ralph --background' to start a ralph task.")
+        return
+
+    # Build project lookup
+    projects = store.list_projects()
+    project_lookup = {p.id: p.name for p in projects}
+
+    table = Table(title="Ralph Runs")
+    table.add_column("ID", style="cyan")
+    table.add_column("Status")
+    table.add_column("Project")
+    table.add_column("Loops")
+    table.add_column("Circuit")
+    table.add_column("Cost", justify="right")
+
+    circuit_colors = {
+        CircuitState.CLOSED: "green",
+        CircuitState.HALF_OPEN: "yellow",
+        CircuitState.OPEN: "red",
+    }
+
+    for r in ralph_runs:
+        emoji, color = format_run_status(r.status)
+        proj_name = project_lookup.get(r.project_id, r.project_id[:8])
+        circuit_color = circuit_colors.get(r.circuit_state, "white")
+
+        table.add_row(
+            r.id[:8],
+            f"[{color}]{emoji} {r.status.value}[/{color}]",
+            proj_name,
+            f"{r.loop_count}/{r.max_loops}",
+            f"[{circuit_color}]{r.circuit_state.value}[/{circuit_color}]",
+            f"${r.cost_usd:.4f}" if r.cost_usd else "-",
+        )
+
+    console.print(table)
+
+
+# ========== Supervisor Daemon Commands ==========
+
+
+@supervisor_app.command("start")
+def supervisor_start(
+    poll_interval: Annotated[int, typer.Option("--poll-interval", "-i", help="Poll interval in seconds")] = 30,
+    foreground: Annotated[bool, typer.Option("--foreground", "-f", help="Run in foreground (don't daemonize)")] = False,
+):
+    """Start the supervisor daemon for auto-resume polling.
+
+    The supervisor polls REVIEW tasks and auto-resumes based on supervision policies.
+    """
+    from gluon.supervisor_daemon import is_running, run_supervisor, setup_logging
+
+    running, pid = is_running()
+    if running:
+        console.print(f"[yellow]Supervisor already running[/yellow] (PID: {pid})")
+        raise typer.Exit(1)
+
+    if foreground:
+        console.print(f"[cyan]Starting supervisor in foreground[/cyan] (poll interval: {poll_interval}s)")
+        console.print("[dim]Press Ctrl+C to stop[/dim]\n")
+        setup_logging()
+        try:
+            import asyncio
+
+            asyncio.run(run_supervisor(poll_interval))
+        except KeyboardInterrupt:
+            console.print("\n[yellow]Supervisor stopped[/yellow]")
+    else:
+        # Start as background process
+        import subprocess
+        import sys
+
+        cmd = [
+            sys.executable,
+            "-m",
+            "gluon.supervisor_daemon",
+            "--poll-interval",
+            str(poll_interval),
+        ]
+
+        # Start detached process
+        subprocess.Popen(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+
+        # Give it a moment to start
+        import time
+
+        time.sleep(0.5)
+
+        # Check if it started successfully
+        running, pid = is_running()
+        from gluon.supervisor_daemon import get_log_file
+
+        if running:
+            console.print(f"[green]✓[/green] Supervisor started (PID: {pid})")
+            console.print(f"[dim]Log file: {get_log_file()}[/dim]")
+        else:
+            console.print("[red]Error:[/red] Failed to start supervisor")
+            console.print(f"[dim]Check log file: {get_log_file()}[/dim]")
+            raise typer.Exit(1)
+
+
+@supervisor_app.command("stop")
+def supervisor_stop():
+    """Stop the supervisor daemon."""
+    from gluon.supervisor_daemon import is_running, stop_daemon
+
+    running, pid = is_running()
+    if not running:
+        console.print("[yellow]Supervisor not running[/yellow]")
+        return
+
+    if stop_daemon():
+        console.print(f"[green]✓[/green] Supervisor stopped (was PID: {pid})")
+    else:
+        console.print("[red]Error:[/red] Failed to stop supervisor")
+        raise typer.Exit(1)
+
+
+@supervisor_app.command("status")
+def supervisor_status():
+    """Check supervisor daemon status."""
+    from gluon.supervisor_daemon import get_log_file, get_pid_file, is_running
+
+    running, pid = is_running()
+
+    console.print("\n[bold]Supervisor Daemon Status[/bold]\n")
+
+    table = Table()
+    table.add_column("Setting", style="cyan")
+    table.add_column("Value")
+
+    if running:
+        table.add_row("Status", "[green]Running[/green]")
+        table.add_row("PID", str(pid))
+    else:
+        table.add_row("Status", "[yellow]Stopped[/yellow]")
+        table.add_row("PID", "-")
+
+    table.add_row("PID File", str(get_pid_file()))
+    table.add_row("Log File", str(get_log_file()))
+
+    console.print(table)
+
+    # Show recent log entries if running
+    if running:
+        log_file = get_log_file()
+        if log_file.exists():
+            console.print("\n[bold]Recent Log Entries:[/bold]")
+            try:
+                lines = log_file.read_text().strip().split("\n")[-10:]
+                for line in lines:
+                    console.print(f"[dim]{line}[/dim]")
+            except Exception:
+                console.print("[dim]Unable to read log file[/dim]")
+
+
+@supervisor_app.command("logs")
+def supervisor_logs(
+    follow: Annotated[bool, typer.Option("--follow", "-f", help="Follow log output")] = False,
+    lines: Annotated[int, typer.Option("--lines", "-n", help="Number of lines to show")] = 50,
+):
+    """View supervisor daemon logs."""
+    from gluon.supervisor_daemon import get_log_file
+
+    log_file = get_log_file()
+
+    if not log_file.exists():
+        console.print("[yellow]No log file found[/yellow]")
+        console.print(f"[dim]Expected at: {log_file}[/dim]")
+        return
+
+    if follow:
+        import subprocess
+
+        subprocess.run(["tail", "-f", str(log_file)])
+    else:
+        content = log_file.read_text().strip().split("\n")
+        for line in content[-lines:]:
+            console.print(line)
+
+
+# ========== Supervision Commands ==========
+
+
+@supervision_app.command("status")
+def supervision_status(
+    run_id: Annotated[str, typer.Argument(help="Run ID to check")],
+):
+    """Show supervision status for a run."""
+    store = GluonStore()
+
+    # Try to find run by full ID or prefix
+    run = store.get_run(run_id)
+    if not run:
+        run = store.get_run_by_short_id(run_id)
+
+    if not run:
+        console.print(f"[red]Error:[/red] Run '{run_id}' not found")
+        raise typer.Exit(1)
+
+    from gluon.policies import get_supervision_config
+
+    config = get_supervision_config(run)
+
+    console.print(f"\n[bold]Supervision Status for {run.id[:8]}[/bold]\n")
+
+    table = Table()
+    table.add_column("Setting", style="cyan")
+    table.add_column("Value")
+
+    table.add_row("Enabled", "[green]Yes[/green]" if config.enabled else "[red]No[/red]")
+    table.add_row("Policy", config.policy.value)
+    table.add_row("Max Auto-Resumes", str(config.max_auto_resumes))
+    table.add_row("Auto-Resume Count", str(run.supervision_auto_resume_count))
+    table.add_row("Min Time Between", f"{config.min_time_between_resumes}s")
+    table.add_row(
+        "Last Check",
+        run.last_supervision_check_at.strftime("%Y-%m-%d %H:%M:%S") if run.last_supervision_check_at else "-",
+    )
+    table.add_row(
+        "Last Resume",
+        run.last_supervision_resume_at.strftime("%Y-%m-%d %H:%M:%S") if run.last_supervision_resume_at else "-",
+    )
+
+    if run.supervision_disabled_reason:
+        table.add_row("Disabled Reason", f"[yellow]{run.supervision_disabled_reason}[/yellow]")
+
+    console.print(table)
+
+
+@supervision_app.command("logs")
+def supervision_logs(
+    run_id: Annotated[str, typer.Argument(help="Run ID to show logs for")],
+    limit: Annotated[int, typer.Option("--limit", "-l", help="Max decisions to show")] = 20,
+):
+    """Show supervision decision log for a run."""
+    store = GluonStore()
+
+    run = store.get_run(run_id)
+    if not run:
+        run = store.get_run_by_short_id(run_id)
+
+    if not run:
+        console.print(f"[red]Error:[/red] Run '{run_id}' not found")
+        raise typer.Exit(1)
+
+    decisions = store.list_supervision_decisions(run.id, limit=limit)
+
+    if not decisions:
+        console.print(f"[dim]No supervision decisions for run {run.id[:8]}[/dim]")
+        return
+
+    console.print(f"\n[bold]Supervision Decisions for {run.id[:8]}[/bold]\n")
+
+    table = Table()
+    table.add_column("Time", style="dim")
+    table.add_column("Decision")
+    table.add_column("Reason")
+    table.add_column("Trigger", style="dim")
+
+    decision_colors = {
+        "resume": "green",
+        "skip": "yellow",
+        "hold": "blue",
+        "disable": "red",
+        "resume_failed": "red",
+    }
+
+    for d in decisions:
+        color = decision_colors.get(d.decision, "white")
+        table.add_row(
+            d.timestamp.strftime("%H:%M:%S"),
+            f"[{color}]{d.decision.upper()}[/{color}]",
+            d.reason[:50] + "..." if len(d.reason) > 50 else d.reason,
+            d.trigger or "-",
+        )
+
+    console.print(table)
+
+
+@supervision_app.command("disable")
+def supervision_disable(
+    run_id: Annotated[str, typer.Argument(help="Run ID to disable supervision for")],
+    reason: Annotated[str, typer.Option("--reason", "-r", help="Reason for disabling")] = "Manual disable",
+):
+    """Disable supervision for a run."""
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+
+    run = store.get_run(run_id)
+    if not run:
+        run = store.get_run_by_short_id(run_id)
+
+    if not run:
+        console.print(f"[red]Error:[/red] Run '{run_id}' not found")
+        raise typer.Exit(1)
+
+    from gluon.resume_coordinator import ResumeCoordinator
+
+    coordinator = ResumeCoordinator(store=store, runner=runner)
+
+    import asyncio
+
+    success = asyncio.get_event_loop().run_until_complete(coordinator.disable_supervision(run.id, reason))
+
+    if success:
+        console.print(f"[green]✓[/green] Supervision disabled for run {run.id[:8]}")
+    else:
+        console.print("[red]Error:[/red] Failed to disable supervision")
+        raise typer.Exit(1)
+
+
+@supervision_app.command("evaluate")
+def supervision_evaluate(
+    run_id: Annotated[str, typer.Argument(help="Run ID to evaluate")],
+):
+    """Manually evaluate a run for auto-resume."""
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+
+    run = store.get_run(run_id)
+    if not run:
+        run = store.get_run_by_short_id(run_id)
+
+    if not run:
+        console.print(f"[red]Error:[/red] Run '{run_id}' not found")
+        raise typer.Exit(1)
+
+    import asyncio
+
+    result = asyncio.get_event_loop().run_until_complete(runner.evaluate_supervision(run.id))
+
+    if result:
+        decision = result["decision"]
+        reason = result["reason"]
+        color = "green" if decision == "resume" else "yellow"
+        console.print(f"\n[bold]Evaluation Result for {run.id[:8]}[/bold]\n")
+        console.print(f"Decision: [{color}]{decision.upper()}[/{color}]")
+        console.print(f"Reason: {reason}")
+        if result.get("wait_seconds", 0) > 0:
+            console.print(f"Wait: {result['wait_seconds']}s until retry")
+    else:
+        console.print("[red]Error:[/red] Failed to evaluate run")
+        raise typer.Exit(1)
+
+
+# ========== Utility Commands ==========
+
+
+@app.command("version")
+def version():
+    """Show version."""
+    console.print(f"Gluon Agent v{__version__}")
+
+
+@app.command("cleanup")
+def cleanup(
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run", "-n", help="Preview what would be deleted without deleting"),
+    ] = False,
+):
+    """Clean up old log files based on retention policies.
+
+    Retention policies:
+    - Orphan logs (no DB record): deleted immediately
+    - Archived runs: deleted 30 days after completion
+    - Failed runs: deleted 7 days after completion
+    - Completed runs (non-archived): deleted 30 days after completion
+    """
+    store = GluonStore()
+    service = LogCleanupService(store=store)
+
+    if dry_run:
+        preview = service.preview()
+        total = sum(len(ids) for ids in preview.values())
+
+        if total == 0:
+            console.print("[green]No logs to clean up[/green]")
+            return
+
+        console.print("[bold]Logs that would be deleted:[/bold]\n")
+
+        table = Table(show_header=True, header_style="bold")
+        table.add_column("Category")
+        table.add_column("Count", justify="right")
+        table.add_column("Run IDs")
+
+        for category, run_ids in preview.items():
+            if run_ids:
+                ids_display = ", ".join(run_ids[:3])
+                if len(run_ids) > 3:
+                    ids_display += f" (+{len(run_ids) - 3} more)"
+                table.add_row(category.title(), str(len(run_ids)), ids_display)
+
+        console.print(table)
+        console.print(f"\n[bold]Total:[/bold] {total} log directories would be deleted")
+    else:
+        stats = service.cleanup()
+        total = (
+            stats["orphan_deleted"] + stats["archived_deleted"] + stats["failed_deleted"] + stats["completed_deleted"]
+        )
+
+        if total == 0:
+            console.print("[green]No logs to clean up[/green]")
+        else:
+            console.print("[bold]Cleanup complete:[/bold]")
+            console.print(f"  Orphan:    {stats['orphan_deleted']}")
+            console.print(f"  Archived:  {stats['archived_deleted']}")
+            console.print(f"  Failed:    {stats['failed_deleted']}")
+            console.print(f"  Completed: {stats['completed_deleted']}")
+            console.print(f"  [bold]Total:[/bold]    {total}")
+
+        if stats["errors"] > 0:
+            console.print(f"\n[yellow]Errors: {stats['errors']}[/yellow]")
+
+
+def _format_bytes(size_bytes: int) -> str:
+    """Format bytes as human-readable string."""
+    size: float = float(size_bytes)
+    for unit in ("B", "KB", "MB", "GB"):
+        if size < 1024:
+            return f"{size:.1f} {unit}"
+        size /= 1024
+    return f"{size:.1f} TB"
+
+
+@app.command("stats")
+def stats():
+    """Show disk usage statistics for ~/.gluon directory."""
+    gluon_dir = Path.home() / ".gluon"
+
+    if not gluon_dir.exists():
+        console.print("[yellow]~/.gluon directory does not exist[/yellow]")
+        return
+
+    console.print("[bold]Disk Usage: ~/.gluon[/bold]\n")
+
+    # Calculate sizes for main sections
+    sections = []
+    for entry in gluon_dir.iterdir():
+        if entry.is_file():
+            sections.append((entry.name, entry.stat().st_size))
+        elif entry.is_dir():
+            total = sum(f.stat().st_size for f in entry.rglob("*") if f.is_file())
+            sections.append((entry.name + "/", total))
+
+    sections.sort(key=lambda x: x[1], reverse=True)
+    total_size = sum(size for _, size in sections)
+
+    # Display section breakdown
+    table = Table(show_header=True, header_style="bold")
+    table.add_column("Section")
+    table.add_column("Size", justify="right")
+    table.add_column("%", justify="right")
+
+    for name, size in sections:
+        pct = (size / total_size * 100) if total_size > 0 else 0
+        table.add_row(name, _format_bytes(size), f"{pct:.0f}%")
+
+    table.add_row("[bold]Total[/bold]", f"[bold]{_format_bytes(total_size)}[/bold]", "[bold]100%[/bold]")
+    console.print(table)
+
+    # Show top runs by size
+    store = GluonStore()
+    service = LogCleanupService(store=store)
+    usage = service.get_disk_usage()
+
+    if usage["run_count"] > 0:
+        console.print(f"\n[bold]Log Directory:[/bold] {usage['run_count']} runs, {_format_bytes(usage['total_bytes'])}")
+
+        top_runs = usage.get("top_runs", [])
+        if top_runs:
+            console.print("\n[bold]Top 5 Largest Runs:[/bold]")
+            runs_table = Table(show_header=True, header_style="bold")
+            runs_table.add_column("Run ID")
+            runs_table.add_column("Size", justify="right")
+            runs_table.add_column("Status")
+            runs_table.add_column("Project")
+
+            db_runs = {run.id: run for run in store.list_runs(limit=10000, include_archived=True)}
+
+            for run_id, size in top_runs[:5]:
+                run = db_runs.get(run_id)
+                status = run.status.value if run else "[orphan]"
+                project = run.project_id if run else "-"
+                runs_table.add_row(run_id[:8] + "...", _format_bytes(size), status, project)
+
+            console.print(runs_table)
+
+
+# ========== Helper Functions ==========
+
+
+def _print_message(msg: AgentMessage) -> None:
+    """Print an agent message to console."""
+    if msg.type == "text":
+        console.print(msg.content)
+    elif msg.type == "tool_use":
+        console.print(f"[dim]{msg.content}[/dim]")
+    elif msg.type == "system":
+        pass  # Silent
+    elif msg.type == "error":
+        console.print(f"[red]{msg.content}[/red]")
+    elif msg.type == "result":
+        pass  # Handled separately
+
+
+def _print_result(result: AgentResult) -> None:
+    """Print agent result summary."""
+    if result.success:
+        console.print("[green]✓ Complete[/green]")
+    else:
+        console.print(f"[red]✗ Failed: {result.error}[/red]")
+
+    console.print(f"[dim]Cost: ${result.total_cost_usd:.4f} | Turns: {result.total_turns}[/dim]")
+
+    if result.claude_session_id:
+        console.print(f"[dim]Session: {result.claude_session_id[:8]}...[/dim]")
+
+
+# ========== Chain Commands ==========
+
+
+@chain_app.command("create")
+def chain_create(
+    project: Annotated[str, typer.Argument(help="Project name")],
+    name: Annotated[str, typer.Argument(help="Chain name")],
+    steps_file: Annotated[Path, typer.Argument(help="YAML/JSON file with step definitions")],
+    worktree: Annotated[bool, typer.Option("--worktree", "-w", help="Execute in worktree")] = False,
+):
+    """Create a task chain from a step definition file."""
+    import yaml
+
+    from gluon.chain_executor import ChainExecutor
+    from gluon.models import TaskChain, TaskProfile, TaskStep
+
+    store = GluonStore()
+    orchestrator = get_orchestrator()
+
+    try:
+        proj = orchestrator.get_project(project)
+    except ProjectNotFoundError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    if not steps_file.exists():
+        console.print(f"[red]Error:[/red] File not found: {steps_file}")
+        raise typer.Exit(1)
+
+    # Parse step definitions
+    with open(steps_file) as f:
+        if steps_file.suffix in (".yaml", ".yml"):
+            data = yaml.safe_load(f)
+        else:
+            import json as json_mod
+
+            data = json_mod.load(f)
+
+    chain = TaskChain(
+        project_id=proj.id,
+        name=data.get("name", name),
+        description=data.get("description"),
+        use_worktree=data.get("use_worktree", worktree),
+        initiator="cli",
+    )
+
+    # Create steps with name-based ID mapping
+    step_name_to_id: dict[str, str] = {}
+    steps_data = data.get("steps", [])
+
+    # First pass: create steps and map names to IDs
+    for step_data in steps_data:
+        step = TaskStep(
+            chain_id=chain.id,
+            name=step_data["name"],
+            prompt=step_data["prompt"],
+            profile=TaskProfile(step_data.get("profile", "standard")),
+        )
+        step_name_to_id[step.name] = step.id
+        chain.steps.append(step)
+
+    # Second pass: resolve depends_on names to IDs
+    for i, step_data in enumerate(steps_data):
+        dep_names = step_data.get("depends_on", [])
+        dep_ids = []
+        for dep_name in dep_names:
+            dep_id = step_name_to_id.get(dep_name)
+            if not dep_id:
+                console.print(f"[red]Error:[/red] Step '{chain.steps[i].name}' depends on unknown step '{dep_name}'")
+                raise typer.Exit(1)
+            dep_ids.append(dep_id)
+        chain.steps[i].depends_on = dep_ids
+
+    # Validate
+    runner = TaskRunner(store=store)
+    executor = ChainExecutor(store, runner)
+    errors = executor.validate_chain(chain)
+    if errors:
+        for err in errors:
+            console.print(f"[red]Error:[/red] {err}")
+        raise typer.Exit(1)
+
+    # Persist
+    store.create_chain(chain)
+    for step in chain.steps:
+        store.create_step(step)
+
+    console.print(f"[green]Created chain[/green] {chain.id} ({chain.name})")
+    console.print(f"  {len(chain.steps)} steps defined")
+
+    # Show step graph
+    for step in chain.steps:
+        deps = [s.name for s in chain.steps if s.id in step.depends_on]
+        dep_str = f" (after: {', '.join(deps)})" if deps else ""
+        console.print(f"  - {step.name} [{step.profile.value}]{dep_str}")
+
+    console.print(f"\nStart with: [bold]gluon chain start {chain.id}[/bold]")
+
+
+@chain_app.command("start")
+def chain_start(
+    chain_id: Annotated[str, typer.Argument(help="Chain ID to start")],
+):
+    """Start executing a task chain."""
+    from gluon.chain_executor import ChainExecutor
+
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+    executor = ChainExecutor(store, runner)
+
+    chain = store.get_chain(chain_id)
+    if not chain:
+        console.print(f"[red]Error:[/red] Chain not found: {chain_id}")
+        raise typer.Exit(1)
+
+    async def _start():
+        await executor.start_chain(chain_id)
+
+    anyio.run(_start)
+    console.print(f"[green]Started chain[/green] {chain_id}")
+    console.print(f"Use [bold]gluon chain show {chain_id}[/bold] to track progress.")
+
+
+@chain_app.command("list")
+def chain_list(
+    project: Annotated[str | None, typer.Option("--project", "-p", help="Filter by project")] = None,
+):
+    """List task chains."""
+    from gluon.models import ChainStatus
+
+    store = GluonStore()
+    project_id = None
+    if project:
+        orchestrator = get_orchestrator()
+        try:
+            proj = orchestrator.get_project(project)
+            project_id = proj.id
+        except ProjectNotFoundError as e:
+            console.print(f"[red]Error:[/red] {e}")
+            raise typer.Exit(1)
+
+    chains = store.list_chains(project_id=project_id)
+    if not chains:
+        console.print("[dim]No chains found.[/dim]")
+        return
+
+    # Project lookup
+    projects = store.list_projects()
+    project_lookup = {p.id: p.name for p in projects}
+
+    table = Table(title="Task Chains")
+    table.add_column("ID", style="cyan")
+    table.add_column("Name")
+    table.add_column("Status")
+    table.add_column("Project")
+    table.add_column("Steps")
+    table.add_column("Created", style="dim")
+
+    status_styles = {
+        ChainStatus.PENDING: ("⏳", "yellow"),
+        ChainStatus.RUNNING: ("🔄", "blue"),
+        ChainStatus.COMPLETED: ("✅", "green"),
+        ChainStatus.FAILED: ("❌", "red"),
+        ChainStatus.CANCELLED: ("🚫", "dim"),
+    }
+
+    for chain in chains:
+        emoji, color = status_styles.get(chain.status, ("❓", "white"))
+        proj_name = project_lookup.get(chain.project_id, chain.project_id[:8])
+        completed = sum(1 for s in chain.steps if s.status.value == "completed")
+        step_str = f"{completed}/{len(chain.steps)}"
+
+        table.add_row(
+            chain.id,
+            chain.name,
+            f"[{color}]{emoji} {chain.status.value}[/{color}]",
+            proj_name,
+            step_str,
+            chain.created_at.strftime("%Y-%m-%d %H:%M"),
+        )
+
+    console.print(table)
+
+
+@chain_app.command("show")
+def chain_show(
+    chain_id: Annotated[str, typer.Argument(help="Chain ID")],
+):
+    """Show chain details with step status."""
+    from gluon.models import StepStatus
+
+    store = GluonStore()
+    chain = store.get_chain(chain_id)
+    if not chain:
+        console.print(f"[red]Error:[/red] Chain not found: {chain_id}")
+        raise typer.Exit(1)
+
+    projects = store.list_projects()
+    project_lookup = {p.id: p.name for p in projects}
+    proj_name = project_lookup.get(chain.project_id, chain.project_id[:8])
+
+    console.print(
+        Panel(
+            f"[bold]{chain.name}[/bold]\n"
+            f"Project: {proj_name}\n"
+            f"Status: {chain.status.value}\n"
+            f"Created: {chain.created_at.strftime('%Y-%m-%d %H:%M')}"
+            + (f"\nDescription: {chain.description}" if chain.description else ""),
+            title=f"Chain {chain.id}",
+        )
+    )
+
+    step_styles = {
+        StepStatus.PENDING: ("⏳", "yellow"),
+        StepStatus.BLOCKED: ("🔒", "dim"),
+        StepStatus.READY: ("🟢", "green"),
+        StepStatus.RUNNING: ("🔄", "blue"),
+        StepStatus.COMPLETED: ("✅", "green"),
+        StepStatus.FAILED: ("❌", "red"),
+        StepStatus.SKIPPED: ("⏭️", "dim"),
+    }
+
+    table = Table(title="Steps")
+    table.add_column("Name", style="bold")
+    table.add_column("Status")
+    table.add_column("Profile")
+    table.add_column("Run ID")
+    table.add_column("Duration")
+
+    step_name_lookup = {s.id: s.name for s in chain.steps}
+    for step in chain.steps:
+        emoji, color = step_styles.get(step.status, ("❓", "white"))
+        deps = [step_name_lookup.get(d, d[:8]) for d in step.depends_on]
+        name = step.name
+        if deps:
+            name += f" (after: {', '.join(deps)})"
+
+        duration = "-"
+        if step.duration_seconds:
+            from gluon.runner import format_duration
+
+            duration = format_duration(step.duration_seconds)
+
+        table.add_row(
+            name,
+            f"[{color}]{emoji} {step.status.value}[/{color}]",
+            step.profile.value,
+            step.run_id[:8] if step.run_id else "-",
+            duration,
+        )
+
+    console.print(table)
+
+
+@chain_app.command("cancel")
+def chain_cancel(
+    chain_id: Annotated[str, typer.Argument(help="Chain ID to cancel")],
+):
+    """Cancel a running chain and all its steps."""
+    from gluon.chain_executor import ChainExecutor
+
+    store = GluonStore()
+    runner = TaskRunner(store=store)
+    executor = ChainExecutor(store, runner)
+
+    chain = store.get_chain(chain_id)
+    if not chain:
+        console.print(f"[red]Error:[/red] Chain not found: {chain_id}")
+        raise typer.Exit(1)
+
+    async def _cancel():
+        await executor.cancel_chain(chain_id)
+
+    anyio.run(_cancel)
+    console.print(f"[green]Cancelled chain[/green] {chain_id}")
+
+
+# ========== Doctor Commands ==========
+
+
+@doctor_app.callback(invoke_without_command=True)
+def doctor_check(
+    ctx: typer.Context,
+    fix: Annotated[bool, typer.Option("--fix", help="Auto-fix fixable issues")] = False,
+):
+    """Run system health diagnostics."""
+    if ctx.invoked_subcommand is not None:
+        return
+
+    from gluon.doctor import run_all_fixes, run_diagnostics
+    from gluon.store import DEFAULT_LOG_PATH
+
+    store = GluonStore()
+    results = run_diagnostics(store, DEFAULT_LOG_PATH)
+
+    table = Table(title="Gluon Health Check")
+    table.add_column("Check", style="bold")
+    table.add_column("Status")
+    table.add_column("Message")
+    table.add_column("Fixable")
+
+    status_styles = {"ok": "green", "warn": "yellow", "error": "red"}
+
+    for r in results:
+        style = status_styles.get(r.status, "white")
+        table.add_row(
+            r.name,
+            f"[{style}]{r.status.upper()}[/{style}]",
+            r.message,
+            "yes" if r.fixable else "",
+        )
+        for detail in r.details:
+            table.add_row("", "", f"  {detail}", "")
+
+    console.print(table)
+
+    # Summary
+    errors = sum(1 for r in results if r.status == "error")
+    warns = sum(1 for r in results if r.status == "warn")
+    if errors == 0 and warns == 0:
+        console.print("\n[green]All checks passed.[/green]")
+    else:
+        if errors:
+            console.print(f"\n[red]{errors} error(s)[/red]", end="")
+        if warns:
+            console.print(f"  [yellow]{warns} warning(s)[/yellow]", end="")
+        console.print()
+
+    # Auto-fix if requested
+    if fix:
+        fixable = [r for r in results if r.fixable and r.status in ("warn", "error")]
+        if not fixable:
+            console.print("[dim]Nothing to fix.[/dim]")
+            return
+
+        console.print("\n[bold]Running fixes...[/bold]")
+        fix_results = run_all_fixes(store)
+        total_fixed = sum(fix_results.values())
+        for name, count in fix_results.items():
+            if count > 0:
+                console.print(f"  [green]Fixed {count}[/green] {name.replace('_', ' ')}")
+        if total_fixed == 0:
+            console.print("  [dim]No issues needed fixing.[/dim]")
+        else:
+            console.print(f"\n[green]Fixed {total_fixed} issue(s).[/green]")
+
+
+@doctor_app.command("fix")
+def doctor_fix():
+    """Auto-fix all fixable issues."""
+    from gluon.doctor import run_all_fixes
+
+    store = GluonStore()
+    console.print("[bold]Running all fixes...[/bold]")
+    fix_results = run_all_fixes(store)
+    total_fixed = sum(fix_results.values())
+    for name, count in fix_results.items():
+        if count > 0:
+            console.print(f"  [green]Fixed {count}[/green] {name.replace('_', ' ')}")
+    if total_fixed == 0:
+        console.print("[dim]No issues found.[/dim]")
+    else:
+        console.print(f"\n[green]Fixed {total_fixed} issue(s).[/green]")
+
+
+# ========== Activity Log Commands (F11) ==========
+
+
+@app.command("activity")
+def activity_list(
+    limit: Annotated[int, typer.Option(help="Max events to show")] = 50,
+    actor: Annotated[str | None, typer.Option(help="Filter by actor")] = None,
+    action: Annotated[str | None, typer.Option(help="Filter by action")] = None,
+) -> None:
+    """Show recent activity events."""
+    from gluon.activity_log import ActivityLogger
+
+    store = GluonStore()
+    logger = ActivityLogger(store)
+    events = logger.query(actor=actor, action=action, limit=limit)
+
+    if not events:
+        console.print("[dim]No activity events found.[/dim]")
+        return
+
+    table = Table(title="Activity Log")
+    table.add_column("Timestamp", style="dim", width=20)
+    table.add_column("Actor", width=12)
+    table.add_column("Action", style="cyan", width=20)
+    table.add_column("Result", width=10)
+    table.add_column("Message", max_width=50)
+
+    for event in events:
+        table.add_row(
+            event.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            event.actor[:12],
+            event.action,
+            event.result or "",
+            event.message or "",
+        )
+
+    console.print(table)
+
+
+# ========== Formula Commands (F10) ==========
+
+formula_app = typer.Typer(help="Workflow formula templates")
+app.add_typer(formula_app, name="formula")
+
+
+@formula_app.command("list")
+def formula_list_cmd() -> None:
+    """List available workflow formulas."""
+    from gluon.formulas import FormulaLoader
+
+    templates = FormulaLoader.discover()
+
+    if not templates:
+        console.print("[dim]No formulas found.[/dim]")
+        return
+
+    table = Table(title="Available Formulas")
+    table.add_column("Name", style="cyan")
+    table.add_column("Description")
+    table.add_column("Steps", justify="right")
+    table.add_column("Variables", justify="right")
+    table.add_column("Source", style="dim")
+
+    for t in templates:
+        source = str(t.source_path) if t.source_path else "builtin"
+        table.add_row(
+            t.name,
+            t.description or "",
+            str(len(t.steps)),
+            str(len(t.variables)),
+            source,
+        )
+
+    console.print(table)
+
+
+@formula_app.command("show")
+def formula_show(name: Annotated[str, typer.Argument(help="Formula name")]) -> None:
+    """Show details of a workflow formula."""
+    from gluon.formulas import FormulaLoader
+
+    template = FormulaLoader.load(name)
+    if not template:
+        console.print(f"[red]Formula not found: {name}[/red]")
+        raise typer.Exit(1)
+
+    console.print(Panel(f"[bold]{template.name}[/bold]\n{template.description or ''}", title="Formula"))
+
+    if template.variables:
+        var_table = Table(title="Variables")
+        var_table.add_column("Name", style="cyan")
+        var_table.add_column("Type")
+        var_table.add_column("Required")
+        var_table.add_column("Default")
+        var_table.add_column("Help")
+
+        for v in template.variables:
+            var_table.add_row(
+                v.name,
+                v.type,
+                "yes" if v.required else "no",
+                v.default or "",
+                v.help or "",
+            )
+        console.print(var_table)
+
+    step_table = Table(title="Steps")
+    step_table.add_column("ID", style="cyan")
+    step_table.add_column("Name")
+    step_table.add_column("Profile")
+    step_table.add_column("Depends On")
+
+    for s in template.steps:
+        step_table.add_row(
+            s.id,
+            s.name,
+            s.profile,
+            ", ".join(s.depends_on) if s.depends_on else "-",
+        )
+    console.print(step_table)
+
+
+@formula_app.command("run")
+def formula_run(
+    name: Annotated[str, typer.Argument(help="Formula name")],
+    project: Annotated[str, typer.Argument(help="Project name")],
+    var: Annotated[list[str] | None, typer.Option("--var", help="Variable as key=value")] = None,
+) -> None:
+    """Execute a workflow formula on a project."""
+    from gluon.chain_executor import ChainExecutor
+    from gluon.formula_executor import FormulaExecutor
+    from gluon.formulas import FormulaLoader
+    from gluon.runner import TaskRunner
+
+    template = FormulaLoader.load(name)
+    if not template:
+        console.print(f"[red]Formula not found: {name}[/red]")
+        raise typer.Exit(1)
+
+    # Parse variables from --var key=value
+    variables: dict[str, str] = {}
+    for v in var or []:
+        if "=" not in v:
+            console.print(f"[red]Invalid variable format: {v} (expected key=value)[/red]")
+            raise typer.Exit(1)
+        k, val = v.split("=", 1)
+        variables[k] = val
+
+    orchestrator = get_orchestrator()
+    proj = orchestrator.get_project(project)
+    store = GluonStore()
+    runner = TaskRunner(store)
+    chain_executor = ChainExecutor(store, runner)
+    formula_executor = FormulaExecutor(store, chain_executor)
+
+    async def _run() -> str:
+        return await formula_executor.execute(
+            template=template,
+            project_id=proj.id,
+            variables=variables,
+            initiator="cli",
+        )
+
+    chain_id = anyio.from_thread.run(_run)
+    console.print(f"[green]Formula '{name}' started as chain {chain_id}[/green]")
+
+
+@formula_app.command("validate")
+def formula_validate(path: Annotated[Path, typer.Argument(help="Path to YAML formula file")]) -> None:
+    """Validate a formula template file."""
+    from gluon.formulas import FormulaLoader, validate_formula
+
+    template = FormulaLoader.load_from_file(path)
+    errors = validate_formula(template)
+
+    if errors:
+        for err in errors:
+            console.print(f"[red]  {err}[/red]")
+        raise typer.Exit(1)
+    console.print(f"[green]Formula '{template.name}' is valid ({len(template.steps)} steps).[/green]")
+
+
+# ========== Work Queue Commands (F12) ==========
+
+queue_app = typer.Typer(help="Work queue management")
+app.add_typer(queue_app, name="queue")
+
+
+@queue_app.command("add")
+def queue_add(
+    project: Annotated[str, typer.Argument(help="Project name")],
+    prompt: Annotated[str, typer.Argument(help="Task prompt")],
+    profile: Annotated[str, typer.Option(help="Task profile")] = "standard",
+    priority: Annotated[int, typer.Option(help="Priority (lower=higher)")] = 10,
+) -> None:
+    """Add a task to the work queue."""
+    from gluon.work_queue import WorkQueueManager
+
+    orchestrator = get_orchestrator()
+    proj = orchestrator.get_project(project)
+    store = GluonStore()
+    wq = WorkQueueManager(store)
+    item = wq.enqueue(proj.id, prompt, profile=profile, priority=priority)
+    console.print(f"[green]Queued: {item.id} (priority={priority})[/green]")
+
+
+@queue_app.command("list")
+def queue_list_cmd(
+    project: Annotated[str | None, typer.Option(help="Filter by project name")] = None,
+    status: Annotated[str | None, typer.Option(help="Filter by status")] = None,
+) -> None:
+    """List work queue items."""
+    from gluon.work_queue import WorkQueueManager
+
+    store = GluonStore()
+    wq = WorkQueueManager(store)
+
+    project_id = None
+    if project:
+        orchestrator = get_orchestrator()
+        proj = orchestrator.get_project(project)
+        project_id = proj.id
+
+    items = wq.list_items(project_id=project_id, status=status)
+
+    if not items:
+        console.print("[dim]No work queue items found.[/dim]")
+        return
+
+    table = Table(title="Work Queue")
+    table.add_column("ID", style="cyan", width=12)
+    table.add_column("Project", width=12)
+    table.add_column("Status", width=10)
+    table.add_column("Priority", justify="right", width=8)
+    table.add_column("Prompt", max_width=40)
+    table.add_column("Created", style="dim", width=16)
+
+    for item in items:
+        table.add_row(
+            item.id,
+            item.project_id[:12],
+            item.status.value,
+            str(item.priority),
+            item.prompt[:40],
+            item.created_at.strftime("%Y-%m-%d %H:%M"),
+        )
+
+    console.print(table)
+
+
+@queue_app.command("cancel")
+def queue_cancel(item_id: Annotated[str, typer.Argument(help="Work queue item ID")]) -> None:
+    """Cancel a queued work item."""
+    from gluon.work_queue import WorkQueueManager
+
+    store = GluonStore()
+    wq = WorkQueueManager(store)
+    wq.cancel(item_id)
+    console.print(f"[green]Cancelled: {item_id}[/green]")
+
+
+# ========== Merge Queue Commands (F8) ==========
+
+merge_app = typer.Typer(help="Merge queue management")
+app.add_typer(merge_app, name="merge")
+
+
+@merge_app.command("list")
+def merge_list_cmd(
+    status: Annotated[str | None, typer.Option(help="Filter by status")] = None,
+) -> None:
+    """List merge queue entries."""
+    store = GluonStore()
+    entries = store.list_merge_entries(status=status)
+
+    if not entries:
+        console.print("[dim]No merge queue entries found.[/dim]")
+        return
+
+    table = Table(title="Merge Queue")
+    table.add_column("ID", style="cyan", width=12)
+    table.add_column("Branch", width=25)
+    table.add_column("PR", width=8)
+    table.add_column("Status", width=10)
+    table.add_column("Conflicts", justify="right", width=10)
+    table.add_column("Created", style="dim", width=16)
+
+    for entry in entries:
+        table.add_row(
+            entry.id,
+            entry.branch_name,
+            str(entry.pr_number or "-"),
+            entry.status.value,
+            str(entry.conflict_count),
+            entry.created_at.strftime("%Y-%m-%d %H:%M"),
+        )
+
+    console.print(table)
+
+
+@merge_app.command("retry")
+def merge_retry(entry_id: Annotated[str, typer.Argument(help="Merge queue entry ID")]) -> None:
+    """Retry a failed/conflicted merge entry."""
+    from gluon.models import MergeQueueStatus
+
+    store = GluonStore()
+    entry = store.get_merge_entry(entry_id)
+    if not entry:
+        console.print(f"[red]Entry not found: {entry_id}[/red]")
+        raise typer.Exit(1)
+
+    entry.status = MergeQueueStatus.PENDING
+    entry.next_retry_at = None
+    store.update_merge_entry(entry)
+    console.print(f"[green]Reset entry {entry_id} to PENDING for retry.[/green]")
+
+
+@merge_app.command("cancel")
+def merge_cancel(entry_id: Annotated[str, typer.Argument(help="Merge queue entry ID")]) -> None:
+    """Cancel a merge queue entry."""
+    from gluon.models import MergeQueueStatus, utc_now
+
+    store = GluonStore()
+    entry = store.get_merge_entry(entry_id)
+    if not entry:
+        console.print(f"[red]Entry not found: {entry_id}[/red]")
+        raise typer.Exit(1)
+
+    entry.status = MergeQueueStatus.CANCELLED
+    entry.completed_at = utc_now()
+    store.update_merge_entry(entry)
+    console.print(f"[green]Cancelled: {entry_id}[/green]")
+
+
+# ========== Witness Commands (F9) ==========
+
+
+@app.command("witness")
+def witness_show(run_id: Annotated[str, typer.Argument(help="Run ID")]) -> None:
+    """Show witness decision history for a run."""
+    store = GluonStore()
+    decisions = store.list_witness_decisions(run_id)
+
+    if not decisions:
+        console.print("[dim]No witness decisions found for this run.[/dim]")
+        return
+
+    table = Table(title=f"Witness Decisions for {run_id[:12]}")
+    table.add_column("Timestamp", style="dim", width=20)
+    table.add_column("Classification", style="cyan", width=20)
+    table.add_column("Confidence", justify="right", width=10)
+    table.add_column("Action", width=12)
+    table.add_column("Reasoning", max_width=40)
+
+    for d in decisions:
+        table.add_row(
+            d.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            d.classification.value,
+            f"{d.confidence:.2f}",
+            d.action.value,
+            d.reasoning[:40] if d.reasoning else "",
+        )
+
+    console.print(table)
+
+
+if __name__ == "__main__":
+    app()

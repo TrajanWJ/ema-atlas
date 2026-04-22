@@ -1,0 +1,26 @@
+{
+  "proposals": {
+    "prp_992984d5adfa": {
+      "id": "prp_992984d5adfa",
+      "status": "draft",
+      "context": {},
+      "metadata": {},
+      "project": "ema-phase2-build",
+      "updated_at": "2026-04-06T08:04:32.452306Z",
+      "summary": "Bootstrap scope advisor",
+      "intent": "scope-advisor",
+      "created_at": "2026-04-06T08:04:32.452306Z",
+      "execution_ids": [],
+      "approved_by": null
+    }
+  },
+  "executions": {},
+  "outcomes": {},
+  "projects": {
+    "ema-phase2-build": {
+      "proposal": [
+        "prp_992984d5adfa"
+      ]
+    }
+  }
+}

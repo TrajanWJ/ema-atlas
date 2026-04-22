@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trajan's Wiki</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <!-- Top bar -->
+  <div id="topbar">
+    <a href="/" id="topbar-brand" onclick="navigate('/')">📚 Wiki</a>
+    <div id="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search pages..." autocomplete="off" />
+    </div>
+    <div id="topbar-stats">Loading...</div>
+    <div id="topbar-ws" title="WebSocket status"></div>
+  </div>
+
+  <!-- Main layout -->
+  <div id="main">
+    <nav id="sidebar">
+      <div id="sidebar-content">
+        <div class="loading">Loading...</div>
+      </div>
+    </nav>
+    <main id="content">
+      <div class="loading">Loading...</div>
+    </main>
+  </div>
+
+  <!-- Marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Highlight.js for code syntax -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <script src="/app.js"></script>
+</body>
+</html>

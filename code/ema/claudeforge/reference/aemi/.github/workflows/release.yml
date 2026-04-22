@@ -1,0 +1,154 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: aemi-linux-x86_64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            artifact: aemi-linux-aarch64
+            cross: true
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            artifact: aemi-macos-x86_64
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            artifact: aemi-macos-aarch64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          echo '[target.aarch64-unknown-linux-gnu]' >> ~/.cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> ~/.cargo/config.toml
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Rename binary
+        run: cp target/${{ matrix.target }}/release/aemi ${{ matrix.artifact }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/**/*
+
+  npm-publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Upgrade npm and clean auth config
+        run: |
+          npm install -g npm@latest
+          sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG" 2>/dev/null || true
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Publish platform packages
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+
+          declare -A PKG_MAP=(
+            ["aemi-linux-x86_64"]="cli-linux-x64"
+            ["aemi-linux-aarch64"]="cli-linux-arm64"
+            ["aemi-macos-x86_64"]="cli-darwin-x64"
+            ["aemi-macos-aarch64"]="cli-darwin-arm64"
+          )
+
+          for artifact in "${!PKG_MAP[@]}"; do
+            pkg_dir="${PKG_MAP[$artifact]}"
+            staging="npm-staging/${pkg_dir}"
+
+            mkdir -p "${staging}/bin"
+            cp "artifacts/${artifact}/${artifact}" "${staging}/bin/aemi"
+            chmod +x "${staging}/bin/aemi"
+
+            node -e "
+              const pkg = require('./npm/${pkg_dir}/package.json');
+              pkg.version = '${VERSION}';
+              require('fs').writeFileSync('${staging}/package.json', JSON.stringify(pkg, null, 2) + '\n');
+            "
+
+            cd "${staging}"
+            npm publish --access public --provenance
+            cd -
+          done
+
+      - name: Publish main wrapper package
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          staging="npm-staging/aemi"
+
+          mkdir -p "${staging}/bin"
+          cp npm/aemi/bin/aemi "${staging}/bin/aemi"
+          chmod +x "${staging}/bin/aemi"
+          cp README.md "${staging}/README.md"
+
+          node -e "
+            const pkg = require('./npm/aemi/package.json');
+            pkg.version = '${VERSION}';
+            for (const dep of Object.keys(pkg.optionalDependencies || {})) {
+              pkg.optionalDependencies[dep] = '${VERSION}';
+            }
+            require('fs').writeFileSync('${staging}/package.json', JSON.stringify(pkg, null, 2));
+          "
+
+          cd "${staging}"
+          npm publish --access public --provenance

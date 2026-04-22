@@ -1,0 +1,44 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Local agent/tooling noise
+.serena/
+.expert/
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+
+# Node
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/.turbo/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Elixir / Phoenix
+daemon/_build/
+daemon/deps/
+daemon/erl_crash.dump
+daemon/.elixir_ls/
+
+# Runtime DBs / local mutable state
+*.db
+*.db-shm
+*.db-wal
+daemon/priv/*.db
+daemon/priv/*.db-shm
+daemon/priv/*.db-wal
+
+# Project-local runtime artifacts
+dispatch.db

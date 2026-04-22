@@ -1,0 +1,109 @@
+services:
+  gluon:
+    image: ghcr.io/carrotly-ai/gluon-agent:latest
+    container_name: gluon-agent
+
+    # Load environment variables from .env
+    env_file:
+      - .env
+
+    # Mount host directories
+    volumes:
+      # Configuration and state
+      - ${HOME}/.claude:/home/gluon/.claude
+      - ${HOME}/.gluon:/home/gluon/.gluon
+
+      # Worktrees (persist across container restarts)
+      - ${HOME}/.gluon/worktrees:/tmp/gluon-worktrees
+
+      # Projects
+      - ${HOME}/workspaces:/home/gluon/workspaces
+
+      # AWS credentials (read-only)
+      - ${HOME}/.aws:/home/gluon/.aws:ro
+
+      # GitHub CLI config (read-only) - for PR creation
+      - ${HOME}/.config/gh:/home/gluon/.config/gh:ro
+
+      # Cache
+      - ${HOME}/.cache/gluon:/home/gluon/.cache/gluon
+
+      # Browser automation cache (agent-browser/Playwright)
+      - ${HOME}/.cache/agent-browser:/home/gluon/.cache/ms-playwright
+
+    # Pass environment variables
+    environment:
+      # Run as the host user's UID/GID so bind-mounted volumes have correct ownership
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+
+      # AWS credentials (passed from host)
+      - AWS_PROFILE=${AWS_PROFILE:-default}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_BEARER_TOKEN_BEDROCK
+
+      # Claude configuration
+      - CLAUDE_API_KEY
+      - CLAUDE_LOG_LEVEL=info
+      - CLAUDE_CODE_USE_BEDROCK=1
+
+      # Note: These are loaded from .env via env_file directive above:
+      # - GH_TOKEN (GitHub personal access token for PR operations)
+      # - GIT_USER_EMAIL (git config user.email)
+      # - GIT_USER_NAME (git config user.name)
+
+      # Node.js memory tuning for Claude Code CLI
+      # Limit heap to 6GB to leave room for subprocesses within 12GB container
+      - NODE_OPTIONS=--max-old-space-size=6144
+
+      # Gluon configuration (loaded from env_file, only override if needed)
+      - GLUON_GIT_ENABLED=true
+
+      # Redis (embedded in container for cross-process event bus)
+      - GLUON_REDIS_URL=redis://localhost:6379/0
+
+      # Browser automation (agent-browser)
+      - AGENT_BROWSER_STREAM_PORT=9223
+
+      # Vercel CLI (optional, loaded from .env or host)
+      - VERCEL_TOKEN
+
+      # SSL/HTTPS (optional - set both in .env to enable HTTPS for web dashboard)
+      # GLUON_SSL_CERTFILE and GLUON_SSL_KEYFILE are loaded via env_file
+
+    # Interactive mode for CLI
+    stdin_open: true
+    tty: true
+
+    # Network (if needed for web dashboard)
+    ports:
+      - "45866:45866"  # Web dashboard
+      - "9223:9223"    # Browser streaming/preview
+
+    # Allow container to reach host services (e.g., MCP servers on localhost)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # Resource limits for running concurrent Claude Code agents
+    # Each agent can use 512MB-1GB for context windows and code analysis
+    # With 5-6 concurrent agents + web dashboard overhead, need 8-12GB
+    deploy:
+      resources:
+        limits:
+          cpus: '8'
+          memory: 12G
+        reservations:
+          cpus: '4'
+          memory: 6G
+
+    # Run web dashboard by default
+    # To run different commands, uncomment and modify:
+    # command: gluon serve --telegram --discord
+    # command: gluon status
+
+    # Auto-start when Docker/OrbStack starts
+    restart: always
+    command: ["gluon", "serve", "--web", "--telegram", "--discord"]

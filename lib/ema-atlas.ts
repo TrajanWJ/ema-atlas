@@ -390,9 +390,33 @@ export const docRegistry: DocEntry[] = [
     feeds: ["docs", "program", "showroom"]
   },
   {
+    title: "Orchestration Kernel",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/orchestration-kernel.md",
+    note: "The simplest control model for an active EMA swarm: one objective, one main lane, support lanes around it.",
+    kind: "doctrine",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Active Wave",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/active-wave-current.md",
+    note: "The live EMA swarm wave with one main deliverables lane, support lanes, risks, and stop rules.",
+    kind: "backlog",
+    status: "active",
+    feeds: ["docs", "program", "showroom"]
+  },
+  {
     title: "Continuous Progress Protocol",
     path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/continuous-progress-protocol.md",
     note: "Operational loop for lanes, claims, handoffs, drift handling, refresh cadence, and protected zones.",
+    kind: "backlog",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Active Wave Template",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/active-wave-template.md",
+    note: "A compact shared template for one live swarm wave with one main lane and a few support lanes.",
     kind: "backlog",
     status: "active",
     feeds: ["docs", "program"]
@@ -558,7 +582,8 @@ export const topLevelRoutes = [
   { href: "/futures-board", label: "Futures" },
   { href: "/decisions", label: "Decisions" },
   { href: "/research", label: "Research" },
-  { href: "/vapps", label: "vApps" }
+  { href: "/vapps", label: "vApps" },
+  { href: "/launchpad", label: "Launchpad" }
 ];
 
 export function getPart(slug: string) {

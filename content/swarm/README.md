@@ -7,15 +7,21 @@ orchestrators are supposed to align around the same truth.
 
 Start here if you need the short version:
 
-1. [`fresh-orchestrator-read-order.md`](./fresh-orchestrator-read-order.md) - the
+1. [`orchestration-kernel.md`](./orchestration-kernel.md) - the simplest
+   control model for the swarm
+2. [`active-wave-current.md`](./active-wave-current.md) - the live wave shape
+   right now
+3. [`fresh-orchestrator-read-order.md`](./fresh-orchestrator-read-order.md) - the
    lean read path for a new orchestrator
-2. [`ema-swarm-workspace.md`](./ema-swarm-workspace.md) - the doctrine and
+4. [`ema-swarm-workspace.md`](./ema-swarm-workspace.md) - the doctrine and
    workspace model
-3. [`continuous-progress-protocol.md`](./continuous-progress-protocol.md) - the
+5. [`continuous-progress-protocol.md`](./continuous-progress-protocol.md) - the
    operating loop for active lanes
-4. [`orchestrator-alignment.md`](./orchestrator-alignment.md) - multi-orchestrator
+6. [`orchestrator-alignment.md`](./orchestrator-alignment.md) - multi-orchestrator
    coordination rules
-5. [`object-model.md`](./object-model.md) - canonical swarm vocabulary
+7. [`object-model.md`](./object-model.md) - canonical swarm vocabulary
+8. [`active-wave-template.md`](./active-wave-template.md) - the shared shape for
+   one live swarm wave
 
 If Claude is taking the main deliverables lane:
 
@@ -41,6 +47,7 @@ EMA-owned facts.
 
 ## What this pack covers
 
+- the minimum orchestration kernel that keeps the swarm coherent
 - why the shared swarm workspace exists
 - the overall workspace model
 - the key object families that should be treated as first-class

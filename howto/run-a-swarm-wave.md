@@ -9,13 +9,14 @@ another orchestrator.
 Before claiming work, read:
 
 1. [`../content/swarm/README.md`](../content/swarm/README.md)
-2. [`../content/swarm/fresh-orchestrator-read-order.md`](../content/swarm/fresh-orchestrator-read-order.md)
-3. [`../content/swarm/continuous-progress-protocol.md`](../content/swarm/continuous-progress-protocol.md)
-4. [`../content/swarm/orchestrator-alignment.md`](../content/swarm/orchestrator-alignment.md)
-5. [`../content/swarm/object-model.md`](../content/swarm/object-model.md)
-6. [`../content/swarm/no-drift-rules.md`](../content/swarm/no-drift-rules.md)
-7. [`../content/swarm/vision-guardrails.md`](../content/swarm/vision-guardrails.md)
-8. [`../OPEN_QUESTIONS.md`](../OPEN_QUESTIONS.md) for unresolved swarm-adjacent decisions
+2. [`../content/swarm/orchestration-kernel.md`](../content/swarm/orchestration-kernel.md)
+3. [`../content/swarm/fresh-orchestrator-read-order.md`](../content/swarm/fresh-orchestrator-read-order.md)
+4. [`../content/swarm/continuous-progress-protocol.md`](../content/swarm/continuous-progress-protocol.md)
+5. [`../content/swarm/orchestrator-alignment.md`](../content/swarm/orchestrator-alignment.md)
+6. [`../content/swarm/object-model.md`](../content/swarm/object-model.md)
+7. [`../content/swarm/no-drift-rules.md`](../content/swarm/no-drift-rules.md)
+8. [`../content/swarm/vision-guardrails.md`](../content/swarm/vision-guardrails.md)
+9. [`../OPEN_QUESTIONS.md`](../OPEN_QUESTIONS.md) for unresolved swarm-adjacent decisions
 
 If the wave is part of the current EMA 0.0.3 reconstruction pass, also read:
 
@@ -47,20 +48,23 @@ Do not use a swarm wave when:
 ## Minimal loop
 
 1. Read the current workspace state.
-2. Split work into narrow lanes with explicit ownership.
-3. Publish claims before edits.
-4. Keep each worker inside its lane.
-5. Refresh claims and handoffs as work moves.
-6. Reconcile outputs into the shared record.
-7. Close or hand off each lane explicitly.
+2. Name one main write lane.
+3. Add only the support lanes that actually help that main lane.
+4. Publish claims before edits.
+5. Keep each worker inside its lane.
+6. Refresh claims and handoffs as work moves.
+7. Reconcile outputs into the shared record.
+8. Close or hand off each lane explicitly.
 
 ## Lane design rules
 
+- Every wave should have one main write lane.
 - Each lane should have one primary owner.
 - Each lane should name exact files, folders, docs, or artifacts in scope.
 - Each lane should have a visible done-when.
 - Each lane should be small enough that another worker can understand it from the claim and handoff alone.
 - Keep discovery, implementation, verification, and reconciliation distinct unless the task is too small to justify splitting them.
+- If two lanes are changing the same main deliverable, stop and simplify.
 
 ## Claims and handoffs
 

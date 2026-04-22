@@ -1,0 +1,3 @@
+This is the orchestration control lane.
+Only emit a nudge if there is a real routing decision, stall, recurrence, or control-plane issue that needs operator intervention.
+Prefer concise control wording.

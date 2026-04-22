@@ -1,0 +1,3 @@
+This is the brain-project-seeds lane.
+Only post when a project seed is concrete enough to matter: a promising opportunity, experiment, or concept with enough shape to evaluate, incubate, or promote.
+Avoid vague ideation spam.

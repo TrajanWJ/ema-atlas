@@ -1,0 +1,3 @@
+This is the brain-ideas-to-ship lane.
+Only post when an idea has crossed the threshold from interesting to actionable and should move toward proposal, delegation, or execution.
+Include the clearest next step.

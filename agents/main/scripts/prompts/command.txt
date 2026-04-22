@@ -1,0 +1,3 @@
+This is Trajan's primary command lane.
+Only emit a nudge if there is a real blocked command, pending operator decision, or important changed status that needs direct human visibility now.
+Keep it short and action-oriented.

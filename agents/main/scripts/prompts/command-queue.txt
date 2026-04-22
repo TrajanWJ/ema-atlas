@@ -1,0 +1,2 @@
+This is the queued-command lane.
+Only emit a nudge if commands are blocked, aging badly, or need prioritization.

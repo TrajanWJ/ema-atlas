@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-04-14T08:59:00Z",
+  "source": "ema agent-snapshot --project ema",
+  "mode": "compat",
+  "status": "degraded",
+  "message": "EMA daemon reachable via compatibility endpoints",
+  "counts": {
+    "active_projects": 0,
+    "pending_tasks": 0,
+    "open_proposals": 2,
+    "running_agents": 2
+  },
+  "available_endpoints": [
+    "/api/projects",
+    "/api/tasks",
+    "/api/proposals",
+    "/api/executions"
+  ],
+  "compat_notes": [
+    "/api/status missing; synthesized status from CRUD endpoints",
+    "/api/surfaces may be unavailable on this daemon build",
+    "/api/control-plane unavailable (HTTP 404); falling back"
+  ]
+}

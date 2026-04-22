@@ -1,0 +1,224 @@
+[
+  {
+    "schedule": "*/2 * * * *",
+    "command": "/home/trajan/bin/gateway-watchdog.sh >> /var/log/gateway-watchdog.log 2>&1",
+    "name": "gateway-watchdog.log",
+    "class": "detector"
+  },
+  {
+    "schedule": "*/2 * * * *",
+    "command": "/home/trajan/bin/session-watchdog.sh",
+    "name": "session-watchdog.sh",
+    "class": "detector"
+  },
+  {
+    "schedule": "*/5 * * * *",
+    "command": "/home/trajan/bin/system-watchdog.sh >> /tmp/watchdog.log 2>&1",
+    "name": "watchdog.log",
+    "class": "detector"
+  },
+  {
+    "schedule": "*/10 * * * *",
+    "command": "/home/trajan/bin/auto-resume.sh >> /var/log/auto-resume.log 2>&1",
+    "name": "auto-resume.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "*/30 * * * *",
+    "command": "/home/trajan/bin/memory-pressure.sh --quiet >> /tmp/memory-pressure.log 2>&1",
+    "name": "memory-pressure.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "*/30 * * * *",
+    "command": "flock -n /tmp/qmd.lock timeout 300 bash -c \"/usr/bin/qmd update && /usr/bin/qmd embed\" 2>&1 | tail -5 >> /tmp/qmd-cron.log",
+    "name": "qmd-cron.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "*/30 * * * *",
+    "command": "sha256sum -c /home/trajan/config/integrity-checksums.txt --quiet 2>/dev/null || echo \"$(date -u +\\%Y-\\%m-\\%dT\\%H:\\%M:\\%SZ) INTEGRITY ALERT\" >> /var/log/integrity.log",
+    "name": "integrity.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 */3 * * *",
+    "command": "/home/trajan/bin/signal-to-queue.sh >> /tmp/signal-to-queue.log 2>&1",
+    "name": "signal-to-queue.log",
+    "class": "feeder"
+  },
+  {
+    "schedule": "0 */3 * * *",
+    "command": "flock -n /tmp/ontology-sync.lock python3 /home/trajan/skills/obsidian-ontology-sync/scripts/sync.py --config /home/trajan/skills/obsidian-ontology-sync/config.yaml extract >> /tmp/ontology-sync.log 2>&1",
+    "name": "ontology-sync.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 * * * *",
+    "command": "/home/trajan/bin/dispatch.sh schedule >> /tmp/dispatch-schedule.log 2>&1",
+    "name": "dispatch-schedule.log",
+    "class": "feeder"
+  },
+  {
+    "schedule": "30 */4 * * *",
+    "command": "/home/trajan/bin/reddit-intel.sh >> /home/trajan/logs/reddit-intel.log 2>&1",
+    "name": "reddit-intel.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 */2 * * *",
+    "command": "/home/trajan/scripts/vault-autocommit.sh >> /home/trajan/logs/vault-autocommit.log 2>&1",
+    "name": "vault-autocommit.log",
+    "class": "janitor"
+  },
+  {
+    "schedule": "0 4 * * *",
+    "command": "/home/trajan/scripts/session-janitor.sh >> /home/trajan/logs/session-janitor.log 2>&1",
+    "name": "session-janitor.log",
+    "class": "janitor"
+  },
+  {
+    "schedule": "0 4 * * *",
+    "command": "find /tmp -name \"*.log\" -user trajan -size +10M -exec truncate -s 1M {} \\; 2>/dev/null; find ~/dispatch/done -name \"*.json\" -mtime +14 -delete 2>/dev/null",
+    "name": "null",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 12 * * *",
+    "command": "bash /home/trajan/bin/overnight-digest.sh >> /tmp/overnight-digest.log 2>&1",
+    "name": "overnight-digest.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 14 * * *",
+    "command": "bash /home/trajan/bin/morning-briefing-v2.sh 2>&1 | head -200 >> /tmp/morning-briefing.log",
+    "name": "morning-briefing.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 */6 * * *",
+    "command": "crontab -l > /home/trajan/vault/System/cron-backup.txt",
+    "name": "cron-backup.txt",
+    "class": "unknown"
+  },
+  {
+    "schedule": "@reboot sleep 30 && /home/trajan/bin/cron-restore.sh",
+    "command": ">> /tmp/cron-restore.log 2>&1",
+    "name": "cron-restore.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "*/1 * * * *",
+    "command": "/home/trajan/bin/dispatch-engine.sh >> /tmp/dispatch-engine.log 2>&1",
+    "name": "dispatch-engine.log",
+    "class": "executor"
+  },
+  {
+    "schedule": "0 */2 * * *",
+    "command": "/home/trajan/bin/proactive-task-generator.sh >> /tmp/proactive-task-generator.log 2>&1",
+    "name": "proactive-task-generator.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 2 * * *",
+    "command": "/home/trajan/bin/research-implement-pipeline.sh >> /home/trajan/logs/research-pipeline.log 2>&1",
+    "name": "research-pipeline.log",
+    "class": "executor"
+  },
+  {
+    "schedule": "0 9 * * *",
+    "command": "bash /home/trajan/bin/vault-janitor.sh >> /tmp/vault-janitor.log 2>&1",
+    "name": "vault-janitor.log",
+    "class": "janitor"
+  },
+  {
+    "schedule": "*/5 * * * *",
+    "command": "flock -n /tmp/links-pipeline.lock /home/trajan/bin/links-pipeline.sh >> /home/trajan/logs/links-pipeline.log 2>&1",
+    "name": "links-pipeline.log",
+    "class": "executor"
+  },
+  {
+    "schedule": "*/5 * * * *",
+    "command": "/home/trajan/bin/proposal-cron.sh >> /home/trajan/logs/proposal-cron.log 2>&1",
+    "name": "proposal-cron.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 6 * * 1",
+    "command": "flock -n /tmp/competitive-scan.lock /home/trajan/bin/competitive-scan.sh >> /home/trajan/logs/competitive-scan.log 2>&1",
+    "name": "competitive-scan.log",
+    "class": "detector"
+  },
+  {
+    "schedule": "0 */4 * * *",
+    "command": "flock -n /tmp/vault-research-loop.lock /home/trajan/bin/vault-research-loop.sh >> /home/trajan/logs/vault-research-loop.log 2>&1",
+    "name": "vault-research-loop.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 2 * * 0",
+    "command": "flock -n /tmp/evolution-loop.lock /home/trajan/bin/evolution-loop.sh >> /home/trajan/logs/evolution-loop.log 2>&1",
+    "name": "evolution-loop.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 3 * * *",
+    "command": "flock -n /tmp/agent-learning-sync.lock /home/trajan/bin/agent-learning-sync.sh >> /home/trajan/logs/agent-learning-sync.log 2>&1",
+    "name": "agent-learning-sync.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "*/15 * * * *",
+    "command": "flock -n /tmp/desk-dispatch.lock /home/trajan/bin/desk-dispatch.sh --scan >> /home/trajan/logs/desk-dispatch.log 2>&1",
+    "name": "desk-dispatch.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 */6 * * *",
+    "command": "flock -n /tmp/transcript-scanner.lock /home/trajan/bin/transcript-scanner.sh >> /home/trajan/logs/transcript-scanner.log 2>&1",
+    "name": "transcript-scanner.log",
+    "class": "detector"
+  },
+  {
+    "schedule": "*/30 * * * *",
+    "command": "/home/trajan/bin/stale-task-cleanup.sh >> /home/trajan/logs/stale-task-cleanup.log 2>&1",
+    "name": "stale-task-cleanup.log",
+    "class": "janitor"
+  },
+  {
+    "schedule": "*/30 * * * *",
+    "command": "/home/trajan/bin/session-tree.sh volatile-check >> /home/trajan/vault/System/session-tree-expiry.log 2>&1",
+    "name": "session-tree-expiry.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 8 * * *",
+    "command": "/home/trajan/bin/github-trending-intel.sh >> /home/trajan/logs/github-trending.log 2>&1",
+    "name": "github-trending.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "0 */2 * * *",
+    "command": "/home/trajan/bin/system-integrity-scan.sh --fix --quiet >> /home/trajan/logs/integrity-scan.log 2>&1",
+    "name": "integrity-scan.log",
+    "class": "mutator"
+  },
+  {
+    "schedule": "*/15 * * * *",
+    "command": "/home/trajan/bin/dispatch-heartbeat.sh >> /home/trajan/logs/dispatch-heartbeat.log 2>&1",
+    "name": "dispatch-heartbeat.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "*/30 * * * *",
+    "command": "flock -n /tmp/host-oauth-sync.lock /home/trajan/bin/sync-host-oauth.sh >> /home/trajan/logs/host-oauth-sync.log 2>&1",
+    "name": "host-oauth-sync.log",
+    "class": "unknown"
+  },
+  {
+    "schedule": "* * * * *",
+    "command": "flock -n /tmp/oauth-auto-approve.lock /home/trajan/bin/oauth-auto-approve.sh >> /home/trajan/logs/oauth-auto-approve.log 2>&1",
+    "name": "oauth-auto-approve.log",
+    "class": "mutator"
+  }
+]

@@ -1,0 +1,2 @@
+This is the synthesized results lane.
+Only emit a nudge if real completed work is waiting for promotion, synthesis, or review.

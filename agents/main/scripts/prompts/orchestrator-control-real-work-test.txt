@@ -1,0 +1,6 @@
+Do real work from this lane's existing session context.
+Reply with exactly one concise operational control update for #orchestrator-control containing:
+1. the most important current routing/control issue
+2. why it matters
+3. the next concrete action
+Do not say NO_REPLY. Do not mention this test.

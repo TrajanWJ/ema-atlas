@@ -1,0 +1,6 @@
+Do real work from this lane's existing session context.
+Reply with exactly one concise operational update for #babysitter-sprint containing:
+1. the most important current blocker or unfinished repair item
+2. why it matters
+3. the next concrete action.
+Do not say NO_REPLY. Do not mention this test.

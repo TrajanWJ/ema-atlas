@@ -1,0 +1,26 @@
+{
+  "name": "toomanytools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Maximalist media/asset/MCP workspace for OpenClaw agent toomanytools",
+  "type": "module",
+  "scripts": {
+    "mcp:remotion": "npx @remotion/mcp",
+    "mcp:charts": "npx @antv/mcp-server-chart",
+    "mcp:playwright": "npx @playwright/mcp",
+    "mcp:mermaid": "npx mcp-mermaid",
+    "svg:optimize": "svgo -f assets/svg",
+    "remotion:studio": "remotion studio",
+    "remotion:render": "remotion render",
+    "doctor": "node scripts/doctor.mjs"
+  },
+  "dependencies": {
+    "@antv/mcp-server-chart": "^0.9.10",
+    "@playwright/mcp": "^0.0.70",
+    "@remotion/mcp": "^4.0.448",
+    "mcp-mermaid": "^0.4.1",
+    "remotion": "^4.0.448",
+    "sharp": "^0.34.4",
+    "svgo": "^3.3.2"
+  }
+}

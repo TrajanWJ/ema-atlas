@@ -1,0 +1,126 @@
+{
+  "channel": {
+    "id": "1489841292627152916",
+    "name": "babysitter-repair-log"
+  },
+  "summary": {
+    "primary_root_cause": "Split-brain automation authority between old EMA watchdogs and live OpenClaw runtime",
+    "current_state": "Recovery continuations exist, but live OpenClaw config is still invalid and old gateway-watchdog cron remains active",
+    "confidence": "high"
+  },
+  "blockers": [
+    {
+      "id": "old-watchdog-active",
+      "severity": "critical",
+      "evidence": "/home/trajan/config/crons.conf still includes gateway-watchdog.sh every 2m"
+    },
+    {
+      "id": "invalid-streaming-schema",
+      "severity": "critical",
+      "evidence": "~/.openclaw/openclaw.json channels.discord.streaming and channels.telegram.streaming are {'mode':'partial'}"
+    },
+    {
+      "id": "version-schema-mismatch",
+      "severity": "high",
+      "evidence": "session summary reported config written by newer OpenClaw 2026.4.14 while runtime is 2026.3.13"
+    },
+    {
+      "id": "session-store-drift",
+      "severity": "high",
+      "evidence": "orchestrator-implementation binding was missing while sibling lane bindings existed"
+    },
+    {
+      "id": "topology-expanded-under-instability",
+      "severity": "medium",
+      "evidence": "brain lanes and five recovery lanes added before authority stabilized"
+    }
+  ],
+  "timeline": [
+    {
+      "ts": "2026-04-14",
+      "event": "Managed self-nudge crons found missing; babysitter signal check added; real control alert delivered to babysitter-sprint"
+    },
+    {
+      "ts": "2026-04-15/16",
+      "event": "Heartbeat pressure continued; some scheduled delivery proof existed but durability remained unresolved"
+    },
+    {
+      "ts": "2026-04-17T00:41Z",
+      "event": "New mah brain category and lanes created with bindings and continuation jobs"
+    },
+    {
+      "ts": "2026-04-17T00:55Z-01:55Z",
+      "event": "Failure signature converged on invalid streaming schema and missing orchestrator-implementation session binding"
+    },
+    {
+      "ts": "2026-04-17T01:56Z-02:07Z",
+      "event": "Direct repair temporarily fixed config/session state, then regression exposed external writer; old EMA watchdog identified as strongest suspect"
+    },
+    {
+      "ts": "2026-04-17T02:25Z-06:10Z",
+      "event": "Lane oscillated between verified and blocked due to local proof without durable runtime stability"
+    },
+    {
+      "ts": "2026-04-17T06:15Z",
+      "event": "Operator requested full ingest and five recovery lanes; crons for recovery lanes were added"
+    }
+  ],
+  "lost_threads": [
+    "Disable or quarantine gateway-watchdog authority",
+    "Trace actual writer lineage for openclaw.json and sessions.json",
+    "Stabilize orchestrator-implementation session lineage",
+    "Define durability-based verification criteria",
+    "Decide whether new brain/recovery lanes should stay enabled during repair"
+  ],
+  "recovery_lanes": [
+    "recovery-chronology",
+    "recovery-config-runtime",
+    "recovery-session-lineage",
+    "recovery-lost-threads",
+    "recovery-rebuild-plan"
+  ],
+  "artifacts_to_maintain": [
+    "authority-graph",
+    "lane-lineage-table",
+    "config-schema-drift-ledger",
+    "verification-ladder",
+    "lost-thread-queue"
+  ],
+  "evidence": [
+    {
+      "type": "script",
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh",
+      "claim": "Lane continuation hard-depends on sessions.json binding"
+    },
+    {
+      "type": "script",
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scripts/babysitter_signal_check.sh",
+      "claim": "Control-lane signal check added to watch missing crons and gateway churn"
+    },
+    {
+      "type": "script",
+      "path": "/home/trajan/bin/gateway-watchdog.sh",
+      "claim": "Old EMA watchdog runs EMA doctor --fix against EMA-era config path"
+    },
+    {
+      "type": "file",
+      "path": "/home/trajan/config/crons.conf",
+      "claim": "Contains both old gateway-watchdog and new continuation/recovery jobs"
+    },
+    {
+      "type": "file",
+      "path": "/home/trajan/.openclaw/openclaw.json",
+      "claim": "Current streaming fields are invalid object shape"
+    },
+    {
+      "type": "file",
+      "path": "/home/trajan/.openclaw/agents/main/sessions/sessions.json",
+      "claim": "Current repair-log and babysitter-sprint session keys exist; history documented missing orchestrator-implementation key"
+    },
+    {
+      "type": "doc",
+      "path": "/home/trajan/.openclaw/agents/main/workspace/bootstrap/automation-registry.curated.json",
+      "claim": "gateway-watchdog already classified as high-risk canonical mutator"
+    }
+  ]
+}

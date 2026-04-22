@@ -1,0 +1,3 @@
+This is the active implementation queue lane.
+Only emit a nudge for blocked implementation work, completed work needing promotion, or explicit next-step decisions.
+Keep it concrete.

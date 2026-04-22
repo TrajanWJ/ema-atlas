@@ -1,0 +1,9 @@
+from pathlib import Path
+path = Path('/home/trajan/Projects/ema/apps/renderer/src/components/hq/HQApp.tsx')
+text = path.read_text()
+text = text.replace("  const [goalProvenance, setGoalProvenance] = useState<GoalProvenanceBundle[]>([]);\n  const [intentTree, setIntentTree] = useState<IntentNode[]>([]);\n  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);\n", "  const [goalProvenance, setGoalProvenance] = useState<GoalProvenanceBundle[]>([]);\n  const [intentTree, setIntentTree] = useState<IntentNode[]>([]);\n  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);\n  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);\n")
+anchor = "  const scopedGoalProvenance = useMemo(() => (\n    selectedProject\n      ? goalProvenance.filter(({ goal }) => goal.project_id === selectedProject.id)\n      : goalProvenance\n  ), [goalProvenance, selectedProject]);\n  const provenanceCoverageCount = scopedGoalProvenance.filter(({ provenance }) => provenance?.receipt || provenance?.review_item || provenance?.chronicle).length;\n  const selectedGoalProvenance = scopedGoalProvenance[0] ?? null;\n"
+replace = anchor + "\n  useEffect(() => {\n    if (selectedGoalId && scopedGoalProvenance.some(({ goal }) => goal.id === selectedGoalId)) return;\n    setSelectedGoalId(scopedGoalProvenance[0]?.goal.id ?? null);\n  }, [scopedGoalProvenance, selectedGoalId]);\n\n  const selectedGoalProvenance = scopedGoalProvenance.find(({ goal }) => goal.id === selectedGoalId) ?? scopedGoalProvenance[0] ?? null;\n"
+text = text.replace(anchor, replace)
+text = text.replace("                          highlighted={selectedGoalProvenance?.goal.id === goal.id}\n                          onClick={() => void openGoal(goal)}\n", "                          highlighted={selectedGoalProvenance?.goal.id === goal.id}\n                          onClick={() => setSelectedGoalId(goal.id)}\n")
+path.write_text(text)

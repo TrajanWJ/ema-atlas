@@ -1,0 +1,3 @@
+This is the canonical babysitter control lane.
+Only emit an alert if there is a real blocker, repair regression, lane binding issue, or decision that needs operator attention.
+Prefer very short control-lane wording.

@@ -1,0 +1,3 @@
+This is the EMA/runtime/control-plane operations lane.
+Only emit a nudge on real runtime state changes, daemon/proxy/host blockers, or recovery actions needing attention.
+Prefer concise ops wording.

@@ -1,0 +1,131 @@
+version: 1
+system: real-estate-agent-network
+shared_agents:
+  - name: Portfolio Director Agent
+    lane: re-hq
+    purpose: portfolio-level prioritization and division allocation
+    outputs: [weekly priorities, resource shifts, strategic directives]
+  - name: Opportunity Intake Agent
+    lane: opportunity-intake-agent
+    purpose: normalize all inbound leads into common schema
+    outputs: [normalized opportunity records]
+  - name: Lead Enrichment Agent
+    lane: lead-enrichment-agent
+    purpose: append owner, parcel, market, distress, and context enrichment
+    outputs: [enriched lead records]
+  - name: Strategy Router Agent
+    lane: strategy-router-agent
+    purpose: route opportunities to best-fit strategy
+    outputs: [primary_strategy, assigned_lane, confidence]
+  - name: Follow-Up Orchestrator Agent
+    lane: follow-up-orchestrator-agent
+    purpose: create next-action sequences and protect against dropped leads
+    outputs: [tasks, reminders, follow-up cadences]
+  - name: KPI Intelligence Agent
+    lane: kpi-intelligence-agent
+    purpose: summarize pipeline, conversion, and bottlenecks
+    outputs: [daily summaries, weekly KPI reports]
+wholesaling:
+  - name: Off-Market List Builder Agent
+    lane: off-market-list-builder-agent
+    purpose: build niche lead lists using off-market filters
+    outputs: [lead lists]
+  - name: Distress Monitoring Agent
+    lane: distress-monitoring-agent
+    purpose: detect probate, foreclosure, tax, code, eviction, and distress records
+    outputs: [distress leads]
+  - name: Seller Motivation Scoring Agent
+    lane: seller-motivation-scoring-agent
+    purpose: score urgency and discount likelihood
+    outputs: [motivation score, priority rank]
+  - name: Outreach Agent
+    lane: outreach-agent
+    purpose: manage cold outreach sequences
+    outputs: [contact attempts, templates, reply classifications]
+  - name: Acquisitions Triage Agent
+    lane: acquisitions-triage-agent
+    purpose: classify seller responses and escalate hot leads
+    outputs: [hot/warm/dead classifications]
+  - name: Fast Underwriting Agent
+    lane: fast-underwriting-agent
+    purpose: estimate ARV, repairs, MAO, and assignment spread
+    outputs: [wholesale underwriting briefs]
+  - name: Buyer Match Dispo Agent
+    lane: buyer-match-dispo-agent
+    purpose: align contracted opportunities to buyer boxes
+    outputs: [buyer matches, dispo briefs]
+rental:
+  - name: Rental Market Intelligence Agent
+    lane: rental-market-intelligence-agent
+    purpose: monitor rents, vacancy, and submarket health
+    outputs: [market snapshots]
+  - name: Buy Box Filter Agent
+    lane: buy-box-filter-agent
+    purpose: filter opportunities against hold criteria
+    outputs: [pass/fail buy-box decisions]
+  - name: Rental Underwriting Agent
+    lane: rental-underwriting-agent
+    purpose: model DSCR, cap rate, expenses, and cash-on-cash returns
+    outputs: [rental underwriting briefs]
+  - name: Rehab Turn Scope Agent
+    lane: rehab-turn-scope-agent
+    purpose: estimate rent-ready scope and deferred maintenance risk
+    outputs: [turn scope summaries]
+  - name: Portfolio Fit Agent
+    lane: portfolio-fit-agent
+    purpose: determine strategic fit within portfolio constraints
+    outputs: [fit assessment]
+  - name: Asset Management Agent
+    lane: asset-management-agent
+    purpose: monitor post-close performance and NOI drift
+    outputs: [asset health summaries]
+multifamily_commercial:
+  - name: Deal Intake OM Parser Agent
+    lane: deal-intake-om-parser-agent
+    purpose: parse offering memorandums, rent rolls, and T12s
+    outputs: [structured OM extracts]
+  - name: Commercial Underwriting Agent
+    lane: commercial-underwriting-agent
+    purpose: model NOI, pro forma, debt, exit cap, and returns
+    outputs: [commercial underwriting packages]
+  - name: Distress Loan Maturity Agent
+    lane: distress-loan-maturity-agent
+    purpose: track debt stress and operational weakness
+    outputs: [maturity/distress watchlists]
+  - name: Broker Relationship Agent
+    lane: broker-relationship-agent
+    purpose: organize broker intelligence and relationship cadence
+    outputs: [broker notes, follow-up actions]
+  - name: Diligence Agent
+    lane: diligence-agent
+    purpose: manage diligence checklist and issue tracking
+    outputs: [diligence checklists, red flags]
+  - name: Asset Optimization Agent
+    lane: asset-optimization-agent
+    purpose: surface NOI growth and ops improvement opportunities
+    outputs: [optimization recommendations]
+land_development:
+  - name: Land Sourcing Agent
+    lane: land-sourcing-agent
+    purpose: source vacant land, lots, assemblages, and teardown candidates
+    outputs: [parcel opportunities]
+  - name: Zoning Entitlement Agent
+    lane: zoning-entitlement-agent
+    purpose: evaluate zoning, overlays, density, and rezoning paths
+    outputs: [zoning briefs]
+  - name: GIS Parcel Constraints Agent
+    lane: gis-parcel-constraints-agent
+    purpose: evaluate flood, wetlands, utility, access, and physical constraints
+    outputs: [constraints reports]
+  - name: Highest Best Use Agent
+    lane: highest-best-use-agent
+    purpose: compare hold, subdivide, rezone, teardown, and build scenarios
+    outputs: [HBU recommendations]
+  - name: Development Underwriting Agent
+    lane: development-underwriting-agent
+    purpose: model land basis, entitlement cost, build cost, and developer margin
+    outputs: [development underwriting packages]
+  - name: Municipality Planning Monitor Agent
+    lane: municipality-planning-monitor-agent
+    purpose: track planning agendas, permits, and nearby development signals
+    outputs: [planning watch summaries]

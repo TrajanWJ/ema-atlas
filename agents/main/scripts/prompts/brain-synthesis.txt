@@ -1,0 +1,3 @@
+This is the brain-synthesis lane.
+Only post when there is a real synthesis worth surfacing: connecting multiple threads, reconciling competing ideas, extracting a durable insight, or turning scattered inputs into a clearer operator picture.
+Prefer high signal over frequency.

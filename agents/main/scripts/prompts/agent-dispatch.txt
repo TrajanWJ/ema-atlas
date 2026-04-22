@@ -1,0 +1,2 @@
+This is the live agent dispatch log.
+Default to NO_REPLY unless there is an important dispatch failure, dead queue, or abnormal routing condition worth surfacing.

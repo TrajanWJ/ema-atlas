@@ -1,0 +1,1997 @@
+{
+  "version": 1,
+  "generatedFrom": [
+    "active user crontab",
+    "observed systemd user services",
+    "bootstrap audit docs"
+  ],
+  "entries": [
+    {
+      "id": "service.openclaw-gateway",
+      "kind": "service",
+      "owner": "ops",
+      "domain": "openclaw",
+      "class": "executor",
+      "risk": "high",
+      "externalEffects": true,
+      "canonical": true,
+      "unit": "openclaw-gateway.service",
+      "script": "/usr/lib/node_modules/openclaw/dist/index.js gateway --port 18789",
+      "reads": [
+        "~/.openclaw/openclaw.json",
+        "~/.openclaw/.env"
+      ],
+      "writes": [
+        "/tmp/openclaw/",
+        "~/.openclaw/logs/"
+      ],
+      "docs": [
+        "BOOTSTRAP_RUNBOOK.md",
+        "LOG_INDEX_AND_SERVICE_DEPENDENCIES_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": true,
+      "writesSensitive": true,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P1"
+    },
+    {
+      "id": "service.oauth-credentials-watcher",
+      "kind": "service",
+      "owner": "ops",
+      "domain": "auth",
+      "class": "mutator",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": true,
+      "unit": "oauth-credentials-watcher.service",
+      "script": "/home/trajan/bin/oauth-credentials-watcher.sh",
+      "reads": [
+        "local CLI credential stores"
+      ],
+      "writes": [
+        "OpenClaw-accessible credential state",
+        "oauth watcher logs"
+      ],
+      "docs": [
+        "BOOTSTRAP_RUNBOOK.md",
+        "LOG_INDEX_AND_SERVICE_DEPENDENCIES_2026-04-06.md"
+      ],
+      "status": "canonical",
+      "related": [
+        "cron.host-oauth-sync",
+        "cron.oauth-auto-approve"
+      ],
+      "notes": "Primary local auth sync trigger; canonical local propagation path, downstream of intentional host bridge when applicable.",
+      "touchesCredentials": true,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P1"
+    },
+    {
+      "id": "service.ema-observer",
+      "kind": "service",
+      "owner": "ops",
+      "domain": "ema",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": true,
+      "canonical": true,
+      "unit": "ema-observer.service",
+      "script": "pnpm exec next start --hostname 0.0.0.0 --port 3200",
+      "reads": [
+        "/home/trajan/projects/frontend-layer"
+      ],
+      "writes": [
+        "/home/trajan/logs/ema-observer.log"
+      ],
+      "docs": [
+        "EMA_INTEGRATION_MAP_2026-04-06.md",
+        "LOG_INDEX_AND_SERVICE_DEPENDENCIES_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.gateway-watchdog",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "mutator",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/2 * * * *",
+      "script": "/home/trajan/bin/gateway-watchdog.sh",
+      "reads": [
+        "gateway runtime state"
+      ],
+      "writes": [
+        "/var/log/gateway-watchdog.log"
+      ],
+      "docs": [
+        "CRON_SERVICE_CLASSIFICATION_2026-04-06.md",
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "high-risk-canonical",
+      "related": [
+        "cron.session-watchdog",
+        "cron.system-watchdog"
+      ],
+      "notes": "Self-healing gateway recovery controller with config mutation and AI-assisted repair behavior.",
+      "touchesCredentials": false,
+      "touchesConfig": true,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P2"
+    },
+    {
+      "id": "cron.session-watchdog",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/2 * * * *",
+      "script": "/home/trajan/bin/session-watchdog.sh",
+      "reads": [
+        "session/runtime state"
+      ],
+      "writes": [
+        "session health side effects or logs"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "canonical",
+      "related": [
+        "cron.gateway-watchdog",
+        "cron.system-watchdog"
+      ],
+      "notes": "Post-restart resume notifier, not a general watchdog.",
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P2"
+    },
+    {
+      "id": "cron.system-watchdog",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/5 * * * *",
+      "script": "/home/trajan/bin/system-watchdog.sh",
+      "reads": [
+        "system state"
+      ],
+      "writes": [
+        "/tmp/watchdog.log"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "canonical",
+      "related": [
+        "cron.gateway-watchdog",
+        "cron.session-watchdog"
+      ],
+      "notes": "System alerting/remediation layer, broader than gateway recovery.",
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P2"
+    },
+    {
+      "id": "cron.auto-resume",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "recovery",
+      "class": "mutator",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/10 * * * *",
+      "script": "/home/trajan/bin/auto-resume.sh",
+      "reads": [
+        "session/task state"
+      ],
+      "writes": [
+        "runtime/session recovery state",
+        "/var/log/auto-resume.log"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P1",
+      "notes": "Session resurrection nudge keyed off CONTINUE.md and absence of active main session; narrower than its name suggests."
+    },
+    {
+      "id": "cron.signal-to-queue",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "feeder",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "0 */3 * * *",
+      "script": "/home/trajan/bin/signal-to-queue.sh",
+      "reads": [
+        "signals / source systems"
+      ],
+      "writes": [
+        "/home/trajan/dispatch/queue",
+        "/tmp/signal-to-queue.log"
+      ],
+      "docs": [
+        "DISPATCH_SUBSTRATE_MAP_2026-04-06.md",
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "canonical",
+      "related": [
+        "cron.dispatch-schedule-loader",
+        "cron.proactive-task-generator"
+      ],
+      "notes": "Condition/signal-based dispatch feeder.",
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P2"
+    },
+    {
+      "id": "cron.dispatch-schedule-loader",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "feeder",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "0 * * * *",
+      "script": "/home/trajan/bin/dispatch.sh schedule",
+      "reads": [
+        "scheduling inputs"
+      ],
+      "writes": [
+        "/home/trajan/dispatch/schedule.json",
+        "/tmp/dispatch-schedule.log"
+      ],
+      "docs": [
+        "DISPATCH_SUBSTRATE_MAP_2026-04-06.md"
+      ],
+      "status": "canonical",
+      "related": [
+        "cron.signal-to-queue",
+        "cron.proactive-task-generator"
+      ],
+      "notes": "Primary structured dispatch feeder.",
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P2"
+    },
+    {
+      "id": "cron.dispatch-engine",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "executor",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/1 * * * *",
+      "script": "/home/trajan/bin/dispatch-engine.sh",
+      "reads": [
+        "/home/trajan/dispatch/queue",
+        "/home/trajan/dispatch/schedule.json",
+        "/home/trajan/dispatch/dispatch.db"
+      ],
+      "writes": [
+        "/home/trajan/dispatch/active",
+        "/home/trajan/dispatch/done",
+        "/home/trajan/dispatch/failed",
+        "/tmp/dispatch-engine.log"
+      ],
+      "docs": [
+        "DISPATCH_SUBSTRATE_MAP_2026-04-06.md",
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "canonical",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P1",
+      "notes": "Dispatch control plane; core infrastructure with high complexity concentration. Protect lifecycle invariants."
+    },
+    {
+      "id": "cron.dispatch-heartbeat",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/15 * * * *",
+      "script": "/home/trajan/bin/dispatch-heartbeat.sh",
+      "reads": [
+        "dispatch health"
+      ],
+      "writes": [
+        "/home/trajan/logs/dispatch-heartbeat.log"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.proactive-task-generator",
+      "kind": "cron",
+      "owner": "strategist",
+      "domain": "dispatch",
+      "class": "feeder",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */2 * * *",
+      "script": "/home/trajan/bin/proactive-task-generator.sh",
+      "reads": [
+        "system/project state"
+      ],
+      "writes": [
+        "/home/trajan/dispatch/proposals",
+        "/tmp/proactive-task-generator.log"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "heuristic",
+      "related": [
+        "cron.dispatch-schedule-loader",
+        "cron.signal-to-queue"
+      ],
+      "notes": "Opportunity/suggestion feeder; non-authoritative.",
+      "touchesCredentials": true,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P2"
+    },
+    {
+      "id": "cron.vault-research-loop",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "0 */4 * * *",
+      "script": "/home/trajan/bin/vault-research-loop.sh",
+      "reads": [
+        "/home/trajan/vault",
+        "/home/trajan/dispatch"
+      ],
+      "writes": [
+        "/home/trajan/dispatch/proposals",
+        "/home/trajan/logs/vault-research-loop.log"
+      ],
+      "docs": [
+        "VAULT_KNOWLEDGE_FLOW_MAP_2026-04-06.md",
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.transcript-scanner",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "0 */6 * * *",
+      "script": "/home/trajan/bin/transcript-scanner.sh",
+      "reads": [
+        "session transcripts / logs"
+      ],
+      "writes": [
+        "vault/knowledge artifacts",
+        "/home/trajan/logs/transcript-scanner.log"
+      ],
+      "docs": [
+        "VAULT_KNOWLEDGE_FLOW_MAP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.qmd-update-embed",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "mutator",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/30 * * * *",
+      "script": "/usr/bin/qmd update && /usr/bin/qmd embed",
+      "reads": [
+        "qmd sources"
+      ],
+      "writes": [
+        "qmd index/embed state",
+        "/tmp/qmd-cron.log"
+      ],
+      "docs": [
+        "VAULT_KNOWLEDGE_FLOW_MAP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.ontology-sync-extract",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "0 */3 * * *",
+      "script": "python3 /home/trajan/skills/obsidian-ontology-sync/scripts/sync.py --config /home/trajan/skills/obsidian-ontology-sync/config.yaml extract",
+      "reads": [
+        "/home/trajan/vault"
+      ],
+      "writes": [
+        "/tmp/ontology-sync.log"
+      ],
+      "docs": [
+        "VAULT_KNOWLEDGE_FLOW_MAP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": true,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.vault-autocommit",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "publisher",
+      "risk": "medium",
+      "externalEffects": true,
+      "canonical": true,
+      "schedule": "0 */2 * * *",
+      "script": "/home/trajan/scripts/vault-autocommit.sh",
+      "reads": [
+        "/home/trajan/vault"
+      ],
+      "writes": [
+        "git history for vault",
+        "/home/trajan/logs/vault-autocommit.log"
+      ],
+      "docs": [
+        "VAULT_KNOWLEDGE_FLOW_MAP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.vault-janitor",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "janitor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "0 9 * * *",
+      "script": "/home/trajan/bin/vault-janitor.sh",
+      "reads": [
+        "/home/trajan/vault"
+      ],
+      "writes": [
+        "/tmp/vault-janitor.log"
+      ],
+      "docs": [
+        "VAULT_KNOWLEDGE_FLOW_MAP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.research-implement-pipeline",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "research",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 2 * * *",
+      "script": "/home/trajan/bin/research-implement-pipeline.sh",
+      "reads": [
+        "research queue / project state"
+      ],
+      "writes": [
+        "/home/trajan/logs/research-pipeline.log",
+        "dispatch/research artifacts"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.reddit-intel",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "intel",
+      "class": "ingestor",
+      "risk": "low",
+      "externalEffects": true,
+      "canonical": true,
+      "schedule": "30 */4 * * *",
+      "script": "/home/trajan/bin/reddit-intel.sh",
+      "reads": [
+        "external reddit/intel sources"
+      ],
+      "writes": [
+        "/home/trajan/logs/reddit-intel.log",
+        "/home/trajan/dispatch/results"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.github-trending-intel",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "intel",
+      "class": "ingestor",
+      "risk": "low",
+      "externalEffects": true,
+      "canonical": true,
+      "schedule": "0 8 * * *",
+      "script": "/home/trajan/bin/github-trending-intel.sh",
+      "reads": [
+        "external github sources"
+      ],
+      "writes": [
+        "/home/trajan/logs/github-trending.log",
+        "/home/trajan/dispatch/results"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.oauth-auto-approve",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "auth",
+      "class": "mutator",
+      "risk": "critical",
+      "externalEffects": true,
+      "canonical": false,
+      "schedule": "* * * * *",
+      "script": "/home/trajan/bin/oauth-auto-approve.sh",
+      "reads": [
+        "browser OAuth pages / auth state"
+      ],
+      "writes": [
+        "credential approval state",
+        "/home/trajan/logs/oauth-auto-approve.log"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "dangerous-convenience",
+      "related": [
+        "service.oauth-credentials-watcher",
+        "cron.host-oauth-sync"
+      ],
+      "notes": "Browser-coupled auth automation; should not be normal-path dependency.",
+      "touchesCredentials": true,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": true,
+      "decision": "demote",
+      "priority": "P1"
+    },
+    {
+      "id": "cron.host-oauth-sync",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "auth",
+      "class": "mutator",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/30 * * * *",
+      "script": "/home/trajan/bin/sync-host-oauth.sh",
+      "reads": [
+        "host OAuth sources"
+      ],
+      "writes": [
+        "OpenClaw/agent-side auth state",
+        "/home/trajan/logs/host-oauth-sync.log"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "canonical",
+      "related": [
+        "service.oauth-credentials-watcher",
+        "cron.oauth-auto-approve"
+      ],
+      "notes": "Intentional host\u2192VM credential bridge; accepted upstream auth dependency.",
+      "touchesCredentials": true,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P1"
+    },
+    {
+      "id": "cron.integrity-scan-fix",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "integrity",
+      "class": "mutator",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */2 * * *",
+      "script": "/home/trajan/bin/system-integrity-scan.sh --fix --quiet",
+      "reads": [
+        "system integrity state"
+      ],
+      "writes": [
+        "system/integrity state",
+        "/home/trajan/logs/integrity-scan.log"
+      ],
+      "docs": [
+        "AUTOMATION_CRON_DEEPER_CLEANUP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P1",
+      "notes": "Over-bundled detector+mutator janitor; should eventually split into detect-only, safe-fix, and dangerous-fix modes."
+    },
+    {
+      "id": "cron.session-janitor",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "janitor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "0 4 * * *",
+      "script": "/home/trajan/scripts/session-janitor.sh",
+      "reads": [
+        "session artifacts"
+      ],
+      "writes": [
+        "/home/trajan/logs/session-janitor.log"
+      ],
+      "docs": [
+        "CRON_SERVICE_CLASSIFICATION_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.stale-task-cleanup",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "janitor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": true,
+      "schedule": "*/30 * * * *",
+      "script": "/home/trajan/bin/stale-task-cleanup.sh",
+      "reads": [
+        "dispatch/task state"
+      ],
+      "writes": [
+        "/home/trajan/logs/stale-task-cleanup.log"
+      ],
+      "docs": [
+        "CRON_SERVICE_CLASSIFICATION_2026-04-06.md",
+        "DISPATCH_SUBSTRATE_MAP_2026-04-06.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.gateway-watchdog.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/2 * * * *",
+      "script": "/home/trajan/bin/gateway-watchdog.sh >> /var/log/gateway-watchdog.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.watchdog.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/5 * * * *",
+      "script": "/home/trajan/bin/system-watchdog.sh >> /tmp/watchdog.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.auto-resume.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/10 * * * *",
+      "script": "/home/trajan/bin/auto-resume.sh >> /var/log/auto-resume.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.memory-pressure.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/30 * * * *",
+      "script": "/home/trajan/bin/memory-pressure.sh --quiet >> /tmp/memory-pressure.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.qmd",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/30 * * * *",
+      "script": "flock -n /tmp/qmd.lock timeout 300 bash -c \"/usr/bin/qmd update && /usr/bin/qmd embed\" 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.null",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/30 * * * *",
+      "script": "sha256sum -c /home/trajan/config/integrity-checksums.txt --quiet 2>/dev/null",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": true,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.signal-to-queue.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */3 * * *",
+      "script": "/home/trajan/bin/signal-to-queue.sh >> /tmp/signal-to-queue.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.ontology-sync.log",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */3 * * *",
+      "script": "flock -n /tmp/ontology-sync.lock python3 /home/trajan/skills/obsidian-ontology-sync/scripts/sync.py --config /home/trajan/skills/obsidian-ontology-sync/config.yaml extract >> /tmp/ontology-sync.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": true,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.dispatch-schedule.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 * * * *",
+      "script": "/home/trajan/bin/dispatch.sh schedule >> /tmp/dispatch-schedule.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.reddit-intel.log",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "research",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": true,
+      "canonical": false,
+      "schedule": "30 */4 * * *",
+      "script": "/home/trajan/bin/reddit-intel.sh >> /home/trajan/logs/reddit-intel.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.vault-autocommit.log",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "mutator",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */2 * * *",
+      "script": "/home/trajan/scripts/vault-autocommit.sh >> /home/trajan/logs/vault-autocommit.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.session-janitor.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "janitor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 4 * * *",
+      "script": "/home/trajan/scripts/session-janitor.sh >> /home/trajan/logs/session-janitor.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.overnight-digest.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 12 * * *",
+      "script": "bash /home/trajan/bin/overnight-digest.sh >> /tmp/overnight-digest.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.morning-briefing-v2",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 14 * * *",
+      "script": "bash /home/trajan/bin/morning-briefing-v2.sh 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.cron-backup.txt",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "janitor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */6 * * *",
+      "script": "crontab -l > /home/trajan/vault/System/cron-backup.txt",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.cron-restore.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "@reboot sleep 30 && /home/trajan/bin/cron-restore.sh",
+      "script": ">> /tmp/cron-restore.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.dispatch-engine.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/1 * * * *",
+      "script": "/home/trajan/bin/dispatch-engine.sh >> /tmp/dispatch-engine.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.proactive-task-generator.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */2 * * *",
+      "script": "/home/trajan/bin/proactive-task-generator.sh >> /tmp/proactive-task-generator.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.research-pipeline.log",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "research",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": true,
+      "canonical": false,
+      "schedule": "0 2 * * *",
+      "script": "/home/trajan/bin/research-implement-pipeline.sh >> /home/trajan/logs/research-pipeline.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.vault-janitor.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "janitor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 9 * * *",
+      "script": "bash /home/trajan/bin/vault-janitor.sh >> /tmp/vault-janitor.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.links-pipeline.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/5 * * * *",
+      "script": "flock -n /tmp/links-pipeline.lock /home/trajan/bin/links-pipeline.sh >> /home/trajan/logs/links-pipeline.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.proposal-cron.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/5 * * * *",
+      "script": "/home/trajan/bin/proposal-cron.sh >> /home/trajan/logs/proposal-cron.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.competitive-scan.log",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "research",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": true,
+      "canonical": false,
+      "schedule": "0 6 * * 1",
+      "script": "flock -n /tmp/competitive-scan.lock /home/trajan/bin/competitive-scan.sh >> /home/trajan/logs/competitive-scan.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.vault-research-loop.log",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "research",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": true,
+      "canonical": false,
+      "schedule": "0 */4 * * *",
+      "script": "flock -n /tmp/vault-research-loop.lock /home/trajan/bin/vault-research-loop.sh >> /home/trajan/logs/vault-research-loop.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.evolution-loop.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 2 * * 0",
+      "script": "flock -n /tmp/evolution-loop.lock /home/trajan/bin/evolution-loop.sh >> /home/trajan/logs/evolution-loop.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.agent-learning-sync.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 3 * * *",
+      "script": "flock -n /tmp/agent-learning-sync.lock /home/trajan/bin/agent-learning-sync.sh >> /home/trajan/logs/agent-learning-sync.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.desk-dispatch.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "dispatch",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/15 * * * *",
+      "script": "flock -n /tmp/desk-dispatch.lock /home/trajan/bin/desk-dispatch.sh --scan >> /home/trajan/logs/desk-dispatch.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.transcript-scanner.log",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */6 * * *",
+      "script": "flock -n /tmp/transcript-scanner.lock /home/trajan/bin/transcript-scanner.sh >> /home/trajan/logs/transcript-scanner.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.stale-task-cleanup.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "janitor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/30 * * * *",
+      "script": "/home/trajan/bin/stale-task-cleanup.sh >> /home/trajan/logs/stale-task-cleanup.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.session-tree-expiry.log",
+      "kind": "cron",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/30 * * * *",
+      "script": "/home/trajan/bin/session-tree.sh volatile-check >> /home/trajan/vault/System/session-tree-expiry.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.github-trending.log",
+      "kind": "cron",
+      "owner": "researcher",
+      "domain": "research",
+      "class": "ingestor",
+      "risk": "medium",
+      "externalEffects": true,
+      "canonical": false,
+      "schedule": "0 8 * * *",
+      "script": "/home/trajan/bin/github-trending-intel.sh >> /home/trajan/logs/github-trending.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": true,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.integrity-scan.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "mutator",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "0 */2 * * *",
+      "script": "/home/trajan/bin/system-integrity-scan.sh --fix --quiet >> /home/trajan/logs/integrity-scan.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.dispatch-heartbeat.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "health",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/15 * * * *",
+      "script": "/home/trajan/bin/dispatch-heartbeat.sh >> /home/trajan/logs/dispatch-heartbeat.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.host-oauth-sync.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "*/30 * * * *",
+      "script": "flock -n /tmp/host-oauth-sync.lock /home/trajan/bin/sync-host-oauth.sh >> /home/trajan/logs/host-oauth-sync.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": true,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "cron.oauth-auto-approve.log",
+      "kind": "cron",
+      "owner": "ops",
+      "domain": "maintenance",
+      "class": "mutator",
+      "risk": "high",
+      "externalEffects": false,
+      "canonical": false,
+      "schedule": "* * * * *",
+      "script": "flock -n /tmp/oauth-auto-approve.lock /home/trajan/bin/oauth-auto-approve.sh >> /home/trajan/logs/oauth-auto-approve.log 2>&1",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": true,
+      "touchesConfig": false,
+      "writesSensitive": true,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "service.claudeforge",
+      "kind": "service",
+      "owner": "ops",
+      "domain": "runtime",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "unit": "claudeforge.service",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "service.opentabs",
+      "kind": "service",
+      "owner": "ops",
+      "domain": "runtime",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "unit": "opentabs.service",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "service.session-migration",
+      "kind": "service",
+      "owner": "ops",
+      "domain": "runtime",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": false,
+      "unit": "session-migration.service",
+      "reads": [
+        "unknown"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "hook.claude.on-startup",
+      "kind": "hook",
+      "owner": "ops",
+      "domain": "runtime",
+      "class": "executor",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "script": "~/.claude/hooks/on-startup.js",
+      "reads": [
+        "context/runtime"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [
+        "BOOTSTRAP_OWNERSHIP_MAP.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "hook.claude.on-clear",
+      "kind": "hook",
+      "owner": "ops",
+      "domain": "runtime",
+      "class": "executor",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": true,
+      "script": "~/.claude/hooks/on-clear.js",
+      "reads": [
+        "context/runtime"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [
+        "BOOTSTRAP_OWNERSHIP_MAP.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P3"
+    },
+    {
+      "id": "hook.claude.safety-check",
+      "kind": "hook",
+      "owner": "security",
+      "domain": "auth",
+      "class": "detector",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "script": "~/.claude/hooks/safety-check.sh",
+      "reads": [
+        "context/runtime"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [
+        "BOOTSTRAP_OWNERSHIP_MAP.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    },
+    {
+      "id": "hook.claude.tool-use-trace",
+      "kind": "hook",
+      "owner": "ops",
+      "domain": "observability",
+      "class": "publisher",
+      "risk": "low",
+      "externalEffects": false,
+      "canonical": true,
+      "script": "~/.claude/hooks/tool-use-trace.js",
+      "reads": [
+        "context/runtime"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [
+        "BOOTSTRAP_OWNERSHIP_MAP.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "keep",
+      "priority": "P3"
+    },
+    {
+      "id": "hook.claude.vault-post-write",
+      "kind": "hook",
+      "owner": "vault-keeper",
+      "domain": "knowledge",
+      "class": "mutator",
+      "risk": "medium",
+      "externalEffects": false,
+      "canonical": true,
+      "script": "~/.claude/hooks/vault-post-write.sh",
+      "reads": [
+        "context/runtime"
+      ],
+      "writes": [
+        "unknown"
+      ],
+      "docs": [
+        "BOOTSTRAP_OWNERSHIP_MAP.md"
+      ],
+      "status": "active",
+      "related": [],
+      "touchesCredentials": false,
+      "touchesConfig": false,
+      "writesSensitive": false,
+      "requiresNetwork": false,
+      "decision": "review",
+      "priority": "P3"
+    }
+  ]
+}

@@ -16,3 +16,25 @@ load_priority: 1
 
 Authoritative inventory: which GitHub repos and local roots fed this pack.
 Use this as the source-of-truth for "where did this branch come from?"
+
+## Why this matters
+
+Source-of-truth for which GitHub repos and which local agent-vm/host paths fed this transfer pack. Use it whenever you ask 'where did this branch come from?'
+
+## What lives here
+
+- `inventory/GITHUB_REPOS.md` — TrajanWJ EMA-related repos
+- `inventory/LOCAL_ROOTS.md` — agent-vm/host paths (`/home/trajan/Projects/ema`, `/home/trajan/.openclaw`, `/home/trajan/vault`, `/home/trajan/wiki`, `/home/trajan/staging/host-vault`)
+- `BRANCH_MAP.md` — original short branch list
+
+## Where it connects
+
+- `main` (which carries the rendered `SYSTEM_GRAPH.md`)
+- Every `codebase-*` and `lineage-*` branch traces back to one of these roots.
+
+## How to load it efficiently
+
+```bash
+git show origin/lineage-index:inventory/GITHUB_REPOS.md
+git show origin/lineage-index:inventory/LOCAL_ROOTS.md
+```

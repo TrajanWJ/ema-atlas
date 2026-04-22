@@ -18,3 +18,30 @@ load_priority: 1
 Aggregation root for the transfer pack. Holds the five high-signal handoff
 documents and the branch maps. Every other branch is a satellite of this one.
 Read `MACBOOK_AGENT_HANDOFF_MASTER.md` first, then `SYSTEM_GRAPH.md`.
+
+## Why this matters
+
+This is the entry point. Every other branch is a satellite. If an agent reads exactly one file, it should be `MACBOOK_AGENT_HANDOFF_MASTER.md`; if it reads two, the second is `SYSTEM_GRAPH.md`.
+
+## What lives here
+
+- Five high-signal handoff docs (`01-…` through `05-…`)
+- The `SYSTEM_GRAPH.md` rendered overview
+- The `AGENT_TRAVERSAL.md` traversal guide
+- The `AGENT_BOOTSTRAP.md` fresh-machine setup
+- `graph/` (schema, nodes, edges)
+- `scripts/probe.sh` and `scripts/check-graph.sh`
+
+## Where it connects
+
+- All 35 other branches via `graph/nodes/<branch>.qmd`
+- The original VM repos via `lineage-index/inventory/LOCAL_ROOTS.md`
+- The original GitHub repos via `lineage-index/inventory/GITHUB_REPOS.md`
+
+## How to load it efficiently
+
+```bash
+git clone https://github.com/TrajanWJ/ema-transfer-pack-20260422-060938.git
+cd ema-transfer-pack-20260422-060938 && git fetch --all
+./scripts/probe.sh
+```

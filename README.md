@@ -15,7 +15,9 @@ load only the slice of context its task needs.
 3. [`AGENT_TRAVERSAL.md`](AGENT_TRAVERSAL.md) — how to load context from the graph efficiently
 4. [`AGENT_BOOTSTRAP.md`](AGENT_BOOTSTRAP.md) — fresh-machine setup (Path A: EMA installed; Path B: ecosystem from scratch)
 5. [`05-fresh-context-project-app-model.md`](05-fresh-context-project-app-model.md) — newest user PRD framing (project/space/org, named app surfaces)
-6. The four-doc handoff series:
+6. [`GLOSSARY.md`](GLOSSARY.md) — controlled vocabulary
+7. [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) — single canonical list of unresolved decisions
+8. The four-doc handoff series:
    - [`01-best-prompt-and-answer.md`](01-best-prompt-and-answer.md)
    - [`02-project-transfer-brief.md`](02-project-transfer-brief.md)
    - [`03-architectural-evolution-and-major-decisions.md`](03-architectural-evolution-and-major-decisions.md)
@@ -30,6 +32,9 @@ load only the slice of context its task needs.
 ├─ SYSTEM_GRAPH.md           # rendered lineage graph
 ├─ AGENT_TRAVERSAL.md        # how to load context from the graph
 ├─ AGENT_BOOTSTRAP.md        # fresh-machine setup (paths A and B)
+├─ GLOSSARY.md               # controlled vocabulary
+├─ OPEN_QUESTIONS.md         # canonical list of unresolved decisions
+├─ SYSTEM_MANIFEST.json      # machine-readable index (regen via scripts/manifest.sh)
 ├─ BRANCH_MAP.md             # short branch list
 ├─ BRANCH_MAP_EXPANDED.md    # long branch list
 ├─ graph/
@@ -38,7 +43,8 @@ load only the slice of context its task needs.
 │   └─ edges/<topic>.md      # cross-cutting topic indexes
 └─ scripts/
     ├─ probe.sh              # detect Path A vs Path B
-    └─ check-graph.sh        # graph integrity check (warns, never blocks)
+    ├─ check-graph.sh        # graph integrity check (warns, never blocks)
+    └─ manifest.sh           # regenerate SYSTEM_MANIFEST.json
 ```
 
 The codebase, lineage, docs, and recovery snapshots live on **other branches**

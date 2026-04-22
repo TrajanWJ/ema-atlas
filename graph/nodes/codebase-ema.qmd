@@ -21,3 +21,36 @@ The canonical EMA daemon snapshot. Contains the live `control_plane/`
 EMA-truth / Hermes-execution split is already real in code, not just doctrine.
 Holds ClaudeForge under `code/ema/claudeforge/` and the working
 `hermes-provider.ts` seam.
+
+## Why this matters
+
+The canonical core. Holds **working code** for the EMA-truth / Hermes-execution split: `control_plane/` (event_log, store, replay, execution_supervisor, incidents/*, proposal_events, persistence, schema, supervisor), `babysitter/`, `sessions/`, and `surfaces/hermes_client.ex`. Also contains a sanitized snapshot of ClaudeForge (`code/ema/claudeforge/`) with a working `hermes-provider.ts` seam.
+
+## What lives here
+
+- `code/ema/daemon/lib/ema/control_plane/` — authority
+- `code/ema/daemon/lib/ema/babysitter/` — OpenClaw doctrine, crystallized
+- `code/ema/daemon/lib/ema/sessions/` — session identity
+- `code/ema/daemon/lib/ema/surfaces/hermes_client.ex` — surface↔Hermes seam
+- `code/ema/daemon/lib/ema/second_brain/indexer.ex` — memory index
+- `code/ema/docs/AGENT-CONTRACT.md` — capability locality
+- `code/ema/docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md`
+- `code/ema/docs/HERMES_HARNESS_DRIVER_REGISTRY.md`
+- `code/ema/workspace/shared/exports/HERMES_EMA_LINEAGE_META_HARNESS_AUDIT_2026-04-22.md`
+- `code/ema/claudeforge/packages/server/src/providers/hermes-provider.ts`
+
+## Where it connects
+
+- Inherited code: `lineage-original-elixir-ema`
+- Inherited doctrine: `lineage-openclaw`
+- Inherited surface seam: `codebase-claudeforge`
+- Refined by spec: `docs-ema-next-steps`
+- Newest user framing applied here next: `design-review-fresh-context`
+
+## How to load it efficiently
+
+Don't check out the whole branch. Pull only the artifact you need:
+```bash
+git show origin/codebase-ema:code/ema/docs/AGENT-CONTRACT.md
+git show origin/codebase-ema:code/ema/docs/HERMES_HARNESS_DRIVER_REGISTRY.md
+```

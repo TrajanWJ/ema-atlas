@@ -17,3 +17,32 @@ load_priority: 1
 EMA v1.1 next-step planning corpus. Holds the Vertical Slices draft, vApp
 final-vision checklist, Ultimate Wiki Architecture, daemon-backbone spec, and
 current priorities. **Load this before doing any v1.1 design work.**
+
+## Why this matters
+
+The forward-looking planning corpus. Holds the Vertical Slices draft, vApp final-vision checklist, Ultimate Wiki Architecture, daemon-backbone spec, and current priorities. **Load this whenever you do v1.1 design work** — it's where intent is codified before code.
+
+## What lives here
+
+- `host/EMA-v1.1-Next-Steps/01-PLANS/CURRENT-PRIORITIES.md` — 7-step priority list
+- `host/EMA-v1.1-Next-Steps/01-PLANS/VERTICAL-SLICES-DRAFT.md` — slices 1-5
+- `host/EMA-v1.1-Next-Steps/01-PLANS/VAPP-FINAL-VISION-CHECKLIST.md` — surface families
+- `host/EMA-v1.1-Next-Steps/01-PLANS/ULTIMATE-WIKI-ARCHITECTURE.qmd`
+- `host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-SUBPROJECT-A-DAEMON-BACKBONE-SPEC-DRAFT.md`
+- `host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md`
+- `host/EMA-v1.1-Next-Steps/01-PLANS/META-BOOTSTRAP-POINTER.md`
+- `host/EMA-v1.1-Next-Steps/01-PLANS/OPENCLAW-*` plans (knowledge ingest, write-paths, Discord/vault loop)
+
+## Where it connects
+
+- Refines: `codebase-ema`
+- Refined further by: `design-review-fresh-context` (newest framing)
+- Wiki design connects to: `docs-vault-wiki`, `docs-host-obsidian-vault`
+
+## How to load it efficiently
+
+```bash
+git show origin/docs-ema-next-steps:host/EMA-v1.1-Next-Steps/01-PLANS/CURRENT-PRIORITIES.md
+git show origin/docs-ema-next-steps:host/EMA-v1.1-Next-Steps/01-PLANS/VERTICAL-SLICES-DRAFT.md
+git show origin/docs-ema-next-steps:host/EMA-v1.1-Next-Steps/01-PLANS/VAPP-FINAL-VISION-CHECKLIST.md
+```

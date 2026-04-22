@@ -19,3 +19,26 @@ Isolated snapshot of the original Elixir/Phoenix EMA daemon plus
 Tauri-era architecture docs. Confirms that the daemon-first authority model
 predates the current rewrite. Compare against `codebase-ema` to see what
 survived vs what got refactored.
+
+## Why this matters
+
+The earliest visible Elixir/Phoenix EMA daemon, before the current rewrite. Confirms that the daemon-first authority model and the `control_plane/` shape are not new — they're the foundation that survived.
+
+## What lives here
+
+- `code/daemon/lib/ema/control_plane/` — predecessor of the current control plane
+- `code/daemon/lib/ema/babysitter/` — earliest babysitter implementation
+- `code/daemon/lib/ema/sessions/` — predecessor session registry
+- `code/daemon/lib/ema/claude/` — Claude provider integration (predecessor of the harness driver layer)
+
+## Where it connects
+
+- Superseded by: `codebase-ema`
+- Useful for: comparing what survived vs what got refactored
+
+## How to load it efficiently
+
+```bash
+git diff origin/lineage-original-elixir-ema:code/daemon/lib/ema/control_plane \
+        origin/codebase-ema:code/ema/daemon/lib/ema/control_plane
+```

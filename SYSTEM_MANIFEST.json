@@ -1,0 +1,986 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-22T08:03:45Z",
+  "repo": "TrajanWJ/ema-transfer-pack-20260422-060938",
+  "canonical_rule": "EMA owns truth. Hermes owns execution. Surfaces do not own state.",
+  "entry_docs": [
+    "README.md",
+    "MACBOOK_AGENT_HANDOFF_MASTER.md",
+    "SYSTEM_GRAPH.md",
+    "AGENT_TRAVERSAL.md",
+    "AGENT_BOOTSTRAP.md",
+    "GLOSSARY.md",
+    "OPEN_QUESTIONS.md",
+    "05-fresh-context-project-app-model.md"
+  ],
+  "branch_count": 36,
+  "node_count": 36,
+  "edge_topics": [
+    "authority",
+    "collab",
+    "execution",
+    "identity",
+    "memory",
+    "orchestration",
+    "recovery",
+    "surfaces",
+    "transport",
+    "ux-metaphor",
+    "workspace"
+  ],
+  "branches": {
+    "codebase-agent-os-bridge": "b8be50127f616f0347df9ef2425bdb0acd1ab93a",
+    "codebase-agent-os-demo": "1d29c0408b74a6148f1cbda82ecaef8142e2e218",
+    "codebase-agent-os-demo-pages": "3e3fb3090191b2e59d9297b07f5679d846b20570",
+    "codebase-agent-os-v8": "e482f75cf3b3ae043aea18275d7a6bfa42e5f9f6",
+    "codebase-agentgpt": "0bcead041aac919f350fa0a75a4ea4840060628e",
+    "codebase-claudeforge": "2c016f5f44236db621946ce123162e339b315080",
+    "codebase-ema": "f27a068c25bcae2be8561ed5ed7db79341abf83a",
+    "codebase-execudeck": "39e0e0507be6525ea9f90026ba91bf3895f18bab",
+    "codebase-executive": "fb75485d4f4f9c4127e309a874091b3bb365fd1d",
+    "codebase-frontend-layer": "fa0487aa23d538dfe8556540a3922a1def7bd83f",
+    "codebase-mission-control-claude": "b78b808be2d18852541e08fc517a22b67581f072",
+    "codebase-multi-agent-expirements": "9544824ff361bfc5c3db8a3d1bfce65957f7ae07",
+    "codebase-place-companion": "27d72250c8653002d3729ff5040440d40e7835c7",
+    "codebase-place-org": "a9d0756e6b151da935c12ce588f55c703d49b6d2",
+    "codebase-place-org-openclaw": "1209ab98473b299d22dc204d8a8ae15c486088ea",
+    "codebase-superman": "a56840eed76456c9229297de4b819617fea0920e",
+    "codebase-t3code-fork": "09c31db2b580e18baede4fa02d5f1fa47b26f976",
+    "design-review-fresh-context": "9e5a37acd428bdcdd3bd54b407390afae6060385",
+    "docs-clis-mcps-integrations": "d06e4b6915a35e0766affecac7ba95adbdc9ad4b",
+    "docs-ema-next-steps": "32e801a47afbce6739129df34cb317bd29b889cf",
+    "docs-frontend-interface-inspirations": "d3a85f589a9cd18449e034a26fc7cb60e0bea4d4",
+    "docs-host-obsidian-vault": "16a4b9fb36a18648982916a6d17873d066fa0543",
+    "docs-host-system-launchpad-hq": "3af6a5a7094306105557e3421d9232aa58582475",
+    "docs-host-vault-agent-modules-routing": "cfaae98ec87eba899148f5ef9e57fde69c7f1998",
+    "docs-host-vault-context": "af13afa0fc7e2ec4d650a8823601e2816e8170c8",
+    "docs-place-org-era-research": "751f54a50da28e9b9ebe3aa6c8c7696236328c5e",
+    "docs-vault-wiki": "558bc37f32494669a04a71d4e28562633b33a077",
+    "git-history-extracts": "8f8b96d67806efb50cbce9d927cded35f58ea00a",
+    "github-legacy-repos": "bfb30bf46b7dabb6e22607642e64949ca00400a1",
+    "lineage-index": "3f31c3020e6e1dfafb2066b87293c72f36fece51",
+    "lineage-openclaw": "020740f5e9cee768ed24b1ce9458f26850d375f2",
+    "lineage-openclaw-agent-workspaces": "6842b36301bb7bd3236bde2b58f1f716c0dcf0a9",
+    "lineage-openclaw-archive-subprojects": "651ffb7a795f135a2074b390896d28cf29fdd9b2",
+    "lineage-original-elixir-ema": "0ec1ddc2c124a6cffac817a8731f3403dda9fcdf",
+    "main": "0a80550a284095ea29b824443275b36a3a001223",
+    "recovery-old-agent-vm-vault-system": "b04a780848d5a170bf983bcb79627925f52ebddc"
+  },
+  "nodes": [
+    {
+      "id": "codebase-agent-os-bridge",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "driver",
+        "transport"
+      ],
+      "preserves_from": [
+        "codebase-agent-os-demo"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-agent-os-v8"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-agent-os-demo-pages",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "ux-metaphor"
+      ],
+      "preserves_from": [
+        "codebase-agent-os-demo"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-agent-os-demo"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "codebase-agent-os-demo",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-agent-os-v8",
+        "codebase-agent-os-bridge",
+        "codebase-agent-os-demo-pages"
+      ],
+      "adjacent_to": [
+        "codebase-agent-os-v8"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-agent-os-v8",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-agent-os-demo"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-agent-os-demo",
+        "codebase-agent-os-bridge"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-agentgpt",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "orchestration"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "codebase-claudeforge",
+      "type": "codebase",
+      "era": "claudeforge",
+      "status": "doctrine-only",
+      "contributes": [
+        "surface",
+        "execution",
+        "driver"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-ema",
+        "docs-clis-mcps-integrations"
+      ],
+      "superseded_by": [],
+      "adjacent_to": [
+        "codebase-frontend-layer",
+        "codebase-mission-control-claude"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md"
+      ],
+      "key_artifacts": [
+        "packages/server/src/providers/hermes-provider.ts",
+        "packages/server/test/session-manager-hermes.test.ts",
+        "packages/bot/test/hermes-commands.test.ts"
+      ],
+      "aliases": [
+        "claude-remote-discord",
+        "alfred"
+      ],
+      "load_priority": 2
+    },
+    {
+      "id": "codebase-ema",
+      "type": "codebase",
+      "era": "ema-daemon",
+      "status": "canonical",
+      "contributes": [
+        "authority",
+        "execution",
+        "workspace",
+        "identity",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "lineage-original-elixir-ema",
+        "lineage-openclaw",
+        "codebase-claudeforge"
+      ],
+      "inspires": [
+        "docs-ema-next-steps"
+      ],
+      "superseded_by": [],
+      "adjacent_to": [
+        "codebase-claudeforge"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "HERMES_EMA_LINEAGE_META_HARNESS_AUDIT_2026-04-22.md"
+      ],
+      "key_artifacts": [
+        "code/ema/daemon/lib/ema/control_plane",
+        "code/ema/daemon/lib/ema/babysitter",
+        "code/ema/daemon/lib/ema/sessions",
+        "code/ema/daemon/lib/ema/surfaces/hermes_client.ex",
+        "code/ema/docs/AGENT-CONTRACT.md",
+        "code/ema/docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md",
+        "code/ema/docs/HERMES_HARNESS_DRIVER_REGISTRY.md",
+        "code/ema/workspace/shared"
+      ],
+      "aliases": [
+        "/home/trajan/Projects/ema"
+      ],
+      "load_priority": 1
+    },
+    {
+      "id": "codebase-execudeck",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "ux-metaphor"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-executive"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "codebase-executive",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "orchestration",
+        "workspace"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-mission-control-claude",
+        "codebase-multi-agent-expirements"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-frontend-layer",
+      "type": "codebase",
+      "era": "claudeforge",
+      "status": "doctrine-only",
+      "contributes": [
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-claudeforge"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-claudeforge",
+        "codebase-mission-control-claude"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-mission-control-claude",
+      "type": "codebase",
+      "era": "claudeforge",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "codebase-claudeforge"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-claudeforge",
+        "codebase-executive"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-multi-agent-expirements",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "orchestration"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-executive",
+        "codebase-superman"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [
+        "multi-agent-experiments"
+      ],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-place-companion",
+      "type": "codebase",
+      "era": "place-org",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-place-org"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-place-org-openclaw",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "codebase-place-org",
+        "lineage-openclaw"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-place-org",
+        "lineage-openclaw"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "codebase-place-org",
+      "type": "codebase",
+      "era": "place-org",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-place-companion",
+        "codebase-place-org-openclaw",
+        "docs-host-system-launchpad-hq",
+        "docs-vault-wiki"
+      ],
+      "superseded_by": [],
+      "adjacent_to": [
+        "codebase-place-companion",
+        "docs-place-org-era-research"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "05-fresh-context-project-app-model.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [
+        "place.org",
+        "placeOS"
+      ],
+      "load_priority": 3
+    },
+    {
+      "id": "codebase-superman",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "orchestration"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-multi-agent-expirements"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "codebase-t3code-fork",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "surface"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "design-review-fresh-context",
+      "type": "meta",
+      "era": "meta",
+      "status": "active",
+      "contributes": [
+        "identity",
+        "workspace",
+        "collab",
+        "ux-metaphor"
+      ],
+      "preserves_from": [
+        "main"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-system-launchpad-hq",
+        "docs-frontend-interface-inspirations"
+      ],
+      "referenced_in_docs": [
+        "05-fresh-context-project-app-model.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "05-fresh-context-project-app-model.md",
+        "SOURCE_CONTEXT.md"
+      ],
+      "aliases": [
+        "fresh-context"
+      ],
+      "load_priority": 1
+    },
+    {
+      "id": "docs-clis-mcps-integrations",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "driver",
+        "execution"
+      ],
+      "preserves_from": [
+        "lineage-openclaw",
+        "codebase-claudeforge"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-vault-agent-modules-routing",
+        "lineage-openclaw"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 3
+    },
+    {
+      "id": "docs-ema-next-steps",
+      "type": "docs",
+      "era": "ema-daemon",
+      "status": "active",
+      "contributes": [
+        "authority",
+        "workspace",
+        "identity"
+      ],
+      "preserves_from": [
+        "codebase-ema"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-ema",
+        "design-review-fresh-context"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "host/EMA-v1.1-Next-Steps/01-PLANS/CURRENT-PRIORITIES.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/VERTICAL-SLICES-DRAFT.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/VAPP-FINAL-VISION-CHECKLIST.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/ULTIMATE-WIKI-ARCHITECTURE.qmd",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-SUBPROJECT-A-DAEMON-BACKBONE-SPEC-DRAFT.md"
+      ],
+      "aliases": [
+        "EMA-v1.1-Next-Steps"
+      ],
+      "load_priority": 1
+    },
+    {
+      "id": "docs-frontend-interface-inspirations",
+      "type": "docs",
+      "era": "meta",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "ux-metaphor"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-system-launchpad-hq",
+        "design-review-fresh-context"
+      ],
+      "referenced_in_docs": [
+        "05-fresh-context-project-app-model.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "docs-host-obsidian-vault",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "memory"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-vault-wiki",
+        "docs-host-vault-context"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "docs-host-system-launchpad-hq",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "design-review-fresh-context",
+        "docs-frontend-interface-inspirations"
+      ],
+      "referenced_in_docs": [
+        "05-fresh-context-project-app-model.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 3
+    },
+    {
+      "id": "docs-host-vault-agent-modules-routing",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "orchestration",
+        "driver"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-vault-context",
+        "docs-clis-mcps-integrations"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 3
+    },
+    {
+      "id": "docs-host-vault-context",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "memory",
+        "doctrine"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-vault-wiki",
+        "docs-host-obsidian-vault"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [
+        "/home/trajan/staging/host-vault"
+      ],
+      "load_priority": 3
+    },
+    {
+      "id": "docs-place-org-era-research",
+      "type": "docs",
+      "era": "place-org",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "doctrine"
+      ],
+      "preserves_from": [
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-place-org"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "docs-vault-wiki",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "memory",
+        "doctrine"
+      ],
+      "preserves_from": [
+        "lineage-openclaw",
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-vault-context",
+        "docs-host-obsidian-vault"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [
+        "/home/trajan/wiki"
+      ],
+      "load_priority": 3
+    },
+    {
+      "id": "git-history-extracts",
+      "type": "recovery",
+      "era": "meta",
+      "status": "archive",
+      "contributes": [
+        "recovery"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "github-legacy-repos"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "github-legacy-repos",
+      "type": "recovery",
+      "era": "meta",
+      "status": "archive",
+      "contributes": [
+        "recovery"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "git-history-extracts"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "lineage-index",
+      "type": "meta",
+      "era": "meta",
+      "status": "meta",
+      "contributes": [
+        "authority"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "main"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md",
+        "BRANCH_MAP.md",
+        "BRANCH_MAP_EXPANDED.md"
+      ],
+      "key_artifacts": [
+        "BRANCH_MAP.md",
+        "inventory/GITHUB_REPOS.md",
+        "inventory/LOCAL_ROOTS.md"
+      ],
+      "aliases": [],
+      "load_priority": 1
+    },
+    {
+      "id": "lineage-openclaw-agent-workspaces",
+      "type": "lineage",
+      "era": "openclaw",
+      "status": "doctrine-only",
+      "contributes": [
+        "workspace",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "lineage-openclaw"
+      ],
+      "inspires": [
+        "codebase-ema"
+      ],
+      "adjacent_to": [
+        "lineage-openclaw",
+        "lineage-openclaw-archive-subprojects"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 4
+    },
+    {
+      "id": "lineage-openclaw-archive-subprojects",
+      "type": "lineage",
+      "era": "openclaw",
+      "status": "archive",
+      "contributes": [
+        "recovery",
+        "doctrine"
+      ],
+      "preserves_from": [
+        "lineage-openclaw"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "lineage-openclaw"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [],
+      "load_priority": 5
+    },
+    {
+      "id": "lineage-openclaw",
+      "type": "lineage",
+      "era": "openclaw",
+      "status": "doctrine-only",
+      "contributes": [
+        "orchestration",
+        "doctrine",
+        "memory"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-ema",
+        "lineage-openclaw-agent-workspaces",
+        "lineage-openclaw-archive-subprojects",
+        "codebase-place-org-openclaw",
+        "docs-vault-wiki"
+      ],
+      "superseded_by": [
+        "codebase-ema"
+      ],
+      "adjacent_to": [
+        "docs-clis-mcps-integrations"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md"
+      ],
+      "key_artifacts": [],
+      "aliases": [
+        ".openclaw"
+      ],
+      "load_priority": 3
+    },
+    {
+      "id": "lineage-original-elixir-ema",
+      "type": "lineage",
+      "era": "ema-daemon",
+      "status": "canonical",
+      "contributes": [
+        "authority",
+        "execution",
+        "doctrine"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-ema"
+      ],
+      "superseded_by": [
+        "codebase-ema"
+      ],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "03-architectural-evolution-and-major-decisions.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/daemon/lib/ema/control_plane",
+        "code/daemon/lib/ema/babysitter",
+        "code/daemon/lib/ema/sessions",
+        "code/daemon/lib/ema/claude"
+      ],
+      "aliases": [],
+      "load_priority": 2
+    },
+    {
+      "id": "main",
+      "type": "meta",
+      "era": "meta",
+      "status": "meta",
+      "contributes": [
+        "authority",
+        "doctrine"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "superseded_by": [],
+      "adjacent_to": [
+        "lineage-index",
+        "design-review-fresh-context"
+      ],
+      "referenced_in_docs": [
+        "README.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "04-agent-orchestration-and-shared-workspace-briefing.md",
+        "05-fresh-context-project-app-model.md"
+      ],
+      "aliases": [],
+      "load_priority": 1
+    },
+    {
+      "id": "recovery-old-agent-vm-vault-system",
+      "type": "recovery",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "recovery"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "agent-vm/dispatch/active-tasks.json",
+        "agent-vm/dispatch/agent-status.json"
+      ],
+      "aliases": [],
+      "load_priority": 5
+    }
+  ]
+}

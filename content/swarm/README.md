@@ -1,9 +1,9 @@
 # Swarm Workspace Pack
 
 This folder is the canonical overview pack for EMA's shared swarm workspace.
-It exists to keep the coordination model legible in one place: what the
-workspace is for, what it owns, what it does not own, and how multiple
-orchestrators are supposed to align around the same truth.
+It is the support-lane and coordination entrypoint for active EMA swarm work:
+what the workspace is for, what it owns, what it does not own, and how
+multiple orchestrators are supposed to align around the same truth.
 
 Start here if you need the short version:
 

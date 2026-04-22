@@ -1,0 +1,275 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Portfolio Design System
+   Colors are set dynamically via inline styles on portfolio-root.
+   CSS variables referenced here:
+     --p-bg, --p-accent, --p-text, --p-text-secondary
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ── Satoshi font-face ─────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ── Root container ────────────────────────────────────────────────────── */
+.portfolio-root {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  scroll-snap-type: y proximity;
+  overflow-y: auto;
+  height: 100dvh;
+  background: var(--p-bg, #fafaf9);
+  color: var(--p-text, #18181b);
+
+  --portfolio-content-max-width: 1200px;
+  --portfolio-content-padding: clamp(24px, 5vw, 80px);
+}
+
+/* ── Sections ──────────────────────────────────────────────────────────── */
+.portfolio-section {
+  scroll-snap-align: start;
+  min-height: 100dvh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--portfolio-content-padding);
+}
+
+.portfolio-section--tall {
+  min-height: 150dvh;
+}
+
+/* ── Typography — Display (Cinzel) ─────────────────────────────────────── */
+.display-xl {
+  font-family: var(--font-cinzel, 'Cinzel'), serif;
+  font-weight: 700;
+  font-size: clamp(72px, 10vw, 160px);
+  line-height: 1.0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-style: normal;
+}
+
+.display-lg {
+  font-family: var(--font-cinzel, 'Cinzel'), serif;
+  font-weight: 500;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  font-style: normal;
+}
+
+.display-md {
+  font-family: var(--font-cinzel, 'Cinzel'), serif;
+  font-weight: 400;
+  font-size: clamp(24px, 3vw, 40px);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  font-style: normal;
+}
+
+/* ── Typography — Body (Satoshi / system sans) ─────────────────────────── */
+.body-lg {
+  font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.7;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.body-md {
+  font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ── Typography — Mono (JetBrains Mono / system mono) ─────────────────── */
+.mono-sm {
+  font-family: var(--font-jetbrains-mono, 'JetBrains Mono'), ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--p-text-secondary, #71717a);
+}
+
+.mono-xs {
+  font-family: var(--font-jetbrains-mono, 'JetBrains Mono'), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--p-text-secondary, #71717a);
+}
+
+/* ── Label ─────────────────────────────────────────────────────────────── */
+.portfolio-label {
+  font-family: var(--font-cinzel, 'Cinzel'), serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-style: normal;
+}
+
+/* ── Accent shapes ─────────────────────────────────────────────────────── */
+.portfolio-accent-circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.portfolio-accent-diagonal {
+  position: absolute;
+  pointer-events: none;
+  transform: rotate(-12deg);
+}
+
+/* ── Breath zone ───────────────────────────────────────────────────────── */
+.portfolio-breath {
+  min-height: 100dvh;
+  width: 100%;
+}
+
+/* ── Mirror zone placeholder ───────────────────────────────────────────── */
+.portfolio-mirror-content {
+  min-height: 50dvh;
+  width: 100%;
+}
+
+/* ── Mirror wave animation ─────────────────────────────────────────────── */
+@keyframes mirror-wave {
+  0%,
+  100% {
+    transform: scaleY(-1) skewX(0deg) translateX(0px);
+  }
+  25% {
+    transform: scaleY(-1) skewX(1deg) translateX(2px);
+  }
+  75% {
+    transform: scaleY(-1) skewX(-1deg) translateX(-2px);
+  }
+}
+
+/* ── Footer marquee ───────────────────────────────────────────────────── */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── Terminal cursor blink ────────────────────────────────────────────── */
+@keyframes terminal-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Variant Nav ───────────────────────────────────────────────────────── */
+.variant-nav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 6px;
+  cursor: grab;
+  user-select: none;
+}
+
+.variant-nav:active {
+  cursor: grabbing;
+}
+
+.variant-nav-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.variant-nav-tab {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-jetbrains-mono, 'JetBrains Mono'), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: color 0.15s, background 0.15s;
+  font-style: normal;
+}
+
+.variant-nav-tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.variant-nav-tab[data-active] {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.variant-nav-list {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 4px;
+}
+
+.variant-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Satoshi', system-ui, sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
+  font-style: normal;
+  text-align: left;
+  width: 100%;
+}
+
+.variant-nav-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.variant-nav-item[data-active] {
+  color: #fff;
+}
+
+.variant-nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.variant-nav-item[data-active] .variant-nav-dot {
+  box-shadow: 0 0 6px currentColor;
+}
+
+.variant-nav-label {
+  white-space: nowrap;
+}

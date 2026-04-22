@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>place.org v2 — Complete Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #08080d;
+    color: #d8d8e0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    padding: 32px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 2.2rem; margin-bottom: 4px; color: #fff; letter-spacing: -0.5px; }
+  h2 { font-size: 1.5rem; margin: 48px 0 16px; color: #7eb8ff; border-bottom: 1px solid rgba(126,184,255,0.15); padding-bottom: 10px; }
+  h3 { font-size: 1.15rem; margin: 28px 0 10px; color: #a0d0ff; }
+  h4 { font-size: 0.95rem; margin: 18px 0 6px; color: #c0c0d0; font-weight: 600; }
+  p { margin: 8px 0; font-size: 14px; }
+  code { background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #aabbff; }
+  pre { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 10px; overflow-x: auto; margin: 12px 0; font-size: 12.5px; line-height: 1.5; color: #c8c8d8; }
+  .subtitle { color: #666680; font-size: 15px; margin-bottom: 36px; }
+  .section { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin: 14px 0; }
+  .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; margin: 14px 0; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 14px 0; }
+  .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px; }
+  .card h4 { margin-top: 0; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px; font-weight: 500; }
+  .tag.blue { background: rgba(126,184,255,0.12); color: #7eb8ff; }
+  .tag.green { background: rgba(100,255,150,0.1); color: #6f6; }
+  .tag.orange { background: rgba(255,180,100,0.1); color: #fb4; }
+  .tag.purple { background: rgba(180,130,255,0.1); color: #b8f; }
+  .tag.red { background: rgba(255,100,100,0.1); color: #f66; }
+  .tag.glass { background: rgba(255,255,255,0.06); color: #aaa; }
+  ul { margin: 6px 0 6px 18px; font-size: 13.5px; }
+  li { margin: 3px 0; }
+  .highlight { background: rgba(126,184,255,0.06); border-left: 3px solid #7eb8ff; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 14px; }
+  .warn { background: rgba(255,180,100,0.06); border-left: 3px solid #fb4; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 14px; }
+  .crit { background: rgba(255,100,100,0.06); border-left: 3px solid #f66; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 14px; }
+  .diagram { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; margin: 14px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12.5px; white-space: pre; line-height: 1.35; overflow-x: auto; color: #b0b0c0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); color: #7eb8ff; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 12px 0; }
+  .flow-step { background: rgba(126,184,255,0.08); border: 1px solid rgba(126,184,255,0.18); padding: 8px 12px; border-radius: 8px; font-size: 12px; }
+  .flow-arrow { color: #7eb8ff; font-size: 16px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(126,184,255,0.08); border: 1px solid rgba(126,184,255,0.15); padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #7eb8ff; }
+  hr { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 32px 0; }
+</style>
+</head>
+<body>
+
+<h1>place.org — Complete Design</h1>
+<p class="subtitle">v2 — Desktop Core + Immersive Breakouts + Legacy + Full Productivity System</p>
+
+<div class="highlight">
+  <strong>Design philosophy:</strong> Deep space cockpit that breathes. Clean, minimal, alive. The site shifts with time of day — cool blues deepen at night, warm hints appear at dawn. Frosted glass on infinite dark. Not a brand agency site (that's LetMeScale). This is a personal operating system floating in space — calm, focused, organic. Every pixel says "this person lives here."
+</div>
+
+<!-- ==================== COMPLETE SITE MAP ==================== -->
+<h2>1. Complete Site Map</h2>
+
+<div class="diagram">place.org
+│
+├── /                          THE DESKTOP — your operating system
+│   │
+│   ├── [System Layer]
+│   │   ├── Boot Sequence      → Server-rendered ritual, ambient sound, fade-in
+│   │   ├── Ambient Bar        → Live context: date, weather, focus stats, inbox, energy, streak
+│   │   ├── Dock               → App launchers + page links + system tray
+│   │   ├── Desktop Surface    → Draggable icons, cursor effects, right-click menu, wallpaper
+│   │   ├── Window Manager     → react-rnd, z-index focus, snap, minimize, maximize
+│   │   ├── Command Palette    → ⌘+K global search + actions
+│   │   ├── Sound Engine       → Ambient pads, interaction sounds, mutable
+│   │   └── Notification Layer → Toasts, alerts, reminders (Popover API)
+│   │
+│   ├── [App Windows]
+│   │   ├── 🧠 Brain Dump      → GTD inbox: capture → clarify → organize → reflect → engage
+│   │   ├── 📓 Journal          → Daily entries, prompts, mood/energy, gratitude, reflection
+│   │   ├── ◉  Focus Timer      → Soft-boundary Pomodoro, PiP, analytics, ambient sound
+│   │   ├── ✓  Tasks            → Organized by Must/Should/Could, linked to goals
+│   │   ├── 📊 Dashboard        → The ONE Thing, goal cascade, energy levels, daily metrics
+│   │   ├── 🔄 Review           → Weekly Collect→Reflect→Plan, monthly rollups
+│   │   ├── 📅 Calendar         → Time blocks, events, schedule view
+│   │   ├── 🔥 Habits           → Daily/weekly tracking, streaks, 5-7 active limit
+│   │   ├── ▸  Terminal          → Slash commands, unix metaphor, power-user access
+│   │   └── ⚙  Settings         → Theme, sounds, data, account, PWA install
+│   │
+│   └── [Widgets] (optional small windows)
+│       ├── Clock / World Time
+│       ├── Music Player (ambient/lo-fi)
+│       └── Quick Note (sticky note style)
+│
+├── /portfolio                  IMMERSIVE BREAKOUT — case studies, shipped work
+│   ├── Hero: 3D accent scene (R3F)
+│   ├── Project grid with clip-path hover reveals
+│   ├── Individual case study pages with scroll choreography
+│   └── Projects: LetMeScale, ExecuDeck, Proslync, DispoHub, Truks,
+│       XpressDrop, FlexiFocus, JarvisAI, QuickNotes
+│
+├── /cool-stuff                 IMMERSIVE BREAKOUT — curated finds & experiments
+│   ├── Bento grid of discoveries
+│   ├── Categories: tools, sites, articles, experiments, music
+│   ├── Interactive cards with micro-previews
+│   └── User-submitted items (authenticated)
+│
+├── /about                      IMMERSIVE BREAKOUT — personal narrative
+│   ├── Scroll-driven story with ambient context
+│   ├── Values, philosophy, what drives you
+│   ├── Live context: location, weather, current focus
+│   ├── Social links, contact, PGP key
+│   └── "The site IS the pitch" — this page proves it
+│
+├── /community                  IMMERSIVE BREAKOUT — place.org heritage
+│   ├── People grid: Allen, Paul, Elizabeth, Kusco, Zachary
+│   ├── Organizations: Texas Juggling Society, Multiplexing, Siteswap, KoFightClub
+│   ├── Heritage narrative
+│   ├── Links to live services
+│   └── "Time Machine" → /oldplace/
+│
+├── /services                   PORTAL — existing place.org services
+│   ├── → Searx (privacy search)
+│   ├── → Commafeed (RSS reader)
+│   └── → Hubzilla (federated social)
+│
+├── /oldplace/*                 LEGACY ARCHIVE — current site preserved as-is
+│   ├── /oldplace/              → Original homepage (Debian, badges, links)
+│   ├── /oldplace/user/         → User resources
+│   └── /oldplace/~{user}/     → Individual homepages
+│
+└── [Infrastructure]
+    ├── PWA manifest + Service Worker + offline
+    ├── SQLite WASM (OPFS) in Web Worker
+    ├── Google OAuth (optional, for sync)
+    └── Reverse proxy preserves existing service URLs</div>
+
+<!-- ==================== AESTHETIC ==================== -->
+<h2>2. Visual Design Language</h2>
+
+<div class="glass">
+  <h4 style="margin-top:0; color:#7eb8ff;">Deep Space × Living Organism × Clean Cockpit</h4>
+  <p>NOT LetMeScale (that's cinematic agency, dark reds, Bloomberg). place.org is a calm living space floating in deep blue-black. It breathes — colors shift with time of day, backgrounds gently move, light follows your cursor like bioluminescence. Clean and minimal, never cluttered.</p>
+
+  <div class="grid">
+    <div>
+      <h4>Color Palette — Living</h4>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;">
+        <div style="width:48px;height:48px;background:#060610;border:1px solid rgba(100,150,255,0.15);border-radius:8px;" title="Deep Space"></div>
+        <div style="width:48px;height:48px;background:#0a0e1a;border:1px solid rgba(100,150,255,0.15);border-radius:8px;" title="Surface"></div>
+        <div style="width:48px;height:48px;background:rgba(80,130,220,0.06);border:1px solid rgba(100,150,255,0.12);border-radius:8px;backdrop-filter:blur(4px);" title="Glass"></div>
+        <div style="width:48px;height:48px;background:#e8eaf0;border-radius:8px;" title="Text"></div>
+        <div style="width:48px;height:48px;background:#5b9cf5;border-radius:8px;" title="Primary Blue"></div>
+        <div style="width:48px;height:48px;background:#38c97a;border-radius:8px;" title="Success/Growth"></div>
+        <div style="width:48px;height:48px;background:#e8a84c;border-radius:8px;" title="Warm/Warning"></div>
+        <div style="width:48px;height:48px;background:#ef6b6b;border-radius:8px;" title="Urgent"></div>
+      </div>
+      <p style="font-size:12px;color:#888;">Base: deep blue-black (not pure black). Text: soft white (not harsh). Accent: living blue that shifts.</p>
+
+      <h4 style="margin-top:16px;">Time-of-Day Color Breathing</h4>
+      <div style="display:flex; gap:4px; margin:8px 0; height:32px; border-radius:6px; overflow:hidden;">
+        <div style="flex:1;background:linear-gradient(to bottom, #1a1535, #0a0e1a);" title="Night (12am-5am)"></div>
+        <div style="flex:1;background:linear-gradient(to bottom, #1a1a30, #1a1535);" title="Pre-dawn"></div>
+        <div style="flex:1;background:linear-gradient(to bottom, #2a1a2a, #1a1530);" title="Dawn — warm hint"></div>
+        <div style="flex:1;background:linear-gradient(to bottom, #0d1225, #0a0e1a);" title="Morning"></div>
+        <div style="flex:1;background:linear-gradient(to bottom, #0a1020, #060610);" title="Midday — clearest"></div>
+        <div style="flex:1;background:linear-gradient(to bottom, #0e1428, #0a1020);" title="Afternoon"></div>
+        <div style="flex:1;background:linear-gradient(to bottom, #1a1228, #0e0a1a);" title="Sunset — purple hint"></div>
+        <div style="flex:1;background:linear-gradient(to bottom, #0a0a18, #060610);" title="Evening — deep"></div>
+      </div>
+      <p style="font-size:11px;color:#666;">Background gradient shifts through the day. Dawn gets a warm rose hint. Midday is cleanest blue. Sunset goes purple. Night deepens. All shifts are slow — you don't notice them happening, you just feel the time of day.</p>
+
+      <h4 style="margin-top:16px;">Accent Color Shifts</h4>
+      <ul style="font-size:12px;">
+        <li><strong>Default:</strong> Cool blue <code>#5b9cf5</code> — calm, focused</li>
+        <li><strong>Focus mode active:</strong> Shifts warmer — subtle amber tint on borders and accents</li>
+        <li><strong>Streak milestone:</strong> Brief green pulse on habit/streak elements</li>
+        <li><strong>Overdue/urgent:</strong> Warm orange touches (never aggressive red unless critical)</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Typography</h4>
+      <ul>
+        <li><strong>Display:</strong> Variable font with weight range — clean geometric (e.g., Satoshi, General Sans, or custom)</li>
+        <li><strong>Body:</strong> Inter / system-ui — crisp, readable at small sizes</li>
+        <li><strong>Mono:</strong> JetBrains Mono / Geist Mono — terminal, data, code</li>
+        <li><strong>Fluid scaling:</strong> <code>clamp()</code> for all sizes, 320px→1920px+</li>
+        <li><strong>Letter spacing:</strong> Tight on headlines (-0.02em), open on small text</li>
+        <li><strong>Weight:</strong> Light weights for large text (display), medium for body. Never heavy — the aesthetic is weightless, floating.</li>
+      </ul>
+
+      <h4 style="margin-top:20px;">Surface Treatment</h4>
+      <ul>
+        <li><strong>Windows:</strong> Frosted glass — <code>backdrop-filter: blur(16px)</code> + 1px border at <code>rgba(100,160,255,0.08)</code></li>
+        <li><strong>Cards:</strong> Nearly invisible elevation. Borders appear on hover like they're materializing.</li>
+        <li><strong>Active elements:</strong> Soft blue glow on focus/hover — like bioluminescence, not neon.</li>
+        <li><strong>Background:</strong> Slow-moving gradient mesh (CSS <code>@property</code> animating hue/position over minutes, not seconds).</li>
+        <li><strong>Depth:</strong> z-layers with subtle parallax — background nebula, desktop, windows, modals, notifications.</li>
+        <li><strong>Noise texture:</strong> Very subtle film grain overlay (CSS or SVG filter) — adds organic warmth to digital surfaces.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <h4>The "Living" System</h4>
+      <p style="font-size:13px;">The site is not static. It breathes.</p>
+      <ul>
+        <li><strong>Background mesh:</strong> 3-4 soft color blobs drift very slowly (CSS @property animation over 60-120 second cycles). Like a lava lamp in space at 0.1x speed.</li>
+        <li><strong>Cursor light:</strong> Radial gradient follows pointer — like carrying a dim flashlight through deep water. Very low opacity. Reveals subtle texture on surfaces you hover near.</li>
+        <li><strong>Time awareness:</strong> Background palette shifts with real time (see color bar above). Boot message references time of day.</li>
+        <li><strong>Data-driven life:</strong> Ambient bar metrics aren't static text — they subtly pulse or shimmer when values change. Focus timer progress ring glows slightly brighter as you approach target.</li>
+        <li><strong>Idle state:</strong> After 5 min idle, the desktop enters a "screensaver" — subtle particle drift or aurora effect. Any input wakes it.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Motion</h4>
+      <ul>
+        <li><strong>Easing:</strong> <code>cubic-bezier(0.65, 0.05, 0, 1)</code> — fast start, smooth land. Feels natural.</li>
+        <li><strong>Duration:</strong> 150ms micro-interactions, 300ms transitions, 600ms page changes</li>
+        <li><strong>Spring physics:</strong> Motion library for dock hover, window open/close — bouncy but controlled</li>
+        <li><strong>Scroll:</strong> Lenis smooth scroll on immersive pages, native on desktop</li>
+        <li><strong>Principle:</strong> Motion communicates state change and hierarchy, never decorative. But ambient motion (background, cursor light) is always present — the site is alive even when you're not interacting.</li>
+        <li><strong>Reduced motion:</strong> Respects <code>prefers-reduced-motion</code>. Ambient effects disabled. Functional transitions preserved but simplified.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BOOT SEQUENCE ==================== -->
+<h2>3. Boot Sequence</h2>
+
+<div class="section">
+  <div class="flow">
+    <div class="flow-step"><strong>0ms</strong><br>SSR HTML frame<br><span style="font-size:11px;color:#666;">Dark screen, subtle text</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><strong>~200ms</strong><br>Boot text appears<br><span style="font-size:11px;color:#666;">Character by character, monospace</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><strong>~1s</strong><br>JS + SQLite init<br><span style="font-size:11px;color:#666;">Progress subtly indicated</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><strong>~1.5s</strong><br>Ambient sound fades in<br><span style="font-size:11px;color:#666;">Requires user gesture first</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><strong>~2s</strong><br>Desktop fades in<br><span style="font-size:11px;color:#666;">Dock, ambient bar, wallpaper</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><strong>~2.5s</strong><br>Data populates<br><span style="font-size:11px;color:#666;">Stats, inbox count, streak</span></div>
+  </div>
+
+  <div class="highlight">
+    <strong>Boot text example:</strong><br>
+    <code style="color:#6fff8e;">place.org v1.0.0</code><br>
+    <code style="color:#888;">loading workspace...</code><br>
+    <code style="color:#888;">sqlite initialized (247 entries)</code><br>
+    <code style="color:#888;">last session: 2h 47m focused</code><br>
+    <code style="color:#7eb8ff;">welcome back, trajan.</code>
+  </div>
+
+  <p><strong>Returning users:</strong> Boot restores last window positions + open apps from SQLite. Feels like waking up your computer.</p>
+  <p><strong>First-time visitors:</strong> Boot is shorter. A "tour" window opens explaining what this is. Brain Dump opens by default — instant utility.</p>
+  <p><strong>Skip option:</strong> Press any key or click to skip boot, jump straight to desktop.</p>
+</div>
+
+<!-- ==================== DESKTOP SYSTEM ==================== -->
+<h2>4. Desktop System Layer</h2>
+
+<h3>4a. Ambient Context Bar</h3>
+<div class="section">
+<div class="diagram" style="font-size:13px;">
+┌────────────────────────────────────────────────────────────────────────────────────┐
+│  ☼ place.org   │  Fri Mar 20, 6:42 PM   Denver 48°F ☁   │  🧠 3 inbox  │  ◉ 1h23m  │  🔥 5-day  │  ⚡ 7/10  │  🎯 Ship Focus Timer  │
+└────────────────────────────────────────────────────────────────────────────────────┘
+  branding          date + weather + location              inbox count  focus today  streak    energy     THE ONE THING</div>
+  <ul>
+    <li><strong>Left:</strong> place.org logo/wordmark (click → about page)</li>
+    <li><strong>Center:</strong> Date, time, weather (Geolocation + open weather API)</li>
+    <li><strong>Right:</strong> Live metrics from SQLite — unprocessed inbox, today's focus time, habit streak, current energy level, today's ONE Thing</li>
+    <li><strong>Context-aware:</strong> Morning shows "Good morning" + focus plan. Evening shows daily summary. Monday shows weekly review reminder.</li>
+    <li><strong>Click any metric:</strong> Opens the relevant app window (click inbox count → Brain Dump, click focus → Focus Timer)</li>
+  </ul>
+</div>
+
+<h3>4b. Window Manager</h3>
+<div class="section">
+  <table>
+    <tr><th>Capability</th><th>Implementation</th><th>Detail</th></tr>
+    <tr><td>Drag + resize</td><td><code>react-rnd</code></td><td>Title bar as drag handle. Resize from edges + corners.</td></tr>
+    <tr><td>Z-index / focus</td><td>Zustand global counter</td><td>Click window → counter++ → becomes z-index. Last clicked = top.</td></tr>
+    <tr><td>Minimize</td><td>FLIP animation to dock</td><td>Window morphs toward its dock icon. Dot indicator appears under icon.</td></tr>
+    <tr><td>Maximize</td><td>Fill viewport</td><td>Minus ambient bar + dock. Double-click title bar to toggle.</td></tr>
+    <tr><td>Close</td><td>Remove from process state</td><td>Data persists in SQLite. Window gone. App re-opens fresh or from state.</td></tr>
+    <tr><td>Snap zones</td><td>Edge detection</td><td>Drag to edge → highlight snap zone (half, quarter, third). Release to snap.</td></tr>
+    <tr><td>Window title bar</td><td>Frosted glass strip</td><td>App icon + name + minimize/maximize/close buttons. Drag handle.</td></tr>
+    <tr><td>Render isolation</td><td><code>contain: strict</code></td><td>Each window is isolated — no cross-window reflow cascade.</td></tr>
+    <tr><td>Lazy loading</td><td><code>next/dynamic</code></td><td>App code loads on first window open, not at boot.</td></tr>
+    <tr><td>State persistence</td><td>SQLite <code>window_state</code></td><td>Position, size, z-index, open/closed, minimized — all persisted.</td></tr>
+    <tr><td>Multi-window same app</td><td>Process ID per instance</td><td>Can open multiple journal windows for different dates.</td></tr>
+  </table>
+</div>
+
+<h3>4c. The Dock</h3>
+<div class="section">
+  <div class="diagram" style="font-size:13px;">
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│  🧠 Brain Dump  📓 Journal  ◉ Focus  ✓ Tasks  📊 Dash  🔄 Review  📅 Cal  🔥 Habits  ▸ Term  │  ···  │  🌐 Portfolio  ⚡ Cool  👤 About  🏘 Community  │  ⚙  │
+│  ·               ·           ·                   ·                                       │       │                                                     │     │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+  ← apps (open as windows) →                                                                       ← pages (View Transition breakouts) →               sys</div>
+  <ul>
+    <li><strong>Magnification effect:</strong> Icons scale up on hover with spring physics (Motion library). macOS dock feel.</li>
+    <li><strong>Dot indicators:</strong> Small dots under open apps. Pulsing dot = active/in-progress (focus timer running).</li>
+    <li><strong>Separator:</strong> Visual divider between app launchers and page links.</li>
+    <li><strong>Right-click:</strong> Context menu (Popover API) — "Open", "Open New Window", "Close All", "Pin to Desktop".</li>
+    <li><strong>System tray (far right):</strong> Settings, sound toggle, notifications, install PWA prompt.</li>
+    <li><strong>Badge counts:</strong> Inbox count badge on Brain Dump icon. Overdue count on Tasks.</li>
+    <li><strong>Position:</strong> Bottom by default. User can move to left/right in settings.</li>
+  </ul>
+</div>
+
+<h3>4d. Desktop Surface</h3>
+<div class="section">
+  <ul>
+    <li><strong>Wallpaper:</strong> Animated gradient with subtle grain. CSS <code>@property</code> for smooth color shifts over time (changes with time of day — cooler at night, warmer in morning).</li>
+    <li><strong>Desktop icons:</strong> Draggable shortcut files. Can be links, app shortcuts, or decorative. Arranged in a loose grid with snap-to-grid option.</li>
+    <li><strong>Cursor effect:</strong> Subtle radial light following cursor (CSS radial-gradient on a full-screen overlay at very low opacity). Not a particle trail — just a gentle illumination.</li>
+    <li><strong>Right-click menu:</strong> Popover API context menu — "New Brain Dump", "Open Journal", "Change Wallpaper", "Toggle Sound", "Arrange Icons", "View: Desktop / Launcher".</li>
+    <li><strong>Selection box:</strong> Click + drag on empty space draws a selection rectangle (like a real desktop). Selected icons highlight.</li>
+  </ul>
+</div>
+
+<h3>4e. Command Palette (⌘+K)</h3>
+<div class="section">
+  <div class="glass" style="max-width:500px; margin: 12px auto;">
+    <div style="background:rgba(255,255,255,0.06); border-radius:8px; padding:10px 14px; margin-bottom:12px;">
+      <span style="color:#888; font-size:13px;">Search apps, entries, commands...</span>
+    </div>
+    <div style="font-size:13px; color:#aaa;">
+      <div style="padding:6px 8px; border-radius:6px; background:rgba(126,184,255,0.08); margin:4px 0;">🧠 Brain Dump <span style="float:right;color:#666;">⌘B</span></div>
+      <div style="padding:6px 8px; margin:4px 0;">📓 Today's Journal <span style="float:right;color:#666;">⌘J</span></div>
+      <div style="padding:6px 8px; margin:4px 0;">◉ Start Focus Session <span style="float:right;color:#666;">⌘F</span></div>
+      <div style="padding:6px 8px; margin:4px 0;">📝 Journal: "Meeting with..." <span style="float:right;color:#666;">Mar 18</span></div>
+      <div style="padding:6px 8px; margin:4px 0;">🔍 Search all entries... <span style="float:right;color:#666;">⌘/</span></div>
+    </div>
+  </div>
+  <ul>
+    <li>Fuzzy search across: apps, journal entries, brain dumps, tasks, commands</li>
+    <li>Recent items at top when query is empty</li>
+    <li>Actions: open app, create new entry, navigate to page, run command</li>
+    <li>Keyboard-first: arrow keys navigate, Enter activates, Esc closes</li>
+  </ul>
+</div>
+
+<h3>4f. Keyboard Shortcuts</h3>
+<div class="section">
+  <div class="grid-3">
+    <div>
+      <h4>Apps</h4>
+      <table style="font-size:12px;">
+        <tr><td><code>⌘+K</code></td><td>Command palette</td></tr>
+        <tr><td><code>⌘+B</code></td><td>Brain Dump</td></tr>
+        <tr><td><code>⌘+J</code></td><td>Journal</td></tr>
+        <tr><td><code>⌘+F</code></td><td>Focus Timer</td></tr>
+        <tr><td><code>⌘+T</code></td><td>Terminal</td></tr>
+        <tr><td><code>⌘+D</code></td><td>Dashboard</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>Windows</h4>
+      <table style="font-size:12px;">
+        <tr><td><code>Esc</code></td><td>Minimize active window</td></tr>
+        <tr><td><code>⌘+W</code></td><td>Close active window</td></tr>
+        <tr><td><code>⌘+M</code></td><td>Maximize/restore</td></tr>
+        <tr><td><code>⌘+`</code></td><td>Cycle windows</td></tr>
+        <tr><td><code>⌘+←/→</code></td><td>Snap left/right</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>Navigation</h4>
+      <table style="font-size:12px;">
+        <tr><td><code>⌘+1-9</code></td><td>Open nth dock item</td></tr>
+        <tr><td><code>⌘+↵</code></td><td>Quick brain dump</td></tr>
+        <tr><td><code>⌘+.</code></td><td>Toggle sound</td></tr>
+        <tr><td><code>⌘+,</code></td><td>Settings</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<h3>4g. Sound Engine</h3>
+<div class="section">
+  <ul>
+    <li><strong>Ambient:</strong> Soft pad that plays on boot (after user gesture). Changes with time of day. Web Audio API.</li>
+    <li><strong>Interaction sounds:</strong> Subtle clicks on window open/close, dock hover, button press. Short, crisp, satisfying.</li>
+    <li><strong>Focus mode:</strong> Optional ambient soundscapes — rain, lo-fi, white noise, coffee shop. Uses <code>AnalyserNode</code> for optional waveform visualization in the Focus Timer.</li>
+    <li><strong>Notifications:</strong> Distinct chime for focus timer completion, inbox reminder. Gentle, not alarming.</li>
+    <li><strong>Mutable:</strong> Global toggle in system tray. Per-category controls in Settings. Respects <code>prefers-reduced-motion</code>.</li>
+  </ul>
+</div>
+
+<!-- ==================== APP WINDOWS ==================== -->
+<h2>5. Desktop App Windows — Full Detail</h2>
+
+<h3>5a. 🧠 Brain Dump (GTD Inbox)</h3>
+<div class="section">
+  <p><strong>Philosophy:</strong> Capture EVERYTHING. Process LATER. The fastest path from thought to stored.</p>
+
+  <div class="diagram" style="font-size:12px;">
+┌─────────────────────────────────────────────┐
+│  🧠 Brain Dump                    — □ ✕    │
+├─────────────────────────────────────────────┤
+│                                             │
+│  ┌─────────────────────────────────┐  🎤   │
+│  │ Type or speak...                │  ⏎    │
+│  └─────────────────────────────────┘        │
+│                                             │
+│  ─── Unprocessed (7) ──────────────────     │
+│                                             │
+│  ┌─ 2 min ago ─────────────────────────┐   │
+│  │ "Look into WebGPU compute shaders   │   │
+│  │  for data visualization"            │   │
+│  │          [Task] [Journal] [Archive] │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  ┌─ 1 hour ago ───────────────────────┐    │
+│  │ "Call dentist about Thursday"       │    │
+│  │          [Task] [Journal] [Archive] │    │
+│  └─────────────────────────────────────┘    │
+│                                             │
+│  ┌─ Yesterday ────────────────────────┐    │
+│  │ "LetMeScale needs new case study    │    │
+│  │  for the agency landing page"       │    │
+│  │          [Task] [Journal] [Archive] │    │
+│  └─────────────────────────────────────┘    │
+│                                             │
+│  ─── Processed Today (12) ──── [show] ──   │
+│                                             │
+│  [Process Mode]  [Export]  [Voice Mode]     │
+└─────────────────────────────────────────────┘</div>
+
+  <ul>
+    <li><strong>Capture:</strong> Single input. Type + Enter, or click mic for voice (<span class="tag green">Web Speech API</span>). That's it. No categories, no tags, no friction.</li>
+    <li><strong>Queue:</strong> Chronological list of unprocessed items. Relative timestamps.</li>
+    <li><strong>Quick sort:</strong> Each item has action buttons — Task (creates task), Journal (moves to today's journal), Archive (saves but clears from inbox).</li>
+    <li><strong>Process Mode:</strong> Full-screen card presentation. One item at a time. Decide and move on. GTD "clarify" step. Number keys for quick sort (1=Task, 2=Journal, 3=Archive, 4=Delete).</li>
+    <li><strong>Voice Mode:</strong> Hands-free continuous capture. Speak, pause, speak again. Each pause creates a new item. Great for brain dumping while pacing.</li>
+    <li><strong>Global shortcut:</strong> <code>⌘+↵</code> opens a floating mini-capture anywhere — type, Enter, it disappears. Doesn't even open the full window.</li>
+    <li><strong>2-minute rule:</strong> If an item takes less than 2 minutes, a subtle indicator suggests "just do it now."</li>
+  </ul>
+</div>
+
+<h3>5b. 📓 Journal</h3>
+<div class="section">
+  <p><strong>Philosophy:</strong> Your daily template digitized. Prompts, reflection, metrics — not just a text editor.</p>
+
+  <div class="diagram" style="font-size:12px;">
+┌─────────────────────────────────────────────────────────────┐
+│  📓 Journal — Friday, March 20                  — □ ✕     │
+├─────────────────────────────────────────────────────────────┤
+│  ◄ Mar 19   [Today]   Mar 21 ►     📅 Calendar   🔍       │
+├──────────┬──────────────────────────────────────────────────┤
+│          │                                                  │
+│ SECTIONS │  ## 🎯 Today's Focus                            │
+│          │  ┌──────────────────────────────────────────┐   │
+│ 🎯 Focus │  │ Ship Focus Timer PiP feature             │   │
+│ ⏰ Time  │  └──────────────────────────────────────────┘   │
+│ 📝 Notes │                                                  │
+│ 💡 Ideas │  ## ⏰ Time Blocks                               │
+│ 🙏 Grat. │  ┌────────┬────────────────────────────────┐   │
+│ 🌙 Refl. │  │ 6-9 AM │ Deep work: Focus Timer PiP     │   │
+│ 📊 Metr. │  │ 9-12   │ Code review + standup          │   │
+│          │  │ 1-4 PM │ LetMeScale case study           │   │
+│          │  │ 4-6 PM │ place.org design session        │   │
+│          │  └────────┴────────────────────────────────┘   │
+│          │                                                  │
+│          │  ## 📝 Notes from Today                          │
+│          │  Met with designer about LetMeScale...          │
+│          │                                                  │
+│          │  ## 💡 Ideas & Thoughts                          │
+│          │  > Imported from Brain Dump (3 items)            │
+│          │                                                  │
+│          │  ## 🙏 Gratitude                                 │
+│          │  1. _____  2. _____  3. _____                   │
+│          │                                                  │
+│          │  ## 🌙 End of Day Reflection                     │
+│          │  What went well: ___                             │
+│          │  What could be better: ___                       │
+│          │  Key learning: ___                               │
+│          │  Tomorrow's priority: ___                        │
+│          │                                                  │
+│          │  ## 📊 Daily Metrics                              │
+│          │  Deep work: [##████──] 4.2h                      │
+│          │  Tasks done: 8/12                                │
+│          │  Energy:  P:7  M:8  E:6                         │
+│          │  Inbox zero: ✓                                   │
+└──────────┴──────────────────────────────────────────────────┘</div>
+
+  <ul>
+    <li><strong>Mirrors your vault daily template:</strong> ONE Thing focus, time blocks, notes, ideas, gratitude, reflection, metrics.</li>
+    <li><strong>Markdown editor:</strong> Live preview with section sidebar navigation.</li>
+    <li><strong>Calendar strip:</strong> Navigate between dates. Click any date to view/create entry.</li>
+    <li><strong>Mood/Energy tracker:</strong> Physical (P), Mental (M), Emotional (E) on 1-10 scale. Visual indicators.</li>
+    <li><strong>Brain dump import:</strong> Items sorted to "Journal" in Brain Dump appear in today's Ideas section.</li>
+    <li><strong>Daily metrics:</strong> Auto-populated from Focus Timer (deep work hours), Tasks (completion), Habits (streaks).</li>
+    <li><strong>Full-text search:</strong> SQLite FTS5 across all entries. Search by date, content, tags, mood range.</li>
+    <li><strong>Export:</strong> Download as .md files (<span class="tag green">File System Access API</span>). Compatible with Obsidian vault structure.</li>
+  </ul>
+</div>
+
+<h3>5c. ◉ Focus Timer (FlexiFocus Evolution)</h3>
+<div class="section">
+  <p><strong>Philosophy:</strong> Awareness, not enforcement. Soft boundaries. Your FlexiFocus spec, evolved with browser superpowers.</p>
+
+  <div class="diagram" style="font-size:12px;">
+┌──────────────────────────────────────────────┐
+│  ◉ Focus Timer                    — □ ✕     │
+├──────────────────────────────────────────────┤
+│                                              │
+│              ┌──────────┐                    │
+│         ╭────│  25:00   │────╮               │
+│        ╱     │  target  │     ╲              │
+│       │      │          │      │  ← circular │
+│       │      │  32:47   │      │    progress │
+│        ╲     │  actual  │     ╱    ring      │
+│         ╰────│          │────╯               │
+│              └──────────┘                    │
+│                                              │
+│         ┌── OVERRUN: +7:47 ──┐               │
+│         │  You passed your    │               │
+│         │  target. Keep going │               │
+│         │  or transition.     │               │
+│         └────────────────────┘               │
+│                                              │
+│       ┌────────────────────────┐             │
+│       │     ⏭ TRANSITION       │  ← single  │
+│       └────────────────────────┘    button   │
+│                                              │
+│  Label: [FlexiFocus PiP    ▾]  [+ tag]      │
+│                                              │
+│  Session: W1 → B1 → W2 → B2 → W3 → ...     │
+│  Today:   2h 14m focused  │  3 sessions      │
+│                                              │
+│  [🔊 Ambient]  [📌 PiP]  [📊 Analytics]     │
+└──────────────────────────────────────────────┘</div>
+
+  <ul>
+    <li><strong>Core mechanic:</strong> Timer notifies at target. Never stops. User decides when to transition. Overrun is first-class data.</li>
+    <li><strong>Single Transition button:</strong> Ends current block, logs it, starts next (work→break→work). Minimal interaction.</li>
+    <li><strong>Circular progress ring:</strong> SVG/Canvas. Fills to 100% at target, then changes color and keeps going (overrun visualization).</li>
+    <li><strong>Labels:</strong> Optional. Add during or after. Reclassify blocks after the fact.</li>
+    <li><strong>Picture-in-Picture:</strong> <span class="tag green">Document PiP API</span> — float a mini timer over other browser tabs. Shows time + transition button.</li>
+    <li><strong>Screen Wake Lock:</strong> <span class="tag green">Screen Wake Lock API</span> — screen stays on during focus sessions.</li>
+    <li><strong>Ambient sound:</strong> Built-in soundscapes (rain, lo-fi, white noise). Web Audio API with <code>AnalyserNode</code> for waveform.</li>
+    <li><strong>Notifications:</strong> <span class="tag green">Notification API</span> — "Target reached!" even when tab is backgrounded.</li>
+    <li><strong>Analytics panel:</strong> Charts (daily/weekly focus hours, overrun patterns, work/break ratios). From SQLite aggregation.</li>
+    <li><strong>Journal integration:</strong> On session end, prompt: "What did you focus on?" → auto-creates journal note.</li>
+    <li><strong>Session model:</strong> Identical to FlexiFocus spec — blocks with target_ms, actual_ms, type, label, overrun.</li>
+  </ul>
+</div>
+
+<h3>5d. ✓ Tasks</h3>
+<div class="section">
+  <p><strong>Philosophy:</strong> Must/Should/Could priority matrix. Linked to goals. Not a Jira clone — a personal task surface.</p>
+  <ul>
+    <li><strong>Priority levels:</strong> Must-do (red), Should-do (orange), Could-do (blue), Won't-do (archived)</li>
+    <li><strong>Categories:</strong> Work, Personal, Learning/Growth, Health/Wellness (from your daily template)</li>
+    <li><strong>Quick add:</strong> Type + Enter at top. Assign priority with keyboard shortcut.</li>
+    <li><strong>Due dates:</strong> Optional. Overdue items surface in ambient bar and Brain Dump.</li>
+    <li><strong>Goal linking:</strong> Tasks can link to goals from the Dashboard. "This task advances: [Ship Focus Timer]".</li>
+    <li><strong>Drag to reorder.</strong> Drag between priority groups. Drag to calendar for time-blocking.</li>
+    <li><strong>Incomplete processing:</strong> At end of day/week, unfinished tasks prompt "Why? → Reschedule / Delegate / Delete" (from your weekly review template).</li>
+    <li><strong>Views:</strong> List (default), Kanban (by status), Calendar (by due date).</li>
+  </ul>
+</div>
+
+<h3>5e. 📊 Dashboard</h3>
+<div class="section">
+  <p><strong>Philosophy:</strong> Your goal cascade at a glance. THE ONE THING front and center. Energy as a metric.</p>
+  <ul>
+    <li><strong>The ONE Thing:</strong> Largest element. "What's the ONE thing such that by doing it, everything else becomes easier?" Editable daily.</li>
+    <li><strong>Goal cascade:</strong> Collapsible tree — 3-Year Vision → Yearly Goals → Monthly Goals → This Week. Each with progress %.</li>
+    <li><strong>Energy gauge:</strong> Physical / Mental / Emotional (1-10). Visual meter. Set once per day, tracked over time.</li>
+    <li><strong>Daily metrics panel:</strong> Deep work hours, tasks completed, inbox zero status, focus sessions.</li>
+    <li><strong>Weekly trend:</strong> Sparkline charts for focus time, task completion, energy levels over the past 7 days.</li>
+    <li><strong>Active projects:</strong> List of current projects with status indicators and last-touched date.</li>
+  </ul>
+</div>
+
+<h3>5f. 🔄 Review</h3>
+<div class="section">
+  <p><strong>Philosophy:</strong> GTD weekly review digitized. Collect → Reflect → Plan. Three phases, guided.</p>
+  <ul>
+    <li><strong>Phase 1 — Collect:</strong> Surface all unprocessed brain dumps, incomplete tasks, unreviewed journal entries. "Is everything captured?"</li>
+    <li><strong>Phase 2 — Reflect:</strong> Wins, challenges, lessons learned. Incomplete task processing (why didn't this get done?). Energy trends.</li>
+    <li><strong>Phase 3 — Plan:</strong> Set next week's ONE Thing. Fill priority matrix. Plan day-by-day time blocks. Set habit targets.</li>
+    <li><strong>Monthly mode:</strong> Same flow but zoomed out — monthly goal progress, project status updates, quarterly check-in.</li>
+    <li><strong>Guided wizard:</strong> Step-by-step cards walk through each phase. Not a blank page — structured prompts.</li>
+    <li><strong>Export:</strong> Generate markdown weekly review note compatible with Obsidian vault template.</li>
+  </ul>
+</div>
+
+<h3>5g. 📅 Calendar</h3>
+<div class="section">
+  <ul>
+    <li><strong>Views:</strong> Day (time blocks), Week (overview), Month (summary).</li>
+    <li><strong>Time blocks:</strong> Visual blocks from journal's time block section. Drag to adjust.</li>
+    <li><strong>Focus sessions:</strong> Auto-populated from Focus Timer data. Shows actual vs planned.</li>
+    <li><strong>Events:</strong> Manual creation. Reminders via Notification API.</li>
+    <li><strong>Drag from Tasks:</strong> Drag a task to a time slot to schedule it.</li>
+    <li><strong>Today indicator:</strong> Current time marker that scrolls with real time.</li>
+  </ul>
+</div>
+
+<h3>5h. 🔥 Habits</h3>
+<div class="section">
+  <ul>
+    <li><strong>Active limit:</strong> 5-7 habits max. System enforces this — must archive one to add another.</li>
+    <li><strong>Daily habits:</strong> Morning routine, exercise, reading, etc. Checkbox per day.</li>
+    <li><strong>Weekly habits:</strong> Exercise 3x, deep work 5x, learning 3hrs — with target and actual.</li>
+    <li><strong>Streak visualization:</strong> GitHub-style contribution grid. Longest streak highlighted.</li>
+    <li><strong>Habit heat map:</strong> Which days of the week are strongest? Time-of-day patterns?</li>
+    <li><strong>Integration:</strong> Some habits auto-track — "Deep work 5x" counts from Focus Timer sessions.</li>
+    <li><strong>Gentle reminders:</strong> Notification at configurable times if habit not checked.</li>
+  </ul>
+</div>
+
+<h3>5i. ▸ Terminal</h3>
+<div class="section">
+  <ul>
+    <li><strong>Library:</strong> <code>jquery.terminal</code> (no jQuery dependency). Tab completion, history, CTRL shortcuts.</li>
+    <li><strong>Unix metaphor:</strong> <code>~/inbox/</code>, <code>~/journal/</code>, <code>~/focus/</code>, <code>~/tasks/</code>, <code>~/habits/</code></li>
+    <li><strong>Commands:</strong> <code>/dump "thought"</code>, <code>/focus 25</code>, <code>/journal</code>, <code>/review</code>, <code>/search query</code>, <code>/export</code></li>
+    <li><strong>Data queries:</strong> <code>ls ~/journal/ --last 7</code>, <code>cat ~/journal/2026-03-20</code>, <code>grep "LetMeScale" ~/journal/</code></li>
+    <li><strong>Navigation:</strong> <code>open portfolio</code>, <code>open cool-stuff</code>, <code>goto /about</code></li>
+    <li><strong>Fun:</strong> <code>cowsay</code>, <code>fortune</code>, <code>matrix</code>, <code>cal</code>, <code>uptime</code> (shows how long place.org has been running in this session)</li>
+    <li><strong>AI (future):</strong> <code>/ask "summarize this week"</code>, <code>/suggest "what should I focus on?"</code></li>
+  </ul>
+</div>
+
+<!-- ==================== IMMERSIVE PAGES ==================== -->
+<h2>6. Immersive Page Breakouts</h2>
+
+<div class="highlight">
+  <strong>Transition:</strong> Clicking a page link triggers <span class="tag green">View Transitions API</span>. The desktop blurs and slides back while the page content morphs in from the dock icon position. A floating "↩ Desktop" pill + <code>Esc</code> key reverses the transition. The dock is hidden but a mini-dock appears on hover at the bottom edge.
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h4>🌐 /portfolio</h4>
+    <p>Your shipped work. 9 projects showcased.</p>
+    <ul>
+      <li>3D hero scene (React Three Fiber) — one impactful moment, not a gimmick</li>
+      <li>Horizontal scroll project gallery (Lenis + GSAP)</li>
+      <li>Each project: clip-path hover reveals detail card (Lando Norris pattern)</li>
+      <li>Case study pages: scroll-driven animations, split-text headings, image parallax</li>
+      <li>Context-aware nav: transparent overlay → solid on scroll (Lando Norris)</li>
+      <li>Projects: LetMeScale, ExecuDeck, Proslync, DispoHub, Truks, XpressDrop, FlexiFocus, JarvisAI, QuickNotes</li>
+      <li>Each case study: problem → approach → tech stack → results → screenshots</li>
+    </ul>
+    <span class="tag purple">R3F</span> <span class="tag purple">GSAP</span> <span class="tag purple">Lenis</span> <span class="tag green">View Transitions</span> <span class="tag green">Scroll-Driven Animations</span>
+  </div>
+
+  <div class="card">
+    <h4>⚡ /cool-stuff</h4>
+    <p>Curated discoveries. The stuff that inspires you.</p>
+    <ul>
+      <li>Bento grid — different card sizes by content type</li>
+      <li>Categories: tools, sites, articles, experiments, music, resources</li>
+      <li>Each card: micro-preview (screenshot thumbnail, animation, or embed)</li>
+      <li>Filter/sort with animated layout shifts (Motion library <code>layoutId</code>)</li>
+      <li>Submit form for authenticated users</li>
+      <li>Inspired by WebGardens + coolstuff.app</li>
+    </ul>
+    <span class="tag">Bento Grid</span> <span class="tag purple">Motion</span> <span class="tag green">View Transitions</span>
+  </div>
+
+  <div class="card">
+    <h4>👤 /about</h4>
+    <p>Who you are. Your philosophy. The human behind the tools.</p>
+    <ul>
+      <li>Scroll-driven narrative — story unfolds with scroll</li>
+      <li>Ambient details: live location, weather, current project, what you're listening to</li>
+      <li>Values + philosophy ("execution over aspiration", "the site IS the pitch")</li>
+      <li>Tech stack showcase — what you build with</li>
+      <li>Social links, contact form, PGP key</li>
+      <li>Photo/illustration moments between sections</li>
+      <li>"The site IS the pitch" — the about page itself proves your capabilities</li>
+    </ul>
+    <span class="tag green">Scroll-Driven</span> <span class="tag green">Geolocation</span> <span class="tag green">View Transitions</span>
+  </div>
+
+  <div class="card">
+    <h4>🏘 /community</h4>
+    <p>The people and organizations of place.org.</p>
+    <ul>
+      <li>People grid with hover cards (Allen, Paul, Elizabeth, Kusco, Zachary)</li>
+      <li>Organizations: Texas Juggling Society, Multiplexing.org, Siteswap.org, KoFightClub</li>
+      <li>Heritage story: place.org's history, the Debian roots</li>
+      <li>Live service links: Searx, Commafeed, Hubzilla</li>
+      <li>"Time Machine" button → <code>/oldplace/</code> with retro transition effect</li>
+    </ul>
+    <span class="tag">Community</span> <span class="tag green">View Transitions</span>
+  </div>
+</div>
+
+<!-- ==================== LEGACY ==================== -->
+<h2>7. Legacy Preservation</h2>
+<div class="section">
+  <table>
+    <tr><th>Current URL</th><th>New Location</th><th>Method</th></tr>
+    <tr><td><code>place.org/</code></td><td><code>place.org/oldplace/</code></td><td>Static HTML served as-is</td></tr>
+    <tr><td><code>place.org/user/</code></td><td><code>place.org/oldplace/user/</code></td><td>Static files</td></tr>
+    <tr><td><code>place.org/~paul/</code></td><td><code>place.org/oldplace/~paul/</code></td><td>Static files + redirect from old URL</td></tr>
+    <tr><td>Searx instance</td><td>Same URL (subdomain or path)</td><td>Reverse proxy, unchanged</td></tr>
+    <tr><td>Commafeed</td><td>Same URL</td><td>Reverse proxy, unchanged</td></tr>
+    <tr><td>Hubzilla</td><td>Same URL</td><td>Reverse proxy, unchanged</td></tr>
+  </table>
+  <div class="warn">
+    <strong>301 redirects</strong> from old paths to /oldplace/* equivalents. No broken links. Existing services keep their URLs — only the homepage changes.
+  </div>
+</div>
+
+<!-- ==================== BROWSER APIS ==================== -->
+<h2>8. Browser Platform Features (Full Map)</h2>
+<table>
+  <tr><th>Feature</th><th>API</th><th>Where</th><th>Fallback</th><th>Support</th></tr>
+  <tr><td>Float timer</td><td>Document PiP</td><td>Focus Timer</td><td>Regular window</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>Screen stays on</td><td>Screen Wake Lock</td><td>Focus sessions</td><td>"Keep tab active" note</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>Page transitions</td><td>View Transitions</td><td>Desktop↔pages</td><td>CSS fade</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>Voice capture</td><td>Web Speech Recognition</td><td>Brain Dump</td><td>Type instead</td><td><span class="tag blue">Chrome/Edge/Safari</span></td></tr>
+  <tr><td>Native popovers</td><td>Popover API</td><td>Menus, tooltips</td><td>Custom modal</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>Scroll animations</td><td>Scroll-Driven CSS</td><td>Immersive pages</td><td>Intersection Observer</td><td><span class="tag blue">Chrome/Safari</span></td></tr>
+  <tr><td>App icon badge</td><td>Badging API</td><td>Inbox count</td><td>Favicon badge (canvas)</td><td><span class="tag blue">Chrome/Edge/iOS</span></td></tr>
+  <tr><td>No browser chrome</td><td>Window Controls Overlay</td><td>Installed PWA</td><td>Normal PWA</td><td><span class="tag orange">Chromium PWA</span></td></tr>
+  <tr><td>File export</td><td>File System Access</td><td>Journal export</td><td>Download blob</td><td><span class="tag orange">Chromium</span></td></tr>
+  <tr><td>File import</td><td>File Handling</td><td>Open .md → Journal</td><td>Drag & drop</td><td><span class="tag orange">Chromium</span></td></tr>
+  <tr><td>Background alerts</td><td>Notification API</td><td>Timer, reminders</td><td>In-app toast</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>Ambient sound</td><td>Web Audio + AnalyserNode</td><td>Sound engine</td><td>HTML Audio</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>Local database</td><td>SQLite WASM + OPFS</td><td>Everything</td><td>IndexedDB</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>Offline</td><td>Service Worker + Cache</td><td>Full app</td><td>—</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>OS keyboard capture</td><td>Keyboard Lock</td><td>Terminal fullscreen</td><td>Standard shortcuts</td><td><span class="tag orange">Chromium</span></td></tr>
+  <tr><td>Command palette</td><td>Custom (⌘+K)</td><td>Global</td><td>—</td><td>All (JS)</td></tr>
+  <tr><td>Geolocation</td><td>Geolocation API</td><td>Weather, ambient bar</td><td>Manual location</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>PWA install</td><td>Web App Manifest</td><td>System tray prompt</td><td>Bookmark</td><td><span class="tag green">All</span></td></tr>
+  <tr><td>App shortcuts</td><td>Shortcuts (manifest)</td><td>Right-click PWA icon</td><td>—</td><td><span class="tag blue">Chrome/Edge</span></td></tr>
+</table>
+
+<!-- ==================== TECH STACK ==================== -->
+<h2>9. Tech Stack</h2>
+<table>
+  <tr><th>Layer</th><th>Choice</th><th>Why</th></tr>
+  <tr><td>Framework</td><td>Next.js 16 (App Router)</td><td>SSR boot frame, route groups, your stack</td></tr>
+  <tr><td>Language</td><td>TypeScript strict</td><td>Your convention. No <code>any</code>, no <code>as</code> without justification.</td></tr>
+  <tr><td>Styling</td><td>Tailwind v4 + CSS <code>@scope</code>/<code>@layer</code></td><td>Utility-first + modern cascade isolation per window</td></tr>
+  <tr><td>Animation (React)</td><td>Motion v12 (Framer Motion)</td><td>32KB, hardware-accelerated, best React integration</td></tr>
+  <tr><td>Animation (scroll)</td><td>GSAP + Lenis</td><td>Scroll choreography, split-text, timeline sequencing</td></tr>
+  <tr><td>3D (portfolio)</td><td>React Three Fiber + Drei</td><td>One hero scene. Not throughout.</td></tr>
+  <tr><td>Window manager</td><td>react-rnd</td><td>Drag + resize. Proven in DaedalOS, windows93.net.</td></tr>
+  <tr><td>State</td><td>Zustand 5</td><td>Window state, app state, cross-component. Your convention.</td></tr>
+  <tr><td>Database</td><td>wa-sqlite + OPFS (Web Worker)</td><td>Full SQL, persistent, fast. Non-blocking.</td></tr>
+  <tr><td>Auth</td><td>NextAuth.js + Google OAuth</td><td>Optional. For sync layer only.</td></tr>
+  <tr><td>Terminal</td><td>jquery.terminal</td><td>3K stars, no jQuery dep, tab completion, history.</td></tr>
+  <tr><td>Markdown</td><td>MDXEditor or TipTap</td><td>Rich editing for journal. WYSIWYG + markdown source.</td></tr>
+  <tr><td>Charts</td><td>Chart.js or Recharts</td><td>Focus analytics, habit heatmaps, goal progress.</td></tr>
+  <tr><td>PWA</td><td>Serwist (next-pwa successor)</td><td>Service worker, caching, install prompt, offline.</td></tr>
+  <tr><td>Lint/Format</td><td>Biome</td><td>Your convention.</td></tr>
+  <tr><td>Package manager</td><td>pnpm</td><td>Your convention.</td></tr>
+  <tr><td>Pre-commit</td><td>Husky + lint-staged</td><td>Your convention.</td></tr>
+  <tr><td>Testing</td><td>Vitest + React Testing Library</td><td>Your convention. 70/20/10 pyramid.</td></tr>
+</table>
+
+<!-- ==================== DATA MODEL ==================== -->
+<h2>10. Data Model (SQLite)</h2>
+<pre>
+-- ===================== BRAIN DUMP / INBOX =====================
+CREATE TABLE inbox (
+  id          TEXT PRIMARY KEY,
+  content     TEXT NOT NULL,
+  source      TEXT DEFAULT 'text',  -- 'text' | 'voice'
+  processed   INTEGER DEFAULT 0,
+  action      TEXT,                  -- 'task' | 'journal' | 'archive' | NULL
+  created_at  TEXT NOT NULL,
+  processed_at TEXT
+);
+
+-- ===================== JOURNAL =====================
+CREATE TABLE journal_entries (
+  id          TEXT PRIMARY KEY,
+  date        TEXT NOT NULL UNIQUE,  -- YYYY-MM-DD, one per day
+  content     TEXT NOT NULL,          -- full markdown
+  one_thing   TEXT,                   -- today's ONE focus
+  mood        INTEGER CHECK(mood BETWEEN 1 AND 10),
+  energy_p    INTEGER CHECK(energy_p BETWEEN 1 AND 10),  -- physical
+  energy_m    INTEGER CHECK(energy_m BETWEEN 1 AND 10),  -- mental
+  energy_e    INTEGER CHECK(energy_e BETWEEN 1 AND 10),  -- emotional
+  gratitude   TEXT,                   -- JSON array of 3 strings
+  tags        TEXT,                   -- JSON array
+  created_at  TEXT NOT NULL,
+  updated_at  TEXT NOT NULL
+);
+CREATE VIRTUAL TABLE journal_fts USING fts5(content, one_thing, tags, content=journal_entries);
+
+-- ===================== FOCUS SESSIONS =====================
+CREATE TABLE focus_sessions (
+  id          TEXT PRIMARY KEY,
+  started_at  TEXT NOT NULL,
+  ended_at    TEXT,
+  status      TEXT DEFAULT 'active'  -- 'active' | 'completed' | 'abandoned'
+);
+CREATE TABLE focus_blocks (
+  id          TEXT PRIMARY KEY,
+  session_id  TEXT NOT NULL REFERENCES focus_sessions(id),
+  type        TEXT NOT NULL,          -- 'work' | 'short_break' | 'long_break'
+  target_ms   INTEGER NOT NULL,
+  actual_ms   INTEGER,
+  overrun_ms  INTEGER GENERATED ALWAYS AS (actual_ms - target_ms) STORED,
+  label       TEXT,
+  tags        TEXT,                   -- JSON array
+  started_at  TEXT NOT NULL,
+  ended_at    TEXT
+);
+
+-- ===================== TASKS =====================
+CREATE TABLE tasks (
+  id          TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  description TEXT,
+  priority    TEXT DEFAULT 'should',  -- 'must' | 'should' | 'could'
+  category    TEXT,                    -- 'work' | 'personal' | 'learning' | 'health'
+  status      TEXT DEFAULT 'pending', -- 'pending' | 'in_progress' | 'done' | 'archived'
+  due_date    TEXT,                    -- YYYY-MM-DD
+  goal_id     TEXT REFERENCES goals(id),
+  sort_order  INTEGER DEFAULT 0,
+  created_at  TEXT NOT NULL,
+  completed_at TEXT,
+  incomplete_reason TEXT              -- "Why didn't this get done?"
+);
+
+-- ===================== GOALS =====================
+CREATE TABLE goals (
+  id          TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  level       TEXT NOT NULL,          -- 'three_year' | 'yearly' | 'monthly' | 'weekly'
+  parent_id   TEXT REFERENCES goals(id),  -- cascade hierarchy
+  progress    INTEGER DEFAULT 0,      -- 0-100
+  status      TEXT DEFAULT 'active',
+  target_date TEXT,
+  created_at  TEXT NOT NULL,
+  updated_at  TEXT NOT NULL
+);
+
+-- ===================== HABITS =====================
+CREATE TABLE habits (
+  id          TEXT PRIMARY KEY,
+  name        TEXT NOT NULL,
+  frequency   TEXT NOT NULL,          -- 'daily' | 'weekly'
+  target      TEXT,                    -- e.g., "3x" or "3hrs"
+  active      INTEGER DEFAULT 1,
+  sort_order  INTEGER DEFAULT 0,
+  created_at  TEXT NOT NULL
+);
+CREATE TABLE habit_logs (
+  id          TEXT PRIMARY KEY,
+  habit_id    TEXT NOT NULL REFERENCES habits(id),
+  date        TEXT NOT NULL,          -- YYYY-MM-DD
+  completed   INTEGER DEFAULT 0,      -- 0 or 1 (daily), or count (weekly)
+  notes       TEXT
+);
+
+-- ===================== CALENDAR EVENTS =====================
+CREATE TABLE events (
+  id          TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  date        TEXT NOT NULL,
+  start_time  TEXT,                    -- HH:MM
+  end_time    TEXT,
+  description TEXT,
+  reminder_ms INTEGER,                -- ms before event to notify
+  created_at  TEXT NOT NULL
+);
+
+-- ===================== TIME BLOCKS =====================
+CREATE TABLE time_blocks (
+  id          TEXT PRIMARY KEY,
+  date        TEXT NOT NULL,
+  start_time  TEXT NOT NULL,          -- HH:MM
+  end_time    TEXT NOT NULL,
+  label       TEXT NOT NULL,
+  category    TEXT,                    -- 'deep_work' | 'meetings' | 'personal' | 'admin'
+  task_id     TEXT REFERENCES tasks(id),
+  created_at  TEXT NOT NULL
+);
+
+-- ===================== REVIEWS =====================
+CREATE TABLE reviews (
+  id          TEXT PRIMARY KEY,
+  type        TEXT NOT NULL,          -- 'weekly' | 'monthly'
+  date        TEXT NOT NULL,
+  wins        TEXT,                    -- JSON array
+  challenges  TEXT,                    -- JSON array
+  lessons     TEXT,                    -- JSON array
+  next_one_thing TEXT,
+  content     TEXT,                    -- full markdown
+  created_at  TEXT NOT NULL
+);
+
+-- ===================== COOL STUFF =====================
+CREATE TABLE cool_stuff (
+  id          TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  url         TEXT NOT NULL,
+  description TEXT,
+  category    TEXT,                    -- 'tools' | 'sites' | 'articles' | 'experiments' | 'music'
+  thumbnail   TEXT,                    -- URL or base64
+  created_at  TEXT NOT NULL
+);
+
+-- ===================== SYSTEM =====================
+CREATE TABLE window_state (
+  id          TEXT PRIMARY KEY,
+  app_id      TEXT NOT NULL,
+  x REAL, y REAL, width REAL, height REAL,
+  z_index     INTEGER,
+  minimized   INTEGER DEFAULT 0,
+  maximized   INTEGER DEFAULT 0,
+  updated_at  TEXT NOT NULL
+);
+
+CREATE TABLE settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL  -- JSON
+);
+
+CREATE TABLE desktop_icons (
+  id    TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  icon  TEXT,
+  action TEXT NOT NULL,  -- 'app:braindump' | 'url:https://...' | 'page:/portfolio'
+  x REAL, y REAL,
+  sort_order INTEGER
+);
+</pre>
+
+<!-- ==================== MOBILE ==================== -->
+<h2>11. Mobile Strategy</h2>
+<div class="section">
+  <p><strong>Rule:</strong> No draggable windows on mobile. The desktop becomes a launcher. Everything else adapts.</p>
+
+  <div class="grid">
+    <div>
+      <h4>Desktop → Launcher</h4>
+      <ul>
+        <li>Ambient bar becomes compact header (date, one metric)</li>
+        <li>Apps shown as vertical card list (swipe between)</li>
+        <li>Tap card → app fills screen</li>
+        <li>Swipe right → back to launcher</li>
+        <li>Bottom nav: Brain Dump, Journal, Focus, Tasks, More</li>
+        <li>Quick capture: floating ⌘+↵ button always visible</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Immersive Pages</h4>
+      <ul>
+        <li>Work naturally — scroll experiences are mobile-native</li>
+        <li>3D hero → simplified 2D animation on mobile</li>
+        <li>Horizontal scroll → vertical stack or swipeable</li>
+        <li>Touch-optimized: 44px min touch targets</li>
+        <li>Same View Transitions between launcher and pages</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== INTERACTION PATTERNS ==================== -->
+<h2>12. Interaction Patterns (from Inspiration)</h2>
+<table>
+  <tr><th>Pattern</th><th>Source</th><th>Where in place.org</th><th>Implementation</th></tr>
+  <tr><td>Boot ritual</td><td>Poolsuite</td><td>Initial load</td><td>SSR HTML frame + char-by-char text + fade-in</td></tr>
+  <tr><td>Draggable windows + dock</td><td>Poolsuite, DaedalOS</td><td>Desktop</td><td>react-rnd + Zustand process state</td></tr>
+  <tr><td>Dock magnification</td><td>macOS</td><td>Dock</td><td>Motion spring physics on hover</td></tr>
+  <tr><td>Ambient sound</td><td>Poolsuite, nows.stunl.io</td><td>Sound engine</td><td>Web Audio API + AnalyserNode</td></tr>
+  <tr><td>Clip-path hover reveal</td><td>Lando Norris</td><td>Portfolio cards</td><td>CSS clip-path transition on hover</td></tr>
+  <tr><td>Context-aware nav</td><td>Lando Norris</td><td>Immersive pages</td><td>Scroll-linked opacity/background via IntersectionObserver</td></tr>
+  <tr><td>Horizontal scroll gallery</td><td>Lando Norris</td><td>Portfolio</td><td>Lenis + GSAP ScrollTrigger</td></tr>
+  <tr><td>Split-text animation</td><td>Lando Norris</td><td>Portfolio headings</td><td>GSAP SplitText + staggered reveal</td></tr>
+  <tr><td>Fluid typography</td><td>Lando Norris</td><td>All text</td><td>CSS clamp() 320px→1920px</td></tr>
+  <tr><td>Digital garden ethos</td><td>henry.codes</td><td>/about page</td><td>Personal values, ambient context, imperfection welcome</td></tr>
+  <tr><td>Live ambient context</td><td>henry.codes</td><td>Ambient bar</td><td>Geolocation + weather API + SQLite metrics</td></tr>
+  <tr><td>Cursor illumination</td><td>Almost Studio</td><td>Desktop surface</td><td>CSS radial-gradient following pointer</td></tr>
+  <tr><td>Bento grid</td><td>WebGardens</td><td>/cool-stuff</td><td>CSS Grid auto-placement with variable spans</td></tr>
+  <tr><td>Local-first zero-friction</td><td>ZenScape, yoyotools</td><td>Core principle</td><td>SQLite WASM, no login required</td></tr>
+  <tr><td>Terminal navigation</td><td>taminomartinius.de</td><td>Terminal window</td><td>jquery.terminal with custom command handlers</td></tr>
+  <tr><td>Community heritage</td><td>Cameron's World</td><td>/community, /oldplace</td><td>Archive + heritage narrative</td></tr>
+  <tr><td>Soft-boundary timer</td><td>FlexiFocus (yours)</td><td>Focus Timer</td><td>Same spec, evolved UI</td></tr>
+  <tr><td>Progressive disclosure</td><td>nows.stunl.io</td><td>Advanced settings, terminal</td><td>Controls appear on demonstrated intent</td></tr>
+  <tr><td>Glass morphism</td><td>LetMeScale (yours)</td><td>All windows, surfaces</td><td>backdrop-filter + border + gradient</td></tr>
+  <tr><td>Density/detail toggle</td><td>Joe Coleman</td><td>Dashboard (future)</td><td>Single slider shifts summary↔detail view</td></tr>
+</table>
+
+<div style="margin-top:48px; padding:28px; background: linear-gradient(135deg, rgba(126,184,255,0.08), rgba(100,255,150,0.04)); border:1px solid rgba(126,184,255,0.15); border-radius:14px;">
+  <h3 style="margin-top:0; color:#7eb8ff;">Does this feel like place.org now?</h3>
+  <p style="font-size:15px; line-height:1.7;">This covers: full site map, visual design language, boot sequence, desktop system (ambient bar, window manager, dock, surface, command palette, keyboard shortcuts, sound engine), 9 app windows with detailed wireframes, 4 immersive breakout pages, legacy preservation, 19 browser APIs, complete tech stack, full SQLite data model with 14 tables, mobile strategy, and 20 interaction patterns mapped from inspiration.</p>
+  <p style="font-size:15px; line-height:1.7;">Tell me what's missing, what's wrong, or what needs to change. Once you approve, I'll write the formal spec and move to implementation planning.</p>
+</div>
+
+</body>
+</html>

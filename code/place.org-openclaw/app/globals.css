@@ -1,0 +1,450 @@
+@import "tailwindcss";
+
+:root {
+	/* ===== New Design Token System (--place-*) ===== */
+
+	/* Surfaces */
+	--place-void: #060610;
+	--place-base: #08090E;
+	--place-surface-1: #0E1017;
+	--place-surface-2: #141620;
+	--place-surface-3: #1A1D2A;
+
+	/* Text (white at opacity) */
+	--place-text-primary: rgba(255,255,255, 0.87);
+	--place-text-secondary: rgba(255,255,255, 0.60);
+	--place-text-tertiary: rgba(255,255,255, 0.40);
+	--place-text-muted: rgba(255,255,255, 0.25);
+	--place-text-ghost: rgba(255,255,255, 0.12);
+
+	/* Primary (Teal) */
+	--place-primary-900: #064E3B;
+	--place-primary-700: #0A7558;
+	--place-primary-500: #0D9373;
+	--place-primary-400: #2DD4A8;
+	--place-primary-300: #5EEAD4;
+	--place-primary-200: #99F6E4;
+	--place-primary-50: #CCFBF1;
+	--place-primary-glow: rgba(13,147,115, 0.25);
+	--place-primary-subtle: rgba(13,147,115, 0.10);
+	--place-primary-border: rgba(45,212,168, 0.20);
+
+	/* Secondary (Slate Blue) */
+	--place-secondary-900: #1E3A6E;
+	--place-secondary-700: #2B5298;
+	--place-secondary-500: #4B7BE5;
+	--place-secondary-400: #6B95F0;
+	--place-secondary-300: #93B4F6;
+	--place-secondary-200: #BDD1FA;
+	--place-secondary-50: #E0ECFD;
+	--place-secondary-glow: rgba(75,123,229, 0.25);
+	--place-secondary-subtle: rgba(75,123,229, 0.10);
+	--place-secondary-border: rgba(107,149,240, 0.20);
+
+	/* Tertiary (Amber) */
+	--place-tertiary-900: #78350F;
+	--place-tertiary-700: #92400E;
+	--place-tertiary-500: #D97706;
+	--place-tertiary-400: #F59E0B;
+	--place-tertiary-300: #FBBF24;
+	--place-tertiary-200: #FDE68A;
+	--place-tertiary-50: #FEF3C7;
+	--place-tertiary-glow: rgba(217,119,6, 0.25);
+	--place-tertiary-subtle: rgba(217,119,6, 0.10);
+	--place-tertiary-border: rgba(245,158,11, 0.20);
+
+	/* Semantic (never themed) */
+	--place-error: #E24B4A;
+	--place-success: #22C55E;
+	--place-warning: #EAB308;
+
+	/* Borders */
+	--place-border-subtle: rgba(255,255,255, 0.04);
+	--place-border-default: rgba(255,255,255, 0.08);
+	--place-border-strong: rgba(255,255,255, 0.15);
+
+	/* Typography */
+	--place-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+	--place-font-mono: "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
+	--place-font-weight-base: 400;
+	--place-font-weight-heading: 600;
+	--place-line-height: 1.5;
+
+	/* Easing */
+	--place-ease-smooth: cubic-bezier(0.65, 0.05, 0, 1);
+
+	/* ===== Backward-compatible aliases — remove after full migration ===== */
+	--bg-deep: var(--place-void);
+	--bg-surface: var(--place-surface-1);
+	--bg-glass: rgba(255,255,255, 0.02);
+	--text-primary: var(--place-text-primary);
+	--text-secondary: var(--place-text-secondary);
+	--accent-blue: var(--place-secondary-400);
+	--accent-success: var(--place-success);
+	--accent-warm: var(--place-tertiary-400);
+	--accent-urgent: var(--place-error);
+	--border: var(--place-border-default);
+	--border-hover: var(--place-border-strong);
+	--glow: var(--place-secondary-glow);
+	--glass-blur: 16px;
+	--ease-smooth: var(--place-ease-smooth);
+}
+
+/* ===== Light mode ===== */
+[data-theme="light"] {
+  --place-void: #f5f5f7;
+  --place-base: #ececee;
+  --place-surface-1: #e2e2e6;
+  --place-surface-2: #d8d8dc;
+  --place-surface-3: #ccccd0;
+  --place-text-primary: rgba(0,0,0,0.87);
+  --place-text-secondary: rgba(0,0,0,0.60);
+  --place-text-tertiary: rgba(0,0,0,0.40);
+  --place-text-muted: rgba(0,0,0,0.25);
+  --place-border-default: rgba(0,0,0,0.10);
+  --place-border-subtle: rgba(0,0,0,0.05);
+  --place-border-strong: rgba(0,0,0,0.18);
+}
+
+/* ===== Contrast modes ===== */
+[data-contrast="increased"] {
+  --place-text-primary: rgba(255,255,255,0.95);
+  --place-text-secondary: rgba(255,255,255,0.75);
+  --place-border-default: rgba(255,255,255,0.15);
+}
+
+[data-contrast="high"] {
+  --place-text-primary: #ffffff;
+  --place-text-secondary: rgba(255,255,255,0.85);
+  --place-text-tertiary: rgba(255,255,255,0.65);
+  --place-border-default: rgba(255,255,255,0.25);
+  --place-border-strong: rgba(255,255,255,0.35);
+}
+
+/* ===== Light mode + contrast combos ===== */
+[data-theme="light"][data-contrast="increased"] {
+  --place-text-primary: rgba(0,0,0,0.95);
+  --place-text-secondary: rgba(0,0,0,0.75);
+  --place-border-default: rgba(0,0,0,0.18);
+}
+
+[data-theme="light"][data-contrast="high"] {
+  --place-text-primary: #000000;
+  --place-text-secondary: rgba(0,0,0,0.85);
+  --place-border-default: rgba(0,0,0,0.30);
+}
+
+/* ===== Title bar styles ===== */
+[data-titlebar="compact"] .window-titlebar { height: 28px; font-size: 0.7rem; }
+[data-titlebar="hidden"] .window-titlebar { display: none; }
+
+body {
+	background-color: var(--place-void);
+	color: var(--place-text-primary);
+	font-family: var(--place-font-sans);
+	overflow: hidden;
+	height: 100dvh;
+	width: 100dvw;
+}
+
+/* ===== Custom Scrollbars ===== */
+
+/* Global — hide scrollbar by default, show on hover */
+::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+	margin: 4px 0;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.06);
+	border-radius: 9999px;
+	transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.15);
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+/* Show scrollbar more prominently when hovering the scroll container */
+*:hover::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.10);
+}
+
+*:hover::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.20);
+}
+
+*:hover::-webkit-scrollbar-thumb:active {
+	background: rgba(255, 255, 255, 0.30);
+}
+
+/* Inside app windows — slightly more visible */
+[role="dialog"] ::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+
+[role="dialog"] ::-webkit-scrollbar-track {
+	background: transparent;
+	margin: 2px;
+}
+
+[role="dialog"] ::-webkit-scrollbar-thumb {
+	background: var(--place-primary-subtle, rgba(13,147,115, 0.12));
+	border-radius: 9999px;
+}
+
+[role="dialog"] ::-webkit-scrollbar-thumb:hover {
+	background: var(--place-primary-border, rgba(45,212,168, 0.25));
+}
+
+[role="dialog"] ::-webkit-scrollbar-thumb:active {
+	background: var(--place-primary-400, #2DD4A8);
+}
+
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+[role="dialog"] * {
+	scrollbar-color: var(--place-primary-subtle, rgba(13,147,115, 0.12)) transparent;
+}
+
+/* Textarea scrollbars — match the app window style */
+textarea::-webkit-scrollbar {
+	width: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.08);
+	border-radius: 9999px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== Glass tiers — liquid glass best practices ===== */
+/*
+ * Each tier layers: tinted background + blur + saturate + border
+ * Higher tiers = more opaque + more blur = more readable over busy backgrounds
+ * saturate(180%) makes colors behind the glass more vivid (Apple-style)
+ */
+.glass-ambient {
+	background: var(--glass-bg-ambient, rgba(14, 16, 23, 0.4));
+	backdrop-filter: blur(var(--glass-blur-ambient, 6px)) saturate(120%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-ambient, 6px)) saturate(120%);
+}
+.glass-surface {
+	background: var(--glass-bg-surface, rgba(14, 16, 23, 0.55));
+	backdrop-filter: blur(var(--glass-blur-surface, 20px)) saturate(150%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-surface, 20px)) saturate(150%);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.glass-elevated {
+	background: var(--glass-bg-elevated, rgba(14, 16, 23, 0.65));
+	backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-accent {
+	background: var(--glass-bg-accent, rgba(10, 30, 25, 0.60));
+	backdrop-filter: blur(var(--glass-blur-accent, 32px)) saturate(180%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-accent, 32px)) saturate(180%);
+	border: 1px solid var(--place-primary-border);
+}
+/* .glass = elevated (most common — windows, dock, top bar) */
+.glass {
+	background: var(--glass-bg-elevated, rgba(14, 16, 23, 0.65));
+	backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gradient-text {
+	display: inline-block;
+}
+
+@keyframes gradient-shift {
+	0% {
+		background-position: 0% center;
+	}
+	100% {
+		background-position: 200% center;
+	}
+}
+
+.skeleton {
+	background: linear-gradient(
+		90deg,
+		var(--bg-surface) 25%,
+		rgba(91, 156, 245, 0.06) 50%,
+		var(--bg-surface) 75%
+	);
+	background-size: 200% 100%;
+	animation: skeleton-shimmer 1.5s ease-in-out infinite;
+	border-radius: 8px;
+}
+
+.skeleton.rounded {
+	border-radius: 9999px;
+}
+
+@keyframes skeleton-shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+/* Markdown preview — deep space theme */
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+	color: var(--place-secondary-400);
+	margin: 0.75em 0 0.35em;
+	line-height: 1.3;
+}
+.markdown-preview h1 { font-size: 1.4rem; }
+.markdown-preview h2 { font-size: 1.2rem; }
+.markdown-preview h3 { font-size: 1.05rem; }
+
+.markdown-preview p {
+	margin: 0 0 0.6em;
+}
+
+.markdown-preview blockquote {
+	border-left: 3px solid var(--place-secondary-400);
+	margin: 0.5em 0;
+	padding: 0.25em 0 0.25em 0.85em;
+	color: var(--place-text-secondary);
+	font-style: italic;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+	margin: 0.4em 0 0.6em 1.25em;
+	padding: 0;
+}
+
+.markdown-preview li {
+	margin-bottom: 0.2em;
+}
+
+.markdown-preview code {
+	background: var(--bg-glass);
+	border: 1px solid var(--border);
+	border-radius: 3px;
+	padding: 0.1em 0.35em;
+	font-family: monospace;
+	font-size: 0.9em;
+}
+
+.markdown-preview hr {
+	border: none;
+	border-top: 1px solid var(--border-hover);
+	margin: 0.9em 0;
+}
+
+.markdown-preview strong { color: var(--text-primary); }
+.markdown-preview em { color: var(--place-text-secondary); font-style: italic; }
+
+/* Mic button pulse animation */
+@keyframes mic-pulse {
+	0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(226, 75, 74, 0.4); }
+	50% { opacity: 0.85; box-shadow: 0 0 0 6px rgba(226, 75, 74, 0); }
+}
+
+/* Window resize handle hover glow */
+.resize-handle-glow {
+	transition: background 0.2s ease !important;
+}
+.resize-handle-glow:hover {
+	background: rgba(45, 212, 168, 0.15) !important;
+}
+
+/* Dock icon hover glow */
+.dock-icon-btn:hover {
+	color: var(--place-secondary-400) !important;
+	box-shadow: 0 0 12px 2px var(--place-secondary-glow), 0 0 4px 1px rgba(75, 123, 229, 0.1);
+}
+
+/* ===== Range slider ===== */
+input[type="range"] {
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	cursor: pointer;
+	width: 100%;
+	height: 4px;
+}
+input[type="range"]::-webkit-slider-track {
+	background: var(--place-surface-3);
+	border-radius: 2px;
+	height: 4px;
+}
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--place-primary-400);
+	border: 2px solid var(--place-void);
+	margin-top: -5px;
+}
+input[type="range"]::-moz-range-track {
+	background: var(--place-surface-3);
+	border-radius: 2px;
+	height: 4px;
+}
+input[type="range"]::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--place-primary-400);
+	border: 2px solid var(--place-void);
+}
+
+/* Window Controls Overlay support */
+.ambient-bar-wco {
+	position: fixed;
+	top: 0;
+	left: env(titlebar-area-x, 0);
+	width: env(titlebar-area-width, 100%);
+	height: env(titlebar-area-height, 40px);
+	-webkit-app-region: drag;
+}
+
+.ambient-bar-wco button,
+.ambient-bar-wco input,
+.ambient-bar-wco a,
+.ambient-bar-wco span[role="button"],
+.ambient-bar-wco [onclick] {
+	-webkit-app-region: no-drag;
+}
+
+/* View Transitions */
+::view-transition-old(root) { animation: vt-fade-out 150ms ease-out; }
+::view-transition-new(root) { animation: vt-fade-in 150ms ease-in; }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }

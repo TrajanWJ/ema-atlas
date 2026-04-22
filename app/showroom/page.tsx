@@ -231,7 +231,7 @@ export default async function ShowroomPage() {
             {typeof item.words === "number" ? (
               <p className="showroom-card__meta">{item.words.toLocaleString()} words</p>
             ) : null}
-            {item.route ? (
+            {item.route && !item.route.includes("[") ? (
               <div className="route-links">
                 <Link className="chip" href={item.route}>Open route</Link>
               </div>

@@ -249,7 +249,10 @@ export default async function ArtifactsPage() {
           {section.entries.length > 0 ? (
             <ul className="research-list">
               {section.entries.map((entry, idx) => {
-                const titleNode = entry.route ? (
+                // Skip Link for dynamic route templates (e.g. "/parts/[slug]")
+                // since Next.js App Router doesn't allow literal template hrefs.
+                const isDynamicTemplate = entry.route?.includes("[");
+                const titleNode = entry.route && !isDynamicTemplate ? (
                   <Link href={entry.route}>{entry.title}</Link>
                 ) : (
                   <span>{entry.title}</span>

@@ -53,15 +53,20 @@ export default async function CanvasPage({ params }: CanvasPageProps) {
               return (
                 <figure className="canvas-diagrams__svg" key={panel.key}>
                   <figcaption className="canvas-diagrams__label">{panel.label}</figcaption>
-                  <div
-                    className="canvas-diagrams__frame"
-                    aria-label={`${part.title} ${panel.label} diagram`}
-                    {...(svg
-                      ? { dangerouslySetInnerHTML: { __html: svg } }
-                      : {})}
-                  >
-                    {!svg && <span className="canvas-diagrams__missing">Diagram pending</span>}
-                  </div>
+                  {svg ? (
+                    <div
+                      className="canvas-diagrams__frame"
+                      aria-label={`${part.title} ${panel.label} diagram`}
+                      dangerouslySetInnerHTML={{ __html: svg }}
+                    />
+                  ) : (
+                    <div
+                      className="canvas-diagrams__frame"
+                      aria-label={`${part.title} ${panel.label} diagram`}
+                    >
+                      <span className="canvas-diagrams__missing">Diagram pending</span>
+                    </div>
+                  )}
                   {caption && <p className="canvas-diagrams__caption">{caption}</p>}
                 </figure>
               );

@@ -9,7 +9,7 @@ inspires: [codebase-ema, lineage-openclaw-agent-workspaces, lineage-openclaw-arc
 superseded_by: [codebase-ema]
 adjacent_to: [docs-clis-mcps-integrations]
 referenced_in_docs: [02-project-transfer-brief.md, 03-architectural-evolution-and-major-decisions.md]
-key_artifacts: []
+key_artifacts: [docs/OpenClaw System Overview.md, docs/OpenClaw Protocols.md, docs/OpenClaw Agent Workspace Guide.md, runtime/openclaw.sanitized.json]
 aliases: [.openclaw]
 load_priority: 3
 ---
@@ -18,3 +18,27 @@ load_priority: 3
 OpenClaw runtime/doc lineage. Donor of named-role/handoff/watchdog patterns
 and Discord-native operator feel. Already absorbed into EMA's
 `babysitter/` and incident model. **Mine for doctrine, do not resurrect.**
+
+## Why this matters
+
+OpenClaw is the doctrine ancestor of EMA's babysitter/incident model. Read this when you need to understand *why* the babysitter exists, not what it does (the what is in `codebase-ema/code/ema/daemon/lib/ema/babysitter/`).
+
+## What lives here
+
+- `docs/OpenClaw System Overview.md` — the original system shape
+- `docs/OpenClaw Protocols.md` — handoff/role/watchdog protocols
+- `docs/OpenClaw Agent Workspace Guide.md` — per-agent workspace pattern (precursor to the shared workspace contract)
+- `runtime/openclaw.sanitized.json` — sanitized runtime config residue
+
+## Where it connects
+
+- Crystallized into: `codebase-ema` (`babysitter/`, `sessions/`, incidents/*)
+- Surface-side residue lived on in: `codebase-claudeforge`, `codebase-place-org-openclaw`
+- Knowledge ingest plans in: `docs-ema-next-steps/.../OPENCLAW-KNOWLEDGE-INGEST-PLAN.qmd`
+
+## How to load it efficiently
+
+```bash
+git show origin/lineage-openclaw:'docs/OpenClaw System Overview.md'
+git show origin/lineage-openclaw:'docs/OpenClaw Protocols.md'
+```

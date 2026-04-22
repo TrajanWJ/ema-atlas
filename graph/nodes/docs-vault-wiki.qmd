@@ -8,7 +8,7 @@ preserves_from: [lineage-openclaw, codebase-place-org]
 inspires: []
 adjacent_to: [docs-host-vault-context, docs-host-obsidian-vault]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [vault/.archive/openclaw-notes/EMA-OpenClaw-Node-Integration-Spec-2026-04-03.md, vault/.archive/host-sessions/2026-03-20 - place.org v0.1 through v0.5 Build Session.md]
 aliases: [/home/trajan/wiki]
 load_priority: 3
 ---
@@ -16,3 +16,27 @@ load_priority: 3
 
 Wiki/codebase summaries and architecture notes. Primary written
 self-awareness substrate; load before any specific codebase- branch.
+
+## Why this matters
+
+User vault snapshots and architecture notes. Primary written self-awareness substrate from outside the codebase — the place to look when you want to know what *the user actually wrote* about an idea before it landed in code.
+
+## What lives here
+
+- `vault/.archive/openclaw-notes/` — OpenClaw-era integration specs (e.g. `EMA-OpenClaw-Node-Integration-Spec-2026-04-03.md`)
+- `vault/.archive/host-sessions/` — narrated build sessions (e.g. place.org v0.1→v0.5)
+- `vault/.archive/host-archive/LetMeScale-docs/` — earlier design notes
+- `vault/.archive/inbox-trash-2026-03-18/` — captured raw context
+
+## Where it connects
+
+- Adjacent: `docs-host-vault-context` (host-machine vault mirror), `docs-host-obsidian-vault` (raw export)
+- Inspires: nothing new (this is reference material), but informs the wiki vApp planned in `docs-ema-next-steps/.../ULTIMATE-WIKI-ARCHITECTURE.qmd`
+
+## How to load it efficiently
+
+Use grep across the branch first; the structure is deep:
+```bash
+git ls-tree -r origin/docs-vault-wiki --name-only | grep -i <topic>
+git show origin/docs-vault-wiki:<path>
+```

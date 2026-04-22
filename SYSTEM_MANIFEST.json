@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-22T08:03:45Z",
+  "generated_at": "2026-04-22T08:31:57Z",
   "repo": "TrajanWJ/ema-transfer-pack-20260422-060938",
   "canonical_rule": "EMA owns truth. Hermes owns execution. Surfaces do not own state.",
   "entry_docs": [
@@ -63,7 +63,7 @@
     "lineage-openclaw-agent-workspaces": "6842b36301bb7bd3236bde2b58f1f716c0dcf0a9",
     "lineage-openclaw-archive-subprojects": "651ffb7a795f135a2074b390896d28cf29fdd9b2",
     "lineage-original-elixir-ema": "0ec1ddc2c124a6cffac817a8731f3403dda9fcdf",
-    "main": "0a80550a284095ea29b824443275b36a3a001223",
+    "main": "b0e648d43a55cf816805ec62a5c2cc8ef4389fce",
     "recovery-old-agent-vm-vault-system": "b04a780848d5a170bf983bcb79627925f52ebddc"
   },
   "nodes": [
@@ -418,7 +418,11 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/place.org-openclaw/AGENTS.md",
+        "code/place.org-openclaw/CLAUDE.md",
+        "code/place.org-openclaw/README.md"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -449,7 +453,13 @@
         "MACBOOK_AGENT_HANDOFF_MASTER.md",
         "05-fresh-context-project-app-model.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/place.org/AGENTS.md",
+        "code/place.org/CLAUDE.md",
+        "code/place.org/README.md",
+        "code/place.org/app/(desktop)/layout.tsx",
+        "code/place.org/app/(desktop)/page.tsx"
+      ],
       "aliases": [
         "place.org",
         "placeOS"
@@ -547,7 +557,11 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "agent-vm/archive-openclaw/control-ui/openclaw-control-ui-source/ARCHITECTURE.md",
+        "agent-vm/archive-openclaw/bin/refresh-openclaw-oauth.sh",
+        "agent-vm/archive-openclaw/bin/sync-cli-auth-to-openclaw.sh"
+      ],
       "aliases": [],
       "load_priority": 3
     },
@@ -650,7 +664,11 @@
         "05-fresh-context-project-app-model.md",
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/OPENCLAW-DISCORD-VAULT-LOOP.qmd",
+        "host/EMA-v1.1-Next-Steps/00-INBOX/2026-04-14-ULTIMATE-WIKI-INBOX-CAPTURE.qmd"
+      ],
       "aliases": [],
       "load_priority": 3
     },
@@ -672,7 +690,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-DAEMON-EXTRACTION-IMPL-NOTES.md",
+        "host/EMA-v1.1-Next-Steps/04-CANON/CATALOG.md",
+        "host/EMA-v1.1-Next-Steps/04-CANON/TS-RUNTIME-GAP-MAP-2026-04-13.md",
+        "host/EMA-v1.1-Next-Steps/05-WIKI/TOP-BAR-SPACES-ORGS-SPEC.md"
+      ],
       "aliases": [],
       "load_priority": 3
     },
@@ -694,7 +717,10 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "host-vault/AI Knowledge/Claude Code Plugins/Claude Code Configuration.md",
+        "host-vault/AI Knowledge/Claude Code Plugins/Claude Code Plugins MOC.md"
+      ],
       "aliases": [
         "/home/trajan/staging/host-vault"
       ],
@@ -744,7 +770,10 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "vault/.archive/openclaw-notes/EMA-OpenClaw-Node-Integration-Spec-2026-04-03.md",
+        "vault/.archive/host-sessions/2026-03-20 - place.org v0.1 through v0.5 Build Session.md"
+      ],
       "aliases": [
         "/home/trajan/wiki"
       ],
@@ -893,7 +922,12 @@
         "02-project-transfer-brief.md",
         "03-architectural-evolution-and-major-decisions.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "docs/OpenClaw System Overview.md",
+        "docs/OpenClaw Protocols.md",
+        "docs/OpenClaw Agent Workspace Guide.md",
+        "runtime/openclaw.sanitized.json"
+      ],
       "aliases": [
         ".openclaw"
       ],

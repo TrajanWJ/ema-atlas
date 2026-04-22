@@ -8,7 +8,7 @@ preserves_from: [codebase-place-org, lineage-openclaw]
 inspires: []
 adjacent_to: [codebase-place-org, lineage-openclaw]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/place.org-openclaw/AGENTS.md, code/place.org-openclaw/CLAUDE.md, code/place.org-openclaw/README.md]
 aliases: []
 load_priority: 4
 ---
@@ -16,3 +16,24 @@ load_priority: 4
 
 Hybrid era where the place.org surface met OpenClaw orchestration. Evidence
 that the surface↔orchestrator question has been live for a long time.
+
+## Why this matters
+
+Hybrid era where the place.org Next.js surface met OpenClaw orchestration. Evidence that the surface↔orchestrator question has been live longer than the current rewrite. Useful as comparison against `codebase-place-org` (pre-merge) and `lineage-openclaw` (orchestrator only).
+
+## What lives here
+
+- `code/place.org-openclaw/AGENTS.md`, `code/place.org-openclaw/CLAUDE.md` — agent-collaboration patterns at the merge point
+- `code/place.org-openclaw/README.md`
+- (Next.js app structure mirrors `codebase-place-org`)
+
+## Where it connects
+
+- Merges: `codebase-place-org` × `lineage-openclaw`
+- Doctrine flowed forward into: `codebase-ema` (babysitter), `codebase-claudeforge` (surface seam)
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-place-org-openclaw:code/place.org-openclaw/AGENTS.md
+```

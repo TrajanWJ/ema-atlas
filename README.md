@@ -17,7 +17,9 @@ load only the slice of context its task needs.
 5. [`05-fresh-context-project-app-model.md`](05-fresh-context-project-app-model.md) — newest user PRD framing (project/space/org, named app surfaces)
 6. [`GLOSSARY.md`](GLOSSARY.md) — controlled vocabulary
 7. [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) — single canonical list of unresolved decisions
-8. The four-doc handoff series:
+8. [`TIMELINE.md`](TIMELINE.md) — chronological lineage skeleton
+9. [`CONTRIBUTING_TO_GRAPH.md`](CONTRIBUTING_TO_GRAPH.md) — rules for keeping the graph self-aware as it grows
+10. The four-doc handoff series:
    - [`01-best-prompt-and-answer.md`](01-best-prompt-and-answer.md)
    - [`02-project-transfer-brief.md`](02-project-transfer-brief.md)
    - [`03-architectural-evolution-and-major-decisions.md`](03-architectural-evolution-and-major-decisions.md)
@@ -34,6 +36,8 @@ load only the slice of context its task needs.
 ├─ AGENT_BOOTSTRAP.md        # fresh-machine setup (paths A and B)
 ├─ GLOSSARY.md               # controlled vocabulary
 ├─ OPEN_QUESTIONS.md         # canonical list of unresolved decisions
+├─ TIMELINE.md               # chronological lineage skeleton
+├─ CONTRIBUTING_TO_GRAPH.md  # rules for keeping the graph self-aware
 ├─ SYSTEM_MANIFEST.json      # machine-readable index (regen via scripts/manifest.sh)
 ├─ BRANCH_MAP.md             # short branch list
 ├─ BRANCH_MAP_EXPANDED.md    # long branch list

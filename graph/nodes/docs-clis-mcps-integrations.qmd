@@ -8,7 +8,7 @@ preserves_from: [lineage-openclaw, codebase-claudeforge]
 inspires: []
 adjacent_to: [docs-host-vault-agent-modules-routing, lineage-openclaw]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [agent-vm/archive-openclaw/control-ui/openclaw-control-ui-source/ARCHITECTURE.md, agent-vm/archive-openclaw/bin/refresh-openclaw-oauth.sh, agent-vm/archive-openclaw/bin/sync-cli-auth-to-openclaw.sh]
 aliases: []
 load_priority: 3
 ---
@@ -16,3 +16,25 @@ load_priority: 3
 
 CLI/MCP integration material — claude-cli, codex-cli, OpenClaw control-ui
 gateway. Direct input to the harness/driver contract design.
+
+## Why this matters
+
+OpenClaw control-UI gateway source plus CLI/MCP integration material. The single best place to study what the harness/driver layer needs to abstract over (auth modes, rate limits, install policies, identity, capability detection).
+
+## What lives here
+
+- `agent-vm/archive-openclaw/control-ui/openclaw-control-ui-source/ARCHITECTURE.md` — gateway architecture
+- `agent-vm/archive-openclaw/control-ui/openclaw-control-ui-source/gateway-backend/` — TS source for assistant identity, auth-mode policy, rate limits, capability tests
+- `agent-vm/archive-openclaw/bin/refresh-openclaw-oauth.sh` — auth refresh
+- `agent-vm/archive-openclaw/bin/sync-cli-auth-to-openclaw.sh` — CLI↔gateway auth sync
+
+## Where it connects
+
+- Inspires: harness/driver registry design in `graph/edges/execution.md`
+- Adjacent: `lineage-openclaw`, `docs-host-vault-agent-modules-routing`
+
+## How to load it efficiently
+
+```bash
+git show origin/docs-clis-mcps-integrations:agent-vm/archive-openclaw/control-ui/openclaw-control-ui-source/ARCHITECTURE.md
+```

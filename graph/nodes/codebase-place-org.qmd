@@ -9,7 +9,7 @@ inspires: [codebase-place-companion, codebase-place-org-openclaw, docs-host-syst
 superseded_by: []
 adjacent_to: [codebase-place-companion, docs-place-org-era-research]
 referenced_in_docs: [02-project-transfer-brief.md, 03-architectural-evolution-and-major-decisions.md, MACBOOK_AGENT_HANDOFF_MASTER.md, 05-fresh-context-project-app-model.md]
-key_artifacts: []
+key_artifacts: [code/place.org/AGENTS.md, code/place.org/CLAUDE.md, code/place.org/README.md, code/place.org/app/(desktop)/layout.tsx, code/place.org/app/(desktop)/page.tsx]
 aliases: [place.org, placeOS]
 load_priority: 3
 ---
@@ -19,3 +19,27 @@ Browser-native workspace / virtual-desktop / local-first "place" lineage.
 Donor of the Launchpad/HQ/Virtual-Desktop UX metaphor that resurfaces in the
 fresh-context product framing. Not architectural; preserve as visual + spatial
 intent only.
+
+## Why this matters
+
+Original Next.js implementation of the place.org virtual desktop. Read `AGENTS.md` and `CLAUDE.md` for the agent-collaboration patterns the user has used; read `app/(desktop)/` for the UX scaffolding that the v1.1 Launchpad/HQ shell will replace or wrap.
+
+## What lives here
+
+- `code/place.org/AGENTS.md` — agent-collaboration conventions
+- `code/place.org/CLAUDE.md` — Claude-specific working notes
+- `code/place.org/README.md` — project README
+- `code/place.org/app/(desktop)/layout.tsx`, `code/place.org/app/(desktop)/page.tsx` — desktop surface scaffolding
+- (full Next.js app under `code/place.org/app/` — explore on demand)
+
+## Where it connects
+
+- Inspires: `codebase-place-companion`, `codebase-place-org-openclaw`, `docs-host-system-launchpad-hq`, `docs-vault-wiki`
+- Concept donor for: every `ux-metaphor` topic node
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-place-org:code/place.org/AGENTS.md
+git show origin/codebase-place-org:code/place.org/app/'(desktop)'/layout.tsx
+```

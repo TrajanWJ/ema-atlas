@@ -8,10 +8,30 @@ preserves_from: []
 inspires: []
 adjacent_to: [docs-vault-wiki, docs-host-obsidian-vault]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [host-vault/AI Knowledge/Claude Code Plugins/Claude Code Configuration.md, host-vault/AI Knowledge/Claude Code Plugins/Claude Code Plugins MOC.md]
 aliases: [/home/trajan/staging/host-vault]
 load_priority: 3
 ---
 # docs-host-vault-context
 
 Imported host-vault mirrors, session logs, and research docs.
+
+## Why this matters
+
+Host-machine vault mirror — Claude Code plugin notes, MCP knowledge, session logs. Useful when designing the agent-side tooling (CLI integrations, plugin contracts) because it captures what the user has already evaluated and how.
+
+## What lives here
+
+- `host-vault/AI Knowledge/Claude Code Plugins/` — per-plugin notes (Configuration, MOC, Task Master, Dippy, Lasso claude-hooks, QMD)
+- (more under `host-vault/AI Knowledge/` and `host-vault/sessions/` — explore on demand)
+
+## Where it connects
+
+- Adjacent: `docs-vault-wiki`, `docs-host-obsidian-vault`
+- Direct input to: `docs-clis-mcps-integrations` (the agent-side CLI/MCP design)
+
+## How to load it efficiently
+
+```bash
+git ls-tree -r origin/docs-host-vault-context --name-only | grep -i <topic>
+```

@@ -2,11 +2,31 @@ import Link from "next/link";
 
 import { SiteShell } from "@/components/site-shell";
 
-import { loadTiers } from "./_tiers";
+import { loadTiers, relToSlug } from "./_tiers";
 
 export default async function DocsPage() {
   const tiers = await loadTiers();
   const total = tiers.reduce((acc, t) => acc + t.files.length, 0);
+  const swarmStart = [
+    {
+      rel: "content/swarm/README.md",
+      title: "Swarm Workspace Pack",
+      summary:
+        "Support-lane entrypoint for active EMA swarm work: doctrine, object families, read order, and alignment rules.",
+    },
+    {
+      rel: "content/swarm/orchestration-kernel.md",
+      title: "Orchestration Kernel",
+      summary:
+        "The control model to start from: one active objective, one main write lane, support lanes around it.",
+    },
+    {
+      rel: "content/swarm/active-wave-current.md",
+      title: "Active Wave",
+      summary:
+        "The live wave contract: current owner, main lane shape, support posture, risks, and stop rules.",
+    },
+  ];
 
   return (
     <SiteShell
@@ -34,6 +54,30 @@ export default async function DocsPage() {
             ))}
           </div>
         </article>
+      </section>
+
+      <section className="docs-tier">
+        <header className="docs-tier__header">
+          <p className="docs-tier__label">Start Here</p>
+          <h2 className="docs-tier__title">Active swarm work has its own lean entry path.</h2>
+          <p className="docs-tier__blurb">
+            If you are joining a live wave, do not reconstruct the swarm from the whole corpus.
+            Start with the support-lane pack, then the kernel, then the live wave.
+          </p>
+        </header>
+        <div className="docs-tier__grid">
+          {swarmStart.map((item) => (
+            <Link
+              className="docs-tile"
+              key={item.rel}
+              href={`/docs/${relToSlug(item.rel)}`}
+            >
+              <p className="docs-tile__path">{item.rel}</p>
+              <h3 className="docs-tile__name">{item.title}</h3>
+              <p className="docs-tile__summary">{item.summary}</p>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {tiers.map((tier) =>

@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 import { SiteShell } from "@/components/site-shell";
 import { loadMarkdown } from "@/lib/markdown";
 import { decorate, loadGlossaryTerms } from "@/lib/text-decorate";
-import { loadTiers } from "../_tiers";
+import { loadTiers, relToSlug } from "../_tiers";
 
 type DocPageProps = {
   params: Promise<{ slug: string }>;
@@ -208,6 +208,18 @@ function renderBlocks(blocks: Block[], terms: string[]): ReactNode[] {
 export default async function DocsDocPage({ params }: DocPageProps) {
   const { slug } = await params;
   const rel = slugToRel(slug);
+  const isSwarmDoc = rel.startsWith("content/swarm/");
+  const swarmPack = [
+    "content/swarm/README.md",
+    "content/swarm/orchestration-kernel.md",
+    "content/swarm/active-wave-current.md",
+    "content/swarm/fresh-orchestrator-read-order.md",
+    "content/swarm/continuous-progress-protocol.md",
+    "content/swarm/orchestrator-alignment.md",
+    "content/swarm/object-model.md",
+    "content/swarm/vision-guardrails.md",
+    "content/swarm/no-drift-rules.md",
+  ].filter((entry) => entry !== rel);
 
   // Defense: forbid traversal slugs.
   if (rel.includes("..") || rel.startsWith("/") || rel.startsWith("\\")) {
@@ -260,12 +272,41 @@ export default async function DocsDocPage({ params }: DocPageProps) {
           <Link className="chip" href="/docs">
             Back to /docs
           </Link>
+          {isSwarmDoc ? (
+            <>
+              <Link className="chip" href={`/docs/${relToSlug("content/swarm/README.md")}`}>
+                Swarm Pack
+              </Link>
+              <Link className="chip" href={`/docs/${relToSlug("content/swarm/active-wave-current.md")}`}>
+                Live Wave
+              </Link>
+            </>
+          ) : null}
           <span className="chip chip--ghost">{meta!.tierLabel}</span>
           <span className="chip chip--ghost">{meta!.tierTitle}</span>
         </div>
       </section>
 
       <section className="research-doc">{renderBlocks(blocks, terms)}</section>
+
+      {isSwarmDoc ? (
+        <section className="panel">
+          <p className="panel__tag">Swarm Pack / Continue Reading</p>
+          <h2 className="panel__title">Stay inside the live coordination path.</h2>
+          <p className="panel__lede">
+            This document is part of the active swarm pack. Move through the kernel,
+            live wave, and support docs directly here instead of re-deriving the
+            control model from the whole atlas.
+          </p>
+          <div className="route-links">
+            {swarmPack.map((entry) => (
+              <Link className="chip" key={entry} href={`/docs/${relToSlug(entry)}`}>
+                {entry.replace("content/swarm/", "").replace(/\.md$/i, "")}
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="panel">
         <p className="panel__tag">Navigate</p>

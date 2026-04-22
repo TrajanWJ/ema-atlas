@@ -384,7 +384,7 @@ export const docRegistry: DocEntry[] = [
   {
     title: "Swarm Workspace Pack",
     path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/README.md",
-    note: "Repo-native entrypoint for the shared swarm workspace, its doctrine, object families, and alignment rules.",
+    note: "Repo-native support-lane coordination pack and entrypoint for the shared swarm workspace, its doctrine, object families, and alignment rules.",
     kind: "doctrine",
     status: "active",
     feeds: ["docs", "program", "showroom"]

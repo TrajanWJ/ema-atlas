@@ -96,6 +96,40 @@ export default function HomePage() {
           </article>
         ))}
       </section>
+
+      <section>
+        <div className="panel">
+          <p className="panel__tag">Session / New depth</p>
+          <h2 className="panel__title">Named surfaces, doctrine, scenarios — now directly routable.</h2>
+          <p className="panel__lede">
+            Roughly 42 new routes ship this session, covering named surfaces, doctrine, control-plane flows, scenarios,
+            and guided tours. The discovery hub is <Link className="chip" href="/surface-index">/surface-index</Link> and
+            the rule is <Link className="chip" href="/canonical-rule">/canonical-rule</Link>.
+          </p>
+          <div className="route-links">
+            <Link className="chip" href="/launchpad">/launchpad</Link>
+            <Link className="chip" href="/hq">/hq</Link>
+            <Link className="chip" href="/wiki">/wiki</Link>
+            <Link className="chip" href="/chat">/chat</Link>
+            <Link className="chip" href="/threads">/threads</Link>
+            <Link className="chip" href="/agent-environment">/agent-environment</Link>
+            <Link className="chip" href="/blueprint">/blueprint</Link>
+            <Link className="chip" href="/desktop">/desktop</Link>
+            <Link className="chip" href="/vapps">/vapps</Link>
+          </div>
+          <div className="route-links">
+            <Link className="chip" href="/canonical-rule">/canonical-rule</Link>
+            <Link className="chip" href="/state-planes">/state-planes</Link>
+            <Link className="chip" href="/surface-index">/surface-index</Link>
+            <Link className="chip" href="/three-futures-gallery">/three-futures-gallery</Link>
+            <Link className="chip" href="/tour/for-skeptic">/tour/for-skeptic</Link>
+            <Link className="chip" href="/tour/for-engineer">/tour/for-engineer</Link>
+            <Link className="chip" href="/tour/for-operator">/tour/for-operator</Link>
+            <Link className="chip" href="/demo/surface-tour">/demo/surface-tour</Link>
+          </div>
+          <p className="panel__lede">Everything else: <Link className="chip" href="/surface-index">/surface-index</Link>.</p>
+        </div>
+      </section>
     </SiteShell>
   );
 }

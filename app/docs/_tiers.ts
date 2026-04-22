@@ -62,6 +62,18 @@ const TIER4 = [
   "05-fresh-context-project-app-model.md",
 ];
 
+const SWARM = [
+  "content/swarm/README.md",
+  "content/swarm/orchestration-kernel.md",
+  "content/swarm/active-wave-current.md",
+  "content/swarm/fresh-orchestrator-read-order.md",
+  "content/swarm/continuous-progress-protocol.md",
+  "content/swarm/orchestrator-alignment.md",
+  "content/swarm/object-model.md",
+  "content/swarm/vision-guardrails.md",
+  "content/swarm/no-drift-rules.md",
+];
+
 export function relToSlug(rel: string): string {
   return rel.replace(/\.md$/i, "").split("/").join("--");
 }
@@ -133,13 +145,15 @@ async function loadHowtoFiles(): Promise<DocFile[]> {
 }
 
 export async function loadTiers(): Promise<Tier[]> {
-  const [t1, t2, t3, t4, t5] = await Promise.all([
+  const [t1, t2, t3, t4, swarm, howto] = await Promise.all([
     loadTierFiles(TIER1),
     loadTierFiles(TIER2),
     loadTierFiles(TIER3),
     loadTierFiles(TIER4),
+    loadTierFiles(SWARM),
     loadHowtoFiles(),
   ]);
+  const t5 = [...swarm, ...howto];
 
   return [
     {
@@ -177,9 +191,9 @@ export async function loadTiers(): Promise<Tier[]> {
     {
       key: "tier5",
       label: "Tier 5",
-      title: "How-to playbooks",
+      title: "Swarm + how-to operations",
       blurb:
-        "Operational recipes auto-discovered from howto/. Pick a verb, follow the steps, ship the change.",
+        "Support-lane entry docs first, then operational playbooks from howto/. Use this tier when work is active and you need the current coordination model, not just background context.",
       files: t5,
     },
   ];

@@ -1,0 +1,19 @@
+graph TD
+    User[Human user]
+    HQ[apps/hq]
+    Launch[apps/launchpad]
+    Threads[apps/threads]
+    Chat[apps/chat]
+    Desk[apps/desktop]
+    Atlas[ema-atlas/app]
+    Place[codebase-place-org]
+    Comp[codebase-place-companion]
+
+    User --> HQ
+    User --> Launch
+    User --> Threads
+    User --> Chat
+    User --> Desk
+    User --> Atlas
+    Place -.donor DNA.-> Desk
+    Comp -.donor DNA.-> Desk

@@ -1,0 +1,16 @@
+graph LR
+    Now[Now: single-host + leases + append log]
+    OC{{Operator Cathedral}}
+    LW{{Living Workspace}}
+    MC{{Mesh Commonwealth}}
+
+    Now --> OC
+    Now --> LW
+    Now --> MC
+
+    OC --> Narrow[Narrow replication slice]
+    OC --> Append[Append-only logs first]
+    LW --> CoP[Co-presence as primary lens]
+    LW --> Rooms[Shared rooms + activity]
+    MC --> Common[Peer commonwealth]
+    MC --> Reloc[Relocatable authority + memory]

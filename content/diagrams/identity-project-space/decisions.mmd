@@ -1,0 +1,17 @@
+graph TD
+    Q1{Personal AI reads everything by default?}
+    Q1 -->|yes| C1a[Cost: accidental omniscience]
+    Q1 -->|no| C1b[Cost: feels less magical]
+
+    Q2{Spaces span projects?}
+    Q2 -->|yes| C2a[Cost: authority model bends]
+    Q2 -->|no| C2b[Cost: collaboration fragmented]
+
+    Q3{Identity model complexity?}
+    Q3 -->|rich delegation| C3a[Cost: hard to explain]
+    Q3 -->|simple| C3b[Cost: real delegation impossible]
+
+    C1a --> Q2
+    C1b --> Q2
+    C2a --> Q3
+    C2b --> Q3

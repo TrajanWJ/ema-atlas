@@ -1,0 +1,23 @@
+graph TD
+    Human[Human]
+    Agent[Agent]
+    WS[code/ema/daemon/lib/ema/workspace]
+    Plans[workspace/plans.ex]
+    Notes[workspace/notes.ex]
+    Threads[workspace/threads.ex]
+    Files[workspace/files.ex]
+    Handoff[workspace/handoffs.ex]
+    Store[(workspace store)]
+    Doc[ema-003-shared-agent-swarm-workspace.md]
+
+    Human --> WS
+    Agent --> WS
+    WS --> Plans
+    WS --> Notes
+    WS --> Threads
+    WS --> Files
+    WS --> Handoff
+    Plans --> Store
+    Notes --> Store
+    Threads --> Store
+    Doc -.specifies.-> WS

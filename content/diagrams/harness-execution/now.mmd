@@ -1,0 +1,17 @@
+graph TD
+    Op[Human / Agent caller]
+    Hermes[code/ema/daemon/lib/ema/hermes]
+    Sess[hermes/session.ex]
+    Run[hermes/run_handle.ex]
+    Adapter[hermes/adapters/*]
+    Provider[Claude / OpenAI / Local model]
+    Events[control_plane/event_log.ex]
+    CF[codebase-claudeforge]
+
+    Op --> Hermes
+    Hermes --> Sess
+    Sess --> Run
+    Run --> Adapter
+    Adapter --> Provider
+    Provider --> Events
+    CF -.donor patterns.-> Hermes

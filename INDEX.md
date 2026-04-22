@@ -162,11 +162,13 @@ Use this when you don't yet know what to search for.
 ## How-to playbooks
 
 - [`howto/add-a-branch.md`](howto/add-a-branch.md) — Use this when you're adding a new branch to the transfer pack (codebase
+- [`howto/add-a-deliverable.md`](howto/add-a-deliverable.md) — A **deliverable** is anything the EMA Atlas presents that expresses the
 - [`howto/add-a-driver.md`](howto/add-a-driver.md) — Use this when you're adding a new harness driver to EMA: `claude-cli`,
 - [`howto/add-a-vapp.md`](howto/add-a-vapp.md) — A **vApp** is a virtual app inside the EMA shell, rendered by the Launchpad
 - [`howto/add-an-edge-topic.md`](howto/add-an-edge-topic.md) — Use this when a cross-cutting concept emerges that doesn't fit any of the
 - [`howto/extract-doctrine-from-a-legacy-branch.md`](howto/extract-doctrine-from-a-legacy-branch.md) — Use this when you want to mine an OpenClaw / place.org / ClaudeForge /
 - [`howto/load-context-for-a-task.md`](howto/load-context-for-a-task.md) — Use this when you're a fresh agent and you need to read **just enough** to
+- [`howto/promote-vault-term.md`](howto/promote-vault-term.md) — The "Vault candidate terms" section of [`GLOSSARY.md`](../GLOSSARY.md)
 - [`howto/resolve-an-open-question.md`](howto/resolve-an-open-question.md) — Use this when you're closing one of the entries in
 
 ## Scripts

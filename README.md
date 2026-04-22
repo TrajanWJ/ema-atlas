@@ -1,12 +1,48 @@
-# EMA / Hermes Transfer Pack
+# EMA Atlas
 
-Cross-machine handoff for the EMA / Hermes / place.org / OpenClaw lineage
-rewrite. The repo is structured as a **navigable graph** so a fresh agent can
-load only the slice of context its task needs.
+This repo is now doing two jobs at once:
+
+1. it remains the lineage-rich handoff and graph archive for the EMA / Hermes / place.org / OpenClaw rewrite
+2. it is now the **primary deliverables hub** for the current stage of EMA, centered on a Next.js / React / TypeScript website that presents the system, its parts, and multiple futures in one navigable place
+
+The archive is still important. But the center of gravity is now the atlas site and the artifact routes it hosts.
 
 ## Canonical rule
 
 > **EMA owns truth. Hermes owns execution. Surfaces do not own state.**
+
+## Current center of gravity
+
+The repo root now contains a Next.js app that turns EMA into a living atlas of:
+
+- system parts
+- three competing future takes per part
+- hard questions and choice pressure
+- graphs
+- canvas / whiteboard-style routes
+- slide deck routes
+- printable brief routes
+- a place-inspired desktop surface
+- linked local knowledge docs that keep accompanying development
+
+Top-level app routes:
+
+- `/` — atlas landing page
+- `/parts` — the EMA system by part
+- `/artifacts` — deliverable formats
+- `/showroom` — gallery-like tour of briefs, slides, canvases, graph views, desktop demos, and implementation tracks
+- `/program` — cross-part program map for deliverables, pressure, and hard questions
+- `/demo` — staged project walkthrough
+- `/graph` — constellation view
+- `/desktop` — place-inspired spatial surface
+- `/docs` — linked local knowledge pack
+
+Run locally:
+
+```bash
+npm install
+npm run dev
+```
 
 ## Read in this order
 
@@ -28,7 +64,10 @@ load only the slice of context its task needs.
 ## Repo layout
 
 ```
-.                            # main: handoff docs + graph + bootstrap
+.                            # atlas app + lineage archive + graph docs
+├─ app/                      # Next.js routes for atlas, parts, graph, canvas, slides, briefs, desktop, docs
+├─ components/               # reusable UI building blocks
+├─ lib/                      # EMA atlas data model and route content
 ├─ MACBOOK_AGENT_HANDOFF_MASTER.md
 ├─ 0[1-5]-*.md               # high-signal handoff docs (numbered reading order)
 ├─ SYSTEM_GRAPH.md           # rendered lineage graph
@@ -67,10 +106,11 @@ git fetch --all
 
 Then follow [`AGENT_BOOTSTRAP.md`](AGENT_BOOTSTRAP.md).
 
-## Notes on the pack
+## Notes on the atlas pack
 
 - Public + intentionally over-included. Pruning happens later, not now.
 - Some branches mirror sanitized snapshots of private repos (place.org,
   place-companion); republished intentionally for this transfer window.
 - The transfer pack is **not** the canonical EMA repo. The canonical repo is
   `TrajanWJ/ema`; the snapshot under `codebase-ema` is a read-only mirror.
+- The current stage treats this repo as the live presentation layer for EMA-in-progress, not only a transfer artifact.

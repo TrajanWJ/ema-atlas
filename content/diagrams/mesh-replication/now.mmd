@@ -1,0 +1,17 @@
+graph TD
+    Node[Single-host EMA node]
+    Log[control_plane/event_log.ex]
+    Lease[control_plane/authority.ex]
+    Repl[code/ema/daemon/lib/ema/replication]
+    Pres[replication/presence.ex]
+    Peer[replication/peer.ex]
+    Routing[docs-host-vault-agent-modules-routing]
+    Doc[ema-003-lineage-architecture-synthesis.md]
+
+    Node --> Log
+    Node --> Lease
+    Node --> Repl
+    Repl --> Pres
+    Repl --> Peer
+    Routing -.informs.-> Repl
+    Doc -.governs.-> Lease

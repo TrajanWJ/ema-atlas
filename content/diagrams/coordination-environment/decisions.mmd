@@ -1,0 +1,17 @@
+graph TD
+    Q1{Lane vs task?}
+    Q1 -->|lane = ownership scope| C1a[Cost: lanes feel heavy]
+    Q1 -->|lane = label| C1b[Cost: weak responsibility]
+
+    Q2{Checkups: rituals or ambient?}
+    Q2 -->|ritual| C2a[Cost: meeting-overhead feel]
+    Q2 -->|ambient| C2b[Cost: missed slippage]
+
+    Q3{Personal AI autonomy in planner?}
+    Q3 -->|high| C3a[Cost: silent reschedules]
+    Q3 -->|low| C3b[Cost: assistant feels inert]
+
+    C1a --> Q2
+    C1b --> Q2
+    C2a --> Q3
+    C2b --> Q3

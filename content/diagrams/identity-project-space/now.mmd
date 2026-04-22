@@ -1,0 +1,19 @@
+graph TD
+    Person[Personal AI]
+    Org[Organization]
+    Proj[Project]
+    Space[Space]
+    Actor[code/ema/daemon/lib/ema/identity/actor.ex]
+    Mem[identity/membership.ex]
+    Scope[identity/scope.ex]
+    MC[codebase-mission-control-claude]
+    Lin[lineage-original-elixir-ema]
+
+    Person --> Actor
+    Org --> Actor
+    Actor --> Mem
+    Mem --> Proj
+    Proj --> Space
+    Space --> Scope
+    MC -.donor.-> Actor
+    Lin -.lineage.-> Actor

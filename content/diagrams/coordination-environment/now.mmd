@@ -1,0 +1,19 @@
+graph TD
+    Planner[code/ema/daemon/lib/ema/planner]
+    Lanes[planner/lanes.ex]
+    Queue[planner/queue.ex]
+    Inbox[planner/handoff_inbox.ex]
+    Cal[planner/calendar.ex]
+    Checkup[planner/checkups.ex]
+    Resp[planner/responsibilities.ex]
+    Exec[codebase-executive]
+    Doc[ema-003-shared-swarm-source-pack.md]
+
+    Planner --> Lanes
+    Planner --> Queue
+    Planner --> Inbox
+    Planner --> Cal
+    Planner --> Checkup
+    Planner --> Resp
+    Exec -.donor.-> Planner
+    Doc -.spec.-> Planner

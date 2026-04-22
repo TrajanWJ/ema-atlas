@@ -16,3 +16,9 @@ Additional branches added after deeper scans across agent-vm + host machine:
 - github-legacy-repos
 
 These complement the earlier EMA/place/OpenClaw/ClaudeForge branches and deliberately over-include lineage so pruning can happen later.
+
+## Additional focused branches
+- docs-frontend-interface-inspirations
+- lineage-openclaw-agent-workspaces
+- docs-host-system-launchpad-hq
+- docs-place-org-era-research

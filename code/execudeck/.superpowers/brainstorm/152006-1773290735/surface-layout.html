@@ -1,0 +1,120 @@
+<h2>What should the unified surface look like?</h2>
+<p class="subtitle">The viewer watches a bureaucracy bootstrap itself from genesis. What are they looking at?</p>
+
+<div class="cards">
+  <!-- Option A: Spatial Graph -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0a0a0a;border-radius:8px;padding:24px;min-height:200px;position:relative;overflow:hidden;">
+        <!-- Central genesis node -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:radial-gradient(circle,#3b82f6,#1e40af);box-shadow:0 0 30px rgba(59,130,246,0.4);display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:bold;z-index:2;">GEN</div>
+        <!-- Branch nodes -->
+        <div style="position:absolute;top:22%;left:30%;width:36px;height:36px;border-radius:50%;background:rgba(139,92,246,0.3);border:1px solid rgba(139,92,246,0.6);display:flex;align-items:center;justify-content:center;font-size:8px;color:#a78bfa;">GOV</div>
+        <div style="position:absolute;top:22%;left:65%;width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,0.3);border:1px solid rgba(34,197,94,0.6);display:flex;align-items:center;justify-content:center;font-size:8px;color:#86efac;">OPS</div>
+        <div style="position:absolute;top:70%;left:25%;width:36px;height:36px;border-radius:50%;background:rgba(251,191,36,0.3);border:1px solid rgba(251,191,36,0.6);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fcd34d;">LAW</div>
+        <div style="position:absolute;top:70%;left:70%;width:36px;height:36px;border-radius:50%;background:rgba(244,63,94,0.3);border:1px solid rgba(244,63,94,0.6);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fda4af;">DEV</div>
+        <!-- Connecting lines (CSS) -->
+        <svg style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;" viewBox="0 0 400 250">
+          <line x1="200" y1="125" x2="130" y2="60" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+          <line x1="200" y1="125" x2="275" y2="60" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+          <line x1="200" y1="125" x2="110" y2="180" stroke="rgba(251,191,36,0.3)" stroke-width="1"/>
+          <line x1="200" y1="125" x2="290" y2="180" stroke="rgba(244,63,94,0.3)" stroke-width="1"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Spatial Node Graph</h3>
+      <p>Living org chart that grows in real-time. Nodes are agents, departments, rules. Edges show relationships. Click any node to see its deliberation. The graph IS the application.</p>
+      <p style="color:#888;font-size:12px;margin-top:8px;">Think: interactive constellation that expands from a single point of light</p>
+    </div>
+  </div>
+
+  <!-- Option B: Dashboard Feed -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0a0a0a;border-radius:8px;padding:16px;min-height:200px;display:flex;gap:12px;">
+        <!-- Sidebar tree -->
+        <div style="width:30%;border-right:1px solid rgba(255,255,255,0.1);padding-right:12px;">
+          <div style="font-size:9px;color:#666;text-transform:uppercase;margin-bottom:8px;">Registry</div>
+          <div style="font-size:10px;color:#3b82f6;margin-bottom:4px;">+ Genesis</div>
+          <div style="font-size:10px;color:#a78bfa;margin-left:12px;margin-bottom:4px;">+ Governance</div>
+          <div style="font-size:10px;color:#86efac;margin-left:12px;margin-bottom:4px;">+ Operations</div>
+          <div style="font-size:10px;color:#fcd34d;margin-left:12px;margin-bottom:4px;">+ Judiciary</div>
+          <div style="font-size:10px;color:#666;margin-left:24px;margin-bottom:4px;">Rule 001</div>
+          <div style="font-size:10px;color:#666;margin-left:24px;margin-bottom:4px;">Rule 002</div>
+        </div>
+        <!-- Activity feed -->
+        <div style="flex:1;">
+          <div style="font-size:9px;color:#666;text-transform:uppercase;margin-bottom:8px;">Activity</div>
+          <div style="background:rgba(59,130,246,0.1);border-left:2px solid #3b82f6;padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">
+            <div style="font-size:9px;color:#3b82f6;">Genesis Agent</div>
+            <div style="font-size:10px;color:#ccc;">Creating Governance Department...</div>
+          </div>
+          <div style="background:rgba(139,92,246,0.1);border-left:2px solid #8b5cf6;padding:6px 8px;margin-bottom:6px;border-radius:0 4px 4px 0;">
+            <div style="font-size:9px;color:#8b5cf6;">Governor</div>
+            <div style="font-size:10px;color:#ccc;">Proposing Rule: Law of Expansion</div>
+          </div>
+          <div style="background:rgba(34,197,94,0.1);border-left:2px solid #22c55e;padding:6px 8px;border-radius:0 4px 4px 0;">
+            <div style="font-size:9px;color:#22c55e;">Committee Vote</div>
+            <div style="font-size:10px;color:#ccc;">Approved: 3/3 in favor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Dashboard + Feed</h3>
+      <p>Central activity feed showing agent deliberations and events. Sidebar shows the evolving registry tree. Like GitHub activity feed meets a file explorer.</p>
+      <p style="color:#888;font-size:12px;margin-top:8px;">Think: mission control — structured, readable, information-dense</p>
+    </div>
+  </div>
+
+  <!-- Option C: OS Desktop -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0a0a0a;border-radius:8px;padding:16px;min-height:200px;position:relative;overflow:hidden;">
+        <!-- Window 1 -->
+        <div style="position:absolute;top:12px;left:12px;width:55%;background:rgba(30,30,30,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;">
+          <div style="background:rgba(255,255,255,0.05);padding:4px 8px;display:flex;align-items:center;gap:4px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#ef4444;"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:#eab308;"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;"></div>
+            <span style="font-size:8px;color:#888;margin-left:4px;">Governance Dept</span>
+          </div>
+          <div style="padding:8px;font-size:9px;color:#aaa;">
+            <div style="color:#3b82f6;">Governor: Evaluating proposal...</div>
+            <div style="margin-top:4px;">Creating sub-committee for rule review</div>
+          </div>
+        </div>
+        <!-- Window 2 -->
+        <div style="position:absolute;top:40px;left:35%;width:55%;background:rgba(30,30,30,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;">
+          <div style="background:rgba(255,255,255,0.05);padding:4px 8px;display:flex;align-items:center;gap:4px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#ef4444;"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:#eab308;"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;"></div>
+            <span style="font-size:8px;color:#888;margin-left:4px;">Operations</span>
+          </div>
+          <div style="padding:8px;font-size:9px;color:#aaa;">
+            <div style="color:#22c55e;">Ops Manager: Spawning analyst role</div>
+          </div>
+        </div>
+        <!-- Window 3 -->
+        <div style="position:absolute;top:110px;left:15%;width:50%;background:rgba(30,30,30,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;">
+          <div style="background:rgba(255,255,255,0.05);padding:4px 8px;display:flex;align-items:center;gap:4px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#ef4444;"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:#eab308;"></div>
+            <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;"></div>
+            <span style="font-size:8px;color:#888;margin-left:4px;">Constitution</span>
+          </div>
+          <div style="padding:8px;font-size:9px;color:#aaa;">
+            <div style="color:#fcd34d;">Article 1: Law of Expansion</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. OS Desktop Metaphor</h3>
+      <p>Floating windows that agents spawn as they create themselves. Each department gets its own panel. Screen fills up organically as the system evolves from void to complexity.</p>
+      <p style="color:#888;font-size:12px;margin-top:8px;">Think: a desktop that builds itself — windows appear from nothing</p>
+    </div>
+  </div>
+</div>

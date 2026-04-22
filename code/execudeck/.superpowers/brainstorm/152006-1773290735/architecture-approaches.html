@@ -1,0 +1,69 @@
+<h2>Architecture: How should the simulation engine work?</h2>
+<p class="subtitle">All three share the same UI (civilization map + nav views + /mapfree dashboard). The difference is how the brain works.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Turn-Based State Machine (Recommended)</h3>
+      <p>A central <strong>SimulationEngine</strong> drives everything. Each "turn" is a discrete cycle: pick an agent → build context (constitution + registry + recent history) → call Claude API → parse structured JSON response → execute MODIFY_REGISTRY actions → update map → next turn. Pause/unpause controls the loop. Save/load serializes the full registry + constitution + turn history to IndexedDB.</p>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Deterministic, debuggable — each turn is a clean state transition</li>
+          <li>Natural pause/resume — just stop the loop</li>
+          <li>Save/load is trivial — serialize the state tree</li>
+          <li>Maps perfectly to your Autopoiesis Node concept</li>
+          <li>Rate-limit friendly — one API call per turn</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Slower pacing — one agent acts at a time</li>
+          <li>Less "alive" feeling between turns</li>
+        </ul></div>
+      </div>
+      <p style="color:#7c7cf0;font-size:13px;margin-top:12px;">💡 This is the approach from your Autopoiesis Node docs. It's proven and maps cleanly to the UI.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Event-Sourced Stream</h3>
+      <p>Instead of turns, the system emits <strong>events</strong> (AgentCreated, RuleProposed, VoteCompleted, DepartmentEstablished). A central event store is the source of truth. The registry, map, and all views are projections of the event stream. Multiple agents can deliberate concurrently via parallel API calls. The UI subscribes to the event stream and updates reactively.</p>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Feels more alive — multiple things happening at once</li>
+          <li>Timeline view comes free — just replay the event log</li>
+          <li>Perfect undo/redo — replay events up to any point</li>
+          <li>More architecturally impressive for a portfolio</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>More complex to build — event sourcing has real engineering overhead</li>
+          <li>Concurrent API calls = higher cost and harder to rate-limit</li>
+          <li>Race conditions possible in registry mutations</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Hybrid: Turn-Based Core + Event Stream UI</h3>
+      <p>The simulation engine runs <strong>turn-based</strong> (one agent per turn, clean state transitions), but every mutation emits an event to a log. The UI consumes the event stream reactively — so the map animates smoothly, the timeline builds itself, and views update in real-time. Best of both: simple engine, rich UI.</p>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Simple engine (turn-based) with rich UI (event-driven)</li>
+          <li>Timeline and undo come from the event log</li>
+          <li>Rate-limit friendly — still one API call per turn</li>
+          <li>Save/load = serialize state + event log</li>
+          <li>Feels alive because events animate the map between turns</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Two mental models (turns for engine, events for UI)</li>
+          <li>Slightly more code than pure turn-based</li>
+        </ul></div>
+      </div>
+      <p style="color:#7c7cf0;font-size:13px;margin-top:12px;">💡 Recommended — gives you the portfolio-impressive event architecture without the complexity of true concurrent agents.</p>
+    </div>
+  </div>
+</div>

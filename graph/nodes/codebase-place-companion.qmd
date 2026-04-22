@@ -8,7 +8,7 @@ preserves_from: [codebase-place-org]
 inspires: []
 adjacent_to: [codebase-place-org]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/place-companion/README.md, code/place-companion/package.json, code/place-companion/src-tauri/Cargo.toml, code/place-companion/src-tauri/src/main.rs, code/place-companion/src-tauri/tauri.conf.json]
 aliases: []
 load_priority: 4
 ---
@@ -16,3 +16,18 @@ load_priority: 4
 
 Native window/companion bridge for place.org. Useful as reference for the
 "native desktop app" surface mentioned in `05-fresh-context-project-app-model.md`.
+
+## Stack & contents
+
+Tauri (Rust) + minimal HTML frontend. ~27 files under `code/place-companion/{src,src-tauri}`. Has its own CI (build.yml, ci.yml) and a local WebSocket bridge (`src-tauri/src/ws_server.rs`).
+
+## Why this is here
+
+Demonstrates the **native desktop companion** half of the place.org era — the bridge between a browser-native workspace and a real OS window. Direct prior art for the 'native desktop app' surface mentioned in `05-fresh-context-project-app-model.md`.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-place-companion:code/place-companion/src-tauri/src/main.rs
+git show origin/codebase-place-companion:code/place-companion/src-tauri/tauri.conf.json
+```

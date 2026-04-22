@@ -8,10 +8,24 @@ preserves_from: []
 inspires: []
 adjacent_to: [github-legacy-repos]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [agent-vm-ema.md, host-ema.md, host-mission-control-claude.md, host-place-org-openclaw.md, host-superman.md]
 aliases: []
 load_priority: 5
 ---
 # git-history-extracts
 
 Selected git-history extracts from prior repos. For archaeology.
+
+## Stack & contents
+
+13 flat markdown files, one per source repo (e.g. `agent-vm-ema.md`, `host-ema.md`, `host-mission-control-claude.md`, `host-place-org-openclaw.md`, `host-superman.md`).
+
+## Why this is here
+
+Records branch/commit/filter history. Use when you need to know **what existed when** without cloning the original repos.
+
+## How to load it efficiently
+
+```bash
+git show origin/git-history-extracts:host-ema.md | head -60
+```

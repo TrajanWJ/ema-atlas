@@ -8,10 +8,25 @@ preserves_from: []
 inspires: []
 adjacent_to: [codebase-multi-agent-expirements]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/superman/package.json, code/superman/app/page.tsx, code/superman/codevault-mcp/index.ts, code/superman/docs/superpowers/specs/2026-03-25-retrieval-pipeline-design.md]
 aliases: []
 load_priority: 5
 ---
 # codebase-superman
 
 "Superman" multi-agent experiment. Archive.
+
+## Stack & contents
+
+Next.js / TypeScript with a built-in MCP server (`codevault-mcp`). ~205 files under `code/superman/{app,codevault-mcp,docs/superpowers}`. MCP tools: analyze / apply / ask / gaps / simulate / validate. Includes `.codevault-memory.json` and a production retrieval-pipeline spec dated 2026-03-25.
+
+## Why this is here
+
+Most concrete prior art for an EMA-side **code-intelligence MCP**. The retrieval-pipeline-design spec is direct input if/when EMA exposes a code-intelligence vApp.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-superman:code/superman/codevault-mcp/index.ts
+git show origin/codebase-superman:code/superman/docs/superpowers/specs/2026-03-25-retrieval-pipeline-design.md
+```

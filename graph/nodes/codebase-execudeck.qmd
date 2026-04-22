@@ -8,10 +8,25 @@ preserves_from: []
 inspires: []
 adjacent_to: [codebase-executive]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/execudeck/CLAUDE.md, code/execudeck/app/page.tsx, code/execudeck/docs/ARCHITECTURE.md, code/execudeck/docs/plans/2026-02-18-phase1-scaffold-plan.md]
 aliases: []
 load_priority: 5
 ---
 # codebase-execudeck
 
 Deck-style executive surface. Visual reference only.
+
+## Stack & contents
+
+Next.js / TypeScript. ~81 files under `code/execudeck/{app,docs,config,.superpowers}`. Extensive docs: `AGENT_MODEL.md`, `ARCHITECTURE.md`, `CLI_SYSTEM.md`, `MANIFEST_SYSTEM.md`, `ROADMAP.md`. Includes `.superpowers/brainstorm/` HTML design artifacts.
+
+## Why this is here
+
+Useful as a fully-elaborated alternative architecture to compare against EMA — same problem domain, different decisions. Read `docs/AGENT_MODEL.md` and `docs/MANIFEST_SYSTEM.md` when designing identity/permissions.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-execudeck:code/execudeck/docs/ARCHITECTURE.md
+git show origin/codebase-execudeck:code/execudeck/docs/plans/2026-02-18-phase1-scaffold-plan.md
+```

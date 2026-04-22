@@ -8,10 +8,25 @@ preserves_from: [codebase-claudeforge]
 inspires: []
 adjacent_to: [codebase-claudeforge, codebase-mission-control-claude]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/frontend-layer/package.json, code/frontend-layer/next.config.ts, code/frontend-layer/pnpm-workspace.yaml, code/frontend-layer/src/app/api/system/full-status/route.ts]
 aliases: []
 load_priority: 4
 ---
 # codebase-frontend-layer
 
 Generic frontend layer experiments. Evaluate for component reuse only.
+
+## Stack & contents
+
+Next.js / TypeScript, pnpm workspace. ~70 files. API routes for agents, dispatch, executive, gateway, messages, system status. Uses shadcn-style `components.json`.
+
+## Why this is here
+
+Most concrete 'frontend over EMA' prior art in TypeScript. Whatever the v1.1 Launchpad/HQ stack ends up being (open question Q7), the route shape and component conventions here are reference material.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-frontend-layer:code/frontend-layer/src/app/api/system/full-status/route.ts
+git show origin/codebase-frontend-layer:code/frontend-layer/package.json
+```

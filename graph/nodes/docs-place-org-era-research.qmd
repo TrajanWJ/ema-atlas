@@ -8,10 +8,25 @@ preserves_from: [codebase-place-org]
 inspires: []
 adjacent_to: [codebase-place-org]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [host/place.org-openclaw/CLAUDE.md, host/place.org-openclaw/docs/openclaw/FORK-ARCHITECTURE.md, host/place.org-openclaw/docs/superpowers/specs/2026-03-20-place-org-design.md, host/place.org-openclaw/app/(desktop)/page.tsx]
 aliases: []
 load_priority: 4
 ---
 # docs-place-org-era-research
 
 Research collected during the place.org era.
+
+## Stack & contents
+
+Mixed markdown + Next.js TSX excerpts. ~132 files under `host/{place-companion, place.org-openclaw}`. Includes immersive route groups (community, companion, services) and a `TimeMachine` component.
+
+## Why this is here
+
+Captures the **place.org research era** before it merged with OpenClaw. Read `docs/superpowers/specs/2026-03-20-place-org-design.md` for the design intent that the v1.1 desktop surface inherits.
+
+## How to load it efficiently
+
+```bash
+git show origin/docs-place-org-era-research:host/place.org-openclaw/docs/openclaw/FORK-ARCHITECTURE.md
+git show origin/docs-place-org-era-research:host/place.org-openclaw/docs/superpowers/specs/2026-03-20-place-org-design.md
+```

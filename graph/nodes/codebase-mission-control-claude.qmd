@@ -8,10 +8,25 @@ preserves_from: [codebase-claudeforge]
 inspires: []
 adjacent_to: [codebase-claudeforge, codebase-executive]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/mission-control-claude/README.md, code/mission-control-claude/Dockerfile, code/mission-control-claude/docker-compose.hardened.yml, code/mission-control-claude/SKILL.md]
 aliases: []
 load_priority: 4
 ---
 # codebase-mission-control-claude
 
 Mission-control style dashboard layered over Claude. Pattern donor for HQ.
+
+## Stack & contents
+
+Large dockerized snapshot, ~551 files. Hardened docker-compose, security docs, CI quality gates, `SKILL.md`, CHANGELOG, CODE_OF_CONDUCT, SECURITY.md.
+
+## Why this is here
+
+Donor of **dashboard-style operator surface** patterns layered over Claude. The `docker-compose.hardened.yml` and SECURITY.md are useful when designing the deployment + permission story for HQ.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-mission-control-claude:code/mission-control-claude/docker-compose.hardened.yml
+git show origin/codebase-mission-control-claude:code/mission-control-claude/SKILL.md
+```

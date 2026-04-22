@@ -8,7 +8,7 @@ preserves_from: []
 inspires: []
 adjacent_to: [codebase-executive, codebase-superman]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [README.md, SOURCE_CONTEXT.md]
 aliases: [multi-agent-experiments]
 load_priority: 4
 ---
@@ -16,3 +16,17 @@ load_priority: 4
 
 Multi-agent coordination experiments. Inspect when designing role assignment
 and dependency-graph orchestration.
+
+## Stack & contents
+
+**Metadata-only branch.** Two files (README.md, SOURCE_CONTEXT.md) pointing at the private GitHub repo `TrajanWJ/Multi-agent-expirements` (sic — original spelling).
+
+## Why this is here
+
+Placeholder. Pull source via `gh repo clone TrajanWJ/Multi-agent-expirements` if needed.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-multi-agent-expirements:SOURCE_CONTEXT.md
+```

@@ -8,7 +8,7 @@ preserves_from: []
 inspires: []
 adjacent_to: [git-history-extracts]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [README.md, REPOS.json, SOURCE_CONTEXT.md]
 aliases: []
 load_priority: 5
 ---
@@ -16,3 +16,18 @@ load_priority: 5
 
 Pointers / snapshots of legacy GitHub repos that fed the lineage. Cross-check
 against `inventory/GITHUB_REPOS.md` on `lineage-index`.
+
+## Stack & contents
+
+Three files: `README.md`, `REPOS.json`, `SOURCE_CONTEXT.md`. Inventory of all `TrajanWJ` GitHub repos with private/fork/updated metadata. Lists 11 repos including ema-transfer-pack, proslync-*, place.org, ema, agent-os-demo, Executive, AgentGPT.
+
+## Why this is here
+
+Authoritative GitHub-side counterpart to `lineage-index/inventory/LOCAL_ROOTS.md`. Pair the two when tracing provenance.
+
+## How to load it efficiently
+
+```bash
+git show origin/github-legacy-repos:REPOS.json
+git show origin/github-legacy-repos:README.md
+```

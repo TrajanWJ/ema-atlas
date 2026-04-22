@@ -8,7 +8,7 @@ preserves_from: [lineage-openclaw]
 inspires: [codebase-ema]
 adjacent_to: [lineage-openclaw, lineage-openclaw-archive-subprojects]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [agents/analyst/AGENTS.md, agents/architect/IDENTITY.md, agents/chief-of-staff/SOUL.md, agents/coder/.openclaw/workspace-state.json]
 aliases: []
 load_priority: 4
 ---
@@ -16,3 +16,18 @@ load_priority: 4
 
 Per-agent workspace residue from OpenClaw — directory shapes and continuity
 patterns. Useful when designing the v1 shared-workspace contract.
+
+## Stack & contents
+
+Markdown + JSON workspace state mirroring `/home/trajan/.openclaw/agents/*/workspace`. ~14,092 files across per-role agent directories: analyst, architect, chief-of-staff, coder, etc. Each role has `AGENTS.md`, `BOOTSTRAP.md`, `HEARTBEAT.md`, `IDENTITY.md`, `SOUL.md`, `TOOLS.md`, `USER.md` and an `.openclaw/workspace-state.json`. Sanitized to docs/config/scripts only.
+
+## Why this is here
+
+Direct empirical input for the **shared workspace contract**: shows what a per-agent durable workspace actually looks like in practice. Compare against `codebase-ema/code/ema/workspace/shared/` for the v1 shape.
+
+## How to load it efficiently
+
+```bash
+git show origin/lineage-openclaw-agent-workspaces:agents/architect/IDENTITY.md
+git show origin/lineage-openclaw-agent-workspaces:agents/coder/.openclaw/workspace-state.json
+```

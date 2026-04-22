@@ -8,10 +8,26 @@ preserves_from: []
 inspires: []
 adjacent_to: []
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/t3code-fork/.docs/architecture.md, code/t3code-fork/.docs/quick-start.md, code/t3code-fork/.plans/01-shared-model-normalization.md, code/t3code-fork/.plans/17-claude-agent.md]
 aliases: []
 load_priority: 5
 ---
 # codebase-t3code-fork
 
 Fork of t3-style code surface. Archive.
+
+## Stack & contents
+
+Filtered TypeScript snapshot of a t3code fork. ~558 files organized around chat/agent/workspace concepts. Extensive `.docs/` and 18+ numbered `.plans/` (shared model normalization through claude-agent integration).
+
+## Why this is here
+
+Donor of **provider-neutral, effect-based runtime** thinking. Read `.plans/01-shared-model-normalization.md` when designing the harness/driver normalization layer.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-t3code-fork:code/t3code-fork/.docs/architecture.md
+git show origin/codebase-t3code-fork:code/t3code-fork/.plans/01-shared-model-normalization.md
+git show origin/codebase-t3code-fork:code/t3code-fork/.plans/17-claude-agent.md
+```

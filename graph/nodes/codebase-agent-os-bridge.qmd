@@ -8,7 +8,7 @@ preserves_from: [codebase-agent-os-demo]
 inspires: []
 adjacent_to: [codebase-agent-os-v8]
 referenced_in_docs: [SYSTEM_GRAPH.md]
-key_artifacts: []
+key_artifacts: [code/agent-os-bridge/server.js, code/agent-os-bridge/db.js, code/agent-os-bridge/package.json, code/agent-os-bridge/routes/agents.js]
 aliases: []
 load_priority: 4
 ---
@@ -16,3 +16,18 @@ load_priority: 4
 
 Bridge layer between the agent-OS surface and underlying runtimes. Worth
 inspecting when designing the harness/driver registry.
+
+## Stack & contents
+
+Node.js / Express-style server. ~17 files under `code/agent-os-bridge/routes/`. Routes for: agents, dispatch, feed, handoffs, inbox, missions, proposals, tasks, wiki.
+
+## Why this is here
+
+This branch is a useful **inventory of HTTP surfaces** an Agent OS gateway tends to need — even if EMA replaces the Node server with the Elixir daemon, the route names map almost 1:1 onto control-plane endpoints.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-agent-os-bridge:code/agent-os-bridge/server.js
+git show origin/codebase-agent-os-bridge:code/agent-os-bridge/routes/agents.js
+```

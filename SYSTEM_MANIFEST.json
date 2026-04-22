@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-22T08:31:57Z",
+  "generated_at": "2026-04-22T08:39:54Z",
   "repo": "TrajanWJ/ema-transfer-pack-20260422-060938",
   "canonical_rule": "EMA owns truth. Hermes owns execution. Surfaces do not own state.",
   "entry_docs": [
@@ -63,7 +63,7 @@
     "lineage-openclaw-agent-workspaces": "6842b36301bb7bd3236bde2b58f1f716c0dcf0a9",
     "lineage-openclaw-archive-subprojects": "651ffb7a795f135a2074b390896d28cf29fdd9b2",
     "lineage-original-elixir-ema": "0ec1ddc2c124a6cffac817a8731f3403dda9fcdf",
-    "main": "b0e648d43a55cf816805ec62a5c2cc8ef4389fce",
+    "main": "764bcf069ac6095da07da0197efb6ac377a2853e",
     "recovery-old-agent-vm-vault-system": "b04a780848d5a170bf983bcb79627925f52ebddc"
   },
   "nodes": [
@@ -86,7 +86,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/agent-os-bridge/server.js",
+        "code/agent-os-bridge/db.js",
+        "code/agent-os-bridge/package.json",
+        "code/agent-os-bridge/routes/agents.js"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -109,7 +114,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/agent-os-demo-pages/README.md",
+        "code/agent-os-demo-pages/index.html",
+        "code/agent-os-demo-pages/UPGRADE-PLAN.md",
+        "code/agent-os-demo-pages/local-server.js"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -134,7 +144,13 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/agent-os-demo/README.md",
+        "code/agent-os-demo/index.html",
+        "code/agent-os-demo/app.js",
+        "code/agent-os-demo/AUDIT.md",
+        "code/agent-os-demo/local-server.js"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -158,7 +174,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/agent-os-v8/CLAUDE.md",
+        "code/agent-os-v8/package.json",
+        "code/agent-os-v8/vite.config.ts",
+        "code/agent-os-v8/src/main.ts"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -176,7 +197,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/AgentGPT/README.md",
+        "code/AgentGPT/package.json",
+        "code/AgentGPT/prisma/schema.prisma",
+        "code/AgentGPT/src/components/AutonomousAgent.ts"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -278,7 +304,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/execudeck/CLAUDE.md",
+        "code/execudeck/app/page.tsx",
+        "code/execudeck/docs/ARCHITECTURE.md",
+        "code/execudeck/docs/plans/2026-02-18-phase1-scaffold-plan.md"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -300,7 +331,10 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "README.md",
+        "SOURCE_CONTEXT.md"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -323,7 +357,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/frontend-layer/package.json",
+        "code/frontend-layer/next.config.ts",
+        "code/frontend-layer/pnpm-workspace.yaml",
+        "code/frontend-layer/src/app/api/system/full-status/route.ts"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -347,7 +386,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/mission-control-claude/README.md",
+        "code/mission-control-claude/Dockerfile",
+        "code/mission-control-claude/docker-compose.hardened.yml",
+        "code/mission-control-claude/SKILL.md"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -368,7 +412,10 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "README.md",
+        "SOURCE_CONTEXT.md"
+      ],
       "aliases": [
         "multi-agent-experiments"
       ],
@@ -393,7 +440,13 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/place-companion/README.md",
+        "code/place-companion/package.json",
+        "code/place-companion/src-tauri/Cargo.toml",
+        "code/place-companion/src-tauri/src/main.rs",
+        "code/place-companion/src-tauri/tauri.conf.json"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -482,7 +535,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/superman/package.json",
+        "code/superman/app/page.tsx",
+        "code/superman/codevault-mcp/index.ts",
+        "code/superman/docs/superpowers/specs/2026-03-25-retrieval-pipeline-design.md"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -500,7 +558,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/t3code-fork/.docs/architecture.md",
+        "code/t3code-fork/.docs/quick-start.md",
+        "code/t3code-fork/.plans/01-shared-model-normalization.md",
+        "code/t3code-fork/.plans/17-claude-agent.md"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -618,7 +681,13 @@
         "05-fresh-context-project-app-model.md",
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "agent-vm/ema-docs/ARCHITECTURE.md",
+        "agent-vm/ema-docs/EMA-FULL-CONTEXT.md",
+        "agent-vm/ema-docs/ROADMAP_SYNTHESIS.md",
+        "agent-vm/ema-docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md",
+        "agent-vm/frontend-layer/README.md"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -639,7 +708,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "host/JarvisAI_vault/Welcome.md",
+        "host/JarvisAI_vault/Architecture/System Overview.md",
+        "host/JarvisAI_vault/Research/Self-Hosted AI Agent Platforms 2026.md",
+        "host/Trajans_Tech_Serious_Vault/Home.md"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -745,7 +819,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "host/place.org-openclaw/CLAUDE.md",
+        "host/place.org-openclaw/docs/openclaw/FORK-ARCHITECTURE.md",
+        "host/place.org-openclaw/docs/superpowers/specs/2026-03-20-place-org-design.md",
+        "host/place.org-openclaw/app/(desktop)/page.tsx"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -795,7 +874,13 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "agent-vm-ema.md",
+        "host-ema.md",
+        "host-mission-control-claude.md",
+        "host-place-org-openclaw.md",
+        "host-superman.md"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -815,7 +900,11 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "README.md",
+        "REPOS.json",
+        "SOURCE_CONTEXT.md"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -867,7 +956,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "agents/analyst/AGENTS.md",
+        "agents/architect/IDENTITY.md",
+        "agents/chief-of-staff/SOUL.md",
+        "agents/coder/.openclaw/workspace-state.json"
+      ],
       "aliases": [],
       "load_priority": 4
     },
@@ -890,7 +984,12 @@
       "referenced_in_docs": [
         "SYSTEM_GRAPH.md"
       ],
-      "key_artifacts": [],
+      "key_artifacts": [
+        "code/control-ui/openclaw-control-ui-source/ARCHITECTURE.md",
+        "code/control-ui/openclaw-control-ui-source/gateway-backend/auth.ts",
+        "code/bin/openclaw-doctor-safe.sh",
+        "code/backups/openclaw.json"
+      ],
       "aliases": [],
       "load_priority": 5
     },
@@ -1011,7 +1110,8 @@
       ],
       "key_artifacts": [
         "agent-vm/dispatch/active-tasks.json",
-        "agent-vm/dispatch/agent-status.json"
+        "agent-vm/dispatch/agent-status.json",
+        "agent-vm/dispatch/archive/cleared-20260422/"
       ],
       "aliases": [],
       "load_priority": 5

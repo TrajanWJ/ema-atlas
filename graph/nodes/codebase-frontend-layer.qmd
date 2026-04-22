@@ -30,3 +30,17 @@ Most concrete 'frontend over EMA' prior art in TypeScript. Whatever the v1.1 Lau
 git show origin/codebase-frontend-layer:code/frontend-layer/src/app/api/system/full-status/route.ts
 git show origin/codebase-frontend-layer:code/frontend-layer/package.json
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Read-only observer surface** — the frontend declares itself a "read-only system observer" and never mutates daemon state; all writes route through the gateway (`code/frontend-layer/README.md` opening + "API Routes" table — every documented route is `GET`).
+- **Per-probe timeouts with safe fallbacks** — every status probe runs under an explicit per-call timeout and degrades to a typed null/zero on failure rather than rejecting the whole status response (`code/frontend-layer/src/app/api/system/full-status/route.ts` — every block has `{ timeout: <ms> }` and a `catch` that assigns a fallback).
+- **Multi-URL reconnect with exponential backoff** — the WebSocket client tries an ordered list of candidate URLs and doubles backoff up to a cap on each disconnect, so a daemon restart or path change is self-healing (`code/frontend-layer/src/lib/useWebSocket.ts` — `WS_URLS` array, `MAX_BACKOFF`, `wsUrlIndexRef++` on close).
+- **Bounded in-memory event buffers** — message and event lists are sliced to a fixed tail (`-500`, `-200`) on every push so a long-running observer cannot grow without bound (`code/frontend-layer/src/lib/useWebSocket.ts` — `messages.slice(-500)`, `agentEvents.slice(-200)`).
+
+Leaves behind (residue):
+- The shadcn/Tailwind v4/Zustand/Next 16 component stack and the Obsidian vault assumptions (`code/frontend-layer/README.md` "Stack").
+- The shell-out probes (`top`, `free`, `df`, `pgrep`, `openclaw agent list`) and the `/home/trajan/.claude-pace.json` path (`src/app/api/system/full-status/route.ts`).
+
+Topic relevance: `surface`, `transport`, `recovery`, `doctrine`, `driver`.

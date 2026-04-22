@@ -37,3 +37,17 @@ Hybrid era where the place.org Next.js surface met OpenClaw orchestration. Evide
 ```bash
 git show origin/codebase-place-org-openclaw:code/place.org-openclaw/AGENTS.md
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Additive-only fork seam** — orchestrator features are confined to a single namespaced directory; the surface is treated as read-only with exactly one named call-site to bootstrap, so upstream/orchestrator can evolve independently (`code/place.org-openclaw/CLAUDE.md` "Critical Rule" + "The ONE exception: `src/app/layout.tsx`"; `docs/openclaw/FORK-ARCHITECTURE.md` §1 "Additive Only").
+- **Graceful degradation when the orchestrator is absent** — every orchestrator-dependent enhancement checks connection state first and renders nothing if the orchestrator is offline, so the surface collapses cleanly to its un-augmented form (`code/place.org-openclaw/CLAUDE.md` "Enhancement Pattern" — `if (!gatewayConnected) return null`).
+- **Typed three-frame transport with authenticated handshake** — surface↔orchestrator traffic is exactly three JSON frame shapes (`req` / `res` / `event`) with monotonic `seq` on events and a challenge-response handshake bound to a cached device identity (`code/place.org-openclaw/CLAUDE.md` "Gateway Protocol"; `docs/openclaw/FORK-ARCHITECTURE.md` referenced auth flow).
+- **Bounded extension points** — the seam between surface and orchestrator is enumerated as a fixed small number of named extension points (app-registry merge, layout init, etc.), not an open ABI, so drift is detectable by counting touch-sites (`docs/openclaw/FORK-ARCHITECTURE.md` §4 "exactly **4 extension points**").
+
+Leaves behind (residue):
+- The Next.js / Zustand / `src/openclaw/` directory layout and the WebSocket port `18789` (`code/place.org-openclaw/CLAUDE.md` "Architecture").
+- The git workflow specifics (`upstream` remote, `git merge upstream/main`, fork-sync cron) (`docs/openclaw/FORK-ARCHITECTURE.md` §2 "Git Setup").
+
+Topic relevance: `surface`, `orchestration`, `transport`, `identity`, `doctrine`, `placement`.

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
 import { VisionTriptych } from "@/components/vision-triptych";
+import { countDiagrams } from "@/lib/diagrams";
 import { getPart } from "@/lib/ema-atlas";
 
 type PartPageProps = {
@@ -16,6 +17,8 @@ export default async function PartPage({ params }: PartPageProps) {
   if (!part) {
     notFound();
   }
+
+  const diagramCount = await countDiagrams(slug);
 
   return (
     <SiteShell eyebrow="Part Atlas" title={part.title} intro={part.summary}>
@@ -71,6 +74,11 @@ export default async function PartPage({ params }: PartPageProps) {
             <Link className="chip" href={`/canvas/${part.slug}`}>
               Canvas Board
             </Link>
+            {diagramCount > 0 && (
+              <Link className="chip" href={`/canvas/${part.slug}#diagrams`}>
+                {diagramCount} diagram{diagramCount === 1 ? "" : "s"}
+              </Link>
+            )}
             <Link className="chip" href="/graph">
               System Graph
             </Link>

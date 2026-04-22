@@ -30,3 +30,17 @@ Donor of **dashboard-style operator surface** patterns layered over Claude. The 
 git show origin/codebase-mission-control-claude:code/mission-control-claude/docker-compose.hardened.yml
 git show origin/codebase-mission-control-claude:code/mission-control-claude/SKILL.md
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Hierarchical capability roles + dual auth** — every operator action is gated by an ordered `viewer < operator < admin` role, with both human (session) and machine (API key) auth carrying a role; agents identify themselves on every call for audit attribution (`code/mission-control-claude/SKILL.md` "Authentication" table + "Roles (hierarchical)" + `X-Agent-Name` note).
+- **Adapter protocol over direct lifecycle calls** — `register → heartbeat → assignments → progress` is one POST endpoint dispatching on `{framework, action, payload}`, so new runtimes plug in by implementing the protocol rather than new routes (`code/mission-control-claude/SKILL.md` "Agent Lifecycle" — all four actions go through `POST /api/adapters`).
+- **Per-identity rate limits** — heartbeat and task-poll quotas are scoped per agent identity, not per IP, so one noisy agent cannot starve the others (`code/mission-control-claude/docs/SECURITY-HARDENING.md` "Rate Limiting" table — "30/min per agent", "20/min per agent").
+- **Hardening as a separate overlay with deny-by-default network** — production posture is layered as an opt-in compose overlay that drops privileges, enables HSTS, and forces an `internal: true` bridge so the surface has no outbound network unless granted (`code/mission-control-claude/docker-compose.hardened.yml` `networks.mc-internal.internal: true` + `MC_ENABLE_HSTS`/`MC_COOKIE_SECURE`/`MC_COOKIE_SAMESITE=strict`).
+
+Leaves behind (residue):
+- The Next.js 16 / SQLite-WAL / pnpm / Docker substrate and the 32-panel UI surface (`code/mission-control-claude/README.md` "Why Mission Control?").
+- The specific `MC_*` env-var names and the Linux-capability detail (`NET_BIND_SERVICE`, `no-new-privileges`) (`docs/SECURITY-HARDENING.md` "Docker Hardening").
+
+Topic relevance: `surface`, `orchestration`, `identity`, `authority`, `doctrine`, `placement`.

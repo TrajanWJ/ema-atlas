@@ -118,10 +118,11 @@ If you are joining active multi-agent work, read these before touching shared
 coordination state:
 
 1. [`content/swarm/README.md`](content/swarm/README.md)
-2. [`content/swarm/fresh-orchestrator-read-order.md`](content/swarm/fresh-orchestrator-read-order.md)
-3. [`content/swarm/continuous-progress-protocol.md`](content/swarm/continuous-progress-protocol.md)
-4. [`content/swarm/orchestrator-alignment.md`](content/swarm/orchestrator-alignment.md)
-5. [`content/swarm/object-model.md`](content/swarm/object-model.md)
+2. [`content/swarm/active-wave-current.md`](content/swarm/active-wave-current.md)
+3. [`content/swarm/fresh-orchestrator-read-order.md`](content/swarm/fresh-orchestrator-read-order.md)
+4. [`content/swarm/continuous-progress-protocol.md`](content/swarm/continuous-progress-protocol.md)
+5. [`content/swarm/orchestrator-alignment.md`](content/swarm/orchestrator-alignment.md)
+6. [`content/swarm/object-model.md`](content/swarm/object-model.md)
 
 If Claude is taking the main deliverables lane:
 

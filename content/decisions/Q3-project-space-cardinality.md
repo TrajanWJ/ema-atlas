@@ -183,44 +183,27 @@ migration shape?
 
 ## Provenance
 
-Cite every external doc, vault note, or branch read while filling this
-in. The matrix is only as good as its grounding.
-
 - [`OPEN_QUESTIONS.md`](../../OPEN_QUESTIONS.md) — Q3 wording, blast
-  radius, the four named variants.
-- [`DESIGN_PRINCIPLES.md`](../../DESIGN_PRINCIPLES.md) — P1, P9
-  (collaboration plane), P10 (Org/Space first-class).
+  radius, four named variants.
+- [`DESIGN_PRINCIPLES.md`](../../DESIGN_PRINCIPLES.md) — P1, P9, P10.
 - [`ARCHITECTURE.md`](../../ARCHITECTURE.md) — identity model
-  sketch ("Q1, Q3 still open"); `event_log` sharded by
-  `project_id`; `Project.spaces: List(SpaceId)` placeholder.
+  ("Q1, Q3 still open"); `event_log` sharded by `project_id`;
+  `Project.spaces` placeholder.
 - [`research/parts/identity-project-space.md`](../../research/parts/identity-project-space.md)
-  — `Project.spaces: List(SpaceId)`; `Space.projects:
-  List(ProjectId)`; `ScopeTarget = ProjectScope | SpaceScope |
-  CrossProject`; the explicit Q3 note: "If Q3 picks
-  `Project-inside-Space` or `Space-inside-Project`, one of these
-  fields must collapse to `Option`, which forces a schema migration
-  on every consumer."
+  — dual List fields; `ScopeTarget = ProjectScope | SpaceScope |
+  CrossProject`; explicit Q3 note that picking inside-the-other
+  collapses one field to `Option` and forces consumer migrations.
 - [`research/build-steps/02-identity-registry-skeleton.md`](../../research/build-steps/02-identity-registry-skeleton.md)
-  — Coded assumption (N:M, encoded as the dual List fields); the
-  `project_spaces` join table in `schema.gleam`; the `Q3` "open
-  questions held open" gloss.
+  — coded N:M assumption; `project_spaces` join in `schema.gleam`.
 - [`05-fresh-context-project-app-model.md`](../../05-fresh-context-project-app-model.md)
-  — "Each instance of these apps / each EMA instance is within a
-  project"; "Projects can belong to an organization or be personal
-  projects"; "Projects/spaces can have different datasets"; "A
-  user's personal AI can access all projects/spaces they are part
-  of"; §3 Threads/Server framing as Discord replacement.
-- [`GLOSSARY.md`](../../GLOSSARY.md) — Project ("the unit each EMA
-  instance binds to. Owns an event_log shard, a workspace root,
-  sessions, harness policy, datasets"); Space ("Collaboration
-  scope inside an Org, orthogonal to Projects. Owns
-  membership-with-roles, channels/threads, collaboration objects");
-  Member; Personal AI; vApp.
+  — "Each EMA instance is within a project"; "Projects/spaces can
+  have different datasets"; "personal AI can access all
+  projects/spaces"; §3 Threads/Server as Discord replacement.
+- [`GLOSSARY.md`](../../GLOSSARY.md) — Project, Space ("orthogonal
+  to Projects"), Member, Personal AI, vApp.
 - [`research/COLLAB_PLANE_OPTIONS.md`](../../research/COLLAB_PLANE_OPTIONS.md)
-  — "Permission gating implications" section: "Org/Space scoping
-  intersects with substrate at the question of *document
-  identity*" — choice of cardinality affects how Collaboration
-  objects key.
+  — "Permission gating implications": Org/Space scoping intersects
+  with substrate at document identity.
 
 ## Decision
 

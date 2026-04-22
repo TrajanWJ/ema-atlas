@@ -1,0 +1,1204 @@
+<!-- v75-1773994100 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#181825">
+  <title>The Stream — Agent OS</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons (modern SVG icon set) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+  <!-- Notification Permission Banner -->
+  <div id="notif-permission-banner" class="notif-permission-banner" style="display:none">
+    <span class="notif-permission-text">🔔 Enable notifications to stay updated</span>
+    <button class="notif-permission-btn enable" onclick="NotificationCenter.enableNotifications()">Enable</button>
+    <button class="notif-permission-btn dismiss" onclick="NotificationCenter.dismissBanner()">Dismiss</button>
+  </div>
+
+  <!-- App Shell -->
+  <div id="app">
+
+    <!-- Desktop Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-logo">
+        <i data-lucide="bot" class="logo-icon-svg"></i>
+        <span class="logo-text">Agent OS</span>
+        <span class="logo-version">v7</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-group">
+          <div class="nav-group-label">⚡ OPERATE</div>
+          <a class="nav-item active" data-page="feed" onclick="nav('feed')">
+            <span class="nav-icon">📡</span>
+            <span class="nav-label">Stream</span>
+            <span class="nav-badge" id="feed-badge"></span>
+          </a>
+          <a class="nav-item" data-page="inbox" onclick="nav('inbox')">
+            <span class="nav-icon">📬</span>
+            <span class="nav-label">Inbox</span>
+            <span class="nav-badge" id="inbox-badge"></span>
+          </a>
+          <a class="nav-item" data-page="queue" onclick="nav('queue')">
+            <span class="nav-icon">📋</span>
+            <span class="nav-label">Proposals</span>
+            <span class="nav-badge" id="proposals-badge"></span>
+          </a>
+          <a class="nav-item" data-page="briefing" onclick="nav('briefing')">
+            <span class="nav-icon">📜</span>
+            <span class="nav-label">Briefing</span>
+            <span class="nav-badge" id="briefing-badge"></span>
+          </a>
+          <a class="nav-item" data-page="workbench" onclick="nav('workbench')">
+            <span class="nav-icon">👁️</span>
+            <span class="nav-label">Workbench</span>
+            <span class="nav-badge" id="workbench-badge"></span>
+          </a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">💬 COMMUNICATE</div>
+          <a class="nav-item" data-page="talk" onclick="nav('talk')">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">Talk</span>
+            <span class="nav-badge" id="talk-badge">7</span>
+          </a>
+          <a class="nav-item" data-page="rooms" onclick="nav('rooms')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Rooms</span>
+            <span class="nav-badge" id="rooms-badge"></span>
+          </a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">🎯 DIRECT</div>
+          <a class="nav-item" data-page="tasks" onclick="nav('tasks')">
+            <span class="nav-icon">✅</span>
+            <span class="nav-label">Tasks</span>
+            <span class="nav-badge" id="tasks-badge"></span>
+          </a>
+          <a class="nav-item" data-page="projects" onclick="nav('projects')">
+            <span class="nav-icon">📁</span>
+            <span class="nav-label">Projects</span>
+            <span class="nav-badge" id="projects-badge"></span>
+          </a>
+          <a class="nav-item" data-page="plans" onclick="nav('plans')">
+            <span class="nav-icon">📝</span>
+            <span class="nav-label">Plans</span>
+            <span class="nav-badge" id="plans-badge"></span>
+          </a>
+          <a class="nav-item" data-page="missions" onclick="nav('missions')">
+            <span class="nav-icon">🎯</span>
+            <span class="nav-label">Missions</span>
+            <span class="nav-badge" id="missions-badge">3</span>
+          </a>
+          <a class="nav-item" data-page="pipelines" onclick="nav('pipelines')">
+            <span class="nav-icon">🔀</span>
+            <span class="nav-label">Pipelines</span>
+            <span class="nav-badge" id="pipelines-badge"></span>
+          </a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">🧠 KNOW</div>
+          <a class="nav-item" data-page="mind" onclick="nav('mind')">
+            <span class="nav-icon">🧠</span>
+            <span class="nav-label">Mind</span>
+            <span class="nav-badge" id="mind-badge"></span>
+          </a>
+          <a class="nav-item" data-page="explore" onclick="nav('explore')">
+            <span class="nav-icon">📖</span>
+            <span class="nav-label">Docs</span>
+            <span class="nav-badge" id="explore-badge"></span>
+          </a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-label">⚙️ CONFIGURE</div>
+          <a class="nav-item" data-page="roles" onclick="nav('roles')">
+            <span class="nav-icon">🛡️</span>
+            <span class="nav-label">Roles</span>
+            <span class="nav-badge" id="roles-badge"></span>
+          </a>
+          <a class="nav-item" data-page="records" onclick="nav('records')">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Records</span>
+            <span class="nav-badge" id="records-badge"></span>
+          </a>
+          <a class="nav-item" data-page="pulse" onclick="nav('pulse')">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">System</span>
+            <span class="nav-badge" id="pulse-badge">1</span>
+          </a>
+        </div>
+
+        <div class="nav-divider"></div>
+        <a class="nav-item nav-external" href="life.html" target="_blank">
+          <span class="nav-icon">🌿</span>
+          <span class="nav-label">Life OS ↗</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-agents" data-tip="Number of agents currently active">
+          <span class="agents-dot active"></span>
+          <span id="sidebar-active-count"></span>
+        </div>
+        <div class="sidebar-xp" data-tip="Your level and experience progress">
+          <span class="xp-icon">⭐</span>
+          <span id="sidebar-xp">Lv3 · 2840 XP</span>
+        </div>
+        <div class="sidebar-version">
+          <span>Agent OS v7.0</span>
+          <span class="sidebar-credit">Built with 🤝 by Right Hand</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="main">
+
+      <!-- Topbar -->
+      <header id="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 class="page-title" id="page-title">Feed</h1>
+        </div>
+        <div class="topbar-center">
+          <div class="omnibus-container" id="omnibus-container">
+            <div class="omnibus-pill" id="omnibus-pill" onclick="focusOmnibus()" data-tip="Universal search — type anything or press ⌘K">
+              <span class="omnibus-icon">⌘</span>
+              <input type="text" class="omnibus-input" id="omnibus-input"
+                placeholder="Ask anything..."
+                oninput="onOmnibusInput(this.value)"
+                onkeydown="handleOmnibusKey(event)"
+                onfocus="onOmnibusFocus()"
+                onblur="onOmnibusBlur()">
+              <span class="omnibus-shortcut">⌘K</span>
+            </div>
+            <div class="omnibus-route-preview hidden" id="omnibus-route-preview"></div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-connection-status" id="topbar-connection-status" data-tip="Bridge connection — green means live data is flowing">
+            <span class="conn-dot" id="conn-dot"></span>
+            <span class="conn-label" id="conn-label">Connecting...</span>
+          </div>
+          <div class="topbar-clock" id="topbar-clock"></div>
+          <div class="topbar-agents" id="topbar-agents">
+            <span class="agent-dot-active"></span>
+            <span id="active-agents-text"></span>
+          </div>
+          <div class="xp-badge" id="xp-badge" onclick="showLevelPanel()" data-tip="Your Agent OS level — earn XP by completing tasks and reviews">
+            <span>⭐ Lv3</span>
+            <div class="xp-bar-mini">
+              <div class="xp-bar-fill" id="xp-bar-mini-fill"></div>
+            </div>
+          </div>
+          <button class="topbar-btn" id="notif-btn" onclick="toggleNotifications()">
+            🔔
+            <span class="notif-count" id="notif-count">3</span>
+          </button>
+          <button class="topbar-btn cmd-k-btn" onclick="openCommandPalette()">
+            <span>⌘K</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Breadcrumb Bar -->
+      <div id="breadcrumb-bar" class="breadcrumb-bar" style="display:none">
+        <span id="breadcrumb-trail"></span>
+        <button onclick="clearBreadcrumb()" class="btn-ghost breadcrumb-close">✕</button>
+      </div>
+
+      <!-- Views -->
+      <div id="views">
+
+        <!-- FEED VIEW -->
+        <div id="view-feed" class="view active">
+          <!-- Agent Status Bar -->
+          <div class="agent-status-bar" id="agent-status-bar" data-tip="Agent status bar — shows which agents are active and their current tasks"></div>
+
+          <!-- Quick Stats Row -->
+          <div class="quick-stats-row" id="quick-stats-row">
+            <div class="quick-stat" onclick="filterStream2('action')" data-tip="Tasks currently being worked on by agents">
+              <span class="quick-stat-icon">⚡</span>
+              <span class="quick-stat-value" id="qs-active">0</span>
+              <span class="quick-stat-label">Active</span>
+            </div>
+            <div class="quick-stat" onclick="filterStream2('completed')" data-tip="Tasks completed by agents today">
+              <span class="quick-stat-icon">✅</span>
+              <span class="quick-stat-value" id="qs-completed">0</span>
+              <span class="quick-stat-label">Done Today</span>
+            </div>
+            <div class="quick-stat" onclick="nav('queue')" data-tip="Pending proposals waiting for your review">
+              <span class="quick-stat-icon">📋</span>
+              <span class="quick-stat-value" id="qs-proposals">0</span>
+              <span class="quick-stat-label">Proposals</span>
+            </div>
+            <div class="quick-stat" onclick="filterStream2('errors')" data-tip="Errors encountered today — click to filter">
+              <span class="quick-stat-icon">🔴</span>
+              <span class="quick-stat-value" id="qs-errors">0</span>
+              <span class="quick-stat-label">Errors</span>
+            </div>
+            <div class="quick-stat" data-tip="Vault notes created or updated today">
+              <span class="quick-stat-icon">📚</span>
+              <span class="quick-stat-value" id="qs-vault">0</span>
+              <span class="quick-stat-label">Vault</span>
+            </div>
+            <div class="quick-stat" data-tip="Current system CPU/memory load">
+              <span class="quick-stat-icon">💻</span>
+              <span class="quick-stat-value" id="qs-load">—</span>
+              <span class="quick-stat-label">Load</span>
+            </div>
+          </div>
+
+          <!-- Typing Indicator -->
+          <div class="stream-typing-indicator" id="stream-typing-indicator" style="display:none">
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+            <span class="typing-text" id="typing-text">Agents are working...</span>
+          </div>
+
+          <!-- New Items Banner -->
+          <div class="stream-new-banner" id="stream-new-banner" style="display:none" onclick="scrollStreamToTop()">
+            <span id="new-banner-text">3 new items</span>
+            <span class="new-banner-arrow">↑</span>
+          </div>
+
+          <!-- The Stream -->
+          <div class="stream-filter-bar" id="stream-filter-bar" data-tip="Filter the stream by event type — click a chip to focus">
+            <div class="stream-filter-chips">
+              <button class="stream-chip active" data-filter="all" onclick="filterStream2('all')">All <span class="chip-count" id="chip-count-all"></span></button>
+              <button class="stream-chip" data-filter="action" onclick="filterStream2('action')" data-tip="Items that need your attention or decision">🔴 Needs Action <span class="chip-count" id="chip-count-action"></span></button>
+              <button class="stream-chip" data-filter="completed" onclick="filterStream2('completed')" data-tip="Tasks and operations completed by agents">✅ Completed <span class="chip-count" id="chip-count-completed"></span></button>
+              <button class="stream-chip" data-filter="errors" onclick="filterStream2('errors')" data-tip="Errors and warnings from agent operations">⚠️ Errors <span class="chip-count" id="chip-count-errors"></span></button>
+              <button class="stream-chip" data-filter="vault" onclick="filterStream2('vault')" data-tip="Knowledge vault writes and updates">📚 Vault <span class="chip-count" id="chip-count-vault"></span></button>
+              <button class="stream-chip" data-filter="insights" onclick="filterStream2('insights')" data-tip="Agent insights and recommendations">💡 Insights <span class="chip-count" id="chip-count-insights"></span></button>
+              <button class="stream-chip timeline-toggle" id="timeline-toggle-btn" onclick="toggleTimelineView()" data-tip="Switch to timeline view — see events on a time axis">🕐 Timeline</button>
+            </div>
+            <div class="stream-batch-bar" id="stream-batch-bar" style="display:none">
+              <label class="stream-select-all"><input type="checkbox" id="stream-select-all" onchange="toggleSelectAllStream(this.checked)"> Select All</label>
+              <button class="stream-batch-btn approve" onclick="batchStreamAction('approve')">✅ Approve</button>
+              <button class="stream-batch-btn dismiss" onclick="batchStreamAction('dismiss')">⏩ Dismiss</button>
+              <button class="stream-batch-btn defer" onclick="batchStreamAction('defer')">⏸️ Defer</button>
+              <span class="stream-batch-count" id="stream-batch-count">0 selected</span>
+            </div>
+          </div>
+          <div id="stream-list" class="stream-list"></div>
+          <div id="timeline-view" class="timeline-view" style="display:none"></div>
+        </div>
+
+        <!-- QUEUE VIEW -->
+        <div id="view-queue" class="view proposals-view">
+          <!-- Top Bar -->
+          <div class="proposals-topbar">
+            <div class="proposals-title-row">
+              <h2 class="proposals-title">📋 Proposals <span class="proposals-count-badge" id="proposals-count-badge"></span></h2>
+              <div class="proposals-topbar-right">
+                <span class="proposals-sync-indicator" id="proposals-sync-indicator">Synced just now</span>
+                <button class="proposals-scan-btn" id="auto-gen-btn" onclick="autoGenerateProposal()">⚡ Run Scan Now</button>
+                <button class="proposals-new-btn" onclick="showNewProposalModal()">+ New</button>
+              </div>
+            </div>
+            <div class="proposals-filter-chips" id="proposals-filter-chips">
+              <button class="filter-chip active" data-filter="all" onclick="filterProposals('all')">All</button>
+              <button class="filter-chip" data-filter="pending" onclick="filterProposals('pending')">Pending</button>
+              <button class="filter-chip" data-filter="approved" onclick="filterProposals('approved')">Approved</button>
+              <button class="filter-chip" data-filter="dismissed" onclick="filterProposals('dismissed')">Dismissed</button>
+            </div>
+          </div>
+
+          <!-- Pipeline Visualization -->
+          <div class="proposals-pipeline" id="proposals-pipeline"></div>
+
+          <!-- Main Content: Split layout with cards + detail -->
+          <div class="proposals-main" id="proposals-main">
+            <div class="proposals-list" id="proposals-list"></div>
+            <div class="proposals-detail-panel hidden" id="proposals-detail-panel"></div>
+          </div>
+
+          <!-- Empty state -->
+          <div id="queue-empty" class="queue-empty hidden">
+            <div class="empty-icon">🎯</div>
+            <div class="empty-title">All clear!</div>
+            <div class="empty-desc">No proposals — agents are handling everything</div>
+          </div>
+        </div>
+
+        <!-- TALK VIEW (Discord Clone) -->
+        <div id="view-talk" class="view talk-layout">
+          <!-- Server Rail -->
+          <div class="server-rail" id="server-rail">
+            <button class="server-icon active" onclick="setTalkMode('channels')" title="Agent OS Server">
+              🤖
+            </button>
+            <div class="server-divider"></div>
+            <button class="server-icon" onclick="setTalkMode('dms')" title="Direct Messages" id="dm-icon">
+              💬
+            </button>
+          </div>
+
+          <!-- Channel Sidebar -->
+          <div class="channel-sidebar" id="channel-sidebar">
+            <div class="channel-server-name">
+              <span>Agent OS</span>
+              <button class="channel-settings-btn" onclick="toggleServerSettings()">⚙️</button>
+            </div>
+            <div class="channel-list" id="channel-list"></div>
+            <div class="channel-sessions" id="channel-sessions"></div>
+          </div>
+
+          <!-- Message Area -->
+          <div class="message-area" id="message-area">
+            <div class="message-topbar" id="message-topbar">
+              <div class="msg-channel-info">
+                <div class="mobile-talk-tabs" style="display:none">
+                  <button class="mobile-talk-tab active" onclick="setTalkMode('channels')">Channels</button>
+                  <button class="mobile-talk-tab" onclick="setTalkMode('dms')">DMs</button>
+                </div>
+                <span class="msg-channel-hash">#</span>
+                <span class="msg-channel-name" id="current-channel-name" onclick="openMobileChannelDrawer()">bridge</span>
+                <span class="channel-topic" id="channel-topic" style="display:none" onclick="expandChannelTopic()" title="Click to expand"></span>
+              </div>
+              <div class="message-topbar-actions">
+                <button class="msg-action-btn" onclick="toggleChannelInfo()" title="Channel Info">ℹ️</button>
+                <button class="msg-action-btn" onclick="togglePinned()" title="Pinned">📌</button>
+                <button class="msg-action-btn" onclick="toggleMemberList()" title="Members">👥</button>
+                <button class="msg-action-btn" onclick="toggleThreadPanel()" title="Threads">🧵</button>
+              </div>
+            </div>
+
+            <!-- Channel Info Sidebar -->
+            <div class="channel-info-panel hidden" id="channel-info-panel">
+              <div class="channel-info-header">
+                <span>Channel Info</span>
+                <button class="channel-info-close" onclick="toggleChannelInfo()">✕</button>
+              </div>
+              <div id="channel-info-content">
+                <div style="padding:16px;text-align:center;color:var(--text-muted)">Loading...</div>
+              </div>
+            </div>
+
+            <!-- Pinned Messages Panel -->
+            <div class="pinned-panel hidden" id="pinned-panel">
+              <div class="pinned-header">📌 Pinned Messages</div>
+              <div id="pinned-list"></div>
+            </div>
+
+            <!-- Messages -->
+            <div class="messages-container" id="messages-container">
+              <div id="messages-list"></div>
+              <div class="typing-indicator hidden" id="typing-indicator">
+                <span class="typing-dots"><span></span><span></span><span></span></span>
+                <span id="typing-who">Agent is typing...</span>
+              </div>
+            </div>
+
+            <!-- Reply Preview -->
+            <div class="reply-preview hidden" id="reply-preview">
+              <div class="reply-preview-bar"></div>
+              <span class="reply-preview-text" id="reply-preview-text"></span>
+              <button class="reply-preview-close" onclick="cancelReply()">✕</button>
+            </div>
+
+            <!-- Message Input -->
+            <div class="message-input-area" id="message-input-area">
+              <button class="input-attach-btn" onclick="attachFile()" title="Attach file">+</button>
+              <div class="message-input-wrapper">
+                <input type="text" id="message-input" class="message-input" 
+                  placeholder="Message #bridge" 
+                  onkeydown="handleMessageInput(event)"
+                  oninput="handleInputChange(event)">
+                <div class="input-autocomplete hidden" id="input-autocomplete"></div>
+              </div>
+              <button class="emoji-btn" onclick="toggleEmojiPicker('message')" title="Emoji">😊</button>
+              <button class="send-btn" onclick="sendMessage()" title="Send (Enter)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.724 1.053a.5.5 0 0 1 .553-.05l12 6.5a.5.5 0 0 1 0 .894l-12 6.5A.5.5 0 0 1 1.5 14.5v-5l7-1.5-7-1.5v-5a.5.5 0 0 1 .224-.447z"/></svg>
+              </button>
+            </div>
+            <!-- Sync indicator -->
+            <div class="chat-sync-bar" id="chat-sync-bar">
+              <span class="sync-dot"></span>
+              <span class="sync-text">Connected to Discord</span>
+            </div>
+          </div>
+
+          <!-- Member List (right side) -->
+          <div class="member-list hidden" id="member-list">
+            <div class="member-list-header">Members</div>
+            <div id="member-list-content"></div>
+          </div>
+
+          <!-- Thread Panel (right side) -->
+          <div class="thread-panel hidden" id="thread-panel">
+            <div class="thread-panel-header">
+              <span>Thread</span>
+              <button onclick="toggleThreadPanel()">✕</button>
+            </div>
+            <div id="thread-content"></div>
+          </div>
+        </div>
+
+        <!-- MIND VIEW -->
+        <div id="view-mind" class="view">
+          <!-- Tab Navigation -->
+          <div class="mind-tab-bar">
+            <button class="mind-tab-btn active" data-tab="search" onclick="setMindTab('search')">🔍 Search</button>
+            <button class="mind-tab-btn" data-tab="browse" onclick="setMindTab('browse')">📂 Browse</button>
+            <button class="mind-tab-btn" data-tab="tags" onclick="setMindTab('tags')">🏷️ Tags</button>
+            <button class="mind-tab-btn" data-tab="graph" onclick="setMindTab('graph')">🕸️ Graph</button>
+            <button class="mind-tab-btn" data-tab="reader" onclick="setMindTab('reader')">📖 Reader</button>
+            <button class="mind-tab-btn" data-tab="insights" onclick="setMindTab('insights')">🧠 Insights</button>
+            <button class="mind-new-note-btn" onclick="openNewNoteModal()" title="New Note">+ New Note</button>
+          </div>
+
+          <!-- Search Panel -->
+          <div id="mind-panel-search" class="mind-tab-panel active">
+            <div class="mind-search-bar">
+              <input type="text" class="mind-search-input" id="mind-search-input" placeholder="Search vault notes..." onkeydown="handleMindSearchKey(event)">
+              <button class="mind-search-btn" onclick="doMindSearch()">Search</button>
+            </div>
+            <div id="mind-recent-searches"></div>
+            <div class="mind-search-stats" id="mind-search-stats"></div>
+            <div id="mind-search-results" class="mind-search-results"></div>
+          </div>
+
+          <!-- Browse Panel -->
+          <!-- Tags Tab -->
+          <div id="mind-panel-tags" class="mind-tab-panel hidden">
+            <div id="mind-tags-content" class="mind-tags-content"></div>
+          </div>
+
+          <div id="mind-panel-browse" class="mind-tab-panel hidden">
+            <div class="mind-browse-layout">
+              <div class="mind-browse-tree-panel" id="mind-browse-tree"></div>
+              <div class="mind-browse-list-panel" id="mind-browse-list">
+                <div class="mind-empty">Select a folder to browse</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Graph Panel -->
+          <div id="mind-panel-graph" class="mind-tab-panel hidden">
+            <div class="mind-graph-toolbar">
+              <input type="text" class="mind-graph-filter-input" placeholder="Filter nodes..." oninput="filterMindGraph(this.value)">
+              <button id="mind-graph-lock-btn" class="graph-lock-btn" onclick="toggleMindGraphLock()">🔒 Lock</button>
+            </div>
+            <div class="mind-graph-container">
+              <canvas id="mind-graph-canvas"></canvas>
+              <div class="graph-detail-panel hidden" id="mind-graph-detail"></div>
+              <div class="graph-tooltip hidden" id="mind-graph-tooltip"></div>
+            </div>
+          </div>
+
+          <!-- Reader Panel -->
+          <div id="mind-panel-reader" class="mind-tab-panel hidden">
+            <div id="mind-reader-content" class="mind-reader-content">
+              <div class="mind-reader-empty empty-state">
+                <div class="empty-state-icon">📖</div>
+                <div class="empty-state-title">No note selected</div>
+                <div class="empty-state-subtitle">Click a note from Search, Browse, or Graph to view it here</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insights Panel -->
+          <div id="mind-panel-insights" class="mind-tab-panel hidden">
+            <div id="mind-insights-content" class="mind-insights-content"></div>
+          </div>
+        </div>
+
+        <!-- PULSE VIEW -->
+        <div id="view-pulse" class="view">
+          <!-- Dashboard Header — 4 Stat Cards -->
+          <div class="sys-dashboard-header" id="sys-dashboard-header"></div>
+
+          <!-- Service Status Grid -->
+          <div class="sys-section" id="sys-services-section">
+            <div class="sys-section-header">
+              <span class="sys-section-icon">🟢</span>
+              <span class="sys-section-title">Service Status</span>
+              <span class="sys-section-badge" id="sys-services-count"></span>
+            </div>
+            <div class="sys-services-grid" id="sys-services-grid"></div>
+          </div>
+
+          <!-- Agent Status Table -->
+          <div class="sys-section" id="sys-agents-section">
+            <div class="sys-section-header">
+              <span class="sys-section-icon">🤖</span>
+              <span class="sys-section-title">Agent Status</span>
+            </div>
+            <div class="sys-agents-table-wrap" id="sys-agents-table"></div>
+          </div>
+
+          <!-- Workflow Pipeline -->
+          <div class="sys-section" id="sys-workflow-section">
+            <div class="sys-section-header">
+              <span class="sys-section-icon">⚡</span>
+              <span class="sys-section-title">Workflow Pipeline</span>
+            </div>
+            <div class="sys-pipeline-wrap" id="sys-pipeline"></div>
+            <div class="sys-pipeline-detail hidden" id="sys-pipeline-detail"></div>
+          </div>
+
+          <div class="sys-two-col">
+            <!-- Cron Schedule -->
+            <div class="sys-section">
+              <div class="sys-section-header">
+                <span class="sys-section-icon">⏰</span>
+                <span class="sys-section-title">Cron Schedule</span>
+              </div>
+              <div id="sys-crons"></div>
+            </div>
+
+            <!-- Cost Tracking -->
+            <div class="sys-section">
+              <div class="sys-section-header">
+                <span class="sys-section-icon">💰</span>
+                <span class="sys-section-title">Cost Tracking</span>
+                <div class="sys-cost-toggle" id="sys-cost-toggle">
+                  <button class="sys-toggle-btn active" data-range="daily" onclick="toggleCostRange('daily')">Daily</button>
+                  <button class="sys-toggle-btn" data-range="weekly" onclick="toggleCostRange('weekly')">Weekly</button>
+                </div>
+              </div>
+              <div id="sys-cost-chart"></div>
+            </div>
+          </div>
+
+          <!-- Process Monitor -->
+          <div class="sys-section" id="sys-process-section">
+            <div class="sys-section-header">
+              <span class="sys-section-icon">📊</span>
+              <span class="sys-section-title">Process Monitor</span>
+              <span class="sys-section-badge" style="font-size:10px;color:var(--text-muted)">top 15 · auto 30s</span>
+            </div>
+            <div id="sys-process-monitor"></div>
+          </div>
+
+          <!-- Live Log Viewer -->
+          <div class="sys-section hidden" id="sys-live-log-section">
+            <div class="sys-section-header">
+              <span class="sys-section-icon">🖥️</span>
+              <span class="sys-section-title" id="sys-live-log-title">Live Logs</span>
+              <div class="sys-live-log-controls">
+                <input type="text" class="sys-log-filter-input" placeholder="🔍 Filter logs..." oninput="filterLogs(this.value)">
+                <button class="sys-log-pause-btn" onclick="refreshLogsNow()">🔄 Refresh</button>
+                <button class="sys-log-pause-btn" id="sys-log-pause" onclick="toggleLogPause()">⏸ Pause</button>
+                <button class="sys-log-pause-btn" onclick="closeLogViewer()" title="Close">✕</button>
+              </div>
+            </div>
+            <div class="sys-terminal-container" id="sys-live-log-output"></div>
+          </div>
+
+          <!-- System Logs (stream) -->
+          <div class="sys-section" id="sys-logs-section">
+            <div class="sys-section-header">
+              <span class="sys-section-icon">📜</span>
+              <span class="sys-section-title">System Logs</span>
+              <button class="sys-log-pause-btn" onclick="toggleLogPause()">⏸ Pause</button>
+            </div>
+            <div class="sys-logs-container" id="sys-logs"></div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <button class="quick-btn btn-secondary" onclick="quickAction('restart-gateway')">🔄 Restart Gateway</button>
+            <button class="quick-btn btn-danger" onclick="showConfirm('Clear Queue?','This will remove all pending queue items.', () => quickAction('clear-queue'), 'Clear', true)">🗑️ Clear Queue</button>
+            <button class="quick-btn btn-secondary" onclick="quickAction('reindex')">📚 Reindex Vault</button>
+            <button class="quick-btn btn-secondary" onclick="quickAction('health-check')">🩺 Health Check</button>
+          </div>
+        </div>
+
+        <!-- BOARD VIEW -->
+        <div id="view-board" class="view">
+          <div class="board-header">
+            <h2>Task Board</h2>
+            <button class="board-add-btn btn-primary" onclick="addBoardCard()">+ New Card</button>
+          </div>
+          <div class="kanban-board" id="kanban-board"></div>
+        </div>
+
+        <!-- STREAM VIEW -->
+        <div id="view-stream" class="view">
+          <div class="stream-toolbar">
+            <input type="text" class="stream-search" id="stream-search" placeholder="🔍 Regex filter..." oninput="filterStream(this.value)">
+            <div class="stream-filters" id="stream-agent-filters"></div>
+            <div class="stream-level-filters">
+              <button class="level-chip debug active" data-level="debug" onclick="toggleLevelFilter('debug', this)">debug</button>
+              <button class="level-chip info active" data-level="info" onclick="toggleLevelFilter('info', this)">info</button>
+              <button class="level-chip warn active" data-level="warn" onclick="toggleLevelFilter('warn', this)">warn</button>
+              <button class="level-chip error active" data-level="error" onclick="toggleLevelFilter('error', this)">error</button>
+            </div>
+            <label class="autoscroll-toggle">
+              <input type="checkbox" id="autoscroll-toggle" checked> Auto-scroll
+            </label>
+          </div>
+          <div class="stream-log" id="stream-log"></div>
+        </div>
+
+        <!-- COMMAND VIEW -->
+        <div id="view-command" class="view command-view">
+          <div class="command-mode-indicator" id="cmd-mode-indicator">
+            <span class="mode-badge search">🔍 Search</span>
+          </div>
+          <div class="command-input-wrapper">
+            <div class="command-prefix" id="cmd-prefix">→</div>
+            <input type="text" id="command-input" class="command-input" 
+              placeholder="Search, > command, @ agent, / system..." 
+              oninput="handleCommandInput(this.value)"
+              onkeydown="handleCommandKey(event)">
+          </div>
+          <div class="command-results" id="command-results"></div>
+          <div class="command-preview" id="command-preview"></div>
+        </div>
+
+        <!-- CONFIG VIEW -->
+        <div id="view-config" class="view">
+          <div class="config-sections">
+            <div class="config-section">
+              <div class="section-title">Agent Configuration</div>
+              <div id="agent-config-cards"></div>
+            </div>
+            <div class="config-section">
+              <div class="section-title">Theme</div>
+              <div class="theme-options">
+                <label class="theme-option active" onclick="setTheme('mocha')">
+                  <div class="theme-preview mocha"></div>
+                  <span>Mocha</span>
+                </label>
+                <label class="theme-option" onclick="setTheme('latte')">
+                  <div class="theme-preview latte"></div>
+                  <span>Latte</span>
+                </label>
+                <label class="theme-option" onclick="setTheme('macchiato')">
+                  <div class="theme-preview macchiato"></div>
+                  <span>Macchiato</span>
+                </label>
+              </div>
+            </div>
+            <div class="config-section">
+              <div class="section-title">Cron Schedule</div>
+              <div id="config-crons"></div>
+            </div>
+            <div class="config-section">
+              <div class="section-title">Skills</div>
+              <div id="config-skills" class="skills-list">
+                <div class="skill-item"><span>🔬</span> Deep Research</div>
+                <div class="skill-item"><span>💻</span> Development</div>
+                <div class="skill-item"><span>⚙️</span> Infrastructure</div>
+                <div class="skill-item"><span>😈</span> Red Team</div>
+                <div class="skill-item"><span>🔧</span> General Purpose</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plans View -->
+        <div id="view-plans" class="view hidden">
+          <div class="view-header">
+            <div>
+              <h2>📋 Plans</h2>
+              <span class="view-subtitle">Agent-managed Kanban boards</span>
+            </div>
+            <div id="plans-selector" class="plans-selector-row"></div>
+          </div>
+          <div id="plans-kanban-container" class="plans-kanban-container"></div>
+        </div>
+
+        <!-- Plan Chat Overlay -->
+        <div id="plan-chat-overlay" class="plan-chat-overlay hidden" onclick="closePlanChat()"></div>
+        <div id="plan-chat-panel" class="plan-chat-panel">
+          <div class="plan-chat-header">
+            <h3 id="plan-chat-title">💬 Discuss Plan</h3>
+            <button class="agent-chat-close" onclick="closePlanChat()">✕</button>
+          </div>
+          <div class="plan-chat-context" id="plan-chat-context"></div>
+          <div class="plan-chat-messages" id="plan-chat-messages"></div>
+          <div class="plan-chat-input-area">
+            <input type="text" class="plan-chat-input" id="plan-chat-input" placeholder="Discuss this plan..."
+              onkeydown="if(event.key==='Enter'){event.preventDefault();sendPlanChatMessage();}">
+            <button class="plan-chat-send" onclick="sendPlanChatMessage()">▶</button>
+          </div>
+        </div>
+
+        <!-- Schedule View -->
+        <div id="view-schedule" class="view hidden">
+          <div class="view-header"><h2>🗓️ Schedule</h2><span class="view-subtitle">Agent calendar & task timeline</span></div>
+          <div class="schedule-content" id="schedule-content"></div>
+        </div>
+
+        <!-- Missions View -->
+        <div id="view-missions" class="view hidden">
+          <div class="view-header"><h2>🎯 Mission Control</h2><span class="view-subtitle">Active missions, plans & decisions</span></div>
+          <div class="mc-layout" id="missions-content">
+            <aside class="mc-sidebar" id="mc-sidebar"></aside>
+            <section class="mc-detail" id="mc-detail"></section>
+          </div>
+        </div>
+
+        <!-- Records View -->
+        <div id="view-records" class="view hidden">
+          <div class="view-header"><h2>🗄️ Records</h2><span class="view-subtitle">Universal entity browser — agents, tasks, proposals, missions, notes, services</span></div>
+          <div class="records-content" id="records-content"></div>
+        </div>
+
+        <!-- Tasks View -->
+        <div id="view-tasks" class="view hidden">
+          <div class="tasks-page-header">
+            <h2>📋 Tasks</h2>
+            <button class="tasks-new-btn" onclick="openNewTaskModal()">➕ New Task</button>
+          </div>
+          <!-- Quick-Add Bar -->
+          <div class="tasks-quick-add" id="tasks-quick-add">
+            <input type="text" class="tasks-quick-input" id="tasks-quick-input" placeholder="Quick add task…" onkeydown="if(event.key==='Enter')quickAddTask()">
+            <select class="tasks-quick-agent" id="tasks-quick-agent">
+              <option value="coder">💻 Coder</option>
+              <option value="researcher">🔬 Researcher</option>
+              <option value="ops">⚙️ Ops</option>
+              <option value="righthand">🤝 Right Hand</option>
+              <option value="utility">🔧 Utility</option>
+              <option value="devil">😈 Devil's Advocate</option>
+            </select>
+            <button class="tasks-quick-add-btn" onclick="quickAddTask()">Add</button>
+          </div>
+          <div class="tasks-layout">
+            <!-- Left: Task List -->
+            <div class="tasks-list-panel" id="tasks-list-panel">
+              <div class="tasks-filter-bar"></div>
+              <div class="tasks-list-content"></div>
+            </div>
+            <!-- Center: Task Detail -->
+            <div class="tasks-detail-panel" id="tasks-detail-panel">
+              <div class="tasks-detail-empty empty-state">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-title">No task selected</div>
+                <div class="empty-state-subtitle">Select a task from the list to view details</div>
+              </div>
+            </div>
+            <!-- Right: Actions + Meta -->
+            <div class="tasks-actions-panel" id="tasks-actions-panel"></div>
+          </div>
+        </div>
+
+        <!-- Projects View -->
+        <div id="view-projects" class="view hidden">
+          <div class="page-header">
+            <h2>📁 Projects</h2>
+            <p class="page-subtitle">Active projects with linked tasks, missions, and vault notes</p>
+          </div>
+          <div id="projects-container" class="projects-grid"></div>
+        </div>
+
+        <!-- Pipelines View -->
+        <div id="view-pipelines" class="view hidden">
+          <div class="view-header"><h2>🔀 Pipelines</h2><span class="view-subtitle">Visual workflow pipelines — watch work flow through stages</span></div>
+          <div class="pipelines-content" id="pipelines-content"></div>
+        </div>
+
+        <!-- Roles View -->
+        <div id="view-roles" class="view hidden">
+          <div class="view-header"><h2>🛡️ Agent Configuration</h2><span class="view-subtitle">Manage agent capabilities, autonomy levels & behavior rules</span></div>
+          <div class="roles-content" id="roles-content"></div>
+        </div>
+
+        <!-- Explore / Documentation View -->
+        <div id="view-explore" class="view hidden">
+          <div class="explore-content" id="explore-content"></div>
+        </div>
+
+        <!-- Inbox View -->
+        <div id="view-inbox" class="view hidden inbox-layout">
+          <!-- Left Panel: Item List -->
+          <div id="inbox-list-panel" class="inbox-list-panel">
+            <div class="inbox-search-bar">
+              <div class="inbox-search-wrapper">
+                <svg class="inbox-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="inbox-search-input" class="inbox-search-input" placeholder="Search inbox..." oninput="filterInboxSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';filterInboxSearch('');this.blur();}">
+                <kbd class="inbox-search-kbd">/</kbd>
+              </div>
+              <div class="inbox-sort-dropdown">
+                <button class="inbox-sort-btn" id="inbox-sort-btn" onclick="toggleInboxSort()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h6"/></svg>
+                </button>
+                <div class="inbox-sort-menu hidden" id="inbox-sort-menu">
+                  <button class="inbox-sort-option" data-sort="newest" onclick="setInboxSort('newest')">Newest first</button>
+                  <button class="inbox-sort-option active" data-sort="priority" onclick="setInboxSort('priority')">Priority</button>
+                  <button class="inbox-sort-option" data-sort="agent" onclick="setInboxSort('agent')">By agent</button>
+                </div>
+              </div>
+            </div>
+            <div class="inbox-category-tabs" id="inbox-category-tabs"></div>
+            <div class="inbox-bulk-bar hidden" id="inbox-bulk-bar">
+              <span class="inbox-bulk-count" id="inbox-bulk-count">0 selected</span>
+              <button class="inbox-bulk-btn approve" onclick="inboxBulkAction('approve')">✅ Approve All</button>
+              <button class="inbox-bulk-btn dismiss" onclick="inboxBulkAction('dismiss')">❌ Dismiss All</button>
+              <button class="inbox-bulk-btn delete" onclick="inboxBulkAction('delete')">🗑️ Delete All</button>
+              <button class="inbox-bulk-btn cancel" onclick="inboxClearSelection()">Cancel</button>
+            </div>
+            <div class="inbox-items-list" id="inbox-items-list"></div>
+          </div>
+          <!-- Center Panel: Detail View -->
+          <div id="inbox-detail-panel" class="inbox-detail-panel"></div>
+          <!-- Right Panel: Context Sidebar -->
+          <div id="inbox-context-panel" class="inbox-context-panel">
+            <div class="inbox-context-header">
+              <span>Context</span>
+              <button class="inbox-context-toggle" onclick="toggleInboxContext()" title="Toggle sidebar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+            <div class="inbox-context-body" id="inbox-context-body"></div>
+          </div>
+          <!-- Keyboard Shortcuts Modal -->
+          <div class="inbox-shortcuts-modal hidden" id="inbox-shortcuts-modal" onclick="if(event.target===this)this.classList.add('hidden')">
+            <div class="inbox-shortcuts-card">
+              <div class="inbox-shortcuts-title">⌨️ Keyboard Shortcuts</div>
+              <div class="inbox-shortcuts-grid">
+                <div class="inbox-shortcut"><kbd>j</kbd><span>Next item</span></div>
+                <div class="inbox-shortcut"><kbd>k</kbd><span>Previous item</span></div>
+                <div class="inbox-shortcut"><kbd>Enter</kbd><span>Open item</span></div>
+                <div class="inbox-shortcut"><kbd>a</kbd><span>Approve</span></div>
+                <div class="inbox-shortcut"><kbd>x</kbd><span>Dismiss</span></div>
+                <div class="inbox-shortcut"><kbd>s</kbd><span>Snooze</span></div>
+                <div class="inbox-shortcut"><kbd>r</kbd><span>Reply</span></div>
+                <div class="inbox-shortcut"><kbd>d</kbd><span>Delete</span></div>
+                <div class="inbox-shortcut"><kbd>/</kbd><span>Search</span></div>
+                <div class="inbox-shortcut"><kbd>Esc</kbd><span>Back to list</span></div>
+                <div class="inbox-shortcut"><kbd>1-6</kbd><span>Switch tabs</span></div>
+                <div class="inbox-shortcut"><kbd>?</kbd><span>This help</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- Snooze Dropdown (floating) -->
+          <div class="inbox-snooze-dropdown hidden" id="inbox-snooze-dropdown">
+            <button onclick="snoozeSelectedItem(3600000)">⏰ 1 hour</button>
+            <button onclick="snoozeSelectedItem(14400000)">🕓 4 hours</button>
+            <button onclick="snoozeSelectedItem(86400000)">🌅 Tomorrow</button>
+            <button onclick="snoozeSelectedItem(604800000)">📅 Next week</button>
+          </div>
+        </div>
+
+        <!-- Rooms View -->
+        <div id="view-rooms" class="view hidden rooms-layout">
+          <div id="rooms-list-panel" class="rooms-list-panel"></div>
+          <div id="rooms-view-panel" class="rooms-view-panel"></div>
+        </div>
+
+        <!-- New Room Modal -->
+        <div id="rooms-modal-overlay" class="rooms-modal-overlay hidden" onclick="if(event.target===this)closeNewRoomModal()">
+          <div class="rooms-modal">
+            <div class="rooms-modal-header">
+              <h3>Create New Room</h3>
+              <button class="rooms-modal-close" onclick="closeNewRoomModal()">✕</button>
+            </div>
+            <div class="rooms-modal-body">
+              <label class="rooms-modal-label">Room Name</label>
+              <input type="text" id="new-room-name" class="rooms-modal-input" placeholder="e.g., 🚀 Sprint Planning">
+              <label class="rooms-modal-label">Agents</label>
+              <div class="rooms-modal-agents" id="new-room-agents">
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="righthand"> 🤝 Right Hand</label>
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="researcher"> 🔬 Researcher</label>
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="coder"> 💻 Coder</label>
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="ops"> ⚙️ Ops</label>
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="devil"> 😈 Devil's Advocate</label>
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="utility"> 🔧 Utility</label>
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="security"> 🔒 Security</label>
+                <label class="rooms-agent-checkbox"><input type="checkbox" class="new-room-agent-cb" value="vault"> 📚 Vault Keeper</label>
+              </div>
+              <label class="rooms-modal-label">Purpose</label>
+              <textarea id="new-room-purpose" class="rooms-modal-textarea" placeholder="What is this room for?"></textarea>
+            </div>
+            <div class="rooms-modal-footer">
+              <button class="rooms-modal-cancel btn-secondary" onclick="closeNewRoomModal()">Cancel</button>
+              <button class="rooms-modal-create btn-primary" onclick="createRoom()">Create Room</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Briefing View -->
+        <div id="view-briefing" class="view hidden briefing-view-layout">
+          <div class="briefing-view-toolbar">
+            <h2 class="briefing-view-title">📋 Daily Briefing</h2>
+            <button class="briefing-refresh-btn btn-secondary" onclick="refreshBriefing()">🔄 Refresh Briefing</button>
+          </div>
+          <div class="briefing-document-wrap">
+            <div class="briefing-document" id="briefing-document">
+              <div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-subtitle">Loading briefing...</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workbench View -->
+        <div id="view-workbench" class="view hidden">
+          <div class="wb-topbar">
+            <div class="wb-topbar-left">
+              <select class="wb-agent-select" id="wb-agent-select" onchange="wbSelectAgent(this.value)">
+                <option value="__all__">👁️ All Agents</option>
+              </select>
+              <button class="wb-btn wb-watch-all-btn" onclick="wbToggleWatchAll()">👁️ Watch All</button>
+            </div>
+            <div class="wb-topbar-right">
+              <span class="wb-live-indicator" id="wb-live-indicator">
+                <span class="wb-live-dot"></span> LIVE
+              </span>
+            </div>
+          </div>
+          <div class="wb-content" id="workbench-content">
+            <div class="empty-state">
+              <div class="empty-state-icon">👁️</div>
+              <div class="empty-state-title">Agent Workbench</div>
+              <div class="empty-state-subtitle">Loading agent activity...</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /views -->
+    </div><!-- /main -->
+  </div><!-- /app -->
+
+  <!-- Quick Actions FAB -->
+  <div class="quick-actions-fab" id="quick-actions-fab" onclick="toggleQuickActions()">⚡</div>
+  <div class="quick-actions-menu hidden" id="quick-actions-menu"></div>
+
+  <!-- Mobile Bottom Bar -->
+  <nav id="mobile-bar">
+    <button class="mobile-nav-item" data-page="menu" onclick="toggleMobileMenu()">
+      <i data-lucide="menu" class="mobile-icon-svg" id="mobile-menu-lucide"></i>
+      <span class="mobile-label">More</span>
+    </button>
+    <button class="mobile-nav-item active" data-page="feed" onclick="nav('feed')">
+      <i data-lucide="zap" class="mobile-icon-svg"></i>
+      <span class="mobile-label">Stream</span>
+    </button>
+    <button class="mobile-nav-item" data-page="talk" onclick="nav('talk')">
+      <i data-lucide="message-circle" class="mobile-icon-svg"></i>
+      <span class="mobile-label">Talk</span>
+      <span class="mobile-badge" id="talk-mobile-badge">7</span>
+    </button>
+    <button class="mobile-nav-item" data-page="queue" onclick="nav('queue')">
+      <i data-lucide="inbox" class="mobile-icon-svg"></i>
+      <span class="mobile-label">Queue</span>
+      <span class="mobile-badge" id="queue-mobile-badge"></span>
+    </button>
+    <button class="mobile-nav-item" data-page="mind" onclick="nav('mind')">
+      <i data-lucide="brain" class="mobile-icon-svg"></i>
+      <span class="mobile-label">Mind</span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu Drawer -->
+  <div class="mobile-menu-drawer hidden" id="mobile-menu-drawer">
+    <div class="mobile-menu-header">
+      <div class="mobile-menu-title-row">
+        <i data-lucide="bot" class="logo-icon-svg"></i>
+        <span class="mobile-menu-title">Agent OS</span>
+        <span class="mobile-menu-version">v7</span>
+      </div>
+      <button class="mobile-menu-close" onclick="toggleMobileMenu()">
+        <i data-lucide="x" class="mobile-icon-svg"></i>
+      </button>
+    </div>
+    <div class="mobile-menu-items">
+      <div class="mobile-menu-group-label">⚡ OPERATE</div>
+      <button class="mobile-menu-item" onclick="nav('feed');toggleMobileMenu()">📡 Stream</button>
+      <button class="mobile-menu-item" onclick="nav('inbox');toggleMobileMenu()">📬 Inbox</button>
+      <button class="mobile-menu-item" onclick="nav('queue');toggleMobileMenu()">📋 Proposals</button>
+      <button class="mobile-menu-item" onclick="nav('briefing');toggleMobileMenu()">📜 Briefing</button>
+      <button class="mobile-menu-item" onclick="nav('workbench');toggleMobileMenu()">👁️ Workbench</button>
+      <div class="mobile-menu-divider"></div>
+      <div class="mobile-menu-group-label">💬 COMMUNICATE</div>
+      <button class="mobile-menu-item" onclick="nav('talk');toggleMobileMenu()">💬 Talk</button>
+      <button class="mobile-menu-item" onclick="nav('rooms');toggleMobileMenu()">🏠 Rooms</button>
+      <div class="mobile-menu-divider"></div>
+      <div class="mobile-menu-group-label">🎯 DIRECT</div>
+      <button class="mobile-menu-item" onclick="nav('tasks');toggleMobileMenu()">✅ Tasks</button>
+      <button class="mobile-menu-item" onclick="nav('projects');toggleMobileMenu()">📁 Projects</button>
+      <button class="mobile-menu-item" onclick="nav('missions');toggleMobileMenu()">🎯 Missions</button>
+      <button class="mobile-menu-item" onclick="nav('pipelines');toggleMobileMenu()">🔀 Pipelines</button>
+      <div class="mobile-menu-divider"></div>
+      <div class="mobile-menu-group-label">🧠 KNOW</div>
+      <button class="mobile-menu-item" onclick="nav('mind');toggleMobileMenu()">🧠 Mind</button>
+      <button class="mobile-menu-item" onclick="nav('explore');toggleMobileMenu()">📖 Docs</button>
+      <div class="mobile-menu-divider"></div>
+      <div class="mobile-menu-group-label">⚙️ CONFIGURE</div>
+      <button class="mobile-menu-item" onclick="nav('roles');toggleMobileMenu()">🛡️ Roles</button>
+      <button class="mobile-menu-item" onclick="nav('records');toggleMobileMenu()">📊 Records</button>
+      <button class="mobile-menu-item" onclick="nav('pulse');toggleMobileMenu()">⚙️ System</button>
+      <div class="mobile-menu-divider"></div>
+      <a class="mobile-menu-item" href="life.html" target="_blank" onclick="toggleMobileMenu()">🌿 Life OS ↗</a>
+    </div>
+  </div>
+
+  <!-- Command Palette Overlay -->
+  <div class="overlay hidden" id="cmd-palette-overlay" onclick="closeCmdPaletteIfOutside(event)">
+    <div class="cmd-palette" id="cmd-palette">
+      <div class="cmd-palette-input-row">
+        <span class="cmd-palette-prefix" id="palette-prefix">🔍</span>
+        <input type="text" id="palette-input" class="cmd-palette-input" 
+          placeholder="Search pages, agents, vault... or type > for actions"
+          oninput="handlePaletteInput(this.value)"
+          onkeydown="handlePaletteKey(event)"
+          autocomplete="off">
+        <span class="palette-mode-indicator" id="palette-mode-indicator"></span>
+        <div class="palette-hints">
+          <kbd>↑↓</kbd> navigate
+          <kbd>⏎</kbd> select
+          <kbd>esc</kbd> close
+          <kbd>tab</kbd> mode
+        </div>
+        <button class="palette-close" onclick="closeCommandPalette()">✕</button>
+      </div>
+      <div class="palette-results" id="palette-results"></div>
+    </div>
+  </div>
+
+  <!-- Notification Panel -->
+  <div class="notif-panel hidden" id="notif-panel">
+    <div class="notif-panel-header">
+      <span>🔔 Notifications</span>
+      <div class="notif-panel-actions">
+        <button onclick="NotificationCenter.markAllRead()">Mark all read</button>
+        <button onclick="NotificationCenter.clearAll()">Clear all</button>
+      </div>
+    </div>
+    <div id="notif-list"></div>
+  </div>
+
+  <!-- Emoji Picker -->
+  <div class="emoji-picker hidden" id="emoji-picker">
+    <div class="emoji-grid" id="emoji-grid"></div>
+  </div>
+
+  <!-- Agent Drawer -->
+  <div class="agent-drawer-overlay hidden" id="agent-drawer-overlay" onclick="closeAgentDrawer()"></div>
+  <div class="agent-drawer" id="agent-drawer">
+    <div class="agent-drawer-header" id="agent-drawer-header"></div>
+    <div class="agent-drawer-body" id="agent-drawer-body"></div>
+    <div class="agent-drawer-footer" id="agent-drawer-footer"></div>
+  </div>
+
+  <!-- Context Panel -->
+  <div id="ctx-panel-overlay" class="ctx-panel-overlay hidden" onclick="closeCtxPanel()"></div>
+  <div id="context-panel" class="ctx-panel hidden">
+    <div class="ctx-panel-header">
+      <span id="ctx-title"></span>
+      <button class="ctx-panel-close" onclick="closeCtxPanel()">✕</button>
+    </div>
+    <div id="ctx-body" class="ctx-panel-body"></div>
+    <div id="ctx-footer" class="ctx-panel-footer"></div>
+  </div>
+
+  <!-- Briefing Modal -->
+  <div id="briefing-overlay" class="briefing-overlay hidden" onclick="closeBriefingIfOutside(event)">
+    <div class="briefing-modal" id="briefing-modal">
+      <div class="briefing-header">
+        <span class="briefing-header-icon">📋</span>
+        <span class="briefing-header-title">Daily Briefing</span>
+        <button class="briefing-close" onclick="closeBriefing()">✕</button>
+      </div>
+      <div class="briefing-body" id="briefing-body"></div>
+      <div class="briefing-footer">
+        <button class="briefing-dismiss-btn" onclick="closeBriefing()">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Level Up Overlay -->
+  <div class="levelup-overlay hidden" id="levelup-overlay">
+    <div class="levelup-card">
+      <div class="levelup-icon">⭐</div>
+      <div class="levelup-title">Level Up!</div>
+      <div class="levelup-text" id="levelup-text">You reached Level 4!</div>
+      <button onclick="closeLevelUp()">Awesome!</button>
+    </div>
+  </div>
+
+  <!-- Card Detail Modal -->
+  <div class="modal-overlay hidden" id="card-modal" onclick="closeModalIfOutside(event)">
+    <div class="card-modal" id="card-modal-content"></div>
+  </div>
+
+  <!-- New Note Modal -->
+  <div class="modal-overlay hidden" id="new-note-modal" onclick="closeNewNoteModalIfOutside(event)">
+    <div class="card-modal" id="new-note-modal-content" style="max-width:520px">
+      <h3 style="margin:0 0 16px;font-size:18px;color:var(--text)">📝 New Note</h3>
+      <label class="modal-label">Title</label>
+      <input id="new-note-title" class="modal-input" placeholder="Note title...">
+      <label class="modal-label">Folder</label>
+      <select id="new-note-folder" class="modal-input" style="padding:10px 14px;cursor:pointer">
+        <option value="">Loading folders...</option>
+      </select>
+      <label class="modal-label">Content</label>
+      <textarea id="new-note-content" class="modal-textarea" rows="10" placeholder="Write your note in Markdown..."></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button class="modal-btn-cancel" onclick="closeNewNoteModal()">Cancel</button>
+        <button class="modal-btn-primary" onclick="submitNewNote()">Create Note</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js?v=1773993468"></script>
+  <script src="ux.js?v=1773994200"></script>
+  <script src="app.js?v=1773993468"></script>
+  <script src="mind.js?v=1773994100"></script>
+  <script src="app2.js?v=1773993468"></script>
+  <script src="app3.js?v=1773993468"></script>
+  <script src="app4.js?v=1773993468"></script>
+  <script src="records.js?v=1773993468"></script>
+  <script src="app5.js?v=1773993468"></script>
+  <script src="app6.js?v=1773993468"></script>
+  <script src="tasks.js?v=1773993468"></script>
+  <script src="projects.js?v=1773994200"></script>
+  <script src="notifications.js?v=1773994300"></script>
+  <script src="bridge.js?v=1773993468"></script>
+  <script src="system.js?v=1773993468"></script>
+  <script src="live.js?v=1773993468"></script>
+  <script src="explore.js?v=1773994200"></script>
+  <script src="help.js?v=1773994100"></script>
+  <script src="timeline.js?v=1773994200"></script>
+  <script src="workbench.js?v=1773994200"></script>
+
+  <!-- New Task Modal -->
+  <div class="task-modal-overlay" id="task-modal-overlay" onclick="closeNewTaskModal()">
+    <div class="task-modal" onclick="event.stopPropagation()">
+      <div class="task-modal-header">✅ Create New Task</div>
+      <div class="task-modal-body">
+        <label class="task-modal-label">Title</label>
+        <input type="text" class="task-modal-input" id="task-modal-title" placeholder="Task title…">
+        <label class="task-modal-label">Agent</label>
+        <select class="task-modal-select" id="task-modal-agent">
+          <option value="coder">💻 Coder</option>
+          <option value="researcher">🔬 Researcher</option>
+          <option value="ops">⚙️ Ops</option>
+          <option value="righthand">🤝 Right Hand</option>
+          <option value="utility">🔧 Utility</option>
+          <option value="devil">😈 Devil's Advocate</option>
+        </select>
+        <label class="task-modal-label">Priority</label>
+        <div class="task-modal-priorities" id="task-modal-priorities">
+          <button class="task-modal-pri-btn" data-pri="P0" onclick="selectTaskPri('P0')">🔴 P0</button>
+          <button class="task-modal-pri-btn selected" data-pri="P1" onclick="selectTaskPri('P1')">🟠 P1</button>
+          <button class="task-modal-pri-btn" data-pri="P2" onclick="selectTaskPri('P2')">🟡 P2</button>
+          <button class="task-modal-pri-btn" data-pri="P3" onclick="selectTaskPri('P3')">🟢 P3</button>
+        </div>
+        <label class="task-modal-label">Description</label>
+        <textarea class="task-modal-textarea" id="task-modal-desc" rows="4" placeholder="Optional description…"></textarea>
+      </div>
+      <div class="task-modal-footer">
+        <button class="task-modal-cancel" onclick="closeNewTaskModal()">Cancel</button>
+        <button class="task-modal-submit" onclick="submitNewTask()">Create ✅</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

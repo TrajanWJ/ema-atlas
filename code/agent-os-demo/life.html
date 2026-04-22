@@ -1,0 +1,3992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧬 Life OS</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-base: #1e1e2e; --bg-mantle: #181825; --bg-crust: #11111b;
+  --surface0: #313244; --surface1: #45475a; --surface2: #585b70;
+  --text: #cdd6f4; --subtext0: #a6adc8; --subtext1: #bac2de;
+  --overlay0: #6c7086; --overlay1: #7f849c;
+  --blue: #89b4fa; --green: #a6e3a1; --red: #f38ba8;
+  --purple: #cba6f7; --yellow: #f9e2af; --peach: #fab387;
+  --teal: #94e2d5; --pink: #f5c2e7; --mauve: #cba6f7;
+  --gold: #E8A838; --sky: #89dceb; --flamingo: #f2cdcd;
+  --sidebar-w: 220px;
+}
+
+html, body { height: 100%; }
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg-base); color: var(--text);
+  display: flex; overflow: hidden;
+}
+
+/* ── Sidebar ──────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w); min-width: var(--sidebar-w);
+  background: var(--bg-mantle); border-right: 1px solid var(--surface0);
+  display: flex; flex-direction: column; height: 100vh;
+  overflow-y: auto; z-index: 200;
+}
+.sidebar-brand {
+  padding: 20px 18px 16px; font-size: 18px; font-weight: 700;
+  border-bottom: 1px solid var(--surface0); display: flex; align-items: center; gap: 8px;
+}
+.sidebar-brand span { color: var(--gold); }
+.sidebar-nav { flex: 1; padding: 8px 0; display: flex; flex-direction: column; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px; font-size: 14px; cursor: pointer;
+  color: var(--subtext0); border-left: 3px solid transparent;
+  transition: all .2s ease; text-decoration: none; user-select: none;
+}
+.nav-item:hover { color: var(--text); background: rgba(69,71,90,.3); }
+.nav-item.active {
+  color: var(--text); border-left-color: var(--gold);
+  background: rgba(69,71,90,.4); font-weight: 600;
+}
+.nav-item .icon { font-size: 16px; width: 22px; text-align: center; }
+.nav-item .badge {
+  margin-left: auto; background: var(--red); color: var(--bg-crust);
+  border-radius: 10px; padding: 1px 7px; font-size: 11px; font-weight: 700;
+}
+.nav-divider { height: 1px; background: var(--surface0); margin: 8px 18px; }
+.nav-back {
+  padding: 12px 18px; border-top: 1px solid var(--surface0);
+  margin-top: auto;
+}
+.nav-back a {
+  color: var(--subtext0); text-decoration: none; font-size: 13px;
+  display: flex; align-items: center; gap: 6px; transition: color .2s;
+}
+.nav-back a:hover { color: var(--text); }
+
+/* ── Main Content ─────────────────────────────── */
+.main {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  height: 100vh; position: relative;
+}
+.page {
+  display: none; padding: 28px 32px; min-height: 100%;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .35s cubic-bezier(.4,0,.2,1), transform .35s cubic-bezier(.4,0,.2,1);
+}
+.page.active { display: block; opacity: 1; transform: translateY(0); }
+.page.fade-in { opacity: 1; transform: translateY(0); }
+
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; letter-spacing: -.3px; }
+.page-header .subtitle { font-size: 13px; color: var(--subtext0); }
+
+/* ── Cards ────────────────────────────────────── */
+.card {
+  background: var(--surface0); border: 1px solid var(--surface1);
+  border-radius: 12px; padding: 18px; margin-bottom: 16px;
+  transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease;
+}
+.card:hover { border-color: var(--surface2); box-shadow: 0 4px 16px rgba(0,0,0,.15); transform: translateY(-1px); }
+.card h3 {
+  font-size: 13px; text-transform: uppercase; letter-spacing: .6px;
+  color: var(--subtext0); margin-bottom: 14px; display: flex;
+  align-items: center; gap: 8px;
+}
+.card-grid { display: grid; gap: 16px; }
+.card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.card-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* ── Stat boxes ───────────────────────────────── */
+.stat-box {
+  text-align: center; padding: 14px; background: var(--bg-mantle); border-radius: 8px;
+  transition: transform .15s, box-shadow .15s;
+}
+.stat-box:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+.stat-box .val { font-size: 28px; font-weight: 700; }
+.stat-box .label { font-size: 12px; color: var(--subtext0); margin-top: 2px; }
+
+/* ── Buttons ──────────────────────────────────── */
+.btn {
+  background: var(--blue); color: var(--bg-crust); border: none;
+  padding: 7px 16px; border-radius: 6px; cursor: pointer;
+  font-size: 13px; font-weight: 600; transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { opacity: .85; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.sm { padding: 4px 10px; font-size: 12px; }
+.btn.danger { background: var(--red); }
+.btn.green { background: var(--green); }
+.btn.purple { background: var(--purple); }
+.btn.gold { background: var(--gold); }
+.btn.ghost {
+  background: transparent; color: var(--subtext0); border: 1px solid var(--surface1);
+}
+.btn.ghost:hover { color: var(--text); border-color: var(--surface2); background: rgba(69,71,90,.2); }
+.btn.teal { background: var(--teal); }
+
+/* ── Form elements ────────────────────────────── */
+input[type="text"], input[type="number"], input[type="date"], textarea, select {
+  background: var(--bg-mantle); border: 1px solid var(--surface1);
+  color: var(--text); padding: 8px 12px; border-radius: 6px;
+  font-size: 13px; font-family: inherit; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(137,180,250,.15); }
+textarea { resize: vertical; min-height: 60px; }
+
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 6px;
+  background: var(--bg-mantle); border-radius: 3px; outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--blue); cursor: pointer;
+  transition: transform .15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* ── Tags & Pills ─────────────────────────────── */
+.tag {
+  display: inline-block; font-size: 11px; padding: 2px 8px;
+  border-radius: 4px; background: var(--surface1); color: var(--subtext0);
+  transition: background .15s;
+}
+.tag.p0 { background: rgba(243,139,168,.2); color: var(--red); }
+.tag.p1 { background: rgba(250,179,135,.2); color: var(--peach); }
+.tag.p2 { background: rgba(249,226,175,.2); color: var(--yellow); }
+.tag.p3 { background: rgba(166,227,161,.2); color: var(--green); }
+.tag.clickable { cursor: pointer; }
+.tag.clickable:hover { opacity: .8; }
+.tag.active-filter { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+/* Tag colors for task tags */
+.tag-work { background: rgba(137,180,250,.2); color: var(--blue); }
+.tag-personal { background: rgba(203,166,247,.2); color: var(--purple); }
+.tag-health { background: rgba(166,227,161,.2); color: var(--green); }
+.tag-learning { background: rgba(249,226,175,.2); color: var(--yellow); }
+.tag-finance { background: rgba(250,179,135,.2); color: var(--peach); }
+.tag-urgent { background: rgba(243,139,168,.2); color: var(--red); }
+.tag-agent { background: rgba(148,226,213,.2); color: var(--teal); }
+.tag-idea { background: rgba(245,194,231,.2); color: var(--pink); }
+
+/* ── Time estimate indicators ─────────────────── */
+.est-indicator {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; padding: 2px 6px; border-radius: 4px;
+}
+.est-small { background: rgba(166,227,161,.15); color: var(--green); }
+.est-medium { background: rgba(249,226,175,.15); color: var(--yellow); }
+.est-large { background: rgba(243,139,168,.15); color: var(--red); }
+
+/* ── Empty state ──────────────────────────────── */
+.empty {
+  color: var(--overlay0); font-size: 13px; text-align: center; padding: 32px 16px;
+  font-style: italic;
+}
+.empty .empty-icon { font-size: 36px; margin-bottom: 8px; display: block; opacity: .6; }
+.empty .empty-hint { font-size: 12px; margin-top: 6px; color: var(--surface2); }
+
+/* ── Loading skeleton ─────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface0) 25%, var(--surface1) 50%, var(--surface0) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease infinite;
+  border-radius: 6px;
+}
+.skeleton-line { height: 14px; margin-bottom: 8px; }
+.skeleton-line.short { width: 60%; }
+.skeleton-line.medium { width: 80%; }
+.skeleton-box { height: 60px; margin-bottom: 8px; }
+@keyframes skeleton-pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ── Task items ───────────────────────────────── */
+.task-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 6px; margin-bottom: 4px;
+  background: var(--bg-mantle); cursor: pointer; transition: all .2s;
+}
+.task-row:hover { background: rgba(69,71,90,.3); transform: translateX(2px); }
+.task-row.dragging { opacity: .5; transform: scale(.98); }
+.task-row.drag-over { border-top: 2px solid var(--blue); }
+.task-check {
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 2px solid var(--surface2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .2s;
+}
+.task-check:hover { border-color: var(--green); }
+.task-check.done { background: var(--green); border-color: var(--green); }
+.task-check.done::after { content: '✓'; color: var(--bg-crust); font-size: 12px; font-weight: 700; }
+.task-row.done .task-title { text-decoration: line-through; color: var(--overlay0); }
+.task-title { flex: 1; font-size: 13px; }
+.task-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.task-time { font-size: 11px; color: var(--overlay0); }
+.task-tags { display: flex; gap: 3px; flex-wrap: wrap; }
+
+/* Task expansion panel */
+.task-expand {
+  max-height: 0; overflow: hidden; transition: max-height .3s ease, padding .3s ease;
+  background: rgba(17,17,27,.3); border-radius: 0 0 6px 6px; margin-top: -4px; margin-bottom: 4px;
+}
+.task-expand.open { max-height: 400px; padding: 12px; }
+.task-expand textarea {
+  width: 100%; min-height: 60px; margin-top: 8px; font-size: 12px;
+}
+.task-expand .subtask-list { margin-top: 8px; }
+.task-expand .subtask-row {
+  display: flex; align-items: center; gap: 8px; padding: 4px 8px;
+  font-size: 12px; border-left: 2px solid var(--surface1); margin-left: 8px;
+  margin-bottom: 2px; transition: background .15s;
+}
+.task-expand .subtask-row:hover { background: rgba(69,71,90,.2); }
+
+/* ── Tabs ─────────────────────────────────────── */
+.tabs { display: flex; gap: 2px; margin-bottom: 16px; background: var(--bg-mantle); border-radius: 8px; padding: 3px; }
+.tab {
+  padding: 7px 14px; border-radius: 6px; font-size: 13px;
+  cursor: pointer; color: var(--subtext0); transition: all .2s;
+  flex: 1; text-align: center; user-select: none;
+}
+.tab:hover { color: var(--text); background: rgba(69,71,90,.2); }
+.tab.active { background: var(--surface0); color: var(--text); font-weight: 600; }
+
+/* ── Modal ────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  z-index: 1000; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--surface0); border: 1px solid var(--surface1);
+  border-radius: 12px; padding: 24px; width: 90%; max-width: 480px;
+  max-height: 80vh; overflow-y: auto;
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+.modal h2 { font-size: 18px; margin-bottom: 16px; }
+.modal .form-group { margin-bottom: 14px; }
+.modal .form-group label { display: block; font-size: 12px; color: var(--subtext0); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .4px; }
+.modal .form-group input, .modal .form-group textarea, .modal .form-group select { width: 100%; }
+.modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+/* ── Progress rings (SVG) ─────────────────────── */
+.progress-ring { display: inline-block; }
+.progress-ring circle { fill: none; stroke-linecap: round; }
+.progress-ring .bg { stroke: var(--surface1); }
+.progress-ring .fg { transition: stroke-dashoffset .4s; }
+
+/* ── Sparkline / Charts ───────────────────────── */
+.chart-container { margin: 12px 0; }
+.chart-container svg { width: 100%; display: block; }
+
+/* ── Habit dots ───────────────────────────────── */
+.habit-dots { display: flex; gap: 3px; flex-wrap: wrap; }
+.habit-dot {
+  width: 12px; height: 12px; border-radius: 2px;
+  background: var(--surface1); transition: background .15s;
+}
+.habit-dot.done { background: var(--green); }
+.habit-dot.missed { background: var(--surface1); }
+.habit-dot.today { border: 1px solid var(--gold); }
+
+/* ── Slider group ─────────────────────────────── */
+.slider-group { margin-bottom: 12px; }
+.slider-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--subtext0); margin-bottom: 4px; }
+.slider-label .val { color: var(--text); font-weight: 700; }
+
+/* ── Timeline blocks ──────────────────────────── */
+.timeline-block {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 6px; font-size: 13px;
+  background: var(--bg-mantle); border-left: 3px solid var(--surface2);
+  margin-bottom: 4px; transition: all .2s;
+}
+.timeline-block:hover { background: rgba(69,71,90,.2); }
+.timeline-block.current {
+  border-left-color: var(--blue); background: rgba(137,180,250,.08);
+}
+.timeline-block .time { color: var(--overlay0); min-width: 100px; font-size: 12px; font-family: monospace; }
+.timeline-block .block-label { flex: 1; }
+.timeline-block .block-cat { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: var(--surface1); color: var(--subtext0); }
+
+/* ── Focus timer ──────────────────────────────── */
+.focus-timer-display { text-align: center; padding: 20px 0; }
+.focus-timer-display .time-text { font-size: 48px; font-weight: 700; font-family: monospace; letter-spacing: 2px; }
+.focus-timer-display .session-label { color: var(--purple); font-size: 14px; margin-top: 4px; }
+.focus-presets { display: flex; gap: 10px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+.preset-btn {
+  background: var(--bg-mantle); border: 1px solid var(--surface1);
+  color: var(--text); padding: 10px 20px; border-radius: 8px;
+  cursor: pointer; font-size: 14px; text-align: center; transition: all .2s;
+}
+.preset-btn:hover { border-color: var(--purple); background: rgba(203,166,247,.08); transform: translateY(-2px); }
+.preset-btn .mins { font-size: 22px; font-weight: 700; display: block; }
+.preset-btn .type { font-size: 11px; color: var(--subtext0); }
+
+/* ── Goal hierarchy ───────────────────────────── */
+.goal-level { margin-bottom: 20px; }
+.goal-level-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.goal-level-header h3 { margin: 0; font-size: 14px; }
+.goal-card {
+  background: var(--bg-mantle); border-radius: 8px; padding: 14px;
+  margin-bottom: 8px; border-left: 3px solid var(--surface2);
+  transition: all .2s;
+}
+.goal-card:hover { background: rgba(69,71,90,.2); }
+.goal-card .goal-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.goal-card .goal-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--subtext0); }
+.goal-progress-inline {
+  flex: 1; max-width: 120px; height: 6px; background: var(--surface1);
+  border-radius: 3px; overflow: hidden;
+}
+.goal-progress-inline .fill { height: 100%; border-radius: 3px; transition: width .3s; }
+.goal-children-list { padding-left: 16px; border-left: 1px solid var(--surface1); margin-left: 12px; margin-top: 8px; }
+
+/* Milestone items */
+.milestone-item {
+  display: flex; align-items: center; gap: 8px; padding: 4px 8px;
+  font-size: 12px; border-radius: 4px; margin-bottom: 2px;
+  transition: background .15s;
+}
+.milestone-item:hover { background: rgba(69,71,90,.2); }
+.milestone-check { width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--surface2); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
+.milestone-check.done { background: var(--green); border-color: var(--green); }
+.milestone-check.done::after { content: '✓'; color: var(--bg-crust); font-size: 9px; font-weight: 700; }
+.milestone-text { flex: 1; }
+.milestone-text.done { text-decoration: line-through; color: var(--overlay0); }
+.key-results { margin-top: 6px; padding-left: 12px; border-left: 2px solid var(--surface1); }
+.key-result { font-size: 12px; color: var(--subtext0); padding: 2px 0; }
+
+/* ── Journal ──────────────────────────────────── */
+.mood-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+.mood-btn {
+  font-size: 24px; cursor: pointer; padding: 6px 10px;
+  border-radius: 8px; border: 2px solid transparent;
+  background: var(--bg-mantle); transition: all .2s;
+}
+.mood-btn:hover { border-color: var(--surface2); transform: scale(1.1); }
+.mood-btn.selected { border-color: var(--gold); background: rgba(232,168,56,.1); transform: scale(1.15); }
+.journal-entry {
+  background: var(--bg-mantle); border-radius: 8px; padding: 14px;
+  margin-bottom: 8px; transition: all .2s;
+}
+.journal-entry:hover { background: rgba(69,71,90,.2); }
+.journal-entry .date { font-size: 12px; color: var(--overlay0); margin-bottom: 6px; }
+.journal-entry .mood-display { font-size: 18px; float: right; }
+
+/* Energy battery */
+.energy-selector { display: flex; gap: 6px; margin-bottom: 12px; }
+.energy-btn {
+  font-size: 20px; cursor: pointer; padding: 4px 6px;
+  border-radius: 6px; border: 2px solid transparent;
+  background: var(--bg-mantle); transition: all .2s; opacity: .4;
+}
+.energy-btn:hover { opacity: .7; }
+.energy-btn.active { opacity: 1; border-color: var(--yellow); }
+
+/* Journal prompt */
+.journal-prompt {
+  background: rgba(137,180,250,.06); border: 1px solid rgba(137,180,250,.15);
+  border-radius: 8px; padding: 12px; margin-bottom: 12px;
+  font-size: 13px; color: var(--subtext1); font-style: italic;
+  display: flex; align-items: center; gap: 8px;
+}
+.journal-prompt .refresh-btn { cursor: pointer; opacity: .6; transition: opacity .15s; }
+.journal-prompt .refresh-btn:hover { opacity: 1; }
+
+/* ── Life Agent / Rules ───────────────────────── */
+.rule-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; background: var(--bg-mantle); border-radius: 8px;
+  margin-bottom: 6px; transition: all .2s;
+}
+.rule-item:hover { background: rgba(69,71,90,.2); }
+.rule-item .rule-text { flex: 1; font-size: 13px; }
+.rule-toggle {
+  position: relative; width: 36px; height: 20px;
+  background: var(--surface2); border-radius: 10px;
+  cursor: pointer; transition: background .2s;
+}
+.rule-toggle.on { background: var(--green); }
+.rule-toggle .knob {
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: white; transition: left .2s;
+}
+.rule-toggle.on .knob { left: 18px; }
+
+/* Life Agent capability row */
+.capability-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; background: var(--bg-mantle); border-radius: 8px;
+  margin-bottom: 6px; transition: all .2s;
+}
+.capability-row:hover { background: rgba(69,71,90,.2); }
+.capability-row .cap-icon { font-size: 18px; width: 28px; text-align: center; }
+.capability-row .cap-info { flex: 1; }
+.capability-row .cap-name { font-size: 13px; font-weight: 600; }
+.capability-row .cap-desc { font-size: 11px; color: var(--subtext0); margin-top: 2px; }
+
+/* Personality section */
+.personality-group { margin-bottom: 16px; }
+.personality-group label { font-size: 12px; color: var(--subtext0); margin-bottom: 6px; display: block; }
+.radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.radio-pill {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+  background: var(--bg-mantle); border: 1px solid var(--surface1); color: var(--subtext0);
+  transition: all .2s; user-select: none;
+}
+.radio-pill:hover { border-color: var(--surface2); color: var(--text); }
+.radio-pill.active { background: rgba(232,168,56,.12); border-color: var(--gold); color: var(--gold); font-weight: 600; }
+
+.proactivity-slider { width: 100%; margin-top: 6px; accent-color: var(--gold); }
+.proactivity-value { font-size: 13px; color: var(--gold); font-weight: 600; margin-left: 8px; }
+
+/* Context display */
+.context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.context-stat {
+  padding: 10px 14px; background: var(--bg-mantle); border-radius: 8px;
+  font-size: 13px; display: flex; align-items: center; gap: 8px;
+}
+.context-stat .stat-icon { font-size: 16px; }
+.context-stat .stat-value { color: var(--text); font-weight: 600; }
+.context-stat .stat-label { color: var(--subtext0); font-size: 11px; }
+
+/* ── Interview / Therapist ────────────────────── */
+.interview-container {
+  display: flex; height: calc(100vh - 80px); gap: 0;
+}
+.interview-chat {
+  flex: 1; display: flex; flex-direction: column; min-width: 0;
+}
+.interview-messages {
+  flex: 1; overflow-y: auto; padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.interview-input-bar {
+  padding: 12px 16px; border-top: 1px solid var(--surface0);
+  display: flex; gap: 8px; align-items: flex-end;
+  background: var(--bg-mantle);
+}
+.interview-input-bar textarea {
+  flex: 1; resize: none; background: var(--surface0); border: 1px solid var(--surface1);
+  border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 13px;
+  font-family: inherit; line-height: 1.4;
+}
+.interview-input-bar textarea:focus { border-color: var(--purple); outline: none; }
+.interview-input-bar button {
+  padding: 10px 18px; border-radius: 8px; background: var(--purple);
+  color: var(--bg-crust); border: none; font-weight: 600; cursor: pointer;
+  font-size: 13px; transition: all .2s; white-space: nowrap;
+}
+.interview-input-bar button:hover { filter: brightness(1.1); }
+
+.interview-sidebar {
+  width: 260px; min-width: 260px; border-left: 1px solid var(--surface0);
+  background: var(--bg-mantle); overflow-y: auto; padding: 16px;
+  transition: all .3s;
+}
+.interview-sidebar.collapsed { width: 0; min-width: 0; padding: 0; overflow: hidden; }
+.interview-sidebar h4 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--subtext0); margin-bottom: 12px;
+}
+.interview-sidebar .ctx-block {
+  margin-bottom: 14px; padding: 10px; background: var(--surface0);
+  border-radius: 6px; font-size: 12px;
+}
+.interview-sidebar .ctx-block .ctx-label {
+  color: var(--subtext0); font-size: 10px; text-transform: uppercase;
+  letter-spacing: .5px; margin-bottom: 4px;
+}
+.interview-sidebar .ctx-block .ctx-value { color: var(--text); }
+
+/* Chat bubbles */
+.msg-row {
+  display: flex; gap: 8px; align-items: flex-start;
+  animation: msgSlideUp .3s ease;
+}
+.msg-row.user { flex-direction: row-reverse; }
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 16px;
+  flex-shrink: 0;
+}
+.msg-row.therapist .msg-avatar { background: var(--surface1); }
+.msg-row.user .msg-avatar { background: var(--surface0); }
+.msg-bubble {
+  max-width: 70%; padding: 10px 14px; border-radius: 12px;
+  font-size: 13px; line-height: 1.5; word-wrap: break-word;
+}
+.msg-row.therapist .msg-bubble {
+  background: var(--surface1); border-top-left-radius: 4px;
+}
+.msg-row.user .msg-bubble {
+  background: var(--surface0); border-top-right-radius: 4px;
+}
+.msg-time {
+  font-size: 10px; color: var(--overlay0); margin-top: 4px;
+}
+.msg-row.user .msg-time { text-align: right; }
+
+/* Action buttons in therapist messages */
+.msg-action-btn {
+  display: inline-block; margin-top: 8px; padding: 4px 12px;
+  border-radius: 6px; font-size: 11px; font-weight: 600;
+  background: rgba(232,168,56,.12); border: 1px solid rgba(232,168,56,.3);
+  color: var(--gold); cursor: pointer; transition: all .2s;
+}
+.msg-action-btn:hover { background: rgba(232,168,56,.2); }
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex; gap: 4px; padding: 10px 14px;
+  background: var(--surface1); border-radius: 12px;
+  border-top-left-radius: 4px; width: fit-content;
+}
+.typing-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--overlay0); animation: typingPulse 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+
+@keyframes typingPulse {
+  0%, 60%, 100% { opacity: .3; transform: scale(.8); }
+  30% { opacity: 1; transform: scale(1); }
+}
+@keyframes msgSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Session history */
+.session-history-item {
+  padding: 8px 10px; background: var(--bg-base); border-radius: 6px;
+  margin-bottom: 4px; cursor: pointer; transition: all .2s; font-size: 12px;
+}
+.session-history-item:hover { background: var(--surface0); }
+.session-history-item .sh-date { color: var(--subtext0); font-size: 10px; }
+.session-history-item .sh-summary { color: var(--text); margin-top: 2px; }
+
+/* Toggle sidebar button */
+.sidebar-toggle-btn {
+  position: absolute; top: 12px; right: 12px; background: var(--surface0);
+  border: 1px solid var(--surface1); border-radius: 6px; padding: 4px 8px;
+  color: var(--subtext0); cursor: pointer; font-size: 12px; z-index: 10;
+  transition: all .2s;
+}
+.sidebar-toggle-btn:hover { color: var(--text); border-color: var(--surface2); }
+
+/* ── Distraction log ──────────────────────────── */
+.distraction-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; font-size: 12px; color: var(--subtext0);
+  background: var(--bg-mantle); border-radius: 4px; margin-bottom: 3px;
+}
+.distraction-item .ts { color: var(--overlay0); min-width: 50px; font-family: monospace; }
+
+/* ── Analytics bars ───────────────────────────── */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-top: 8px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar-col .bar {
+  width: 100%; border-radius: 4px 4px 0 0; transition: height .3s;
+  min-height: 2px;
+}
+.bar-col .bar-label { font-size: 10px; color: var(--overlay0); }
+.bar-col .bar-value { font-size: 10px; color: var(--subtext0); font-weight: 600; }
+
+/* ── Contribution graph ───────────────────────── */
+.contrib-graph { display: grid; grid-template-columns: repeat(7, 14px); gap: 2px; }
+.contrib-cell {
+  width: 14px; height: 14px; border-radius: 2px;
+  background: var(--surface1);
+}
+.contrib-cell.l1 { background: rgba(166,227,161,.25); }
+.contrib-cell.l2 { background: rgba(166,227,161,.5); }
+.contrib-cell.l3 { background: rgba(166,227,161,.75); }
+.contrib-cell.l4 { background: var(--green); }
+
+/* ── Suggestion card ──────────────────────────── */
+.suggestion-card {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px; background: rgba(232,168,56,.06); border: 1px solid rgba(232,168,56,.2);
+  border-radius: 8px; margin-bottom: 8px; transition: all .2s;
+}
+.suggestion-card:hover { background: rgba(232,168,56,.1); }
+.suggestion-card .icon { font-size: 20px; }
+.suggestion-card .content { flex: 1; font-size: 13px; }
+.suggestion-card .actions { display: flex; gap: 6px; }
+
+/* ── Agent Status Widget ──────────────────────── */
+.agent-status-widget {
+  background: var(--bg-mantle); border: 1px solid var(--surface1); border-radius: 8px;
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  transition: all .2s;
+}
+.agent-status-widget:hover { border-color: var(--surface2); }
+.agent-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.agent-status-dot.online { background: var(--green); box-shadow: 0 0 6px rgba(166,227,161,.5); }
+.agent-status-dot.offline { background: var(--red); }
+.agent-status-dot.loading { background: var(--yellow); animation: pulse-dot 1s infinite; }
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+/* ── Calendar ─────────────────────────────────── */
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+}
+.cal-header { font-size: 11px; color: var(--overlay0); text-align: center; padding: 6px 0; font-weight: 600; }
+.cal-cell {
+  min-height: 80px; background: var(--bg-mantle); border-radius: 4px; padding: 4px 6px;
+  font-size: 11px; cursor: pointer; transition: all .2s; border: 1px solid transparent;
+}
+.cal-cell:hover { border-color: var(--surface2); }
+.cal-cell.today { border-color: var(--gold); background: rgba(232,168,56,.06); }
+.cal-cell.other-month { opacity: .3; }
+.cal-day-num { font-weight: 600; margin-bottom: 2px; }
+.cal-event { font-size: 10px; padding: 1px 4px; border-radius: 3px; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-event.focus { background: rgba(203,166,247,.2); color: var(--purple); }
+.cal-event.task { background: rgba(166,227,161,.2); color: var(--green); }
+.cal-event.journal { background: rgba(249,226,175,.2); color: var(--yellow); }
+
+/* ── Review checklist ─────────────────────────── */
+.review-check {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  background: var(--bg-mantle); border-radius: 6px; margin-bottom: 4px;
+  cursor: pointer; transition: all .15s;
+}
+.review-check:hover { background: rgba(69,71,90,.3); }
+.review-check.checked { opacity: .6; }
+.review-check.checked .review-label { text-decoration: line-through; }
+
+/* ── Ambient sound buttons ────────────────────── */
+.ambient-btn {
+  padding: 8px 16px; border-radius: 8px; cursor: pointer;
+  background: var(--bg-mantle); border: 1px solid var(--surface1);
+  color: var(--subtext0); font-size: 13px; transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.ambient-btn:hover { border-color: var(--surface2); color: var(--text); }
+.ambient-btn.active { border-color: var(--teal); background: rgba(148,226,213,.08); color: var(--teal); }
+
+/* ── Toast notifications ──────────────────────── */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--surface0); border: 1px solid var(--surface1); border-radius: 8px;
+  padding: 10px 16px; font-size: 13px; min-width: 200px; max-width: 320px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  animation: toastIn .3s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--blue); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Offline Banner ───────────────────────────── */
+.offline-banner {
+  display: none; background: var(--red); color: var(--bg-crust);
+  text-align: center; padding: 6px; font-size: 12px; font-weight: 600;
+  position: fixed; top: 0; left: var(--sidebar-w); right: 0; z-index: 300;
+}
+.offline-banner.show { display: block; }
+
+/* ── Scrollbar ────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--surface2); }
+
+/* ── Drag handle ──────────────────────────────── */
+.drag-handle {
+  cursor: grab; color: var(--surface2); font-size: 14px; flex-shrink: 0;
+  user-select: none; transition: color .15s; padding: 0 2px;
+}
+.drag-handle:hover { color: var(--overlay0); }
+.drag-handle:active { cursor: grabbing; }
+
+/* ── Due date ─────────────────────────────────── */
+.due-date { font-size: 11px; padding: 2px 6px; border-radius: 4px; }
+.due-date.overdue { background: rgba(243,139,168,.15); color: var(--red); font-weight: 600; }
+.due-date.upcoming { background: rgba(249,226,175,.1); color: var(--yellow); }
+.due-date.normal { color: var(--overlay0); }
+
+/* ── Subtask progress bar ─────────────────────── */
+.subtask-progress {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--overlay0);
+}
+.subtask-progress-bar {
+  width: 40px; height: 4px; background: var(--surface1); border-radius: 2px; overflow: hidden;
+}
+.subtask-progress-bar .fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .3s; }
+
+/* ── Quick-add bar ────────────────────────────── */
+.quick-add-bar {
+  display: flex; gap: 8px; padding: 10px 14px; background: var(--bg-mantle);
+  border: 1px solid var(--surface1); border-radius: 10px; margin-bottom: 16px;
+  align-items: center; transition: border-color .2s, box-shadow .2s;
+}
+.quick-add-bar:focus-within { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(137,180,250,.12); }
+.quick-add-bar input {
+  flex: 1; background: transparent; border: none; color: var(--text);
+  font-size: 14px; outline: none;
+}
+.quick-add-bar input::placeholder { color: var(--overlay0); }
+.quick-add-bar .hint { font-size: 11px; color: var(--surface2); white-space: nowrap; }
+
+/* ── Goal enhancements ────────────────────────── */
+.goal-habits-link { font-size: 11px; color: var(--teal); margin-top: 6px; }
+.goal-habits-link span { background: rgba(148,226,213,.1); padding: 2px 6px; border-radius: 4px; margin-right: 4px; }
+.goal-countdown { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(137,180,250,.1); color: var(--blue); }
+.goal-countdown.urgent { background: rgba(243,139,168,.1); color: var(--red); }
+
+/* ── Habit heat map ───────────────────────────── */
+.habit-heatmap { display: flex; flex-direction: column; gap: 8px; }
+.habit-heatmap-row { display: flex; align-items: center; gap: 10px; }
+.habit-heatmap-row .habit-name { font-size: 13px; font-weight: 600; min-width: 100px; }
+.habit-heatmap-row .habit-stats { font-size: 11px; color: var(--overlay0); margin-left: auto; min-width: 80px; text-align: right; }
+.habit-category-badge {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex-shrink: 0;
+}
+.streak-fire { color: var(--peach); font-weight: 700; }
+.best-streak { font-size: 10px; color: var(--overlay0); }
+
+/* ── Journal enhancements ─────────────────────── */
+.word-count { font-size: 11px; color: var(--overlay0); text-align: right; margin-top: 4px; }
+.journal-entry-viewer {
+  max-height: 0; overflow: hidden; transition: max-height .3s ease;
+}
+.journal-entry-viewer.open { max-height: 500px; }
+.journal-prompts-section {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+}
+.journal-prompt-chip {
+  font-size: 11px; padding: 4px 10px; border-radius: 16px; cursor: pointer;
+  background: var(--bg-mantle); border: 1px solid var(--surface1); color: var(--subtext0);
+  transition: all .2s;
+}
+.journal-prompt-chip:hover { border-color: var(--blue); color: var(--text); background: rgba(137,180,250,.06); }
+
+/* ── Focus enhancements ───────────────────────── */
+.focus-score-ring {
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+}
+.ambient-btn .status { font-size: 10px; display: block; margin-top: 2px; }
+
+/* ── Dashboard stat cards ─────────────────────── */
+.dash-stat-card {
+  background: var(--bg-mantle); border-radius: 10px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; transition: all .2s;
+  border: 1px solid transparent;
+}
+.dash-stat-card:hover { border-color: var(--surface1); transform: translateY(-1px); }
+.dash-stat-card .icon { font-size: 24px; }
+.dash-stat-card .info { flex: 1; }
+.dash-stat-card .val { font-size: 20px; font-weight: 700; }
+.dash-stat-card .label { font-size: 11px; color: var(--subtext0); }
+
+/* ── Stat boxes border-radius match ──────────── */
+.stat-box { border-radius: 10px; }
+
+/* ── Mobile ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    width: 100%; min-width: unset; height: auto; max-height: 64px;
+    flex-direction: row; border-right: none; border-top: 1px solid var(--surface0);
+    overflow-x: auto; overflow-y: hidden; z-index: 200;
+  }
+  .sidebar-brand, .nav-divider, .nav-back { display: none; }
+  .sidebar-nav {
+    flex-direction: row; padding: 0; width: 100%;
+    justify-content: space-around;
+  }
+  .nav-item {
+    flex-direction: column; padding: 8px 6px; font-size: 10px;
+    gap: 2px; border-left: none; border-top: 2px solid transparent;
+    min-width: 0; flex-shrink: 0;
+  }
+  .nav-item.active { border-left-color: transparent; border-top-color: var(--gold); }
+  .nav-item .label { display: none; }
+  .nav-item .icon { font-size: 18px; }
+  .main { height: calc(100vh - 64px); }
+  .page { padding: 16px; }
+  .card-grid.cols-2, .card-grid.cols-3, .card-grid.cols-4 { grid-template-columns: 1fr; }
+  .offline-banner { left: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="offline-banner" id="offlineBanner">⚠ Bridge offline — using local data</div>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-brand"><span>🧬</span> Life OS</div>
+  <div class="sidebar-nav">
+    <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+      <span class="icon">🏠</span><span class="label">Home</span>
+    </div>
+    <div class="nav-item" data-page="tasks" onclick="navigate('tasks')">
+      <span class="icon">✅</span><span class="label">Tasks</span><span class="badge" id="taskBadge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-page="goals" onclick="navigate('goals')">
+      <span class="icon">🎯</span><span class="label">Goals</span>
+    </div>
+    <div class="nav-item" data-page="focus" onclick="navigate('focus')">
+      <span class="icon">⏱️</span><span class="label">Focus</span>
+    </div>
+    <div class="nav-item" data-page="habits" onclick="navigate('habits')">
+      <span class="icon">⚡</span><span class="label">Habits</span>
+    </div>
+    <div class="nav-item" data-page="journal" onclick="navigate('journal')">
+      <span class="icon">📔</span><span class="label">Journal</span>
+    </div>
+    <div class="nav-item" data-page="calendar" onclick="navigate('calendar')">
+      <span class="icon">📅</span><span class="label">Calendar</span>
+    </div>
+    <div class="nav-item" data-page="review" onclick="navigate('review')">
+      <span class="icon">📊</span><span class="label">Review</span>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" data-page="daily" onclick="navigate('daily')">
+      <span class="icon">🌅</span><span class="label">Daily</span>
+    </div>
+    <div class="nav-item" data-page="braindump" onclick="navigate('braindump')">
+      <span class="icon">🧠</span><span class="label">Brain Dump</span>
+    </div>
+    <div class="nav-item" data-page="notes" onclick="navigate('notes')">
+      <span class="icon">📝</span><span class="label">Notes</span>
+    </div>
+    <div class="nav-item" data-page="interview" onclick="navigate('interview')">
+      <span class="icon">🧠</span><span class="label">Interview</span><span class="badge" id="interviewBadge" style="display:none">1</span>
+    </div>
+    <div class="nav-item" data-page="rules" onclick="navigate('rules')">
+      <span class="icon">🤖</span><span class="label">Life Agent</span>
+    </div>
+  </div>
+  <div class="nav-back">
+    <a href="/app/">🔗 Open in Agent OS</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+<!-- ════════════════ DASHBOARD / HOME ════════════════ -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <h1 id="dashGreeting">Good morning 👋</h1>
+    <div class="subtitle" id="dashSummary">Loading...</div>
+  </div>
+
+  <!-- Dashboard Stats Row -->
+  <div class="card-grid cols-4" id="dashStatsRow" style="margin-bottom:16px">
+    <div class="dash-stat-card"><span class="icon">✅</span><div class="info"><div class="val" id="dashTaskCount">0</div><div class="label">tasks today</div></div></div>
+    <div class="dash-stat-card"><span class="icon">⚡</span><div class="info"><div class="val" id="dashHabitStatus">—</div><div class="label">habits done</div></div></div>
+    <div class="dash-stat-card"><span class="icon">🎯</span><div class="info"><div class="val" id="dashGoalProgress">—</div><div class="label">goal progress</div></div></div>
+    <div class="dash-stat-card"><span class="icon">⏱️</span><div class="info"><div class="val" id="dashFocusTime">0m</div><div class="label">focus today</div></div></div>
+  </div>
+
+  <!-- Last Journal Mood + Focus Score -->
+  <div class="card-grid cols-2" style="margin-bottom:16px">
+    <div class="dash-stat-card">
+      <span class="icon">📔</span>
+      <div class="info">
+        <div class="val" id="dashLastMood">—</div>
+        <div class="label">last journal mood</div>
+      </div>
+    </div>
+    <div class="dash-stat-card">
+      <span class="icon">🧘</span>
+      <div class="info">
+        <div class="val" id="dashFocusScore">—</div>
+        <div class="label">focus score today</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent OS Integration row -->
+  <div class="card-grid cols-2" style="margin-bottom:16px">
+    <div class="card" style="padding:14px">
+      <h3>🤖 Agent Status</h3>
+      <div id="agentStatusWidget">
+        <div class="agent-status-widget">
+          <div class="agent-status-dot loading"></div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">Checking...</div>
+            <div style="font-size:11px;color:var(--overlay0)">Connecting to Agent OS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px">
+      <h3>📋 Pending Decisions</h3>
+      <div id="pendingDecisions">
+        <div class="agent-status-widget">
+          <div style="font-size:24px;font-weight:700;color:var(--yellow)" id="pendingCount">—</div>
+          <div style="flex:1">
+            <div style="font-size:13px">proposals awaiting review</div>
+            <div style="font-size:11px;color:var(--overlay0)">from agent system</div>
+          </div>
+          <a href="/app/" class="btn sm ghost" style="text-decoration:none">View →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid cols-3" style="margin-bottom:16px">
+    <div class="card">
+      <h3>🎯 Today's Priorities</h3>
+      <div id="dashPriorities"><div class="empty"><span class="empty-icon">🎯</span>No priorities set<div class="empty-hint">Set intentions in Daily view</div></div></div>
+      <div style="margin-top:10px" id="dashFocusStatus"></div>
+    </div>
+    <div class="card">
+      <h3>📈 7-Day Trends</h3>
+      <div class="chart-container" id="dashSparklines">
+        <svg viewBox="0 0 240 100" preserveAspectRatio="none" style="height:100px">
+          <text x="4" y="12" fill="var(--yellow)" font-size="9">Energy</text>
+          <text x="80" y="12" fill="var(--blue)" font-size="9">Focus</text>
+          <text x="140" y="12" fill="var(--pink)" font-size="9">Mood</text>
+          <path id="dashSparkEnergy" fill="none" stroke="var(--yellow)" stroke-width="2" stroke-linecap="round" d=""/>
+          <path id="dashSparkFocus" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" d=""/>
+          <path id="dashSparkMood" fill="none" stroke="var(--pink)" stroke-width="2" stroke-linecap="round" d=""/>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <h3>⚡ Today's Habits</h3>
+      <div id="dashHabits"><div class="empty"><span class="empty-icon">⚡</span>No habits defined<div class="empty-hint">Add habits in ⚡ Habits view</div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🤖 Agent Suggestions</h3>
+    <div id="dashSuggestions"><div class="empty"><span class="empty-icon">💡</span>No suggestions from agents</div></div>
+  </div>
+</div>
+
+<!-- ════════════════ TASKS ════════════════ -->
+<div class="page" id="page-tasks">
+  <div class="page-header">
+    <h1>✅ Tasks</h1>
+    <div class="subtitle">GTD-inspired task management</div>
+  </div>
+  <div class="tabs" id="taskTabs">
+    <div class="tab active" onclick="switchTaskTab('inbox')">📥 Inbox</div>
+    <div class="tab" onclick="switchTaskTab('today')">📌 Today</div>
+    <div class="tab" onclick="switchTaskTab('scheduled')">📅 Scheduled</div>
+    <div class="tab" onclick="switchTaskTab('someday')">💭 Someday</div>
+    <div class="tab" onclick="switchTaskTab('completed')">✅ Done</div>
+  </div>
+
+  <!-- Quick-add bar -->
+  <div class="quick-add-bar">
+    <span style="color:var(--blue);font-size:16px">+</span>
+    <input type="text" id="quickAddInput" placeholder="Quick add task — press Enter..." onkeydown="if(event.key==='Enter')quickAddTask()">
+    <span class="hint">⏎ Enter</span>
+  </div>
+
+  <!-- Tag filter bar -->
+  <div id="taskTagFilter" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px"></div>
+
+  <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap">
+    <input type="text" id="newTaskInput" placeholder="Add a new task..." style="flex:1;min-width:200px" onkeydown="if(event.key==='Enter')addTask()">
+    <select id="newTaskPriority" style="width:70px">
+      <option value="p1">P1</option>
+      <option value="p2" selected>P2</option>
+      <option value="p3">P3</option>
+      <option value="p0">P0</option>
+    </select>
+    <select id="newTaskEstimate" style="width:85px">
+      <option value="">Est...</option>
+      <option value="small">🟢 Small</option>
+      <option value="medium">🟡 Medium</option>
+      <option value="large">🔴 Large</option>
+    </select>
+    <input type="date" id="newTaskDue" style="width:140px" title="Due date">
+    <input type="text" id="newTaskTags" placeholder="Tags (comma sep)" style="width:140px">
+    <button class="btn" onclick="addTask()">Add</button>
+  </div>
+  <div id="taskList"></div>
+</div>
+
+<!-- ════════════════ GOALS ════════════════ -->
+<div class="page" id="page-goals">
+  <div class="page-header">
+    <h1>🎯 Goals</h1>
+    <div class="subtitle">Aspirations → Missions → Plans → Tasks (OKR-style)</div>
+  </div>
+  <div id="goalsContent"></div>
+</div>
+
+<!-- ════════════════ FOCUS ════════════════ -->
+<div class="page" id="page-focus">
+  <div class="page-header">
+    <h1>⏱️ Focus</h1>
+    <div class="subtitle">Deep work sessions & distraction tracking</div>
+  </div>
+
+  <!-- Currently focused on -->
+  <div id="focusCurrentTask" style="margin-bottom:16px;display:none">
+    <div class="card" style="padding:12px;border-left:3px solid var(--purple)">
+      <div style="font-size:12px;color:var(--overlay0);margin-bottom:2px">Currently focused on:</div>
+      <div id="focusCurrentTaskName" style="font-size:14px;font-weight:600"></div>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center">
+    <svg id="focusRing" width="200" height="200" viewBox="0 0 200 200" style="margin:0 auto; display:block">
+      <circle cx="100" cy="100" r="88" fill="none" stroke="var(--surface1)" stroke-width="10"/>
+      <circle id="focusArc" cx="100" cy="100" r="88" fill="none" stroke="var(--purple)" stroke-width="10"
+        stroke-dasharray="553" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 100 100)" style="transition:stroke-dashoffset .5s"/>
+      <text x="100" y="95" text-anchor="middle" fill="var(--text)" font-size="36" font-weight="700" font-family="monospace" id="focusTimeDisplay">00:00</text>
+      <text x="100" y="118" text-anchor="middle" fill="var(--purple)" font-size="13" id="focusTaskDisplay"></text>
+    </svg>
+
+    <div id="focusStartControls" style="margin-top:16px">
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+        <select id="focusTaskSelect" style="width:220px">
+          <option value="">Select a task...</option>
+        </select>
+        <input type="text" id="focusTaskName" placeholder="Or type what you're working on..." style="width:220px">
+      </div>
+      <div class="focus-presets">
+        <div class="preset-btn" onclick="startFocus(25,5,'Pomodoro')"><span class="mins">25</span><span class="type">Pomodoro (5m break)</span></div>
+        <div class="preset-btn" onclick="startFocus(50,10,'Deep Work')"><span class="mins">50</span><span class="type">Deep Work (10m break)</span></div>
+        <div class="preset-btn" onclick="startFocus(90,0,'Flow State')"><span class="mins">90</span><span class="type">Flow State</span></div>
+      </div>
+      <div style="margin-top:12px">
+        <span style="font-size:12px;color:var(--overlay0)">Custom:</span>
+        <input type="number" id="customFocusMins" placeholder="mins" style="width:60px;margin:0 4px" min="1" max="240">
+        <input type="number" id="customBreakMins" placeholder="break" style="width:60px;margin:0 4px" min="0" max="30">
+        <button class="btn sm purple" onclick="startCustomFocus()">Start</button>
+      </div>
+    </div>
+    <div id="focusActiveControls" style="display:none; margin-top:16px">
+      <button class="btn danger" onclick="stopFocus()" style="margin-right:8px">⏹ Stop</button>
+      <button class="btn ghost" onclick="logDistraction()">😵 I got distracted</button>
+    </div>
+    <div id="focusBreakControls" style="display:none; margin-top:16px">
+      <div style="font-size:14px;color:var(--green);margin-bottom:8px">☕ Break time!</div>
+      <button class="btn green" onclick="skipBreak()">Skip Break</button>
+    </div>
+  </div>
+
+  <!-- Ambient sounds -->
+  <div class="card" style="margin-top:16px">
+    <h3>🔊 Ambient Sounds</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div class="ambient-btn" id="amb-rain" onclick="toggleAmbient('rain')">🌧️ Rain</div>
+      <div class="ambient-btn" id="amb-coffee" onclick="toggleAmbient('coffee')">☕ Coffee Shop</div>
+      <div class="ambient-btn" id="amb-fire" onclick="toggleAmbient('fire')">🔥 Fireplace</div>
+      <div class="ambient-btn" id="amb-forest" onclick="toggleAmbient('forest')">🌲 Forest</div>
+    </div>
+  </div>
+
+  <!-- Daily focus stats -->
+  <div class="card-grid cols-4" style="margin-top:16px">
+    <div class="stat-box"><div class="val" id="focusTotalToday" style="color:var(--purple)">0</div><div class="label">min today</div></div>
+    <div class="stat-box"><div class="val" id="focusSessionsToday" style="color:var(--blue)">0</div><div class="label">sessions</div></div>
+    <div class="stat-box"><div class="val" id="focusStreak" style="color:var(--green)">0</div><div class="label">day streak</div></div>
+    <div class="stat-box"><div class="val" id="focusDeepScore" style="color:var(--gold)">-</div><div class="label">deep score</div></div>
+  </div>
+
+  <div class="card-grid cols-2" style="margin-top:16px">
+    <div class="card">
+      <h3>📋 Today's Sessions</h3>
+      <div id="focusSessionLog"><div class="empty"><span class="empty-icon">⏱️</span>No sessions yet<div class="empty-hint">Start a focus session above</div></div></div>
+    </div>
+    <div class="card">
+      <h3>😵 Distraction Log</h3>
+      <div id="distractionLog"><div class="empty"><span class="empty-icon">🧘</span>No distractions — nice!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ HABITS ════════════════ -->
+<div class="page" id="page-habits">
+  <div class="page-header">
+    <h1>⚡ Habits</h1>
+    <div class="subtitle">Daily tracking & streaks</div>
+  </div>
+
+  <div class="card">
+    <h3>Today's Habits</h3>
+    <div id="habitTodayList"><div class="empty"><span class="empty-icon">⚡</span>No habits defined yet<div class="empty-hint">Add one below to start tracking</div></div></div>
+  </div>
+
+  <div class="card">
+    <h3>Habit Streaks</h3>
+    <div id="habitStreaks"><div class="empty">Add habits to see streaks</div></div>
+  </div>
+
+  <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
+    <input type="text" id="newHabitName" placeholder="New habit name..." style="flex:1;min-width:160px">
+    <select id="newHabitFreq" style="width:100px">
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+    </select>
+    <select id="newHabitCategory" style="width:120px">
+      <option value="health">💪 Health</option>
+      <option value="mind">🧠 Mind</option>
+      <option value="work">💼 Work</option>
+      <option value="social">🤝 Social</option>
+      <option value="creative">🎨 Creative</option>
+      <option value="other">📦 Other</option>
+    </select>
+    <button class="btn green" onclick="addHabit()">+ Add Habit</button>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>🤖 Suggested Habits</h3>
+    <div id="habitSuggestions"><div class="empty">No agent suggestions</div></div>
+  </div>
+</div>
+
+<!-- ════════════════ JOURNAL ════════════════ -->
+<div class="page" id="page-journal">
+  <div class="page-header">
+    <h1>📔 Journal</h1>
+    <div class="subtitle">Daily reflections & gratitude</div>
+  </div>
+
+  <!-- Daily prompt -->
+  <div class="journal-prompt" id="journalPrompt">
+    <span>💭</span>
+    <span id="journalPromptText">Loading prompt...</span>
+    <span class="refresh-btn" onclick="refreshPrompt()">🔄</span>
+  </div>
+
+  <div class="card">
+    <h3>How are you feeling?</h3>
+    <div class="mood-selector">
+      <div class="mood-btn" onclick="selectMood('😢')">😢</div>
+      <div class="mood-btn" onclick="selectMood('😐')">😐</div>
+      <div class="mood-btn" onclick="selectMood('🙂')">🙂</div>
+      <div class="mood-btn" onclick="selectMood('😊')">😊</div>
+      <div class="mood-btn" onclick="selectMood('🤩')">🤩</div>
+    </div>
+
+    <h3 style="margin-top:12px">Energy Level</h3>
+    <div class="energy-selector" id="energySelector">
+      <div class="energy-btn" onclick="selectEnergy(1)" data-level="1">🪫</div>
+      <div class="energy-btn" onclick="selectEnergy(2)" data-level="2">🔋</div>
+      <div class="energy-btn" onclick="selectEnergy(3)" data-level="3">🔋</div>
+      <div class="energy-btn" onclick="selectEnergy(4)" data-level="4">🔋</div>
+      <div class="energy-btn" onclick="selectEnergy(5)" data-level="5">⚡</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <div>
+        <label style="font-size:12px; color:var(--subtext0); display:block; margin-bottom:4px">What are you grateful for?</label>
+        <textarea id="journalGratitude" rows="2" style="width:100%" placeholder="Three things..." oninput="updateWordCount()"></textarea>
+      </div>
+      <div>
+        <label style="font-size:12px; color:var(--subtext0); display:block; margin-bottom:4px">Reflection</label>
+        <textarea id="journalReflection" rows="3" style="width:100%" placeholder="How was your day? What did you learn?" oninput="updateWordCount()"></textarea>
+        <div class="word-count" id="journalWordCount">0 words</div>
+      </div>
+      <div>
+        <label style="font-size:12px; color:var(--subtext0); display:block; margin-bottom:4px">💡 Prompts</label>
+        <div class="journal-prompts-section" id="journalPromptChips"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn gold" onclick="saveJournalEntry()">💾 Save Entry</button>
+      <button class="btn ghost" onclick="saveToVault()">🗃️ Save to Vault</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📖 Past Entries</h3>
+    <div id="journalEntries"><div class="empty"><span class="empty-icon">📝</span>No journal entries yet<div class="empty-hint">Start writing above!</div></div></div>
+  </div>
+</div>
+
+<!-- ════════════════ CALENDAR ════════════════ -->
+<div class="page" id="page-calendar">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <h1>📅 Calendar</h1>
+      <div style="display:flex;gap:4px;margin-left:auto">
+        <button class="btn sm ghost" onclick="changeCalMonth(-1)">◀</button>
+        <span id="calMonthLabel" style="font-size:16px;font-weight:600;min-width:140px;text-align:center"></span>
+        <button class="btn sm ghost" onclick="changeCalMonth(1)">▶</button>
+        <button class="btn sm" onclick="calToday()" style="margin-left:8px">Today</button>
+      </div>
+    </div>
+    <div class="subtitle">Focus sessions, completed tasks & journal entries</div>
+  </div>
+  <div class="card">
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+  <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--overlay0)">
+    <span><span class="cal-event focus" style="display:inline-block;width:8px;height:8px;border-radius:2px"></span> Focus</span>
+    <span><span class="cal-event task" style="display:inline-block;width:8px;height:8px;border-radius:2px"></span> Task</span>
+    <span><span class="cal-event journal" style="display:inline-block;width:8px;height:8px;border-radius:2px"></span> Journal</span>
+  </div>
+</div>
+
+<!-- ════════════════ REVIEW ════════════════ -->
+<div class="page" id="page-review">
+  <div class="page-header">
+    <h1>📊 Weekly Review</h1>
+    <div class="subtitle" id="reviewSubtitle">Review your week and plan ahead</div>
+  </div>
+
+  <div class="card-grid cols-3" style="margin-bottom:16px">
+    <div class="stat-box"><div class="val" style="color:var(--green)" id="reviewTasksDone">0</div><div class="label">tasks completed</div></div>
+    <div class="stat-box"><div class="val" style="color:var(--purple)" id="reviewFocusTime">0h</div><div class="label">focus time</div></div>
+    <div class="stat-box"><div class="val" style="color:var(--yellow)" id="reviewJournalCount">0</div><div class="label">journal entries</div></div>
+  </div>
+
+  <div class="card-grid cols-2">
+    <div class="card">
+      <h3>📋 Review Checklist</h3>
+      <div id="reviewChecklist"></div>
+    </div>
+    <div class="card">
+      <h3>📈 Weekly Stats</h3>
+      <div id="reviewStats"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>📝 Weekly Summary</h3>
+    <div id="reviewSummary" style="font-size:13px;color:var(--subtext0)">
+      <div class="empty"><span class="empty-icon">📝</span>Click "Generate Review" to see your weekly summary</div>
+    </div>
+    <button class="btn gold" style="margin-top:12px" onclick="generateReview()">✨ Generate Review</button>
+  </div>
+</div>
+
+<!-- ════════════════ DAILY ════════════════ -->
+<div class="page" id="page-daily">
+  <div class="page-header">
+    <h1>🌅 Daily</h1>
+    <div class="subtitle" id="dailyDate"></div>
+  </div>
+
+  <div class="card">
+    <h3>🌅 Morning Intentions</h3>
+    <div style="display:flex; flex-direction:column; gap:8px">
+      <input type="text" id="intention1" placeholder="Priority #1 for today..." onchange="saveIntentions()">
+      <input type="text" id="intention2" placeholder="Priority #2..." onchange="saveIntentions()">
+      <input type="text" id="intention3" placeholder="Priority #3..." onchange="saveIntentions()">
+    </div>
+  </div>
+
+  <div class="card-grid cols-2">
+    <div class="card">
+      <h3>🕐 Time Blocks</h3>
+      <div id="dailyTimeline"></div>
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+        <input type="text" id="blockLabel" placeholder="Block name..." style="flex:1;min-width:120px">
+        <input type="text" id="blockStart" placeholder="09:00" style="width:70px">
+        <input type="text" id="blockEnd" placeholder="11:00" style="width:70px">
+        <select id="blockCat" style="width:90px">
+          <option value="deep">🧠 Deep</option>
+          <option value="meeting">👥 Meeting</option>
+          <option value="admin">📋 Admin</option>
+          <option value="break">☕ Break</option>
+          <option value="exercise">💪 Exercise</option>
+        </select>
+        <button class="btn sm" onclick="addTimeBlock()">Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>⚡ Energy Check-in</h3>
+      <div class="slider-group">
+        <div class="slider-label"><span>🔋 Energy</span><span class="val" id="eVal">5</span></div>
+        <input type="range" min="1" max="10" value="5" id="eSlider" oninput="document.getElementById('eVal').textContent=this.value">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>🎯 Focus</span><span class="val" id="fVal">5</span></div>
+        <input type="range" min="1" max="10" value="5" id="fSlider" oninput="document.getElementById('fVal').textContent=this.value">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label"><span>😊 Mood</span><span class="val" id="mVal">5</span></div>
+        <input type="range" min="1" max="10" value="5" id="mSlider" oninput="document.getElementById('mVal').textContent=this.value">
+      </div>
+      <button class="btn green" style="width:100%" onclick="logEnergy()">Log Energy</button>
+      <div class="chart-container">
+        <svg viewBox="0 0 240 60" preserveAspectRatio="none" style="height:60px">
+          <path id="energySparkE" fill="none" stroke="var(--yellow)" stroke-width="1.5" stroke-linecap="round" d=""/>
+          <path id="energySparkF" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-linecap="round" d=""/>
+          <path id="energySparkM" fill="none" stroke="var(--pink)" stroke-width="1.5" stroke-linecap="round" d=""/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🌙 Evening Review</h3>
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <div>
+        <label style="font-size:12px; color:var(--subtext0); display:block; margin-bottom:4px">What went well?</label>
+        <textarea id="reviewWell" rows="2" style="width:100%" onchange="saveReview()"></textarea>
+      </div>
+      <div>
+        <label style="font-size:12px; color:var(--subtext0); display:block; margin-bottom:4px">What to improve?</label>
+        <textarea id="reviewImprove" rows="2" style="width:100%" onchange="saveReview()"></textarea>
+      </div>
+      <div>
+        <label style="font-size:12px; color:var(--subtext0); display:block; margin-bottom:4px">Gratitude</label>
+        <textarea id="reviewGratitude" rows="2" style="width:100%" onchange="saveReview()"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ BRAIN DUMP ════════════════ -->
+<div class="page" id="page-braindump">
+  <div class="page-header">
+    <h1>🧠 Brain Dump</h1>
+    <div class="subtitle">Capture everything, process later</div>
+  </div>
+  <div class="card">
+    <textarea id="dumpTextarea" rows="4" style="width:100%" placeholder="Dump your thoughts here... (one per line, or free-form)"></textarea>
+    <div style="display:flex; gap:8px; margin-top:10px">
+      <button class="btn" onclick="captureDump()">💾 Capture</button>
+      <button class="btn purple" onclick="processAllDumps()">⚡ Process All</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📋 Unprocessed Items</h3>
+    <div id="dumpList"></div>
+  </div>
+</div>
+
+<!-- ════════════════ NOTES ════════════════ -->
+<div class="page" id="page-notes">
+  <div class="page-header">
+    <h1>📝 Notes</h1>
+    <div class="subtitle">Quick notes & scratch space</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <input type="text" id="newNoteTitle" placeholder="Note title..." style="flex:1" onkeydown="if(event.key==='Enter')addNote()">
+    <button class="btn" onclick="addNote()">+ New Note</button>
+  </div>
+  <div id="notesList"></div>
+  <div id="noteEditor" style="display:none" class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <button class="btn sm ghost" onclick="closeNoteEditor()">← Back</button>
+      <input type="text" id="noteEditorTitle" style="flex:1;font-size:16px;font-weight:600;background:transparent;border:none;color:var(--text)" onchange="saveCurrentNote()">
+      <button class="btn sm danger" onclick="deleteCurrentNote()">🗑</button>
+    </div>
+    <textarea id="noteEditorContent" style="width:100%;min-height:300px;font-size:13px" onchange="saveCurrentNote()" placeholder="Write your note..."></textarea>
+  </div>
+</div>
+
+<!-- ════════════════ RULES ════════════════ -->
+<div class="page" id="page-rules">
+  <div class="page-header">
+    <h1>🤖 Life Agent</h1>
+    <div class="subtitle">Your personal AI — bridges intent to action across all of Life OS</div>
+  </div>
+
+  <!-- Current Context -->
+  <div class="card">
+    <h3>📡 Current Context</h3>
+    <div class="context-grid" id="agentContextGrid"></div>
+  </div>
+
+  <!-- Capabilities -->
+  <div class="card">
+    <h3>🔐 Capabilities</h3>
+    <div id="capabilitiesList"></div>
+  </div>
+
+  <!-- Personality -->
+  <div class="card">
+    <h3>🎭 Personality</h3>
+    <div class="personality-group">
+      <label>Communication Style</label>
+      <div class="radio-group" id="commStyleGroup">
+        <div class="radio-pill" data-val="supportive" onclick="setPersonality('commStyle', 'supportive')">☀️ Supportive</div>
+        <div class="radio-pill" data-val="direct" onclick="setPersonality('commStyle', 'direct')">⚡ Direct</div>
+        <div class="radio-pill active" data-val="balanced" onclick="setPersonality('commStyle', 'balanced')">⚖️ Balanced</div>
+      </div>
+    </div>
+    <div class="personality-group">
+      <label>Proactivity <span class="proactivity-value" id="proactivityValue">50%</span></label>
+      <input type="range" class="proactivity-slider" id="proactivitySlider" min="0" max="100" value="50" oninput="setProactivity(this.value)">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--overlay0);margin-top:2px"><span>Silent</span><span>Fully proactive</span></div>
+    </div>
+    <div class="personality-group">
+      <label>Check-in Frequency</label>
+      <div class="radio-group" id="checkinGroup">
+        <div class="radio-pill" data-val="never" onclick="setPersonality('checkin', 'never')">Never</div>
+        <div class="radio-pill active" data-val="daily" onclick="setPersonality('checkin', 'daily')">Daily</div>
+        <div class="radio-pill" data-val="twice" onclick="setPersonality('checkin', 'twice')">Twice daily</div>
+        <div class="radio-pill" data-val="hourly" onclick="setPersonality('checkin', 'hourly')">Hourly</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Rules -->
+  <div class="card">
+    <h3>📜 Custom Rules</h3>
+    <div style="display:flex; gap:8px; margin-bottom:12px">
+      <input type="text" id="newRuleInput" placeholder='e.g. "When I haven&apos;t logged energy by 10am, remind me"' style="flex:1" onkeydown="if(event.key==='Enter')addRule()">
+      <button class="btn" onclick="addRule()">+ Add Rule</button>
+    </div>
+    <div id="ruleList"></div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Rule Templates</h3>
+    <div id="ruleTemplates"></div>
+  </div>
+</div>
+
+<!-- ════════════════ INTERVIEW / THERAPIST ════════════════ -->
+<div class="page" id="page-interview" style="padding:0; height:100vh;">
+  <div class="interview-container" style="position:relative;">
+    <div class="interview-chat">
+      <div style="padding:14px 20px; border-bottom:1px solid var(--surface0); display:flex; align-items:center; gap:10px; background:var(--bg-mantle);">
+        <span style="font-size:22px">🧠</span>
+        <div>
+          <div style="font-size:14px; font-weight:700;">Therapist</div>
+          <div style="font-size:11px; color:var(--subtext0);">Reflect · Recognize patterns · Process</div>
+        </div>
+        <button class="sidebar-toggle-btn" style="position:static;margin-left:auto" onclick="toggleInterviewSidebar()">☰ Context</button>
+      </div>
+      <div class="interview-messages" id="interview-messages"></div>
+      <div class="interview-input-bar">
+        <textarea id="interview-input" placeholder="Talk to your therapist..." rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInterviewMessage()}"></textarea>
+        <button onclick="sendInterviewMessage()">Send</button>
+      </div>
+    </div>
+    <div class="interview-sidebar" id="interviewSidebar">
+      <h4>Session Context</h4>
+      <div id="interview-context"></div>
+      <h4 style="margin-top:18px">Session History</h4>
+      <div id="interview-history"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<!-- ═══ Process Modal ═══ -->
+<div class="modal-overlay" id="processModal">
+  <div class="modal">
+    <h2>Process Item</h2>
+    <div style="background:var(--bg-mantle); padding:12px; border-radius:8px; margin-bottom:16px; font-size:14px" id="processItemText"></div>
+    <p style="font-size:13px; color:var(--subtext0); margin-bottom:12px">Where should this go?</p>
+    <div class="actions" style="flex-wrap:wrap; justify-content:center">
+      <button class="btn" onclick="routeDump('task')">✅ Task</button>
+      <button class="btn purple" onclick="routeDump('journal')">📔 Journal</button>
+      <button class="btn gold" onclick="routeDump('vault')">🗃️ Vault Note</button>
+      <button class="btn danger" onclick="routeDump('dismiss')">🗑️ Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Task Process Modal ═══ -->
+<div class="modal-overlay" id="taskProcessModal">
+  <div class="modal">
+    <h2>Process Task</h2>
+    <div style="background:var(--bg-mantle); padding:12px; border-radius:8px; margin-bottom:16px; font-size:14px" id="taskProcessText"></div>
+    <p style="font-size:13px; color:var(--subtext0); margin-bottom:12px">What should happen with this?</p>
+    <div class="actions" style="flex-wrap:wrap; justify-content:center">
+      <button class="btn green" onclick="processTask('do')">⚡ Do it now (&lt;2min)</button>
+      <button class="btn" onclick="processTask('today')">📌 Schedule Today</button>
+      <button class="btn purple" onclick="processTask('scheduled')">📅 Schedule Later</button>
+      <button class="btn ghost" onclick="processTask('someday')">💭 Someday/Maybe</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Dispatch Modal ═══ -->
+<div class="modal-overlay" id="dispatchModal">
+  <div class="modal">
+    <h2>🤖 Delegate to Agent</h2>
+    <div style="background:var(--bg-mantle); padding:12px; border-radius:8px; margin-bottom:16px; font-size:14px" id="dispatchTaskText"></div>
+    <div class="form-group">
+      <label>Additional instructions</label>
+      <textarea id="dispatchInstructions" rows="3" style="width:100%" placeholder="Any specific instructions for the agent..."></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" onclick="closeModal('dispatchModal')">Cancel</button>
+      <button class="btn teal" onclick="confirmDispatch()">🚀 Dispatch</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════
+// Storage helpers
+// ═══════════════════════════════════════════════════
+const LS = {
+  get(key, fallback) {
+    try { const v = localStorage.getItem('life-os-' + key); return v ? JSON.parse(v) : fallback; }
+    catch { return fallback; }
+  },
+  set(key, val) {
+    try { localStorage.setItem('life-os-' + key, JSON.stringify(val)); } catch {}
+  }
+};
+
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function nowISO() { return new Date().toISOString(); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ═══════════════════════════════════════════════════
+// Toast system
+// ═══════════════════════════════════════════════════
+function showToast(message, type = 'info', duration = 3000) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(10px)'; setTimeout(() => toast.remove(), 300); }, duration);
+}
+
+// ═══════════════════════════════════════════════════
+// Bridge API (graceful fallback)
+// ═══════════════════════════════════════════════════
+const AGENT_OS_BASE = 'http://192.168.122.10:18790';
+const Bridge = {
+  online: false,
+  async _fetch(path, opts = {}) {
+    try {
+      const url = path.startsWith('http') ? path : path;
+      const r = await fetch(url, { ...opts, signal: AbortSignal.timeout(3000), headers: { 'Content-Type': 'application/json', ...(opts.headers||{}) } });
+      if (!r.ok) throw new Error(r.status);
+      this.online = true;
+      document.getElementById('offlineBanner').classList.remove('show');
+      return r.json();
+    } catch(e) {
+      this.online = false;
+      return null;
+    }
+  },
+  getSystemOverview() { return this._fetch(AGENT_OS_BASE + '/api/system/overview'); },
+  getPendingProposals() { return this._fetch(AGENT_OS_BASE + '/api/proposals?status=pending'); },
+  getProposals() { return this._fetch('/api/proposals'); },
+  postTask(task) { return this._fetch(AGENT_OS_BASE + '/api/tasks', { method:'POST', body: JSON.stringify(task) }); },
+  postRule(rule) { return this._fetch('/api/agent/rules', { method:'POST', body: JSON.stringify(rule) }); },
+  syncData(key, data) { return this._fetch('/api/life/sync', { method:'POST', body: JSON.stringify({ key, data }) }); },
+  saveToVault(data) { return this._fetch(AGENT_OS_BASE + '/api/vault/write', { method:'POST', body: JSON.stringify(data) }); },
+};
+
+// ═══════════════════════════════════════════════════
+// Navigation with smooth transitions
+// ═══════════════════════════════════════════════════
+let currentPage = 'dashboard';
+
+function navigate(page) {
+  if (currentPage === page) return;
+  const oldPage = document.getElementById('page-' + currentPage);
+  if (oldPage) { oldPage.style.opacity = '0'; oldPage.style.transform = 'translateY(8px)'; }
+
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + page);
+  const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
+
+  setTimeout(() => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    if (pageEl) {
+      pageEl.style.opacity = '0';
+      pageEl.style.transform = 'translateY(8px)';
+      pageEl.classList.add('active');
+      // Force reflow then animate in
+      void pageEl.offsetHeight;
+      requestAnimationFrame(() => {
+        pageEl.style.opacity = '1';
+        pageEl.style.transform = 'translateY(0)';
+      });
+      // Scroll to top
+      document.querySelector('.main').scrollTo(0, 0);
+    }
+    if (navEl) navEl.classList.add('active');
+    const renderers = {
+      dashboard: renderDashboard, daily: renderDaily, goals: renderGoals,
+      tasks: renderTasks, braindump: renderBrainDump, focus: renderFocus,
+      analytics: renderAnalytics, habits: renderHabits, journal: renderJournal,
+      rules: renderLifeAgent, calendar: renderCalendar, review: renderReview,
+      notes: renderNotes, interview: renderInterview,
+    };
+    if (renderers[page]) renderers[page]();
+  }, 120);
+}
+
+// ═══════════════════════════════════════════════════
+// DASHBOARD / HOME
+// ═══════════════════════════════════════════════════
+async function renderDashboard() {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dashGreeting').textContent = greeting + ' 👋';
+
+  const tasks = LS.get('tasks', []);
+  const habits = LS.get('habits', []);
+  const focusSessions = getTodayFocusSessions();
+  const todayTasks = tasks.filter(t => t.bucket === 'today' && !t.done);
+
+  const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  document.getElementById('dashSummary').textContent =
+    `Today is ${dateStr} — ${todayTasks.length} tasks, ${habits.length} habits, ${focusSessions.length} focus sessions`;
+
+  // Wire up dashboard stat cards
+  document.getElementById('dashTaskCount').textContent = todayTasks.length;
+  const habitLog = LS.get('habit-log-' + todayStr(), {});
+  const habitsDone = habits.filter(h => habitLog[h.id]).length;
+  document.getElementById('dashHabitStatus').textContent = habits.length ? `${habitsDone}/${habits.length}` : '—';
+
+  // Goal progress
+  const goals = LS.get('goals', []);
+  if (goals.length) {
+    const avgProg = Math.round(goals.reduce((s, g) => s + calcGoalProgress(g, goals) * 100, 0) / goals.length);
+    document.getElementById('dashGoalProgress').textContent = avgProg + '%';
+  }
+
+  // Focus time today
+  const focusMins = focusSessions.reduce((s, f) => s + (f.mins || 0), 0);
+  document.getElementById('dashFocusTime').textContent = focusMins >= 60 ? Math.floor(focusMins/60) + 'h ' + (focusMins%60) + 'm' : focusMins + 'm';
+
+  // Last journal mood
+  const allJournal = LS.get('journal', []);
+  const lastEntry = allJournal.length ? allJournal[allJournal.length - 1] : null;
+  document.getElementById('dashLastMood').textContent = lastEntry ? lastEntry.mood : '—';
+
+  // Focus score
+  const distractionsToday = LS.get('distractions', []).filter(d => d.date === todayStr()).length;
+  if (focusMins > 0) {
+    const score = Math.max(0, Math.round(((focusMins - distractionsToday * 5) / focusMins) * 100));
+    document.getElementById('dashFocusScore').textContent = score + '%';
+  } else {
+    document.getElementById('dashFocusScore').textContent = '—';
+  }
+
+  // Priorities
+  const priEl = document.getElementById('dashPriorities');
+  const intentions = LS.get('intentions-' + todayStr(), []);
+  if (intentions.filter(Boolean).length) {
+    priEl.innerHTML = intentions.filter(Boolean).map((t, i) =>
+      `<div class="task-row" style="margin-bottom:4px"><span style="color:var(--gold);font-weight:700;margin-right:6px">${i+1}.</span><span class="task-title">${esc(t)}</span></div>`
+    ).join('');
+  } else if (todayTasks.length) {
+    priEl.innerHTML = todayTasks.slice(0, 3).map(t =>
+      `<div class="task-row"><span class="tag ${t.priority}">${t.priority.toUpperCase()}</span><span class="task-title" style="margin-left:8px">${esc(t.title)}</span></div>`
+    ).join('');
+  } else {
+    priEl.innerHTML = '<div class="empty"><span class="empty-icon">🎯</span>Set your intentions in Daily view</div>';
+  }
+
+  // Focus status
+  const fsEl = document.getElementById('dashFocusStatus');
+  if (focusState.active) {
+    fsEl.innerHTML = `<div style="font-size:12px;color:var(--purple)">🔴 Focusing: ${esc(focusState.task)} (${Math.ceil(focusState.remaining/60000)}m left)</div>`;
+  } else {
+    fsEl.innerHTML = `<div style="font-size:12px;color:var(--overlay0)">No active focus session</div>`;
+  }
+
+  renderDashSparklines();
+
+  // Habits
+  const dhEl = document.getElementById('dashHabits');
+  if (habits.length) {
+    dhEl.innerHTML = habits.map(h =>
+      `<div class="task-row" onclick="toggleHabitFromDash('${h.id}')" style="cursor:pointer">
+        <div class="task-check ${habitLog[h.id] ? 'done' : ''}"></div>
+        <span class="task-title">${esc(h.name)}</span>
+        <span style="font-size:11px;color:var(--overlay0)">${getHabitStreak(h.id)}d streak</span>
+      </div>`
+    ).join('');
+  } else {
+    dhEl.innerHTML = '<div class="empty"><span class="empty-icon">⚡</span>Add habits in ⚡ Habits view</div>';
+  }
+
+  // Agent OS Integration
+  loadAgentStatus();
+  loadPendingDecisions();
+  loadSuggestions();
+}
+
+async function loadAgentStatus() {
+  const el = document.getElementById('agentStatusWidget');
+  const data = await Bridge.getSystemOverview();
+  if (data) {
+    const agentCount = data.agents?.length || data.agentCount || '?';
+    const uptime = data.uptime || 'unknown';
+    el.innerHTML = `<div class="agent-status-widget">
+      <div class="agent-status-dot online"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--green)">Online</div>
+        <div style="font-size:11px;color:var(--overlay0)">${agentCount} agents · uptime: ${uptime}</div>
+      </div>
+      <a href="/app/" class="btn sm ghost" style="text-decoration:none">Open →</a>
+    </div>`;
+  } else {
+    el.innerHTML = `<div class="agent-status-widget">
+      <div class="agent-status-dot offline"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--overlay0)">Offline</div>
+        <div style="font-size:11px;color:var(--overlay0)">Agent OS not reachable</div>
+      </div>
+    </div>`;
+  }
+}
+
+async function loadPendingDecisions() {
+  const data = await Bridge.getPendingProposals();
+  const countEl = document.getElementById('pendingCount');
+  if (data && Array.isArray(data)) {
+    countEl.textContent = data.length;
+    countEl.style.color = data.length > 0 ? 'var(--yellow)' : 'var(--green)';
+  } else {
+    countEl.textContent = '—';
+    countEl.style.color = 'var(--overlay0)';
+  }
+}
+
+function toggleHabitFromDash(id) {
+  const key = 'habit-log-' + todayStr();
+  const log = LS.get(key, {});
+  log[id] = !log[id];
+  LS.set(key, log);
+  renderDashboard();
+}
+
+function renderDashSparklines() {
+  const readings = getRecentEnergyReadings(7);
+  if (!readings.length) return;
+  const svgW = 240, svgH = 100, pad = 20;
+  ['Energy', 'Focus', 'Mood'].forEach((key) => {
+    const prop = key.toLowerCase();
+    const el = document.getElementById('dashSpark' + key);
+    const vals = readings.map(r => r[prop] || 5);
+    if (!vals.length) return;
+    const maxV = 10, minV = 1;
+    const xStep = vals.length > 1 ? (svgW - pad*2) / (vals.length - 1) : 0;
+    const pts = vals.map((v, i) => `${pad + i * xStep},${svgH - pad - ((v - minV) / (maxV - minV)) * (svgH - pad*2)}`);
+    el.setAttribute('d', 'M' + pts.join(' L'));
+  });
+}
+
+async function loadSuggestions() {
+  const el = document.getElementById('dashSuggestions');
+  const data = await Bridge.getProposals();
+  if (!data || !Array.isArray(data) || !data.length) {
+    if (!Bridge.online) {
+      document.getElementById('offlineBanner').classList.add('show');
+    }
+    el.innerHTML = '<div class="empty"><span class="empty-icon">💡</span>No suggestions from agents</div>';
+    return;
+  }
+  el.innerHTML = data.slice(0, 5).map(s =>
+    `<div class="suggestion-card">
+      <div class="icon">💡</div>
+      <div class="content">${esc(s.text || s.message || s.observation || '')}</div>
+      <div class="actions">
+        <button class="btn sm green" onclick="this.parentElement.parentElement.remove()">👍</button>
+        <button class="btn sm ghost" onclick="this.parentElement.parentElement.remove()">✕</button>
+      </div>
+    </div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// DAILY
+// ═══════════════════════════════════════════════════
+function renderDaily() {
+  document.getElementById('dailyDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const intentions = LS.get('intentions-' + todayStr(), ['','','']);
+  document.getElementById('intention1').value = intentions[0] || '';
+  document.getElementById('intention2').value = intentions[1] || '';
+  document.getElementById('intention3').value = intentions[2] || '';
+  renderTimeBlocks();
+  renderEnergySparklines();
+  const review = LS.get('review-' + todayStr(), {});
+  document.getElementById('reviewWell').value = review.well || '';
+  document.getElementById('reviewImprove').value = review.improve || '';
+  document.getElementById('reviewGratitude').value = review.gratitude || '';
+}
+
+function saveIntentions() {
+  LS.set('intentions-' + todayStr(), [
+    document.getElementById('intention1').value,
+    document.getElementById('intention2').value,
+    document.getElementById('intention3').value,
+  ]);
+}
+
+function saveReview() {
+  LS.set('review-' + todayStr(), {
+    well: document.getElementById('reviewWell').value,
+    improve: document.getElementById('reviewImprove').value,
+    gratitude: document.getElementById('reviewGratitude').value,
+  });
+}
+
+function renderTimeBlocks() {
+  const blocks = LS.get('blocks-' + todayStr(), []);
+  const el = document.getElementById('dailyTimeline');
+  if (!blocks.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🕐</span>No time blocks — add one below</div>';
+    return;
+  }
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  blocks.sort((a, b) => timeToMin(a.start) - timeToMin(b.start));
+  el.innerHTML = blocks.map((b, i) => {
+    const sMin = timeToMin(b.start), eMin = timeToMin(b.end);
+    const isCurrent = nowMin >= sMin && nowMin < eMin;
+    const catColors = { deep: 'var(--purple)', meeting: 'var(--blue)', admin: 'var(--yellow)', break: 'var(--green)', exercise: 'var(--peach)' };
+    return `<div class="timeline-block ${isCurrent ? 'current' : ''}" style="border-left-color:${catColors[b.cat]||'var(--surface2)'}">
+      <span class="time">${b.start} – ${b.end}</span>
+      <span class="block-label">${esc(b.label)}</span>
+      <span class="block-cat">${b.cat}</span>
+      <button class="btn sm danger" onclick="removeBlock(${i})" style="padding:2px 6px;font-size:11px">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function addTimeBlock() {
+  const label = document.getElementById('blockLabel').value.trim();
+  const start = document.getElementById('blockStart').value.trim();
+  const end = document.getElementById('blockEnd').value.trim();
+  const cat = document.getElementById('blockCat').value;
+  if (!label || !start || !end) return;
+  const blocks = LS.get('blocks-' + todayStr(), []);
+  blocks.push({ label, start, end, cat });
+  LS.set('blocks-' + todayStr(), blocks);
+  document.getElementById('blockLabel').value = '';
+  document.getElementById('blockStart').value = '';
+  document.getElementById('blockEnd').value = '';
+  renderTimeBlocks();
+}
+
+function removeBlock(i) {
+  const blocks = LS.get('blocks-' + todayStr(), []);
+  blocks.splice(i, 1);
+  LS.set('blocks-' + todayStr(), blocks);
+  renderTimeBlocks();
+}
+
+function timeToMin(t) {
+  const m = t.match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 0;
+}
+
+function logEnergy() {
+  const e = parseInt(document.getElementById('eSlider').value);
+  const f = parseInt(document.getElementById('fSlider').value);
+  const m = parseInt(document.getElementById('mSlider').value);
+  const readings = LS.get('energy', []);
+  readings.push({ date: todayStr(), time: nowISO(), energy: e, focus: f, mood: m });
+  LS.set('energy', readings);
+  Bridge.syncData('energy', readings);
+  showToast('Energy logged!', 'success');
+  renderEnergySparklines();
+}
+
+function getRecentEnergyReadings(days) {
+  const all = LS.get('energy', []);
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days);
+  return all.filter(r => new Date(r.time || r.date) >= cutoff);
+}
+
+function renderEnergySparklines() {
+  const readings = getRecentEnergyReadings(7);
+  if (!readings.length) return;
+  const svgW = 240, svgH = 60, pad = 8;
+  ['E', 'F', 'M'].forEach((k, ki) => {
+    const prop = ['energy', 'focus', 'mood'][ki];
+    const el = document.getElementById('energySpark' + k);
+    if (!el) return;
+    const vals = readings.map(r => r[prop] || 5);
+    const xStep = vals.length > 1 ? (svgW - pad*2) / (vals.length - 1) : 0;
+    const pts = vals.map((v, i) => `${pad + i * xStep},${svgH - pad - ((v - 1) / 9) * (svgH - pad*2)}`);
+    el.setAttribute('d', 'M' + pts.join(' L'));
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// GOALS (4-level hierarchy with milestones & OKR)
+// ═══════════════════════════════════════════════════
+function renderGoals() {
+  const goals = LS.get('goals', getDefaultGoals());
+  const el = document.getElementById('goalsContent');
+
+  const levels = [
+    { key: 'aspiration', label: '🌟 Aspirations', color: 'var(--gold)', desc: 'Life-level vision' },
+    { key: 'mission', label: '🚀 Missions', color: 'var(--purple)', desc: 'Quarter-level strategic' },
+    { key: 'plan', label: '📋 Plans', color: 'var(--blue)', desc: 'Week-level tactical' },
+    { key: 'task', label: '✅ Tasks', color: 'var(--green)', desc: 'Day-level operational' },
+  ];
+
+  el.innerHTML = levels.map(level => {
+    const items = goals.filter(g => g.level === level.key);
+    return `<div class="goal-level">
+      <div class="goal-level-header">
+        <h3 style="color:${level.color}">${level.label}</h3>
+        <span style="font-size:12px;color:var(--overlay0)">${level.desc}</span>
+        <button class="btn sm ghost" style="margin-left:auto" onclick="addGoal('${level.key}')">+ Add</button>
+      </div>
+      ${items.length ? items.map(g => renderGoalCard(g, goals, level.color)).join('') : `<div class="empty"><span class="empty-icon">${level.label.split(' ')[0]}</span>No ${level.key}s defined</div>`}
+    </div>`;
+  }).join('');
+}
+
+function renderGoalCard(goal, allGoals, color) {
+  const children = allGoals.filter(g => g.parentId === goal.id);
+  const milestones = goal.milestones || [];
+  const keyResults = goal.keyResults || [];
+  const progress = calcGoalProgress(goal, allGoals);
+  const pctText = Math.round(progress * 100);
+  const circumference = 2 * Math.PI * 16;
+  const offset = circumference * (1 - progress);
+
+  let milestonesHtml = '';
+  if (milestones.length) {
+    milestonesHtml = `<div style="margin-top:8px">${milestones.map((m, mi) =>
+      `<div class="milestone-item">
+        <div class="milestone-check ${m.done ? 'done' : ''}" onclick="event.stopPropagation();toggleMilestone('${goal.id}',${mi})"></div>
+        <span class="milestone-text ${m.done ? 'done' : ''}">${esc(m.text)}</span>
+      </div>`
+    ).join('')}</div>`;
+  }
+
+  let keyResultsHtml = '';
+  if (keyResults.length) {
+    keyResultsHtml = `<div class="key-results">${keyResults.map(kr =>
+      `<div class="key-result">📏 ${esc(kr)}</div>`
+    ).join('')}</div>`;
+  }
+
+  // Countdown
+  let countdownHtml = '';
+  if (goal.deadline) {
+    const daysLeft = Math.ceil((new Date(goal.deadline) - new Date()) / 86400000);
+    const urgent = daysLeft <= 7;
+    countdownHtml = daysLeft > 0
+      ? `<span class="goal-countdown ${urgent ? 'urgent' : ''}">${daysLeft}d left</span>`
+      : daysLeft === 0 ? `<span class="goal-countdown urgent">Due today</span>`
+      : `<span class="goal-countdown urgent">${Math.abs(daysLeft)}d overdue</span>`;
+  }
+
+  // Linked habits
+  const allHabits = LS.get('habits', []);
+  const linkedHabits = (goal.linkedHabits || []).map(hid => allHabits.find(h => h.id === hid)).filter(Boolean);
+  const linkedHtml = linkedHabits.length
+    ? `<div class="goal-habits-link">Supported by: ${linkedHabits.map(h => `<span>⚡ ${esc(h.name)}</span>`).join('')}</div>`
+    : '';
+
+  return `<div class="goal-card" style="border-left-color:${color}">
+    <div style="display:flex;align-items:center;gap:12px">
+      <svg class="progress-ring" width="40" height="40" viewBox="0 0 40 40">
+        <circle class="bg" cx="20" cy="20" r="16" stroke-width="4"/>
+        <circle class="fg" cx="20" cy="20" r="16" stroke-width="4" stroke="${color}"
+          stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+          transform="rotate(-90 20 20)"/>
+        <text x="20" y="24" text-anchor="middle" fill="var(--text)" font-size="10" font-weight="700">${pctText}</text>
+      </svg>
+      <div style="flex:1">
+        <div class="goal-title">${esc(goal.title)}</div>
+        <div class="goal-meta">
+          ${countdownHtml}
+          <span>${children.length} children</span>
+          ${milestones.length ? `<span>${milestones.filter(m=>m.done).length}/${milestones.length} milestones</span>` : ''}
+          ${goal.missionStatus ? `<span class="tag tag-agent">🤖 ${goal.missionStatus}</span>` : ''}
+        </div>
+        ${linkedHtml}
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn sm ghost" onclick="event.stopPropagation();addMilestone('${goal.id}')" title="Add milestone">+🏁</button>
+        <button class="btn sm ghost" onclick="event.stopPropagation();addKeyResult('${goal.id}')" title="Add key result">+📏</button>
+        <button class="btn sm ghost" onclick="event.stopPropagation();linkHabitToGoal('${goal.id}')" title="Link habit">+⚡</button>
+        <button class="btn sm danger" onclick="removeGoal('${goal.id}')" style="padding:2px 6px;font-size:10px">✕</button>
+      </div>
+    </div>
+    ${keyResultsHtml}
+    ${milestonesHtml}
+  </div>`;
+}
+
+function calcGoalProgress(goal, allGoals) {
+  const milestones = goal.milestones || [];
+  const children = allGoals.filter(g => g.parentId === goal.id);
+
+  // If has milestones, progress = milestone completion
+  if (milestones.length) {
+    return milestones.filter(m => m.done).length / milestones.length;
+  }
+  // If has children, average their progress
+  if (children.length) {
+    const childProgress = children.map(c => calcGoalProgress(c, allGoals));
+    return childProgress.reduce((a, b) => a + b, 0) / children.length;
+  }
+  return goal.done ? 1 : 0;
+}
+
+function addGoal(level) {
+  const title = prompt(`New ${level} title:`);
+  if (!title) return;
+  const deadline = prompt('Target date (YYYY-MM-DD, or leave blank):') || '';
+  const goals = LS.get('goals', getDefaultGoals());
+  let parentId = null;
+  if (level !== 'aspiration') {
+    const parentLevel = level === 'mission' ? 'aspiration' : level === 'plan' ? 'mission' : 'plan';
+    const parents = goals.filter(g => g.level === parentLevel);
+    if (parents.length) {
+      const parentTitle = prompt(`Link to ${parentLevel}:\n` + parents.map((p, i) => `${i+1}. ${p.title}`).join('\n') + '\n\n(Enter number or leave blank)');
+      if (parentTitle && parents[parseInt(parentTitle) - 1]) {
+        parentId = parents[parseInt(parentTitle) - 1].id;
+      }
+    }
+  }
+  goals.push({ id: uid(), level, title, parentId, deadline, done: false, milestones: [], keyResults: [], linkedHabits: [], createdAt: nowISO() });
+  LS.set('goals', goals);
+  renderGoals();
+}
+
+function linkHabitToGoal(goalId) {
+  const habits = LS.get('habits', []);
+  if (!habits.length) { showToast('No habits to link', 'info'); return; }
+  const pick = prompt('Link habit to goal:\n' + habits.map((h, i) => `${i+1}. ${h.name}`).join('\n') + '\n\nEnter number:');
+  if (!pick) return;
+  const habit = habits[parseInt(pick) - 1];
+  if (!habit) return;
+  const goals = LS.get('goals', []);
+  const goal = goals.find(g => g.id === goalId);
+  if (!goal) return;
+  if (!goal.linkedHabits) goal.linkedHabits = [];
+  if (!goal.linkedHabits.includes(habit.id)) goal.linkedHabits.push(habit.id);
+  LS.set('goals', goals);
+  renderGoals();
+  showToast(`Linked "${habit.name}" to goal`, 'success');
+}
+
+function addMilestone(goalId) {
+  const text = prompt('Milestone description:');
+  if (!text) return;
+  const goals = LS.get('goals', getDefaultGoals());
+  const goal = goals.find(g => g.id === goalId);
+  if (!goal) return;
+  if (!goal.milestones) goal.milestones = [];
+  goal.milestones.push({ text, done: false });
+  LS.set('goals', goals);
+  renderGoals();
+}
+
+function toggleMilestone(goalId, milestoneIdx) {
+  const goals = LS.get('goals', getDefaultGoals());
+  const goal = goals.find(g => g.id === goalId);
+  if (!goal || !goal.milestones || !goal.milestones[milestoneIdx]) return;
+  goal.milestones[milestoneIdx].done = !goal.milestones[milestoneIdx].done;
+  LS.set('goals', goals);
+  renderGoals();
+}
+
+function addKeyResult(goalId) {
+  const text = prompt('Key Result (OKR-style):');
+  if (!text) return;
+  const goals = LS.get('goals', getDefaultGoals());
+  const goal = goals.find(g => g.id === goalId);
+  if (!goal) return;
+  if (!goal.keyResults) goal.keyResults = [];
+  goal.keyResults.push(text);
+  LS.set('goals', goals);
+  renderGoals();
+}
+
+function removeGoal(id) {
+  let goals = LS.get('goals', []);
+  const toRemove = new Set([id]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    goals.forEach(g => { if (g.parentId && toRemove.has(g.parentId) && !toRemove.has(g.id)) { toRemove.add(g.id); changed = true; } });
+  }
+  goals = goals.filter(g => !toRemove.has(g.id));
+  LS.set('goals', goals);
+  renderGoals();
+}
+
+function getDefaultGoals() {
+  // Generate dynamic deadlines relative to today
+  const d1 = new Date(); d1.setDate(d1.getDate() + 90);
+  const d2 = new Date(); d2.setDate(d2.getDate() + 60);
+  const d3 = new Date(); d3.setDate(d3.getDate() + 14);
+  const d4 = new Date(); d4.setDate(d4.getDate() + 30);
+  return [
+    { id: 'a1', level: 'aspiration', title: 'Master AI agent architecture', parentId: null, deadline: d1.toISOString().slice(0,10), done: false, milestones: [], keyResults: ['Build 3 production agent systems', 'Contribute to 2 open-source agent frameworks'], linkedHabits: [] },
+    { id: 'a2', level: 'aspiration', title: 'Build financial independence', parentId: null, done: false, milestones: [], keyResults: [], linkedHabits: [] },
+    { id: 'm1', level: 'mission', title: 'Ship Agent OS v2', parentId: 'a1', deadline: d2.toISOString().slice(0,10), done: false, milestones: [{text:'Core engine rewrite',done:true},{text:'Plugin system',done:false},{text:'UI dashboard',done:false}], keyResults: ['100+ daily active users', 'Sub-2s response time'], linkedHabits: [] },
+    { id: 'm2', level: 'mission', title: 'Launch consulting practice', parentId: 'a2', deadline: d4.toISOString().slice(0,10), done: false, milestones: [{text:'Write pitch deck',done:false},{text:'Land first client',done:false}], keyResults: [], linkedHabits: [] },
+    { id: 'p1', level: 'plan', title: 'Redesign proposals page', parentId: 'm1', deadline: d3.toISOString().slice(0,10), done: false, milestones: [], keyResults: [], linkedHabits: [] },
+    { id: 'p2', level: 'plan', title: 'Write pitch deck', parentId: 'm2', done: false, milestones: [], keyResults: [], linkedHabits: [] },
+  ];
+}
+
+// ═══════════════════════════════════════════════════
+// TASKS (GTD) — Enhanced with notes, tags, subtasks, drag, delegate
+// ═══════════════════════════════════════════════════
+let currentTaskTab = 'inbox';
+let processingTaskId = null;
+let expandedTaskId = null;
+let activeTagFilter = null;
+let dragTaskId = null;
+
+const TAG_COLORS = {
+  work: 'tag-work', personal: 'tag-personal', health: 'tag-health',
+  learning: 'tag-learning', finance: 'tag-finance', urgent: 'tag-urgent',
+  agent: 'tag-agent', idea: 'tag-idea',
+};
+
+function getTagClass(tag) {
+  return TAG_COLORS[tag.toLowerCase()] || '';
+}
+
+function renderTasks() {
+  const tasks = LS.get('tasks', []);
+  const inbox = tasks.filter(t => t.bucket === 'inbox' && !t.done);
+  const badge = document.getElementById('taskBadge');
+  if (inbox.length) { badge.textContent = inbox.length; badge.style.display = 'inline'; }
+  else { badge.style.display = 'none'; }
+
+  renderTagFilter();
+  renderTaskList();
+}
+
+function renderTagFilter() {
+  const tasks = LS.get('tasks', []);
+  const allTags = new Set();
+  tasks.forEach(t => (t.tags || []).forEach(tag => allTags.add(tag)));
+  const el = document.getElementById('taskTagFilter');
+  if (!allTags.size) { el.innerHTML = ''; return; }
+  el.innerHTML = `<span style="font-size:11px;color:var(--overlay0);padding:4px 0">Filter:</span>` +
+    [...allTags].map(tag =>
+      `<span class="tag ${getTagClass(tag)} clickable ${activeTagFilter === tag ? 'active-filter' : ''}" onclick="toggleTagFilter('${esc(tag)}')">${esc(tag)}</span>`
+    ).join('') +
+    (activeTagFilter ? `<span class="tag clickable" onclick="toggleTagFilter(null)" style="cursor:pointer">✕ Clear</span>` : '');
+}
+
+function toggleTagFilter(tag) {
+  activeTagFilter = activeTagFilter === tag ? null : tag;
+  renderTagFilter();
+  renderTaskList();
+}
+
+function switchTaskTab(tab) {
+  currentTaskTab = tab;
+  document.querySelectorAll('#taskTabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`#taskTabs .tab:nth-child(${['inbox','today','scheduled','someday','completed'].indexOf(tab)+1})`).classList.add('active');
+  renderTaskList();
+}
+
+function renderTaskList() {
+  const tasks = LS.get('tasks', []);
+  const el = document.getElementById('taskList');
+  let filtered;
+
+  switch (currentTaskTab) {
+    case 'inbox': filtered = tasks.filter(t => t.bucket === 'inbox' && !t.done); break;
+    case 'today': filtered = tasks.filter(t => t.bucket === 'today' && !t.done); break;
+    case 'scheduled': filtered = tasks.filter(t => t.bucket === 'scheduled' && !t.done); break;
+    case 'someday': filtered = tasks.filter(t => t.bucket === 'someday' && !t.done); break;
+    case 'completed': filtered = tasks.filter(t => t.done).slice(-20).reverse(); break;
+    default: filtered = [];
+  }
+
+  // Apply tag filter
+  if (activeTagFilter) {
+    filtered = filtered.filter(t => (t.tags || []).includes(activeTagFilter));
+  }
+
+  if (!filtered.length) {
+    const emptyMessages = {
+      inbox: { icon: '📥', msg: 'Inbox is empty — great!', hint: 'Add tasks above or brain dump ideas' },
+      today: { icon: '📌', msg: 'No tasks for today', hint: 'Process your inbox to schedule tasks' },
+      scheduled: { icon: '📅', msg: 'Nothing scheduled', hint: 'Defer tasks here for later' },
+      someday: { icon: '💭', msg: 'No someday/maybe items', hint: 'Park ideas you want to revisit' },
+      completed: { icon: '✅', msg: 'No completed tasks yet', hint: 'Check off tasks to see them here' },
+    };
+    const e = emptyMessages[currentTaskTab] || { icon: '📋', msg: 'No tasks', hint: '' };
+    el.innerHTML = `<div class="empty"><span class="empty-icon">${e.icon}</span>${e.msg}<div class="empty-hint">${e.hint}</div></div>`;
+    return;
+  }
+
+  // Sort by priority
+  const priOrder = { p0: 0, p1: 1, p2: 2, p3: 3 };
+  if (currentTaskTab !== 'completed') {
+    filtered.sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2));
+  }
+
+  el.innerHTML = filtered.map(t => {
+    const estClass = t.estimate === 'small' ? 'est-small' : t.estimate === 'medium' ? 'est-medium' : t.estimate === 'large' ? 'est-large' : '';
+    const estLabel = t.estimate === 'small' ? '🟢 S' : t.estimate === 'medium' ? '🟡 M' : t.estimate === 'large' ? '🔴 L' : '';
+    const subtasks = t.subtasks || [];
+    const subtasksDone = subtasks.filter(s => s.done).length;
+    const isExpanded = expandedTaskId === t.id;
+    const tagsHtml = (t.tags || []).map(tag => `<span class="tag ${getTagClass(tag)}">${esc(tag)}</span>`).join('');
+    const dueInfo = getDueDateInfo(t.due);
+    const subtaskPct = subtasks.length ? Math.round((subtasksDone / subtasks.length) * 100) : 0;
+
+    return `
+      <div class="task-row ${t.done ? 'done' : ''}" draggable="true" data-task-id="${t.id}"
+        ondragstart="onDragStart(event,'${t.id}')" ondragover="onDragOver(event)" ondragend="onDragEnd(event)"
+        ondrop="onDrop(event,'${t.id}')">
+        <span class="drag-handle" title="Drag to reorder">⠿</span>
+        <div class="task-check ${t.done ? 'done' : ''}" onclick="event.stopPropagation();toggleTask('${t.id}')"></div>
+        <span class="tag ${t.priority}">${t.priority.toUpperCase()}</span>
+        <span class="task-title" onclick="toggleTaskExpand('${t.id}')">${esc(t.title)}</span>
+        <span class="task-meta">
+          <span class="task-tags">${tagsHtml}</span>
+          ${dueInfo ? `<span class="due-date ${dueInfo.class}">${dueInfo.text}</span>` : ''}
+          ${estLabel ? `<span class="est-indicator ${estClass}">${estLabel}</span>` : ''}
+          ${subtasks.length ? `<span class="subtask-progress">${subtasksDone}/${subtasks.length}<span class="subtask-progress-bar"><span class="fill" style="width:${subtaskPct}%"></span></span></span>` : ''}
+          ${currentTaskTab === 'inbox' ? `<button class="btn sm purple" onclick="event.stopPropagation();processTaskModal('${t.id}')">Process</button>` : ''}
+          ${currentTaskTab === 'completed' ? `<span class="task-time">${relTime(t.doneAt)}</span>` : ''}
+          <button class="btn sm ghost" onclick="event.stopPropagation();delegateTask('${t.id}')" title="Delegate to Agent" style="padding:2px 6px;font-size:12px">🤖</button>
+          <button class="btn sm danger" onclick="event.stopPropagation();removeTask('${t.id}')" style="padding:2px 6px;font-size:10px">✕</button>
+        </span>
+      </div>
+      <div class="task-expand ${isExpanded ? 'open' : ''}" id="expand-${t.id}">
+        ${isExpanded ? renderTaskExpandContent(t) : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTaskExpandContent(t) {
+  const subtasks = t.subtasks || [];
+  return `
+    <div style="font-size:12px;color:var(--overlay0);margin-bottom:6px">Notes</div>
+    <textarea placeholder="Add notes..." style="width:100%;font-size:12px" onchange="updateTaskNotes('${t.id}',this.value)">${esc(t.notes || '')}</textarea>
+    <div style="display:flex;gap:4px;margin-top:8px;align-items:center">
+      <span style="font-size:12px;color:var(--overlay0)">Tags:</span>
+      <input type="text" placeholder="Add tag..." style="width:100px;font-size:11px;padding:3px 6px" id="addTagInput-${t.id}"
+        onkeydown="if(event.key==='Enter'){addTagToTask('${t.id}',this.value);this.value=''}">
+    </div>
+    <div style="font-size:12px;color:var(--overlay0);margin-top:10px;margin-bottom:4px">Subtasks (${subtasks.filter(s=>s.done).length}/${subtasks.length})</div>
+    <div class="subtask-list">
+      ${subtasks.map((s, si) => `
+        <div class="subtask-row">
+          <div class="task-check ${s.done ? 'done' : ''}" style="width:14px;height:14px" onclick="toggleSubtask('${t.id}',${si})"></div>
+          <span style="${s.done ? 'text-decoration:line-through;color:var(--overlay0)' : ''}">${esc(s.text)}</span>
+          <button class="btn sm danger" onclick="removeSubtask('${t.id}',${si})" style="padding:1px 4px;font-size:9px;margin-left:auto">✕</button>
+        </div>
+      `).join('')}
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <input type="text" placeholder="Add subtask..." style="flex:1;font-size:11px;padding:3px 6px" id="addSubInput-${t.id}"
+          onkeydown="if(event.key==='Enter'){addSubtask('${t.id}',this.value);this.value=''}">
+        <button class="btn sm" onclick="addSubtask('${t.id}',document.getElementById('addSubInput-${t.id}').value);document.getElementById('addSubInput-${t.id}').value=''" style="padding:2px 6px;font-size:10px">+</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleTaskExpand(id) {
+  if (expandedTaskId === id) {
+    expandedTaskId = null;
+  } else {
+    expandedTaskId = id;
+  }
+  renderTaskList();
+}
+
+function updateTaskNotes(id, notes) {
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === id);
+  if (t) { t.notes = notes; LS.set('tasks', tasks); }
+}
+
+function addTagToTask(id, tag) {
+  tag = tag.trim().toLowerCase();
+  if (!tag) return;
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  if (!t.tags) t.tags = [];
+  if (!t.tags.includes(tag)) t.tags.push(tag);
+  LS.set('tasks', tasks);
+  renderTaskList();
+  renderTagFilter();
+}
+
+function addSubtask(id, text) {
+  text = text.trim();
+  if (!text) return;
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  if (!t.subtasks) t.subtasks = [];
+  t.subtasks.push({ text, done: false });
+  LS.set('tasks', tasks);
+  renderTaskList();
+}
+
+function toggleSubtask(taskId, subIdx) {
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === taskId);
+  if (!t || !t.subtasks || !t.subtasks[subIdx]) return;
+  t.subtasks[subIdx].done = !t.subtasks[subIdx].done;
+  LS.set('tasks', tasks);
+  renderTaskList();
+}
+
+function removeSubtask(taskId, subIdx) {
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === taskId);
+  if (!t || !t.subtasks) return;
+  t.subtasks.splice(subIdx, 1);
+  LS.set('tasks', tasks);
+  renderTaskList();
+}
+
+// Drag and drop reorder
+function onDragStart(e, id) {
+  dragTaskId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('drag-over'); }
+function onDragEnd(e) {
+  dragTaskId = null;
+  document.querySelectorAll('.task-row').forEach(r => { r.classList.remove('dragging','drag-over'); });
+}
+function onDrop(e, targetId) {
+  e.preventDefault();
+  if (!dragTaskId || dragTaskId === targetId) return;
+  const tasks = LS.get('tasks', []);
+  const fromIdx = tasks.findIndex(t => t.id === dragTaskId);
+  const toIdx = tasks.findIndex(t => t.id === targetId);
+  if (fromIdx < 0 || toIdx < 0) return;
+  const [moved] = tasks.splice(fromIdx, 1);
+  tasks.splice(toIdx, 0, moved);
+  LS.set('tasks', tasks);
+  renderTaskList();
+  document.querySelectorAll('.task-row').forEach(r => r.classList.remove('drag-over'));
+}
+
+// Delegate to Agent
+let dispatchingTaskId = null;
+function delegateTask(id) {
+  dispatchingTaskId = id;
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('dispatchTaskText').textContent = t.title;
+  document.getElementById('dispatchInstructions').value = '';
+  document.getElementById('dispatchModal').classList.add('show');
+}
+
+async function confirmDispatch() {
+  if (!dispatchingTaskId) return;
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === dispatchingTaskId);
+  if (!t) return;
+  const instructions = document.getElementById('dispatchInstructions').value.trim();
+  const payload = { title: t.title, description: (t.notes || '') + (instructions ? '\n\n' + instructions : ''), source: 'life-os' };
+  const result = await Bridge.postTask(payload);
+  if (result) {
+    showToast('Task dispatched to Agent OS!', 'success');
+    if (!t.tags) t.tags = [];
+    if (!t.tags.includes('agent')) t.tags.push('agent');
+    LS.set('tasks', tasks);
+  } else {
+    showToast('Could not dispatch — Agent OS offline', 'error');
+  }
+  closeModal('dispatchModal');
+  dispatchingTaskId = null;
+  renderTaskList();
+}
+
+function quickAddTask() {
+  const input = document.getElementById('quickAddInput');
+  const title = input.value.trim();
+  if (!title) return;
+  const tasks = LS.get('tasks', []);
+  tasks.push({ id: uid(), title, priority: 'p2', estimate: '', tags: [], bucket: 'inbox', done: false, notes: '', subtasks: [], createdAt: nowISO() });
+  LS.set('tasks', tasks);
+  input.value = '';
+  showToast('Task added to inbox', 'success');
+  renderTasks();
+}
+
+function addTask() {
+  const title = document.getElementById('newTaskInput').value.trim();
+  if (!title) return;
+  const priority = document.getElementById('newTaskPriority').value;
+  const estimate = document.getElementById('newTaskEstimate').value;
+  const due = document.getElementById('newTaskDue')?.value || '';
+  const tagsRaw = document.getElementById('newTaskTags').value.trim();
+  const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+  const tasks = LS.get('tasks', []);
+  tasks.push({ id: uid(), title, priority, estimate, tags, due, bucket: 'inbox', done: false, notes: '', subtasks: [], createdAt: nowISO() });
+  LS.set('tasks', tasks);
+  document.getElementById('newTaskInput').value = '';
+  document.getElementById('newTaskTags').value = '';
+  document.getElementById('newTaskEstimate').value = '';
+  if (document.getElementById('newTaskDue')) document.getElementById('newTaskDue').value = '';
+  showToast('Task added', 'success');
+  renderTasks();
+}
+
+function getDueDateInfo(due) {
+  if (!due) return null;
+  const today = new Date(todayStr());
+  const dueDate = new Date(due);
+  const diff = Math.ceil((dueDate - today) / 86400000);
+  if (diff < 0) return { class: 'overdue', text: Math.abs(diff) + 'd overdue' };
+  if (diff === 0) return { class: 'overdue', text: 'Due today' };
+  if (diff <= 3) return { class: 'upcoming', text: diff + 'd left' };
+  return { class: 'normal', text: due };
+}
+
+function toggleTask(id) {
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  if (t.done) t.doneAt = nowISO();
+  else delete t.doneAt;
+  LS.set('tasks', tasks);
+  renderTaskList();
+}
+
+function removeTask(id) {
+  let tasks = LS.get('tasks', []);
+  tasks = tasks.filter(t => t.id !== id);
+  LS.set('tasks', tasks);
+  renderTasks();
+}
+
+function processTaskModal(id) {
+  processingTaskId = id;
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('taskProcessText').textContent = t.title;
+  document.getElementById('taskProcessModal').classList.add('show');
+}
+
+function processTask(bucket) {
+  if (!processingTaskId) return;
+  const tasks = LS.get('tasks', []);
+  const t = tasks.find(x => x.id === processingTaskId);
+  if (t) {
+    if (bucket === 'do') {
+      t.bucket = 'today'; t.done = true; t.doneAt = nowISO();
+    } else {
+      t.bucket = bucket;
+    }
+    LS.set('tasks', tasks);
+  }
+  processingTaskId = null;
+  document.getElementById('taskProcessModal').classList.remove('show');
+  renderTasks();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════
+// BRAIN DUMP
+// ═══════════════════════════════════════════════════
+let processingDumpIdx = -1;
+let dumpProcessQueue = [];
+
+function renderBrainDump() {
+  const dumps = LS.get('dumps', []);
+  const el = document.getElementById('dumpList');
+  const unprocessed = dumps.filter(d => !d.processed);
+  if (!unprocessed.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">🧘</span>No unprocessed thoughts — brain clear!</div>';
+    return;
+  }
+  el.innerHTML = unprocessed.map((d) =>
+    `<div class="task-row">
+      <span class="task-title">${esc(d.text)}</span>
+      <span class="task-time">${relTime(d.createdAt)}</span>
+      <button class="btn sm purple" onclick="processSingleDump(${dumps.indexOf(d)})">Route</button>
+      <button class="btn sm danger" onclick="dismissDump(${dumps.indexOf(d)})" style="padding:2px 6px">✕</button>
+    </div>`
+  ).join('');
+}
+
+function captureDump() {
+  const text = document.getElementById('dumpTextarea').value.trim();
+  if (!text) return;
+  const dumps = LS.get('dumps', []);
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  lines.forEach(line => {
+    dumps.push({ id: uid(), text: line, processed: false, createdAt: nowISO() });
+  });
+  LS.set('dumps', dumps);
+  document.getElementById('dumpTextarea').value = '';
+  showToast(`Captured ${lines.length} thought${lines.length > 1 ? 's' : ''}`, 'success');
+  renderBrainDump();
+}
+
+function processSingleDump(idx) {
+  dumpProcessQueue = [idx];
+  processingDumpIdx = 0;
+  showProcessModal();
+}
+
+function processAllDumps() {
+  const dumps = LS.get('dumps', []);
+  dumpProcessQueue = dumps.map((d, i) => !d.processed ? i : -1).filter(i => i >= 0);
+  if (!dumpProcessQueue.length) return;
+  processingDumpIdx = 0;
+  showProcessModal();
+}
+
+function showProcessModal() {
+  if (processingDumpIdx >= dumpProcessQueue.length) {
+    document.getElementById('processModal').classList.remove('show');
+    renderBrainDump();
+    return;
+  }
+  const dumps = LS.get('dumps', []);
+  const idx = dumpProcessQueue[processingDumpIdx];
+  document.getElementById('processItemText').textContent = dumps[idx].text;
+  document.getElementById('processModal').classList.add('show');
+}
+
+function routeDump(dest) {
+  const dumps = LS.get('dumps', []);
+  const idx = dumpProcessQueue[processingDumpIdx];
+  const dump = dumps[idx];
+  if (dest === 'task') {
+    const tasks = LS.get('tasks', []);
+    tasks.push({ id: uid(), title: dump.text, priority: 'p2', estimate: '', tags: [], bucket: 'inbox', done: false, notes: '', subtasks: [], createdAt: nowISO() });
+    LS.set('tasks', tasks);
+  } else if (dest === 'journal') {
+    const entries = LS.get('journal', []);
+    entries.push({ id: uid(), date: todayStr(), mood: '😐', energy: 0, gratitude: '', reflection: dump.text, createdAt: nowISO() });
+    LS.set('journal', entries);
+  }
+  dump.processed = true;
+  dump.routedTo = dest;
+  LS.set('dumps', dumps);
+  processingDumpIdx++;
+  showProcessModal();
+}
+
+function dismissDump(idx) {
+  const dumps = LS.get('dumps', []);
+  dumps[idx].processed = true;
+  dumps[idx].routedTo = 'dismiss';
+  LS.set('dumps', dumps);
+  renderBrainDump();
+}
+
+// ═══════════════════════════════════════════════════
+// FOCUS TIMER — Enhanced with presets, session log, ambient, task link
+// ═══════════════════════════════════════════════════
+const FOCUS_CIRC = 2 * Math.PI * 88;
+const focusState = { active: false, onBreak: false, task: '', endTime: 0, totalMs: 0, remaining: 0, breakMs: 0, interval: null };
+let activeAmbient = null;
+
+function renderFocus() {
+  populateFocusTaskSelect();
+  renderFocusStats();
+  renderFocusSessionLog();
+  renderDistractionLog();
+  updateFocusUI();
+}
+
+function populateFocusTaskSelect() {
+  const tasks = LS.get('tasks', []);
+  const todayTasks = tasks.filter(t => t.bucket === 'today' && !t.done);
+  const sel = document.getElementById('focusTaskSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select a task...</option>' +
+    todayTasks.map(t => `<option value="${esc(t.title)}">${esc(t.title)}</option>`).join('');
+}
+
+function startFocus(mins, breakMins, type) {
+  const selTask = document.getElementById('focusTaskSelect')?.value;
+  const typedTask = document.getElementById('focusTaskName')?.value.trim();
+  const task = selTask || typedTask || type || 'Focus';
+  focusState.active = true;
+  focusState.onBreak = false;
+  focusState.task = task;
+  focusState.totalMs = mins * 60000;
+  focusState.endTime = Date.now() + focusState.totalMs;
+  focusState.type = type;
+  focusState.breakMs = (breakMins || 0) * 60000;
+  updateFocusUI();
+  runFocusTimer();
+}
+
+function startCustomFocus() {
+  const mins = parseInt(document.getElementById('customFocusMins')?.value) || 25;
+  const breakMins = parseInt(document.getElementById('customBreakMins')?.value) || 0;
+  startFocus(mins, breakMins, 'Custom');
+}
+
+function runFocusTimer() {
+  if (focusState.interval) clearInterval(focusState.interval);
+  focusState.interval = setInterval(() => {
+    focusState.remaining = Math.max(0, focusState.endTime - Date.now());
+    const mins = Math.floor(focusState.remaining / 60000);
+    const secs = Math.floor((focusState.remaining % 60000) / 1000);
+    document.getElementById('focusTimeDisplay').textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    const progress = 1 - (focusState.remaining / focusState.totalMs);
+    document.getElementById('focusArc').setAttribute('stroke-dashoffset', FOCUS_CIRC * (1 - progress));
+
+    // Update current task display
+    const ctEl = document.getElementById('focusCurrentTask');
+    const ctNameEl = document.getElementById('focusCurrentTaskName');
+    if (focusState.active && !focusState.onBreak) {
+      ctEl.style.display = 'block';
+      ctNameEl.textContent = focusState.task;
+    }
+
+    if (focusState.remaining <= 0) {
+      if (focusState.onBreak) {
+        endBreak();
+      } else {
+        completeFocus();
+      }
+    }
+  }, 500);
+}
+
+function stopFocus() {
+  const elapsed = focusState.totalMs - focusState.remaining;
+  logFocusSession(focusState.task, Math.round(elapsed / 60000), focusState.type, false);
+  resetFocusState();
+}
+
+function completeFocus() {
+  logFocusSession(focusState.task, Math.round(focusState.totalMs / 60000), focusState.type, true);
+  showToast('Focus session complete! 🎉', 'success');
+
+  // Start break if configured
+  if (focusState.breakMs > 0) {
+    focusState.onBreak = true;
+    focusState.totalMs = focusState.breakMs;
+    focusState.endTime = Date.now() + focusState.breakMs;
+    focusState.remaining = focusState.breakMs;
+    document.getElementById('focusArc').setAttribute('stroke', 'var(--green)');
+    document.getElementById('focusTaskDisplay').textContent = '☕ Break';
+    document.getElementById('focusActiveControls').style.display = 'none';
+    document.getElementById('focusBreakControls').style.display = 'block';
+    renderFocusSessionLog();
+    renderFocusStats();
+    return;
+  }
+  resetFocusState();
+}
+
+function endBreak() {
+  showToast('Break over — back to work!', 'info');
+  resetFocusState();
+}
+
+function skipBreak() {
+  resetFocusState();
+}
+
+function resetFocusState() {
+  if (focusState.interval) clearInterval(focusState.interval);
+  focusState.active = false;
+  focusState.onBreak = false;
+  focusState.task = '';
+  focusState.remaining = 0;
+  document.getElementById('focusTimeDisplay').textContent = '00:00';
+  document.getElementById('focusArc').setAttribute('stroke-dashoffset', '0');
+  document.getElementById('focusArc').setAttribute('stroke', 'var(--purple)');
+  document.getElementById('focusCurrentTask').style.display = 'none';
+  document.getElementById('focusBreakControls').style.display = 'none';
+  updateFocusUI();
+  renderFocusStats();
+  renderFocusSessionLog();
+}
+
+function updateFocusUI() {
+  const startEl = document.getElementById('focusStartControls');
+  const activeEl = document.getElementById('focusActiveControls');
+  const taskEl = document.getElementById('focusTaskDisplay');
+  if (focusState.active && !focusState.onBreak) {
+    if (startEl) startEl.style.display = 'none';
+    if (activeEl) activeEl.style.display = 'block';
+    if (taskEl) taskEl.textContent = focusState.task;
+  } else if (!focusState.onBreak) {
+    if (startEl) startEl.style.display = 'block';
+    if (activeEl) activeEl.style.display = 'none';
+    if (taskEl) taskEl.textContent = '';
+  }
+}
+
+function toggleAmbient(type) {
+  const btn = document.getElementById('amb-' + type);
+  if (activeAmbient === type) {
+    activeAmbient = null;
+    btn.classList.remove('active');
+    showToast('Ambient sound stopped', 'info');
+  } else {
+    document.querySelectorAll('.ambient-btn').forEach(b => b.classList.remove('active'));
+    activeAmbient = type;
+    btn.classList.add('active');
+    showToast(`Playing: ${type} (placeholder)`, 'info');
+  }
+}
+
+function logFocusSession(task, mins, type, completed) {
+  const sessions = LS.get('focus-sessions', []);
+  sessions.push({ id: uid(), task, mins, type, completed, date: todayStr(), time: nowISO() });
+  LS.set('focus-sessions', sessions);
+}
+
+function getTodayFocusSessions() {
+  return LS.get('focus-sessions', []).filter(s => s.date === todayStr());
+}
+
+function renderFocusStats() {
+  const today = getTodayFocusSessions();
+  const totalMin = today.reduce((s, f) => s + (f.mins || 0), 0);
+  const distractions = LS.get('distractions', []).filter(d => d.date === todayStr());
+  const hrs = Math.floor(totalMin / 60);
+  const mins = totalMin % 60;
+
+  document.getElementById('focusTotalToday').textContent = totalMin;
+  document.getElementById('focusSessionsToday').textContent = today.length;
+
+  // Streak
+  const allSessions = LS.get('focus-sessions', []);
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const ds = d.toISOString().slice(0, 10);
+    if (allSessions.some(s => s.date === ds)) { streak++; d.setDate(d.getDate() - 1); }
+    else if (i === 0) { d.setDate(d.getDate() - 1); continue; }
+    else break;
+  }
+  document.getElementById('focusStreak').textContent = streak;
+
+  if (totalMin > 0) {
+    const score = Math.max(0, Math.round(((totalMin - distractions.length * 5) / totalMin) * 100));
+    document.getElementById('focusDeepScore').textContent = score + '%';
+  } else {
+    document.getElementById('focusDeepScore').textContent = '-';
+  }
+}
+
+function renderFocusSessionLog() {
+  const today = getTodayFocusSessions();
+  const el = document.getElementById('focusSessionLog');
+  if (!el) return;
+  if (!today.length) { el.innerHTML = '<div class="empty"><span class="empty-icon">⏱️</span>No sessions yet</div>'; return; }
+
+  // Daily stats summary
+  const totalMin = today.reduce((s, f) => s + (f.mins || 0), 0);
+  const hrs = Math.floor(totalMin / 60);
+  const mins = totalMin % 60;
+  const statsHtml = `<div style="font-size:12px;color:var(--subtext0);margin-bottom:8px;padding:6px;background:var(--bg-crust);border-radius:4px">
+    ${today.length} session${today.length!==1?'s':''}, ${hrs > 0 ? hrs + 'h ' : ''}${mins}m focused today
+  </div>`;
+
+  el.innerHTML = statsHtml + today.map(s =>
+    `<div class="task-row">
+      <span style="color:${s.completed ? 'var(--green)' : 'var(--red)'}; margin-right:6px">${s.completed ? '✓' : '✕'}</span>
+      <span class="task-title">${esc(s.task)}</span>
+      <span class="task-time">${s.mins}m · ${s.type || ''}</span>
+    </div>`
+  ).join('');
+}
+
+function logDistraction() {
+  const note = prompt('What distracted you? (optional)');
+  const distractions = LS.get('distractions', []);
+  distractions.push({ id: uid(), note: note || '', date: todayStr(), time: nowISO() });
+  LS.set('distractions', distractions);
+  renderDistractionLog();
+  renderFocusStats();
+}
+
+function renderDistractionLog() {
+  const distractions = LS.get('distractions', []).filter(d => d.date === todayStr());
+  const el = document.getElementById('distractionLog');
+  if (!el) return;
+  if (!distractions.length) { el.innerHTML = '<div class="empty"><span class="empty-icon">🧘</span>No distractions — nice!</div>'; return; }
+  el.innerHTML = distractions.map(d =>
+    `<div class="distraction-item">
+      <span class="ts">${new Date(d.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+      <span>${esc(d.note || 'Distracted')}</span>
+    </div>`
+  ).join('');
+}
+
+function quickFocus(mins) {
+  navigate('focus');
+  setTimeout(() => startFocus(mins, mins === 25 ? 5 : 0, mins === 25 ? 'Pomodoro' : 'Deep Work'), 200);
+}
+
+// ═══════════════════════════════════════════════════
+// HABITS
+// ═══════════════════════════════════════════════════
+const HABIT_CATEGORY_COLORS = {
+  health: 'var(--green)', mind: 'var(--purple)', work: 'var(--blue)',
+  social: 'var(--pink)', creative: 'var(--peach)', other: 'var(--overlay0)',
+};
+
+function getHabitBestStreak(id) {
+  let best = 0, current = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const ds = d.toISOString().slice(0, 10);
+    const log = LS.get('habit-log-' + ds, {});
+    if (log[id]) { current++; if (current > best) best = current; }
+    else { current = 0; }
+    d.setDate(d.getDate() - 1);
+  }
+  return best;
+}
+
+function renderHabits() {
+  const habits = LS.get('habits', []);
+  const todayLog = LS.get('habit-log-' + todayStr(), {});
+
+  const todayEl = document.getElementById('habitTodayList');
+  if (!habits.length) {
+    todayEl.innerHTML = '<div class="empty"><span class="empty-icon">⚡</span>No habits defined — add one below!</div>';
+  } else {
+    todayEl.innerHTML = habits.map(h => {
+      const streak = getHabitStreak(h.id);
+      const catColor = HABIT_CATEGORY_COLORS[h.category] || 'var(--overlay0)';
+      const streakDisplay = streak >= 3 ? `<span class="streak-fire">🔥 ${streak}</span>` : `<span style="font-size:12px;color:var(--overlay0)">${streak}d</span>`;
+      return `<div class="task-row" onclick="toggleHabit('${h.id}')" style="cursor:pointer">
+        <span class="habit-category-badge" style="background:${catColor}"></span>
+        <div class="task-check ${todayLog[h.id] ? 'done' : ''}"></div>
+        <span class="task-title">${esc(h.name)}</span>
+        <span class="tag">${h.freq}</span>
+        ${streakDisplay}
+        <button class="btn sm danger" onclick="event.stopPropagation();removeHabit('${h.id}')" style="padding:2px 6px;font-size:10px">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  const streakEl = document.getElementById('habitStreaks');
+  if (!habits.length) {
+    streakEl.innerHTML = '<div class="empty">Add habits to see streaks</div>';
+  } else {
+    streakEl.innerHTML = '<div class="habit-heatmap">' + habits.map(h => {
+      const streak = getHabitStreak(h.id);
+      const best = getHabitBestStreak(h.id);
+      const catColor = HABIT_CATEGORY_COLORS[h.category] || 'var(--overlay0)';
+      // Heat map dots - last 30 days
+      const dots = [];
+      let completedDays = 0;
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const ds = d.toISOString().slice(0, 10);
+        const log = LS.get('habit-log-' + ds, {});
+        const isToday = ds === todayStr();
+        const done = !!log[h.id];
+        if (done) completedDays++;
+        // Intensity levels for heat map
+        dots.push(`<div class="habit-dot ${done ? 'done' : 'missed'} ${isToday ? 'today' : ''}" title="${ds}" style="${done ? 'background:' + catColor : ''}"></div>`);
+      }
+      return `<div class="habit-heatmap-row">
+        <span class="habit-category-badge" style="background:${catColor}"></span>
+        <span class="habit-name">${esc(h.name)}</span>
+        <div class="habit-dots">${dots.join('')}</div>
+        <span class="habit-stats">
+          ${streak >= 3 ? '🔥' : ''} ${streak}d streak
+          <br><span class="best-streak">Best: ${best}d · ${completedDays}/30</span>
+        </span>
+      </div>`;
+    }).join('') + '</div>';
+  }
+
+  loadHabitSuggestions();
+}
+
+function addHabit() {
+  const name = document.getElementById('newHabitName').value.trim();
+  if (!name) return;
+  const freq = document.getElementById('newHabitFreq').value;
+  const category = document.getElementById('newHabitCategory')?.value || 'other';
+  const habits = LS.get('habits', []);
+  habits.push({ id: uid(), name, freq, category, createdAt: nowISO() });
+  LS.set('habits', habits);
+  document.getElementById('newHabitName').value = '';
+  showToast('Habit added!', 'success');
+  renderHabits();
+}
+
+function removeHabit(id) {
+  let habits = LS.get('habits', []);
+  habits = habits.filter(h => h.id !== id);
+  LS.set('habits', habits);
+  renderHabits();
+}
+
+function toggleHabit(id) {
+  const key = 'habit-log-' + todayStr();
+  const log = LS.get(key, {});
+  log[id] = !log[id];
+  LS.set(key, log);
+  renderHabits();
+}
+
+function getHabitStreak(id) {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const ds = d.toISOString().slice(0, 10);
+    const log = LS.get('habit-log-' + ds, {});
+    if (log[id]) { streak++; d.setDate(d.getDate() - 1); }
+    else if (i === 0) { d.setDate(d.getDate() - 1); continue; }
+    else break;
+  }
+  return streak;
+}
+
+async function loadHabitSuggestions() {
+  const el = document.getElementById('habitSuggestions');
+  const data = await Bridge.getProposals();
+  if (!data || !Array.isArray(data)) { el.innerHTML = '<div class="empty">No agent suggestions</div>'; return; }
+  const habitSuggestions = data.filter(p => p.type === 'habit');
+  if (!habitSuggestions.length) { el.innerHTML = '<div class="empty">No habit suggestions from agents</div>'; return; }
+  el.innerHTML = habitSuggestions.map(s =>
+    `<div class="suggestion-card">
+      <div class="icon">⚡</div>
+      <div class="content">${esc(s.text || s.message || '')}</div>
+      <button class="btn sm green" onclick="adoptHabitSuggestion('${esc(s.text||s.message||'')}')">Adopt</button>
+    </div>`
+  ).join('');
+}
+
+function adoptHabitSuggestion(name) {
+  const habits = LS.get('habits', []);
+  habits.push({ id: uid(), name, freq: 'daily', createdAt: nowISO() });
+  LS.set('habits', habits);
+  renderHabits();
+}
+
+// ═══════════════════════════════════════════════════
+// JOURNAL — Enhanced with mood (5 emojis), energy, prompts, vault
+// ═══════════════════════════════════════════════════
+let selectedMood = '';
+let selectedEnergy = 0;
+let expandedJournalId = null;
+
+function toggleJournalViewer(id) {
+  expandedJournalId = expandedJournalId === id ? null : id;
+  renderJournalEntries();
+}
+
+const JOURNAL_PROMPTS = [
+  "What's one thing you learned today that surprised you?",
+  "What would you tell your past self from a week ago?",
+  "What's draining your energy right now? What's energizing you?",
+  "If today were your last day working on this project, what would you prioritize?",
+  "What assumption are you making that might be wrong?",
+  "What's one small win you can celebrate today?",
+  "Who helped you recently? How can you pay it forward?",
+  "What would you do differently if you could restart this week?",
+  "What are you avoiding? Why?",
+  "What does 'good enough' look like for your current task?",
+];
+
+function renderJournal() {
+  selectedMood = '';
+  selectedEnergy = 0;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active'));
+  refreshPrompt();
+  renderJournalEntries();
+  renderPromptChips();
+  updateWordCount();
+}
+
+function updateWordCount() {
+  const g = (document.getElementById('journalGratitude')?.value || '').trim();
+  const r = (document.getElementById('journalReflection')?.value || '').trim();
+  const words = (g + ' ' + r).split(/\s+/).filter(Boolean).length;
+  const el = document.getElementById('journalWordCount');
+  if (el) el.textContent = words + ' word' + (words !== 1 ? 's' : '');
+}
+
+function renderPromptChips() {
+  const el = document.getElementById('journalPromptChips');
+  if (!el) return;
+  // Pick 4 random prompts
+  const shuffled = [...JOURNAL_PROMPTS].sort(() => Math.random() - .5).slice(0, 4);
+  el.innerHTML = shuffled.map(p =>
+    `<span class="journal-prompt-chip" onclick="usePromptChip(this)" title="${esc(p)}">${esc(p.length > 40 ? p.slice(0, 40) + '…' : p)}</span>`
+  ).join('');
+}
+
+function usePromptChip(el) {
+  const text = el.title || el.textContent;
+  const textarea = document.getElementById('journalReflection');
+  if (textarea) {
+    textarea.value = (textarea.value ? textarea.value + '\n\n' : '') + text + '\n';
+    textarea.focus();
+    updateWordCount();
+  }
+}
+
+function refreshPrompt() {
+  const idx = Math.floor(Math.random() * JOURNAL_PROMPTS.length);
+  document.getElementById('journalPromptText').textContent = JOURNAL_PROMPTS[idx];
+}
+
+function selectMood(emoji) {
+  selectedMood = emoji;
+  document.querySelectorAll('.mood-btn').forEach(b => {
+    b.classList.toggle('selected', b.textContent === emoji);
+  });
+}
+
+function selectEnergy(level) {
+  selectedEnergy = level;
+  document.querySelectorAll('.energy-btn').forEach(b => {
+    const bl = parseInt(b.dataset.level);
+    b.classList.toggle('active', bl <= level);
+  });
+}
+
+function saveJournalEntry() {
+  const gratitude = document.getElementById('journalGratitude').value.trim();
+  const reflection = document.getElementById('journalReflection').value.trim();
+  if (!gratitude && !reflection && !selectedMood) return;
+
+  const entries = LS.get('journal', []);
+  entries.push({
+    id: uid(), date: todayStr(), mood: selectedMood || '😐', energy: selectedEnergy,
+    gratitude, reflection, createdAt: nowISO(),
+  });
+  LS.set('journal', entries);
+
+  document.getElementById('journalGratitude').value = '';
+  document.getElementById('journalReflection').value = '';
+  selectedMood = '';
+  selectedEnergy = 0;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active'));
+  updateWordCount();
+  showToast('Journal entry saved!', 'success');
+  renderJournalEntries();
+}
+
+async function saveToVault() {
+  const gratitude = document.getElementById('journalGratitude').value.trim();
+  const reflection = document.getElementById('journalReflection').value.trim();
+  const content = `# Journal Entry — ${todayStr()}\n\nMood: ${selectedMood || '😐'}\nEnergy: ${selectedEnergy || '?'}/5\n\n## Grateful For\n${gratitude || 'N/A'}\n\n## Reflection\n${reflection || 'N/A'}`;
+  const result = await Bridge.saveToVault({ path: `journal/${todayStr()}.md`, content });
+  if (result) {
+    showToast('Saved to vault!', 'success');
+  } else {
+    showToast('Vault save unavailable — entry saved locally', 'info');
+  }
+}
+
+function renderJournalEntries() {
+  const entries = LS.get('journal', []).slice().reverse();
+  const el = document.getElementById('journalEntries');
+  if (!entries.length) { el.innerHTML = '<div class="empty"><span class="empty-icon">📝</span>No journal entries yet<div class="empty-hint">Start writing above!</div></div>'; return; }
+
+  el.innerHTML = entries.slice(0, 20).map(e => {
+    const tags = autoTag(e.reflection + ' ' + e.gratitude);
+    const energyDisplay = e.energy ? '⚡'.repeat(e.energy) : '';
+    const wordCount = ((e.gratitude || '') + ' ' + (e.reflection || '')).split(/\s+/).filter(Boolean).length;
+    return `<div class="journal-entry" onclick="toggleJournalViewer('${e.id}')" style="cursor:pointer">
+      <div class="mood-display">${e.mood} ${energyDisplay}</div>
+      <div class="date">${formatDate(e.date)} ${e.createdAt ? '· ' + new Date(e.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''} · ${wordCount} words</div>
+      <div class="journal-entry-viewer ${expandedJournalId === e.id ? 'open' : ''}" id="journal-view-${e.id}">
+        ${e.gratitude ? `<div style="font-size:13px;margin-bottom:6px;margin-top:8px"><strong>Grateful for:</strong> ${esc(e.gratitude)}</div>` : ''}
+        ${e.reflection ? `<div style="font-size:13px">${esc(e.reflection)}</div>` : ''}
+        ${tags.length ? `<div style="margin-top:6px">${tags.map(t => `<span class="tag">${t}</span>`).join(' ')}</div>` : ''}
+      </div>
+      ${expandedJournalId !== e.id ? `<div style="font-size:11px;color:var(--overlay0);margin-top:4px">Click to expand</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function autoTag(text) {
+  if (!text) return [];
+  const tags = [];
+  const lower = text.toLowerCase();
+  if (/work|project|ship|build|code|deploy/.test(lower)) tags.push('work');
+  if (/exercise|run|gym|walk|health/.test(lower)) tags.push('health');
+  if (/learn|read|study|book|course/.test(lower)) tags.push('learning');
+  if (/family|friend|partner|social/.test(lower)) tags.push('relationships');
+  if (/stress|anxious|worry|overwhelm/.test(lower)) tags.push('stress');
+  if (/happy|joy|excit|accomplish|proud/.test(lower)) tags.push('positive');
+  return tags;
+}
+
+// ═══════════════════════════════════════════════════
+// CALENDAR — Shows focus sessions, completed tasks, journal
+// ═══════════════════════════════════════════════════
+let calYear, calMonth;
+{
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+}
+
+function renderCalendar() {
+  const now = new Date();
+  document.getElementById('calMonthLabel').textContent = new Date(calYear, calMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+  const todayDate = todayStr();
+
+  // Gather data
+  const allSessions = LS.get('focus-sessions', []);
+  const allTasks = LS.get('tasks', []);
+  const allJournal = LS.get('journal', []);
+
+  let html = '<div class="cal-header">Sun</div><div class="cal-header">Mon</div><div class="cal-header">Tue</div><div class="cal-header">Wed</div><div class="cal-header">Thu</div><div class="cal-header">Fri</div><div class="cal-header">Sat</div>';
+
+  // Previous month padding
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const day = daysInPrev - i;
+    html += `<div class="cal-cell other-month"><div class="cal-day-num">${day}</div></div>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === todayDate;
+    const sessions = allSessions.filter(s => s.date === dateStr);
+    const completedTasks = allTasks.filter(t => t.done && t.doneAt && t.doneAt.slice(0, 10) === dateStr);
+    const journals = allJournal.filter(j => j.date === dateStr);
+
+    let events = '';
+    sessions.forEach(s => { events += `<div class="cal-event focus">${s.mins}m ${esc(s.task).slice(0,15)}</div>`; });
+    completedTasks.slice(0, 2).forEach(t => { events += `<div class="cal-event task">✅ ${esc(t.title).slice(0,15)}</div>`; });
+    if (completedTasks.length > 2) events += `<div class="cal-event task">+${completedTasks.length - 2} more</div>`;
+    journals.forEach(j => { events += `<div class="cal-event journal">📝 ${j.mood}</div>`; });
+
+    html += `<div class="cal-cell ${isToday ? 'today' : ''}"><div class="cal-day-num">${d}</div>${events}</div>`;
+  }
+
+  // Next month padding
+  const totalCells = firstDay + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="cal-cell other-month"><div class="cal-day-num">${i}</div></div>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function changeCalMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function calToday() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  renderCalendar();
+}
+
+// ═══════════════════════════════════════════════════
+// REVIEW — Weekly review template with stats
+// ═══════════════════════════════════════════════════
+const REVIEW_ITEMS = [
+  'Process inbox to zero',
+  'Review active tasks',
+  'Review goals progress',
+  'Clear completed items',
+  'Plan next week\'s priorities',
+];
+
+function renderReview() {
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekStr = weekAgo.toISOString().slice(0, 10);
+
+  const tasks = LS.get('tasks', []);
+  const weekTasksDone = tasks.filter(t => t.done && t.doneAt && t.doneAt.slice(0, 10) >= weekStr).length;
+
+  const allSessions = LS.get('focus-sessions', []);
+  const weekSessions = allSessions.filter(s => s.date >= weekStr);
+  const weekMins = weekSessions.reduce((s, f) => s + f.mins, 0);
+
+  const allJournal = LS.get('journal', []);
+  const weekJournal = allJournal.filter(j => j.date >= weekStr).length;
+
+  document.getElementById('reviewTasksDone').textContent = weekTasksDone;
+  document.getElementById('reviewFocusTime').textContent = (weekMins / 60).toFixed(1) + 'h';
+  document.getElementById('reviewJournalCount').textContent = weekJournal;
+
+  // Checklist
+  const checks = LS.get('review-checks-' + getWeekStr(), {});
+  const checkEl = document.getElementById('reviewChecklist');
+  checkEl.innerHTML = REVIEW_ITEMS.map((item, i) =>
+    `<div class="review-check ${checks[i] ? 'checked' : ''}" onclick="toggleReviewCheck(${i})">
+      <div class="task-check ${checks[i] ? 'done' : ''}"></div>
+      <span class="review-label">${item}</span>
+    </div>`
+  ).join('');
+
+  // Stats
+  const statsEl = document.getElementById('reviewStats');
+  let habitsKept = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0, 10);
+    const log = LS.get('habit-log-' + ds, {});
+    if (Object.values(log).some(Boolean)) habitsKept++;
+  }
+
+  const activeTasks = tasks.filter(t => !t.done).length;
+  const inboxCount = tasks.filter(t => t.bucket === 'inbox' && !t.done).length;
+  const distractions = LS.get('distractions', []).filter(d => d.date >= weekStr).length;
+
+  statsEl.innerHTML = `
+    <div class="task-row"><span class="task-title">Active tasks</span><span style="font-weight:700">${activeTasks}</span></div>
+    <div class="task-row"><span class="task-title">Inbox items</span><span style="font-weight:700;color:${inboxCount > 5 ? 'var(--red)' : 'var(--green)'}">${inboxCount}</span></div>
+    <div class="task-row"><span class="task-title">Focus sessions</span><span style="font-weight:700">${weekSessions.length}</span></div>
+    <div class="task-row"><span class="task-title">Distractions</span><span style="font-weight:700">${distractions}</span></div>
+    <div class="task-row"><span class="task-title">Days with habits</span><span style="font-weight:700">${habitsKept}/7</span></div>
+  `;
+}
+
+function getWeekStr() {
+  const d = new Date();
+  const day = d.getDay();
+  d.setDate(d.getDate() - day);
+  return d.toISOString().slice(0, 10);
+}
+
+function toggleReviewCheck(i) {
+  const key = 'review-checks-' + getWeekStr();
+  const checks = LS.get(key, {});
+  checks[i] = !checks[i];
+  LS.set(key, checks);
+  renderReview();
+}
+
+function generateReview() {
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekStr = weekAgo.toISOString().slice(0, 10);
+
+  const tasks = LS.get('tasks', []);
+  const completedTasks = tasks.filter(t => t.done && t.doneAt && t.doneAt.slice(0, 10) >= weekStr);
+  const activeTasks = tasks.filter(t => !t.done && t.bucket === 'today');
+  const inboxTasks = tasks.filter(t => !t.done && t.bucket === 'inbox');
+
+  const allSessions = LS.get('focus-sessions', []);
+  const weekSessions = allSessions.filter(s => s.date >= weekStr);
+  const weekMins = weekSessions.reduce((s, f) => s + f.mins, 0);
+
+  const allJournal = LS.get('journal', []);
+  const weekJournal = allJournal.filter(j => j.date >= weekStr);
+  const moods = weekJournal.map(j => j.mood).filter(Boolean);
+
+  let summary = `<div style="background:var(--bg-mantle);border-radius:8px;padding:16px;font-size:13px;line-height:1.8">`;
+  summary += `<strong>📊 Weekly Review — ${formatDate(weekStr)} to ${formatDate(todayStr())}</strong><br><br>`;
+  summary += `<strong>✅ Completed (${completedTasks.length}):</strong><br>`;
+  if (completedTasks.length) {
+    completedTasks.slice(0, 10).forEach(t => { summary += `&nbsp;&nbsp;• ${esc(t.title)}<br>`; });
+    if (completedTasks.length > 10) summary += `&nbsp;&nbsp;...and ${completedTasks.length - 10} more<br>`;
+  } else { summary += '&nbsp;&nbsp;No tasks completed<br>'; }
+
+  summary += `<br><strong>⏱️ Focus:</strong> ${(weekMins/60).toFixed(1)} hours across ${weekSessions.length} sessions<br>`;
+  summary += `<strong>📔 Journal:</strong> ${weekJournal.length} entries`;
+  if (moods.length) summary += ` (moods: ${moods.join(' ')})`;
+  summary += `<br>`;
+
+  if (inboxTasks.length) {
+    summary += `<br><strong>📥 Inbox:</strong> ${inboxTasks.length} items need processing<br>`;
+  }
+  if (activeTasks.length) {
+    summary += `<br><strong>📌 Carry forward:</strong><br>`;
+    activeTasks.slice(0, 5).forEach(t => { summary += `&nbsp;&nbsp;• ${esc(t.title)}<br>`; });
+  }
+  summary += `</div>`;
+
+  document.getElementById('reviewSummary').innerHTML = summary;
+  showToast('Review generated!', 'success');
+}
+
+// ═══════════════════════════════════════════════════
+// NOTES
+// ═══════════════════════════════════════════════════
+let currentNoteId = null;
+
+function renderNotes() {
+  const notes = LS.get('notes', []);
+  const listEl = document.getElementById('notesList');
+  const editorEl = document.getElementById('noteEditor');
+
+  if (currentNoteId) {
+    listEl.style.display = 'none';
+    editorEl.style.display = 'block';
+    const note = notes.find(n => n.id === currentNoteId);
+    if (note) {
+      document.getElementById('noteEditorTitle').value = note.title;
+      document.getElementById('noteEditorContent').value = note.content;
+    }
+    return;
+  }
+
+  listEl.style.display = 'block';
+  editorEl.style.display = 'none';
+
+  if (!notes.length) {
+    listEl.innerHTML = '<div class="empty"><span class="empty-icon">📝</span>No notes yet<div class="empty-hint">Create a note above</div></div>';
+    return;
+  }
+
+  listEl.innerHTML = notes.slice().reverse().map(n =>
+    `<div class="task-row" onclick="openNote('${n.id}')" style="cursor:pointer">
+      <span class="task-title" style="font-weight:600">${esc(n.title)}</span>
+      <span class="task-time">${relTime(n.updatedAt || n.createdAt)}</span>
+      <span style="font-size:11px;color:var(--overlay0)">${(n.content || '').length} chars</span>
+    </div>`
+  ).join('');
+}
+
+function addNote() {
+  const title = document.getElementById('newNoteTitle').value.trim();
+  if (!title) return;
+  const notes = LS.get('notes', []);
+  const id = uid();
+  notes.push({ id, title, content: '', createdAt: nowISO(), updatedAt: nowISO() });
+  LS.set('notes', notes);
+  document.getElementById('newNoteTitle').value = '';
+  currentNoteId = id;
+  renderNotes();
+}
+
+function openNote(id) {
+  currentNoteId = id;
+  renderNotes();
+}
+
+function closeNoteEditor() {
+  saveCurrentNote();
+  currentNoteId = null;
+  renderNotes();
+}
+
+function saveCurrentNote() {
+  if (!currentNoteId) return;
+  const notes = LS.get('notes', []);
+  const note = notes.find(n => n.id === currentNoteId);
+  if (!note) return;
+  note.title = document.getElementById('noteEditorTitle').value;
+  note.content = document.getElementById('noteEditorContent').value;
+  note.updatedAt = nowISO();
+  LS.set('notes', notes);
+}
+
+function deleteCurrentNote() {
+  if (!currentNoteId) return;
+  if (!confirm('Delete this note?')) return;
+  let notes = LS.get('notes', []);
+  notes = notes.filter(n => n.id !== currentNoteId);
+  LS.set('notes', notes);
+  currentNoteId = null;
+  renderNotes();
+}
+
+// ═══════════════════════════════════════════════════
+// ANALYTICS (kept for backward compat, also used by review)
+// ═══════════════════════════════════════════════════
+function renderAnalytics() {
+  // Redirect to review page
+  navigate('review');
+}
+
+// ═══════════════════════════════════════════════════
+// RULES
+// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// LIFE AGENT (formerly Rules)
+// ═══════════════════════════════════════════════════
+const AGENT_CAPABILITIES = [
+  { key: 'tasks', icon: '✅', name: 'Tasks: Read & Write', desc: 'Can create, complete, and modify tasks', default: true },
+  { key: 'goals', icon: '🎯', name: 'Goals: Read & Write', desc: 'Can update goals, add milestones', default: true },
+  { key: 'habits', icon: '⚡', name: 'Habits: Read & Write', desc: 'Can track habits, suggest new ones', default: true },
+  { key: 'journal', icon: '📔', name: 'Journal: Read Only', desc: 'Can read journal for context (privacy default)', default: true },
+  { key: 'focus', icon: '⏱️', name: 'Focus: Read & Write', desc: 'Can start focus sessions, track time', default: true },
+  { key: 'calendar', icon: '📅', name: 'Calendar: Read & Write', desc: 'Can schedule events', default: true },
+  { key: 'external', icon: '🔗', name: 'External: Agent OS Bridge', desc: 'Can send requests to Agent OS (dispatch tasks, search vault)', default: false },
+];
+
+const RULE_TEMPLATES = [
+  { text: "Block focus time every morning 9-11am", trigger: "time=09:00", action: "block_focus" },
+  { text: "Auto-defer P3 tasks if I have more than 5 P1 tasks", trigger: "p1_count>5", action: "defer_p3" },
+  { text: "Remind me to journal every evening at 9pm", trigger: "time=21:00", action: "remind_journal" },
+  { text: "If energy < 4, suggest a break", trigger: "energy<4", action: "suggest_break" },
+  { text: "When I haven't logged energy by 10am, remind me", trigger: "no_energy_by=10:00", action: "remind_energy" },
+];
+
+function renderLifeAgent() {
+  // Render context
+  const tasks = LS.get('tasks', []);
+  const goals = LS.get('goals', []);
+  const habits = LS.get('habits', []);
+  const journal = LS.get('journal', []);
+  const focusSessions = LS.get('focus-sessions', []);
+
+  const activeTasks = tasks.filter(t => !t.done);
+  const overdueTasks = tasks.filter(t => !t.done && t.due && t.due < todayStr());
+  const avgGoalProgress = goals.length ? Math.round(goals.reduce((s, g) => s + (g.progress || 0), 0) / goals.length) : 0;
+
+  // Last journal
+  const lastJ = journal.length ? journal[journal.length - 1] : null;
+  const lastJTime = lastJ ? relTime(lastJ.createdAt || lastJ.date) : 'never';
+  const lastJMood = lastJ?.mood || '—';
+
+  // Habit streak
+  const today = todayStr();
+  let maxStreak = 0;
+  habits.forEach(h => {
+    const log = h.log || [];
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 60; i++) {
+      const ds = d.toISOString().slice(0, 10);
+      if (log.includes(ds)) { streak++; } else if (i > 0) break;
+      d.setDate(d.getDate() - 1);
+    }
+    if (streak > maxStreak) maxStreak = streak;
+  });
+
+  document.getElementById('agentContextGrid').innerHTML = `
+    <div class="context-stat"><span class="stat-icon">📋</span><div><div class="stat-value">${activeTasks.length} active tasks${overdueTasks.length ? ', ' + overdueTasks.length + ' overdue' : ''}</div><div class="stat-label">Task load</div></div></div>
+    <div class="context-stat"><span class="stat-icon">🎯</span><div><div class="stat-value">${goals.length} goals, ${avgGoalProgress}% avg progress</div><div class="stat-label">Goal tracking</div></div></div>
+    <div class="context-stat"><span class="stat-icon">📝</span><div><div class="stat-value">Last journal: ${lastJTime} (mood: ${lastJMood})</div><div class="stat-label">Journal</div></div></div>
+    <div class="context-stat"><span class="stat-icon">🔥</span><div><div class="stat-value">${maxStreak}-day habit streak</div><div class="stat-label">Best current streak</div></div></div>
+  `;
+
+  // Render capabilities
+  const caps = LS.get('agent-capabilities', null);
+  const capState = caps || AGENT_CAPABILITIES.reduce((o, c) => { o[c.key] = c.default; return o; }, {});
+  if (!caps) LS.set('agent-capabilities', capState);
+
+  document.getElementById('capabilitiesList').innerHTML = AGENT_CAPABILITIES.map(c =>
+    `<div class="capability-row">
+      <span class="cap-icon">${c.icon}</span>
+      <div class="cap-info"><div class="cap-name">${c.name}</div><div class="cap-desc">${c.desc}</div></div>
+      <div class="rule-toggle ${capState[c.key] ? 'on' : ''}" onclick="toggleCapability('${c.key}')"><div class="knob"></div></div>
+    </div>`
+  ).join('');
+
+  // Render personality
+  const personality = LS.get('agent-personality', { commStyle: 'balanced', proactivity: 50, checkin: 'daily' });
+  document.getElementById('proactivitySlider').value = personality.proactivity;
+  document.getElementById('proactivityValue').textContent = personality.proactivity + '%';
+
+  document.querySelectorAll('#commStyleGroup .radio-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.val === personality.commStyle);
+  });
+  document.querySelectorAll('#checkinGroup .radio-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.val === personality.checkin);
+  });
+
+  // Render rules
+  renderRulesList();
+}
+
+function toggleCapability(key) {
+  const caps = LS.get('agent-capabilities', {});
+  caps[key] = !caps[key];
+  LS.set('agent-capabilities', caps);
+  renderLifeAgent();
+}
+
+function setPersonality(field, value) {
+  const p = LS.get('agent-personality', { commStyle: 'balanced', proactivity: 50, checkin: 'daily' });
+  p[field] = value;
+  LS.set('agent-personality', p);
+  renderLifeAgent();
+}
+
+function setProactivity(val) {
+  const p = LS.get('agent-personality', { commStyle: 'balanced', proactivity: 50, checkin: 'daily' });
+  p.proactivity = parseInt(val);
+  LS.set('agent-personality', p);
+  document.getElementById('proactivityValue').textContent = val + '%';
+}
+
+function renderRulesList() {
+  const rules = LS.get('rules', []);
+  const el = document.getElementById('ruleList');
+
+  if (!rules.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">📜</span>No custom rules<div class="empty-hint">Add one above or use a template</div></div>';
+  } else {
+    el.innerHTML = rules.map((r, i) =>
+      `<div class="rule-item">
+        <span class="rule-text">${esc(r.text)}</span>
+        <div class="rule-toggle ${r.active ? 'on' : ''}" onclick="toggleRule(${i})"><div class="knob"></div></div>
+        <button class="btn sm danger" onclick="removeRule(${i})" style="padding:2px 6px;font-size:10px">✕</button>
+      </div>`
+    ).join('');
+  }
+
+  const tplEl = document.getElementById('ruleTemplates');
+  tplEl.innerHTML = RULE_TEMPLATES.map(t =>
+    `<div class="rule-item" style="cursor:pointer" onclick="adoptTemplate('${esc(t.text)}')">
+      <span class="rule-text" style="color:var(--subtext0)">${esc(t.text)}</span>
+      <button class="btn sm ghost">Use</button>
+    </div>`
+  ).join('');
+}
+
+function addRule() {
+  const text = document.getElementById('newRuleInput').value.trim();
+  if (!text) return;
+  const rules = LS.get('rules', []);
+  const rule = { id: uid(), text, active: true, createdAt: nowISO() };
+  rules.push(rule);
+  LS.set('rules', rules);
+  Bridge.postRule(rule);
+  document.getElementById('newRuleInput').value = '';
+  showToast('Rule added', 'success');
+  renderRulesList();
+}
+
+function adoptTemplate(text) {
+  const rules = LS.get('rules', []);
+  if (rules.some(r => r.text === text)) return;
+  const rule = { id: uid(), text, active: true, createdAt: nowISO() };
+  rules.push(rule);
+  LS.set('rules', rules);
+  Bridge.postRule(rule);
+  showToast('Rule adopted!', 'success');
+  renderRulesList();
+}
+
+function toggleRule(i) {
+  const rules = LS.get('rules', []);
+  if (rules[i]) {
+    rules[i].active = !rules[i].active;
+    LS.set('rules', rules);
+    renderRulesList();
+  }
+}
+
+function removeRule(i) {
+  const rules = LS.get('rules', []);
+  rules.splice(i, 1);
+  LS.set('rules', rules);
+  renderRulesList();
+}
+
+// ═══════════════════════════════════════════════════
+// INTERVIEW / THERAPIST
+// ═══════════════════════════════════════════════════
+const THERAPIST_RESPONSES = {
+  greeting: [
+    "Hey. How are you feeling today?",
+    "Good to see you. What's on your mind?",
+    "Welcome back. How has your day been?"
+  ],
+  mood_low: [
+    "I hear you. That sounds tough. What do you think is contributing most to that feeling?",
+    "Thank you for sharing that. Sometimes naming what's hard is the first step.",
+  ],
+  mood_high: [
+    "That's great to hear! What's been going well?",
+    "Nice. Let's capture what's working so you can replicate it.",
+  ],
+  goals_struggling: [
+    "I notice your {goal} progress has slowed. What's getting in the way?",
+    "Sometimes goals need recalibrating. Is {goal} still the right target?",
+  ],
+  habit_streak: [
+    "You've got a {count}-day streak on {habit}. How does that feel?",
+    "Consistency is showing up. {count} days of {habit} is real momentum.",
+  ],
+  reflection: [
+    "What's one thing you'd do differently this week?",
+    "If you could only accomplish one thing tomorrow, what would matter most?",
+    "What's something you've been avoiding?",
+  ],
+  stressed: ["What's the biggest source of stress right now? Let's break it down."],
+  overwhelmed: ["When everything feels like too much, let's just pick ONE thing. What's most urgent?"],
+  grateful: ["Gratitude is powerful. Tell me three specific things."],
+  stuck: ["Feeling stuck usually means something needs to change. What's the constraint?"],
+  default: [
+    "Tell me more about that.",
+    "How does that make you feel?",
+    "What would the ideal outcome look like?",
+    "That's interesting. What triggered that thought?",
+    "I'm listening. Keep going.",
+  ],
+};
+
+let interviewSessionId = null;
+let interviewInitialized = false;
+
+function renderInterview() {
+  if (!interviewInitialized) {
+    interviewInitialized = true;
+    loadOrStartSession();
+  }
+  renderInterviewContext();
+  renderInterviewHistory();
+  scrollInterviewToBottom();
+  // Show badge
+  const badge = document.getElementById('interviewBadge');
+  if (badge) badge.style.display = 'none';
+}
+
+function loadOrStartSession() {
+  const sessions = LS.get('interview-sessions', []);
+  const today = todayStr();
+  let current = sessions.find(s => s.date === today && !s.ended);
+  if (!current) {
+    current = { id: uid(), date: today, messages: [], startedAt: nowISO(), ended: false };
+    sessions.push(current);
+    LS.set('interview-sessions', sessions);
+    // Send greeting
+    const greeting = pickRandom(THERAPIST_RESPONSES.greeting);
+    addTherapistMessage(current.id, greeting);
+  }
+  interviewSessionId = current.id;
+  renderMessages(current.messages);
+}
+
+function getSession(sessionId) {
+  const sessions = LS.get('interview-sessions', []);
+  return sessions.find(s => s.id === (sessionId || interviewSessionId));
+}
+
+function saveSession(session) {
+  const sessions = LS.get('interview-sessions', []);
+  const idx = sessions.findIndex(s => s.id === session.id);
+  if (idx >= 0) sessions[idx] = session;
+  LS.set('interview-sessions', sessions);
+}
+
+function renderMessages(messages) {
+  const el = document.getElementById('interview-messages');
+  el.innerHTML = messages.map(m =>
+    `<div class="msg-row ${m.role}">
+      <div class="msg-avatar">${m.role === 'therapist' ? '🧠' : '👤'}</div>
+      <div>
+        <div class="msg-bubble">${esc(m.text)}${m.actions ? m.actions.map(a =>
+          `<br><span class="msg-action-btn" onclick="${a.onclick}">${a.label}</span>`
+        ).join('') : ''}</div>
+        <div class="msg-time">${relTime(m.time)}</div>
+      </div>
+    </div>`
+  ).join('');
+  scrollInterviewToBottom();
+}
+
+function scrollInterviewToBottom() {
+  const el = document.getElementById('interview-messages');
+  if (el) setTimeout(() => el.scrollTop = el.scrollHeight, 50);
+}
+
+function sendInterviewMessage() {
+  const input = document.getElementById('interview-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const session = getSession();
+  if (!session) return;
+
+  session.messages.push({ role: 'user', text, time: nowISO() });
+  saveSession(session);
+  renderMessages(session.messages);
+
+  // Show typing indicator
+  showTypingIndicator();
+
+  // Generate response after delay
+  setTimeout(() => {
+    hideTypingIndicator();
+    const response = generateTherapistResponse(text, session);
+    addTherapistMessage(session.id, response.text, response.actions);
+  }, 800 + Math.random() * 1200);
+}
+
+function showTypingIndicator() {
+  const el = document.getElementById('interview-messages');
+  const indicator = document.createElement('div');
+  indicator.className = 'msg-row therapist';
+  indicator.id = 'typing-indicator';
+  indicator.innerHTML = `
+    <div class="msg-avatar">🧠</div>
+    <div class="typing-indicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>`;
+  el.appendChild(indicator);
+  scrollInterviewToBottom();
+}
+
+function hideTypingIndicator() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function addTherapistMessage(sessionId, text, actions) {
+  const session = getSession(sessionId);
+  if (!session) return;
+  const msg = { role: 'therapist', text, time: nowISO() };
+  if (actions) msg.actions = actions;
+  session.messages.push(msg);
+  saveSession(session);
+  renderMessages(session.messages);
+}
+
+function generateTherapistResponse(userText, session) {
+  const lower = userText.toLowerCase();
+  const tasks = LS.get('tasks', []);
+  const goals = LS.get('goals', []);
+  const habits = LS.get('habits', []);
+
+  // Keyword detection
+  if (lower.match(/stress|anxious|anxiety|tense/)) {
+    return { text: pickRandom(THERAPIST_RESPONSES.stressed) };
+  }
+  if (lower.match(/overwhelm|too much|can't cope|cant cope/)) {
+    return { text: pickRandom(THERAPIST_RESPONSES.overwhelmed) };
+  }
+  if (lower.match(/grateful|thankful|appreciate/)) {
+    return { text: pickRandom(THERAPIST_RESPONSES.grateful) };
+  }
+  if (lower.match(/stuck|blocked|stagnant/)) {
+    return { text: pickRandom(THERAPIST_RESPONSES.stuck) };
+  }
+  if (lower.match(/sad|bad|terrible|awful|horrible|down|depressed|low/)) {
+    return { text: pickRandom(THERAPIST_RESPONSES.mood_low) };
+  }
+  if (lower.match(/great|amazing|good|happy|fantastic|wonderful|awesome/)) {
+    return { text: pickRandom(THERAPIST_RESPONSES.mood_high) };
+  }
+
+  // Context-aware responses
+  if (lower.match(/exercise|workout|gym|run|fitness/) && habits.length >= 0) {
+    return {
+      text: "You mentioned wanting to exercise more. Consistency beats intensity — even 15 minutes counts.",
+      actions: [{ label: '⚡ Create Habit', onclick: "interviewCreateHabit('Exercise')" }]
+    };
+  }
+  if (lower.match(/goal|achieve|accomplish|target/)) {
+    const struggling = goals.find(g => (g.progress || 0) < 30);
+    if (struggling) {
+      return { text: pickRandom(THERAPIST_RESPONSES.goals_struggling).replace('{goal}', struggling.title || 'that goal') };
+    }
+    return {
+      text: "What goal is on your mind? Let's make it concrete.",
+      actions: [{ label: '🎯 Create Goal', onclick: "interviewCreateGoal()" }]
+    };
+  }
+  if (lower.match(/task|todo|to-do|overwhelm/)) {
+    const overdue = tasks.filter(t => !t.done && t.due && t.due < todayStr());
+    if (overdue.length) {
+      return {
+        text: `I see you have ${overdue.length} overdue task${overdue.length > 1 ? 's' : ''}. That weight adds up. Which one is bothering you most?`,
+        actions: [{ label: '📋 Prioritize Tasks', onclick: "navigate('tasks')" }]
+      };
+    }
+  }
+  if (lower.match(/habit/)) {
+    const today = todayStr();
+    let bestStreak = 0, bestHabit = '';
+    habits.forEach(h => {
+      const log = h.log || [];
+      let streak = 0;
+      const d = new Date();
+      for (let i = 0; i < 60; i++) {
+        if (log.includes(d.toISOString().slice(0, 10))) streak++; else if (i > 0) break;
+        d.setDate(d.getDate() - 1);
+      }
+      if (streak > bestStreak) { bestStreak = streak; bestHabit = h.name || h.title || 'a habit'; }
+    });
+    if (bestStreak > 2) {
+      return { text: pickRandom(THERAPIST_RESPONSES.habit_streak).replace('{count}', bestStreak).replace('{habit}', bestHabit) };
+    }
+  }
+
+  // Every 4th message, offer a reflection prompt
+  if (session.messages.length % 8 === 6) {
+    return { text: pickRandom(THERAPIST_RESPONSES.reflection) };
+  }
+
+  return { text: pickRandom(THERAPIST_RESPONSES.default) };
+}
+
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// Bridge actions from therapist
+function interviewCreateHabit(name) {
+  const habits = LS.get('habits', []);
+  habits.push({ id: uid(), name: name || 'New Habit', log: [], createdAt: nowISO() });
+  LS.set('habits', habits);
+  showToast('Habit created: ' + (name || 'New Habit'), 'success');
+  addTherapistMessage(interviewSessionId, `Done — I've created a "${name}" habit for you. The key is showing up, not perfection.`);
+}
+
+function interviewCreateGoal() {
+  navigate('goals');
+  showToast('Create your goal on the Goals page', 'info');
+}
+
+// Sidebar context
+function renderInterviewContext() {
+  const tasks = LS.get('tasks', []);
+  const goals = LS.get('goals', []);
+  const habits = LS.get('habits', []);
+  const journal = LS.get('journal', []);
+  const focusSessions = LS.get('focus-sessions', []);
+
+  const overdue = tasks.filter(t => !t.done && t.due && t.due < todayStr());
+  const activeTasks = tasks.filter(t => !t.done);
+
+  // Mood trend from last 5 journal entries
+  const recentJ = journal.slice(-5);
+  const moodIcons = { great: '😄', good: '🙂', okay: '😐', bad: '😔', terrible: '😢' };
+  const moodTrend = recentJ.map(j => moodIcons[j.mood] || j.mood || '—').join(' ');
+
+  // Best habit streak
+  let bestStreak = 0, bestHabit = '';
+  habits.forEach(h => {
+    const log = h.log || [];
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 60; i++) {
+      if (log.includes(d.toISOString().slice(0, 10))) streak++; else if (i > 0) break;
+      d.setDate(d.getDate() - 1);
+    }
+    if (streak > bestStreak) { bestStreak = streak; bestHabit = h.name || h.title || ''; }
+  });
+
+  // Goal progress
+  const avgProgress = goals.length ? Math.round(goals.reduce((s, g) => s + (g.progress || 0), 0) / goals.length) : 0;
+
+  // Last focus
+  const lastFocus = focusSessions.length ? focusSessions[focusSessions.length - 1] : null;
+
+  // Patterns
+  const patterns = [];
+  if (activeTasks.length > 15) patterns.push('⚠️ Task count high (' + activeTasks.length + ') — mood may be impacted');
+  if (overdue.length > 3) patterns.push('⚠️ ' + overdue.length + ' overdue tasks piling up');
+  if (bestStreak > 5) patterns.push('✅ Strong ' + bestStreak + '-day streak on ' + bestHabit);
+  if (journal.length && !journal.find(j => j.date === todayStr())) patterns.push('📝 No journal entry today');
+
+  const el = document.getElementById('interview-context');
+  el.innerHTML = `
+    <div class="ctx-block"><div class="ctx-label">Mood Trend</div><div class="ctx-value">${moodTrend || 'No entries yet'}</div></div>
+    <div class="ctx-block"><div class="ctx-label">Habit Streaks</div><div class="ctx-value">${bestStreak > 0 ? '🔥 ' + bestStreak + 'd — ' + bestHabit : 'No active streaks'}</div></div>
+    <div class="ctx-block"><div class="ctx-label">Overdue Tasks</div><div class="ctx-value">${overdue.length ? '⚠️ ' + overdue.length + ' overdue' : '✅ All clear'}</div></div>
+    <div class="ctx-block"><div class="ctx-label">Goal Progress</div><div class="ctx-value">${goals.length ? '🎯 ' + avgProgress + '% avg across ' + goals.length + ' goals' : 'No goals set'}</div></div>
+    <div class="ctx-block"><div class="ctx-label">Last Focus</div><div class="ctx-value">${lastFocus ? relTime(lastFocus.endedAt || lastFocus.startedAt) : 'None yet'}</div></div>
+    ${patterns.length ? '<div class="ctx-block"><div class="ctx-label">Patterns Noticed</div><div class="ctx-value">' + patterns.join('<br>') + '</div></div>' : ''}
+  `;
+}
+
+function renderInterviewHistory() {
+  const sessions = LS.get('interview-sessions', []);
+  const past = sessions.filter(s => s.id !== interviewSessionId).reverse().slice(0, 10);
+  const el = document.getElementById('interview-history');
+
+  if (!past.length) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--overlay0)">No previous sessions</div>';
+    return;
+  }
+
+  el.innerHTML = past.map(s => {
+    const msgCount = s.messages.length;
+    const summary = s.messages.find(m => m.role === 'user')?.text?.slice(0, 50) || 'Session';
+    return `<div class="session-history-item" onclick="loadPastSession('${s.id}')">
+      <div class="sh-date">${s.date} · ${msgCount} messages</div>
+      <div class="sh-summary">${esc(summary)}${summary.length >= 50 ? '…' : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function loadPastSession(sessionId) {
+  const session = getSession(sessionId);
+  if (!session) return;
+  interviewSessionId = sessionId;
+  renderMessages(session.messages);
+  renderInterviewContext();
+}
+
+function toggleInterviewSidebar() {
+  const sb = document.getElementById('interviewSidebar');
+  sb.classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function relTime(ts) {
+  if (!ts) return '';
+  try {
+    const diff = Date.now() - new Date(ts).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    return Math.floor(hrs / 24) + 'd ago';
+  } catch { return ts; }
+}
+
+function formatDate(ds) {
+  try {
+    return new Date(ds + 'T00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  } catch { return ds; }
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+renderDashboard();
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', (e) => {
+    if (e.target === m) m.classList.remove('show');
+  });
+});
+
+// Keyboard shortcut: Escape closes modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+  }
+});
+
+</script>
+</body>
+</html>

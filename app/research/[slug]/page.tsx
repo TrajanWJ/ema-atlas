@@ -6,6 +6,7 @@ import { ReactNode } from "react";
 
 import { SiteShell } from "@/components/site-shell";
 import { loadMarkdown } from "@/lib/markdown";
+import { decorate, loadGlossaryTerms } from "@/lib/text-decorate";
 
 type ResearchDocPageProps = {
   params: Promise<{ slug: string }>;
@@ -174,7 +175,12 @@ function renderInline(input: string): ReactNode[] {
   return nodes;
 }
 
-function renderBlocks(blocks: Block[]): ReactNode[] {
+function renderBlocks(blocks: Block[], terms: string[]): ReactNode[] {
+  // Auto-link glossary + Q-refs only inside paragraph and list-item text.
+  // Headings, code blocks, and existing markdown links pass through
+  // untouched (existing links/code become non-string ReactNodes from
+  // renderInline and `decorate` only touches string fragments).
+  const deco = (text: string) => decorate(renderInline(text), terms);
   return blocks.map((b, idx) => {
     switch (b.kind) {
       case "heading": {
@@ -189,12 +195,12 @@ function renderBlocks(blocks: Block[]): ReactNode[] {
           </pre>
         );
       case "quote":
-        return <blockquote key={idx}>{renderInline(b.text)}</blockquote>;
+        return <blockquote key={idx}>{deco(b.text)}</blockquote>;
       case "ul":
         return (
           <ul key={idx}>
             {b.items.map((it, i) => (
-              <li key={i}>{renderInline(it)}</li>
+              <li key={i}>{deco(it)}</li>
             ))}
           </ul>
         );
@@ -202,12 +208,12 @@ function renderBlocks(blocks: Block[]): ReactNode[] {
         return (
           <ol key={idx}>
             {b.items.map((it, i) => (
-              <li key={i}>{renderInline(it)}</li>
+              <li key={i}>{deco(it)}</li>
             ))}
           </ol>
         );
       case "p":
-        return <p key={idx}>{renderInline(b.text)}</p>;
+        return <p key={idx}>{deco(b.text)}</p>;
       case "hr":
         return <hr key={idx} />;
     }

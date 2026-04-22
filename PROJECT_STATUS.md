@@ -1,13 +1,24 @@
 # Project Status
 
 Snapshot of where the EMA project stands right now. Refreshed each
-significant push. Last refresh: **2026-04-22, end of wave 5 partial**.
+significant push. Last refresh: **2026-04-22, live wave alignment pass**.
 
 ## One-line state
 
 We are in **prep stage for EMA v0.0.3** (Gleam/BEAM rewrite). The
 **EMA Atlas** Next.js app is the primary deliverable expressing that
 prep, alongside a navigable lineage archive.
+
+## Swarm control model
+
+- one active objective
+- one main write lane
+- current main-lane owner: `Claude deliverables orchestrator`
+- Codex posture: support lanes only around the main lane
+- support work is limited to alignment, context curation, repo hygiene,
+  handoff packaging, and verification
+- if a task starts touching the main deliverable substance, it should be
+  handed to the main lane instead of expanded in support
 
 ## What's shippable today
 
@@ -65,9 +76,11 @@ CONTRIBUTORS · CONTRIBUTING_TO_GRAPH · CHANGELOG · DELIVERABLES_INDEX
 
 ## What's in flight right now
 
-- **Subagent M** — `research/build-steps/03-driver-registry-skeleton.md`
-  and `04-sessions-and-babysitter.md`
-- **Subagent (SVG + inventory)** — Mermaid SVG renders + `content/artifacts/inventory.md`
+- **Live wave** — one narrow deliverables lane chosen by Claude
+- **Main lane** — `main-deliverables`
+- **Main lane owner** — `Claude deliverables orchestrator`
+- **Support posture** — Codex support swarm keeps claims, handoffs,
+  context, and verification tight without rewriting the main artifact
 
 ## Where the project is going next (per ROADMAP.md)
 

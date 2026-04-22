@@ -1,0 +1,23 @@
+---
+id: codebase-ema
+type: codebase
+era: ema-daemon
+status: canonical
+contributes: [authority, execution, workspace, identity, orchestration]
+preserves_from: [lineage-original-elixir-ema, lineage-openclaw, codebase-claudeforge]
+inspires: [docs-ema-next-steps]
+superseded_by: []
+adjacent_to: [codebase-claudeforge]
+referenced_in_docs: [02-project-transfer-brief.md, 03-architectural-evolution-and-major-decisions.md, MACBOOK_AGENT_HANDOFF_MASTER.md, HERMES_EMA_LINEAGE_META_HARNESS_AUDIT_2026-04-22.md]
+key_artifacts: [code/ema/daemon/lib/ema/control_plane, code/ema/daemon/lib/ema/babysitter, code/ema/daemon/lib/ema/sessions, code/ema/daemon/lib/ema/surfaces/hermes_client.ex, code/ema/docs/AGENT-CONTRACT.md, code/ema/docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md, code/ema/docs/HERMES_HARNESS_DRIVER_REGISTRY.md, code/ema/workspace/shared]
+aliases: [/home/trajan/Projects/ema]
+load_priority: 1
+---
+# codebase-ema
+
+The canonical EMA daemon snapshot. Contains the live `control_plane/`
+(event_log, store, replay, execution_supervisor, incidents/*, proposal_events),
+`babysitter/`, `sessions/`, and `surfaces/hermes_client.ex` — i.e. the
+EMA-truth / Hermes-execution split is already real in code, not just doctrine.
+Holds ClaudeForge under `code/ema/claudeforge/` and the working
+`hermes-provider.ts` seam.

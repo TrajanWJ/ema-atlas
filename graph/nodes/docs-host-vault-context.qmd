@@ -1,0 +1,17 @@
+---
+id: docs-host-vault-context
+type: docs
+era: hybrid
+status: active
+contributes: [memory, doctrine]
+preserves_from: []
+inspires: []
+adjacent_to: [docs-vault-wiki, docs-host-obsidian-vault]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: [/home/trajan/staging/host-vault]
+load_priority: 3
+---
+# docs-host-vault-context
+
+Imported host-vault mirrors, session logs, and research docs.

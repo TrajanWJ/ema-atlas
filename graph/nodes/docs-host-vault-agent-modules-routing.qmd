@@ -1,0 +1,17 @@
+---
+id: docs-host-vault-agent-modules-routing
+type: docs
+era: hybrid
+status: active
+contributes: [orchestration, driver]
+preserves_from: []
+inspires: []
+adjacent_to: [docs-host-vault-context, docs-clis-mcps-integrations]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 3
+---
+# docs-host-vault-agent-modules-routing
+
+Agent-module routing notes — direct prior art for the harness/driver registry.

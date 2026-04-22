@@ -1,0 +1,17 @@
+---
+id: codebase-agentgpt
+type: codebase
+era: hybrid
+status: archive
+contributes: [orchestration]
+preserves_from: []
+inspires: []
+adjacent_to: []
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 5
+---
+# codebase-agentgpt
+
+AgentGPT-derived experiment. Archive; no code reuse expected.

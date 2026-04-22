@@ -1,0 +1,18 @@
+---
+id: lineage-index
+type: meta
+era: meta
+status: meta
+contributes: [authority]
+preserves_from: []
+inspires: []
+adjacent_to: [main]
+referenced_in_docs: [SYSTEM_GRAPH.md, BRANCH_MAP.md, BRANCH_MAP_EXPANDED.md]
+key_artifacts: [BRANCH_MAP.md, inventory/GITHUB_REPOS.md, inventory/LOCAL_ROOTS.md]
+aliases: []
+load_priority: 1
+---
+# lineage-index
+
+Authoritative inventory: which GitHub repos and local roots fed this pack.
+Use this as the source-of-truth for "where did this branch come from?"

@@ -1,0 +1,18 @@
+---
+id: github-legacy-repos
+type: recovery
+era: meta
+status: archive
+contributes: [recovery]
+preserves_from: []
+inspires: []
+adjacent_to: [git-history-extracts]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 5
+---
+# github-legacy-repos
+
+Pointers / snapshots of legacy GitHub repos that fed the lineage. Cross-check
+against `inventory/GITHUB_REPOS.md` on `lineage-index`.

@@ -1,0 +1,18 @@
+---
+id: codebase-place-companion
+type: codebase
+era: place-org
+status: doctrine-only
+contributes: [ux-metaphor, surface]
+preserves_from: [codebase-place-org]
+inspires: []
+adjacent_to: [codebase-place-org]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 4
+---
+# codebase-place-companion
+
+Native window/companion bridge for place.org. Useful as reference for the
+"native desktop app" surface mentioned in `05-fresh-context-project-app-model.md`.

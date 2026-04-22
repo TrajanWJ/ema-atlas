@@ -1,0 +1,18 @@
+---
+id: lineage-openclaw-agent-workspaces
+type: lineage
+era: openclaw
+status: doctrine-only
+contributes: [workspace, orchestration]
+preserves_from: [lineage-openclaw]
+inspires: [codebase-ema]
+adjacent_to: [lineage-openclaw, lineage-openclaw-archive-subprojects]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 4
+---
+# lineage-openclaw-agent-workspaces
+
+Per-agent workspace residue from OpenClaw — directory shapes and continuity
+patterns. Useful when designing the v1 shared-workspace contract.

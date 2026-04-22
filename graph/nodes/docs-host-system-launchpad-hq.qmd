@@ -1,0 +1,18 @@
+---
+id: docs-host-system-launchpad-hq
+type: docs
+era: hybrid
+status: active
+contributes: [ux-metaphor, surface]
+preserves_from: [codebase-place-org]
+inspires: []
+adjacent_to: [design-review-fresh-context, docs-frontend-interface-inspirations]
+referenced_in_docs: [05-fresh-context-project-app-model.md, SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 3
+---
+# docs-host-system-launchpad-hq
+
+Notes on the Launchpad and HQ surfaces. Read alongside
+`05-fresh-context-project-app-model.md` for the top-level surface PRD.

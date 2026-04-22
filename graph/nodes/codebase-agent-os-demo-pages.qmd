@@ -1,0 +1,17 @@
+---
+id: codebase-agent-os-demo-pages
+type: codebase
+era: hybrid
+status: inspiration
+contributes: [surface, ux-metaphor]
+preserves_from: [codebase-agent-os-demo]
+inspires: []
+adjacent_to: [codebase-agent-os-demo]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 5
+---
+# codebase-agent-os-demo-pages
+
+Static/demo pages for the agent-OS demo. Mostly visual reference.

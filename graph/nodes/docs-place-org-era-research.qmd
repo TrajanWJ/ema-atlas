@@ -1,0 +1,17 @@
+---
+id: docs-place-org-era-research
+type: docs
+era: place-org
+status: doctrine-only
+contributes: [ux-metaphor, doctrine]
+preserves_from: [codebase-place-org]
+inspires: []
+adjacent_to: [codebase-place-org]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 4
+---
+# docs-place-org-era-research
+
+Research collected during the place.org era.

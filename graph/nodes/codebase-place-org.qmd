@@ -1,0 +1,21 @@
+---
+id: codebase-place-org
+type: codebase
+era: place-org
+status: doctrine-only
+contributes: [ux-metaphor, surface]
+preserves_from: []
+inspires: [codebase-place-companion, codebase-place-org-openclaw, docs-host-system-launchpad-hq, docs-vault-wiki]
+superseded_by: []
+adjacent_to: [codebase-place-companion, docs-place-org-era-research]
+referenced_in_docs: [02-project-transfer-brief.md, 03-architectural-evolution-and-major-decisions.md, MACBOOK_AGENT_HANDOFF_MASTER.md, 05-fresh-context-project-app-model.md]
+key_artifacts: []
+aliases: [place.org, placeOS]
+load_priority: 3
+---
+# codebase-place-org
+
+Browser-native workspace / virtual-desktop / local-first "place" lineage.
+Donor of the Launchpad/HQ/Virtual-Desktop UX metaphor that resurfaces in the
+fresh-context product framing. Not architectural; preserve as visual + spatial
+intent only.

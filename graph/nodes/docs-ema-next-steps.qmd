@@ -1,0 +1,19 @@
+---
+id: docs-ema-next-steps
+type: docs
+era: ema-daemon
+status: active
+contributes: [authority, workspace, identity]
+preserves_from: [codebase-ema]
+inspires: []
+adjacent_to: [codebase-ema, design-review-fresh-context]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [host/EMA-v1.1-Next-Steps/01-PLANS/CURRENT-PRIORITIES.md, host/EMA-v1.1-Next-Steps/01-PLANS/VERTICAL-SLICES-DRAFT.md, host/EMA-v1.1-Next-Steps/01-PLANS/VAPP-FINAL-VISION-CHECKLIST.md, host/EMA-v1.1-Next-Steps/01-PLANS/ULTIMATE-WIKI-ARCHITECTURE.qmd, host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md, host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-SUBPROJECT-A-DAEMON-BACKBONE-SPEC-DRAFT.md]
+aliases: [EMA-v1.1-Next-Steps]
+load_priority: 1
+---
+# docs-ema-next-steps
+
+EMA v1.1 next-step planning corpus. Holds the Vertical Slices draft, vApp
+final-vision checklist, Ultimate Wiki Architecture, daemon-backbone spec, and
+current priorities. **Load this before doing any v1.1 design work.**

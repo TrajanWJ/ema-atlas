@@ -1,0 +1,21 @@
+---
+id: lineage-original-elixir-ema
+type: lineage
+era: ema-daemon
+status: canonical
+contributes: [authority, execution, doctrine]
+preserves_from: []
+inspires: [codebase-ema]
+superseded_by: [codebase-ema]
+adjacent_to: []
+referenced_in_docs: [03-architectural-evolution-and-major-decisions.md, SYSTEM_GRAPH.md]
+key_artifacts: [code/daemon/lib/ema/control_plane, code/daemon/lib/ema/babysitter, code/daemon/lib/ema/sessions, code/daemon/lib/ema/claude]
+aliases: []
+load_priority: 2
+---
+# lineage-original-elixir-ema
+
+Isolated snapshot of the original Elixir/Phoenix EMA daemon plus
+Tauri-era architecture docs. Confirms that the daemon-first authority model
+predates the current rewrite. Compare against `codebase-ema` to see what
+survived vs what got refactored.

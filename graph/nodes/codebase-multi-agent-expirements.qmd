@@ -1,0 +1,18 @@
+---
+id: codebase-multi-agent-expirements
+type: codebase
+era: hybrid
+status: inspiration
+contributes: [orchestration]
+preserves_from: []
+inspires: []
+adjacent_to: [codebase-executive, codebase-superman]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: [multi-agent-experiments]
+load_priority: 4
+---
+# codebase-multi-agent-expirements
+
+Multi-agent coordination experiments. Inspect when designing role assignment
+and dependency-graph orchestration.

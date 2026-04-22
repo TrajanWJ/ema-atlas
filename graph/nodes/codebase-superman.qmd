@@ -1,0 +1,17 @@
+---
+id: codebase-superman
+type: codebase
+era: hybrid
+status: archive
+contributes: [orchestration]
+preserves_from: []
+inspires: []
+adjacent_to: [codebase-multi-agent-expirements]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 5
+---
+# codebase-superman
+
+"Superman" multi-agent experiment. Archive.

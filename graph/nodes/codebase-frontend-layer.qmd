@@ -1,0 +1,17 @@
+---
+id: codebase-frontend-layer
+type: codebase
+era: claudeforge
+status: doctrine-only
+contributes: [surface]
+preserves_from: [codebase-claudeforge]
+inspires: []
+adjacent_to: [codebase-claudeforge, codebase-mission-control-claude]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 4
+---
+# codebase-frontend-layer
+
+Generic frontend layer experiments. Evaluate for component reuse only.

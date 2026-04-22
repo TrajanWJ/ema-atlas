@@ -1,0 +1,18 @@
+---
+id: docs-clis-mcps-integrations
+type: docs
+era: hybrid
+status: active
+contributes: [driver, execution]
+preserves_from: [lineage-openclaw, codebase-claudeforge]
+inspires: []
+adjacent_to: [docs-host-vault-agent-modules-routing, lineage-openclaw]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 3
+---
+# docs-clis-mcps-integrations
+
+CLI/MCP integration material — claude-cli, codex-cli, OpenClaw control-ui
+gateway. Direct input to the harness/driver contract design.

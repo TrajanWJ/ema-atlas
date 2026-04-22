@@ -1,0 +1,20 @@
+---
+id: lineage-openclaw
+type: lineage
+era: openclaw
+status: doctrine-only
+contributes: [orchestration, doctrine, memory]
+preserves_from: []
+inspires: [codebase-ema, lineage-openclaw-agent-workspaces, lineage-openclaw-archive-subprojects, codebase-place-org-openclaw, docs-vault-wiki]
+superseded_by: [codebase-ema]
+adjacent_to: [docs-clis-mcps-integrations]
+referenced_in_docs: [02-project-transfer-brief.md, 03-architectural-evolution-and-major-decisions.md]
+key_artifacts: []
+aliases: [.openclaw]
+load_priority: 3
+---
+# lineage-openclaw
+
+OpenClaw runtime/doc lineage. Donor of named-role/handoff/watchdog patterns
+and Discord-native operator feel. Already absorbed into EMA's
+`babysitter/` and incident model. **Mine for doctrine, do not resurrect.**

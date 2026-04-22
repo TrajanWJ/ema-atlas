@@ -1,0 +1,17 @@
+---
+id: codebase-execudeck
+type: codebase
+era: hybrid
+status: inspiration
+contributes: [surface, ux-metaphor]
+preserves_from: []
+inspires: []
+adjacent_to: [codebase-executive]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 5
+---
+# codebase-execudeck
+
+Deck-style executive surface. Visual reference only.

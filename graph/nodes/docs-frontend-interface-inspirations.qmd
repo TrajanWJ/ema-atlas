@@ -1,0 +1,18 @@
+---
+id: docs-frontend-interface-inspirations
+type: docs
+era: meta
+status: inspiration
+contributes: [surface, ux-metaphor]
+preserves_from: []
+inspires: []
+adjacent_to: [docs-host-system-launchpad-hq, design-review-fresh-context]
+referenced_in_docs: [05-fresh-context-project-app-model.md, SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 4
+---
+# docs-frontend-interface-inspirations
+
+Curated visual/interaction inspirations for the frontend (Claude.ai design,
+Notion, Obsidian, etc).

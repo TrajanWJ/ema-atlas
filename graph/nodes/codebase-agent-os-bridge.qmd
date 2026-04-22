@@ -1,0 +1,18 @@
+---
+id: codebase-agent-os-bridge
+type: codebase
+era: hybrid
+status: inspiration
+contributes: [driver, transport]
+preserves_from: [codebase-agent-os-demo]
+inspires: []
+adjacent_to: [codebase-agent-os-v8]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 4
+---
+# codebase-agent-os-bridge
+
+Bridge layer between the agent-OS surface and underlying runtimes. Worth
+inspecting when designing the harness/driver registry.

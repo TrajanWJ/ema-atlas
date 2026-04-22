@@ -1,0 +1,21 @@
+---
+id: codebase-claudeforge
+type: codebase
+era: claudeforge
+status: doctrine-only
+contributes: [surface, execution, driver]
+preserves_from: []
+inspires: [codebase-ema, docs-clis-mcps-integrations]
+superseded_by: []
+adjacent_to: [codebase-frontend-layer, codebase-mission-control-claude]
+referenced_in_docs: [02-project-transfer-brief.md, 03-architectural-evolution-and-major-decisions.md, MACBOOK_AGENT_HANDOFF_MASTER.md]
+key_artifacts: [packages/server/src/providers/hermes-provider.ts, packages/server/test/session-manager-hermes.test.ts, packages/bot/test/hermes-commands.test.ts]
+aliases: [claude-remote-discord, alfred]
+load_priority: 2
+---
+# codebase-claudeforge
+
+TypeScript Discord/web operator surface. Proves the surface↔runtime seam:
+`hermes-provider.ts` already runs Hermes as a backend provider with
+`X-Hermes-Session-Id` continuity. Keep as **interface contract**, not as the
+canonical surface — surfaces should not own state.

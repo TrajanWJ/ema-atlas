@@ -1,0 +1,20 @@
+---
+id: main
+type: meta
+era: meta
+status: meta
+contributes: [authority, doctrine]
+preserves_from: []
+inspires: []
+superseded_by: []
+adjacent_to: [lineage-index, design-review-fresh-context]
+referenced_in_docs: [README.md, MACBOOK_AGENT_HANDOFF_MASTER.md, SYSTEM_GRAPH.md]
+key_artifacts: [MACBOOK_AGENT_HANDOFF_MASTER.md, 02-project-transfer-brief.md, 03-architectural-evolution-and-major-decisions.md, 04-agent-orchestration-and-shared-workspace-briefing.md, 05-fresh-context-project-app-model.md]
+aliases: []
+load_priority: 1
+---
+# main
+
+Aggregation root for the transfer pack. Holds the five high-signal handoff
+documents and the branch maps. Every other branch is a satellite of this one.
+Read `MACBOOK_AGENT_HANDOFF_MASTER.md` first, then `SYSTEM_GRAPH.md`.

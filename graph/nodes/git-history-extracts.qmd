@@ -1,0 +1,17 @@
+---
+id: git-history-extracts
+type: recovery
+era: meta
+status: archive
+contributes: [recovery]
+preserves_from: []
+inspires: []
+adjacent_to: [github-legacy-repos]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 5
+---
+# git-history-extracts
+
+Selected git-history extracts from prior repos. For archaeology.

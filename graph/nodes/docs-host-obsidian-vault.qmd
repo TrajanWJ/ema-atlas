@@ -1,0 +1,17 @@
+---
+id: docs-host-obsidian-vault
+type: docs
+era: hybrid
+status: active
+contributes: [memory]
+preserves_from: []
+inspires: []
+adjacent_to: [docs-vault-wiki, docs-host-vault-context]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 4
+---
+# docs-host-obsidian-vault
+
+Raw Obsidian vault export from host machine.

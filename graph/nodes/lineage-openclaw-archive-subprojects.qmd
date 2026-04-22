@@ -1,0 +1,17 @@
+---
+id: lineage-openclaw-archive-subprojects
+type: lineage
+era: openclaw
+status: archive
+contributes: [recovery, doctrine]
+preserves_from: [lineage-openclaw]
+inspires: []
+adjacent_to: [lineage-openclaw]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: []
+aliases: []
+load_priority: 5
+---
+# lineage-openclaw-archive-subprojects
+
+Archived OpenClaw subprojects. Search-only; do not lift code.

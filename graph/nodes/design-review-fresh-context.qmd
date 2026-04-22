@@ -1,0 +1,20 @@
+---
+id: design-review-fresh-context
+type: meta
+era: meta
+status: active
+contributes: [identity, workspace, collab, ux-metaphor]
+preserves_from: [main]
+inspires: []
+adjacent_to: [docs-host-system-launchpad-hq, docs-frontend-interface-inspirations]
+referenced_in_docs: [05-fresh-context-project-app-model.md, SYSTEM_GRAPH.md]
+key_artifacts: [05-fresh-context-project-app-model.md, SOURCE_CONTEXT.md]
+aliases: [fresh-context]
+load_priority: 1
+---
+# design-review-fresh-context
+
+Latest direct-from-user product framing: project/space/org model, personal AI
+access rules, named app interfaces (Wiki, Chat, Threads, Agent vEnv,
+Blueprint), Launchpad/HQ/Virtual-Desktop top surfaces. This is the *current*
+PRD substrate — newer than anything in the codebase- branches.

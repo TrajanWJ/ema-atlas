@@ -30,3 +30,16 @@ Most concrete prior art for an EMA-side **code-intelligence MCP**. The retrieval
 git show origin/codebase-superman:code/superman/codevault-mcp/index.ts
 git show origin/codebase-superman:code/superman/docs/superpowers/specs/2026-03-25-retrieval-pipeline-design.md
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Staged retrieval** — decompose → parallel candidate generation → graph expansion → multi-signal rerank → budgeted assembly. Each stage swappable, no single-pass keyword retrieval (`code/superman/docs/superpowers/specs/2026-03-25-retrieval-pipeline-design.md`).
+- **No silent tool failures** — every error returns a next-step instruction (`call check_status, then analyze_repo`) so the calling agent can self-recover (`codevault-mcp/index.ts` `formatError` and `check_status.nextStep`).
+- **First-class status probe** — health/status reports `active | stale | initializing` plus an auto-recovery hint, and is the first contract any agent surface exposes (`codevault-mcp/index.ts` `check_status` tool definition).
+
+Leaves behind (residue):
+- The specific OpenAI embedding + Qdrant + `.codevault-cache.json` wiring and 50K context budget.
+- The MCP/Zod TypeScript surface and the per-node intent-graph dump in `.codevault-memory.json`.
+
+Topic relevance: `memory`, `recovery`, `orchestration`, `driver`, `doctrine`.

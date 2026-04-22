@@ -31,3 +31,17 @@ git show origin/codebase-t3code-fork:code/t3code-fork/.docs/architecture.md
 git show origin/codebase-t3code-fork:code/t3code-fork/.plans/01-shared-model-normalization.md
 git show origin/codebase-t3code-fork:code/t3code-fork/.plans/17-claude-agent.md
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Single ordered push bus + readiness gate** — UI/transport consumes only typed push events; welcome is held until startup barriers are satisfied (`.docs/architecture.md` "Startup and client connect" — `ServerReadiness + ServerPushBus`).
+- **Receipt-driven async** — async work runs as queue-backed workers that emit typed completion receipts; downstream code (including tests) waits on receipts instead of polling state (`.docs/architecture.md` "Async completion flow" — `DrainableWorker + RuntimeReceiptBus`).
+- **Shared cross-surface contracts** — model lists, normalization, defaults live in one shared contracts module so daemon and clients cannot drift; provider-specific knobs live in a typed `providerOptions` namespace; resume state is opaque to the orchestrator (`.plans/01-shared-model-normalization.md`; `.plans/17-claude-agent.md` §1.3, §2.2).
+- **Schema-validated boundaries** — every IPC/transport entrypoint parses unknown payloads with a schema at the boundary; no internal cast may stand in for validation (`.plans/02-typed-ipc-boundaries.md`).
+
+Leaves behind (residue):
+- The specific Node WebSocket + `codex-app-server` JSON-RPC stdio topology and the Electron main/preload split.
+- Anthropic Agent SDK option surface (`canUseTool`, `maxThinkingTokens`, `pathToClaudeCodeExecutable`) (`.plans/17-claude-agent.md` §2.1.a).
+
+Topic relevance: `transport`, `orchestration`, `driver`, `recovery`, `doctrine`, `identity`, `placement`.

@@ -30,3 +30,16 @@ Useful as a fully-elaborated alternative architecture to compare against EMA —
 git show origin/codebase-execudeck:code/execudeck/docs/ARCHITECTURE.md
 git show origin/codebase-execudeck:code/execudeck/docs/plans/2026-02-18-phase1-scaffold-plan.md
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Trust Zones** — only the human signature promotes a draft to persistent state; rendering and orchestration are explicitly stripped of mutation rights (`code/execudeck/docs/ARCHITECTURE.md` §4 "Trust & Safety Zones": Zone 0/1/2).
+- **Scoped on-demand context** — agents pull context through an ID-addressed query channel governed by an explicit access policy, never carrying ambient state (`docs/AGENT_MODEL.md` §1 "Context Access Mechanism").
+- **Schema-driven artifacts** — a tree + inspector + JSON-transform model is the source of truth, so every mutation is replayable (`docs/MANIFEST_SYSTEM.md` §1 "Editing Model").
+
+Leaves behind (residue):
+- React/Tambo terminal grammar and the 50/50 vertical split UX (`docs/CLI_SYSTEM.md`).
+- The named MVP component catalog (Card/DataTable/LineChart/NavGroup/TextElement) (`docs/MANIFEST_SYSTEM.md` §3).
+
+Topic relevance: `authority`, `surface`, `doctrine`, `ux-metaphor`, `identity`, `orchestration`.

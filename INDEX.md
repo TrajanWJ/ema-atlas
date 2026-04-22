@@ -130,6 +130,21 @@ Use this when you don't yet know what to search for.
 - **place.org / placeOS** — Earliest browser-native virtual-desktop / "place" lineage. Donor of UX metaphor (Launchpad, HQ, Desktop).
 - **Mesh / P2P** — Strategic future direction — peer-aware execution and collaboration on a BEAM-family base. Deferred until local semantics pin down.
 - **Doctrine** — Lessons/patterns extracted from a prior era; carried forward as design principles, not as code.
+- **Space (typed taxonomy)** — Personal / Organization / Shared / Ghost / Public — fundamental isolation unit owning files, tasks, agents, vault, channels, keys, and sync policy. Disambiguate
+- **Ghost Space** — Ephemeral collaboration space with TTL, ephemeral keys, and self-destruct semantics for temporary multi-party work. Distinct from durable Workspace and Collabor
+- **Brain Dump** — Per-Space inbox for raw thoughts that gets auto-classified into tasks, notes, proposals, or journal entries. The capture-before-classify intake surface.
+- **Auto-Resolve Gate** — Pre-queue check (vault precedent + preferences + corrections + confidence ≥ 0.85) that lets agents resolve silently instead of escalating to human review.
+- **Handoff Envelope** — Required metadata header on every agent-to-agent handoff carrying status, confidence, completeness, and provenance alongside the payload. Distinct from executio
+- **Background Results Contract** — XML `<background-results>` wrapper that injects async agent outcomes back into a live session in a uniform format. Inter-agent async result-injection format abo
+- **Bridge / Bridge Server** — Express/WebSocket server that mediates between a surface (Agent OS WebUI) and back-end engines (OpenClaw, Discord, Vault, Dispatch). Concrete prior art for the 
+- **Cognitive Cockpit** — Surface-design stance treating the operator UI as an ambient awareness layer (calm-technology) rather than a chat app with bots. UX doctrine behind Launchpad/HQ
+- **Intelligence Layer** — Always-on pre-routing reasoning tier that does intent parsing, metaprompting, and prompt consulting on every inbound request before any dispatch. Upstream of Dr
+- **Vault Cognitive Layer** — Three-subsystem layer (metabolism = activation decay, graph = typed edges, cognition = injection/contradiction/gap detection) that turns the vault into an activ
+- **Superman (Semantic Layer)** — Embedding/index/query infrastructure that gives every EMA item a semantic fingerprint and powers the `context_for/2` injection function.
+- **Honcho** — External user-modeling/peer-representation service (Plastic Labs) used for pre-dispatch scope advice and post-execution reflexion injection.
+- **Scope Advisor** — Pre-dispatch component that queries Honcho/user-model context to advise on scope and approach before an agent is spawned. Distinct from router/driver selection.
+- **MCP Gateway** — HTTP/stdio server inside the EMA daemon that exposes EMA's tools (vault search, task CRUD, proposals, project context, executions) to Claude agents via MCP. Out
+- **Distributed AI Delegation** — Mesh capability where a rate-limited EMA node routes Claude/inference calls through a peer node's credentials, sharing capacity without exposing keys. Sharpens 
 
 ## Open questions
 

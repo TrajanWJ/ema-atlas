@@ -39,6 +39,35 @@ these terms exactly. When you propose a new term, add it here first.
 | **Mesh / P2P** | Strategic future direction — peer-aware execution and collaboration on a BEAM-family base. Deferred until local semantics pin down. | `graph/edges/transport.md` |
 | **Doctrine** | Lessons/patterns extracted from a prior era; carried forward as design principles, not as code. | `03-architectural-evolution-and-major-decisions.md` §7 |
 
+## Vault candidate terms (added 2026-04-22)
+
+These terms exist in the user's host Obsidian vault (under
+`docs-host-obsidian-vault`) and are surfaced here as **candidate** glossary
+entries. They are not yet canonical for EMA — promoting them requires the
+same workflow as resolving an open question. Source-cited for verification.
+
+| Term | Definition | Source |
+|---|---|---|
+| **Space (typed taxonomy)** | Personal / Organization / Shared / Ghost / Public — fundamental isolation unit owning files, tasks, agents, vault, channels, keys, and sync policy. Disambiguates the bare "Space" entry above. | `docs-host-obsidian-vault:host/cache_agent_vm_full_vault/Architecture/EMA Mesh Architecture.md` |
+| **Ghost Space** | Ephemeral collaboration space with TTL, ephemeral keys, and self-destruct semantics for temporary multi-party work. Distinct from durable Workspace and Collaboration object. | `docs-host-obsidian-vault:.../EMA Mesh Architecture.md` |
+| **Brain Dump** | Per-Space inbox for raw thoughts that gets auto-classified into tasks, notes, proposals, or journal entries. The capture-before-classify intake surface. | `docs-host-obsidian-vault:.../EMA Mesh Architecture.md` |
+| **Auto-Resolve Gate** | Pre-queue check (vault precedent + preferences + corrections + confidence ≥ 0.85) that lets agents resolve silently instead of escalating to human review. | `docs-host-obsidian-vault:.../Agent-Queue-System.md` |
+| **Handoff Envelope** | Required metadata header on every agent-to-agent handoff carrying status, confidence, completeness, and provenance alongside the payload. Distinct from execution lineage — a per-edge reliability contract. | `docs-host-obsidian-vault:.../agent-handoff-envelope.md` |
+| **Background Results Contract** | XML `<background-results>` wrapper that injects async agent outcomes back into a live session in a uniform format. Inter-agent async result-injection format above raw provider streaming. | `docs-host-obsidian-vault:.../background-results-contract.md` |
+| **Bridge / Bridge Server** | Express/WebSocket server that mediates between a surface (Agent OS WebUI) and back-end engines (OpenClaw, Discord, Vault, Dispatch). Concrete prior art for the surface↔runtime mediator distinct from Driver and Harness. | `docs-host-obsidian-vault:.../Agent-OS-Overview.md` |
+| **Cognitive Cockpit** | Surface-design stance treating the operator UI as an ambient awareness layer (calm-technology) rather than a chat app with bots. UX doctrine behind Launchpad/HQ/Threads. | `docs-host-obsidian-vault:.../Discord UX Philosophy.md` |
+| **Intelligence Layer** | Always-on pre-routing reasoning tier that does intent parsing, metaprompting, and prompt consulting on every inbound request before any dispatch. Upstream of Driver/Harness. | `docs-host-obsidian-vault:.../Intelligence Layer - System Vision.md` |
+| **Vault Cognitive Layer** | Three-subsystem layer (metabolism = activation decay, graph = typed edges, cognition = injection/contradiction/gap detection) that turns the vault into an active participant. | `docs-host-obsidian-vault:.../Vault-Cognitive-Layer.md` |
+| **Superman (Semantic Layer)** | Embedding/index/query infrastructure that gives every EMA item a semantic fingerprint and powers the `context_for/2` injection function. | `docs-host-obsidian-vault:.../Intelligence-Integrations/superman-architecture.md` |
+| **Honcho** | External user-modeling/peer-representation service (Plastic Labs) used for pre-dispatch scope advice and post-execution reflexion injection. | `docs-host-obsidian-vault:.../Intelligence-Integrations/HONCHO-DECISION.md` |
+| **Scope Advisor** | Pre-dispatch component that queries Honcho/user-model context to advise on scope and approach before an agent is spawned. Distinct from router/driver selection. | `docs-host-obsidian-vault:.../Intelligence-Integrations/honcho-scope-advisor.md` |
+| **MCP Gateway** | HTTP/stdio server inside the EMA daemon that exposes EMA's tools (vault search, task CRUD, proposals, project context, executions) to Claude agents via MCP. Outbound tool-exposure boundary (complement to inbound Driver/Provider). | `docs-host-obsidian-vault:.../Intelligence-Integrations/MCP-GATEWAY-ARCH.md` |
+| **Distributed AI Delegation** | Mesh capability where a rate-limited EMA node routes Claude/inference calls through a peer node's credentials, sharing capacity without exposing keys. Sharpens Placement semantics. | `docs-host-obsidian-vault:.../EMA P2P Organization Mesh.md` |
+
+> **Status:** these are **vault candidates**, not yet canonical. To promote
+> a term to the main glossary, follow [`howto/resolve-an-open-question.md`](howto/resolve-an-open-question.md)
+> shape (decision doc + back-references) and move the row up.
+
 ## Reserved tag vocabulary (used in `graph/nodes/*.qmd`)
 
 `authority` · `execution` · `surface` · `workspace` · `collab` · `identity` · `placement` · `memory` · `orchestration` · `doctrine` · `ux-metaphor` · `transport` · `driver` · `recovery`

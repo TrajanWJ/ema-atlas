@@ -1,0 +1,90 @@
+/*
+ * EMA Glass layers — extracted from IGNORE_OLD_TAURI_BUILD/app/src/styles/globals.css
+ * and app/src/components/shared/glass.css. Reference-only.
+ *
+ * Three layers (ambient < surface < elevated). All use backdrop-filter for in-document
+ * blur. On KDE Wayland + Electron, window-level desktop blur is NOT available
+ * (Chromium doesn't implement org_kde_kwin_blur) — same-document blur still works.
+ */
+
+.glass-ambient {
+  background: rgba(10, 14, 28, 0.38);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+}
+
+.glass-surface {
+  background: rgba(10, 14, 28, 0.52);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-elevated,
+.glass {
+  background: rgba(10, 14, 28, 0.62);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Root ambient wash — teal + blue radial glows over a deep gradient.
+ * Use on the top-level shell element, not body, so it can layer above
+ * a transparent window if the compositor allows. */
+.ema-root-ambient {
+  background:
+    radial-gradient(circle at top, rgba(45, 212, 168, 0.08), transparent 28%),
+    radial-gradient(circle at 20% 0%, rgba(107, 149, 240, 0.14), transparent 30%),
+    radial-gradient(circle at 80% 100%, rgba(75, 100, 200, 0.08), transparent 32%),
+    linear-gradient(180deg, var(--pn-window-core), var(--pn-window-deep)),
+    var(--pn-window-wash);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+
+.glass-card {
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.glass-card-hover:hover {
+  background: rgba(10, 14, 28, 0.58);
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 200ms var(--ease-smooth, cubic-bezier(0.65, 0.05, 0, 1));
+}
+.glass-btn:hover { background: rgba(255, 255, 255, 0.07); }
+.glass-btn:active { background: rgba(255, 255, 255, 0.10); transform: scale(0.97); }
+
+.glass-input {
+  background: var(--pn-field-bg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.5rem;
+  color: var(--pn-text-primary);
+  outline: none;
+  transition:
+    border-color 200ms var(--ease-smooth, cubic-bezier(0.65, 0.05, 0, 1)),
+    box-shadow 200ms var(--ease-smooth, cubic-bezier(0.65, 0.05, 0, 1)),
+    background 200ms var(--ease-smooth, cubic-bezier(0.65, 0.05, 0, 1));
+}
+.glass-input:hover { background: var(--pn-field-bg-hover); }
+.glass-input:focus {
+  border-color: rgba(45, 212, 168, 0.35);
+  box-shadow: var(--pn-focus-ring);
+  background: var(--pn-field-bg-active);
+}
+.glass-input::placeholder { color: var(--pn-text-muted); }
+
+.glass-scroll::-webkit-scrollbar { width: 4px; }
+.glass-scroll::-webkit-scrollbar-track { background: transparent; }
+.glass-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+.glass-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.14); }

@@ -1,0 +1,1263 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.4.14",
+    "lastTouchedAt": "2026-04-21T18:15:57.312Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-16T07:22:48.290Z",
+    "lastRunVersion": "2026.3.12",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
+  },
+  "logging": {
+    "level": "debug"
+  },
+  "update": {
+    "channel": "stable"
+  },
+  "browser": {
+    "enabled": false,
+    "executablePath": "/usr/bin/google-chrome-stable",
+    "headless": false,
+    "noSandbox": true,
+    "extraArgs": [
+      "--load-extension=/home/trajan/.opentabs/extension",
+      "--enable-extensions"
+    ]
+  },
+  "secrets": "REDACTED",
+  "acp": {
+    "enabled": true,
+    "backend": "acpx",
+    "defaultAgent": "codex",
+    "allowedAgents": [
+      "pi",
+      "claude",
+      "codex",
+      "opencode",
+      "gemini",
+      "kimi"
+    ]
+  },
+  "models": {
+    "providers": {
+      "anthropic": {
+        "baseUrl": "http://localhost:4488/v1",
+        "apiKey": "REDACTED",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "anthropic/claude-opus-4-6",
+            "name": "Claude Opus 4.6",
+            "api": "anthropic-messages",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1000000,
+            "maxTokens": "REDACTED"
+          },
+          {
+            "id": "anthropic/claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6",
+            "api": "anthropic-messages",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1000000,
+            "maxTokens": "REDACTED"
+          },
+          {
+            "id": "anthropic/claude-haiku-4-5-20251001",
+            "name": "Claude Haiku 4.5",
+            "api": "anthropic-messages",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": "REDACTED"
+          }
+        ]
+      },
+      "anthropic-backup": {
+        "baseUrl": "http://localhost:4488/v1",
+        "apiKey": "REDACTED",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "anthropic-backup/claude-opus-4-6",
+            "name": "Claude Opus 4.6 (backup)",
+            "api": "anthropic-messages",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1000000,
+            "maxTokens": "REDACTED"
+          },
+          {
+            "id": "anthropic-backup/claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6 (backup)",
+            "api": "anthropic-messages",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1000000,
+            "maxTokens": "REDACTED"
+          },
+          {
+            "id": "anthropic-backup/claude-haiku-4-5-20251001",
+            "name": "Claude Haiku 4.5 (backup)",
+            "api": "anthropic-messages",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": "REDACTED"
+          }
+        ]
+      },
+      "openai": {
+        "baseUrl": "https://api.openai.com/v1",
+        "apiKey": "REDACTED",
+        "api": "openai-responses",
+        "models": [
+          {
+            "id": "openai/gpt-4.1",
+            "name": "GPT-4.1 (Codex)",
+            "api": "openai-responses",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1047576,
+            "maxTokens": "REDACTED"
+          },
+          {
+            "id": "openai/o4-mini",
+            "name": "o4-mini (Codex)",
+            "api": "openai-responses",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": "REDACTED"
+          },
+          {
+            "id": "openai/gpt-4.1-mini",
+            "name": "GPT-4.1 Mini (Codex)",
+            "api": "openai-responses",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 1047576,
+            "maxTokens": "REDACTED"
+          }
+        ]
+      },
+      "openai-codex": {
+        "baseUrl": "https://chatgpt.com/backend-api",
+        "apiKey": "REDACTED",
+        "api": "openai-codex-responses",
+        "models": [
+          {
+            "id": "openai-codex/gpt-5.4",
+            "name": "GPT-5.4 (Codex)",
+            "api": "openai-codex-responses",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 200000,
+            "maxTokens": "REDACTED"
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai-codex/gpt-5.4",
+        "fallbacks": [
+          "anthropic-backup/claude-sonnet-4-6",
+          "anthropic/claude-opus-4-6",
+          "anthropic-backup/claude-opus-4-6",
+          "openai-codex/gpt-5.4",
+          "anthropic/claude-haiku-4-5-20251001",
+          "anthropic-backup/claude-haiku-4-5-20251001"
+        ]
+      },
+      "models": {
+        "anthropic-backup/claude-opus-4-6": {},
+        "anthropic/claude-opus-4-6": {
+          "alias": "opus",
+          "params": {
+            "cacheRetention": "short"
+          }
+        },
+        "anthropic/claude-sonnet-4-6": {
+          "alias": "sonnet"
+        },
+        "anthropic/claude-haiku-4-5-20251001": {},
+        "openai-codex/gpt-5.4": {
+          "alias": "codex"
+        },
+        "anthropic-backup/claude-sonnet-4-6": {}
+      },
+      "bootstrapMaxChars": 15000,
+      "memorySearch": {
+        "enabled": true,
+        "sources": [
+          "memory",
+          "sessions"
+        ],
+        "extraPaths": [
+          "/home/trajan/vault/Research",
+          "/home/trajan/vault/Trajan",
+          "/home/trajan/vault/System"
+        ],
+        "experimental": {
+          "sessionMemory": true
+        },
+        "query": {
+          "hybrid": {
+            "enabled": true,
+            "vectorWeight": 0.7,
+            "textWeight": 0.3,
+            "candidateMultiplier": 4,
+            "mmr": {
+              "enabled": true,
+              "lambda": 0.7
+            },
+            "temporalDecay": {
+              "enabled": true,
+              "halfLifeDays": 30
+            }
+          }
+        }
+      },
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "1h"
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "model": "anthropic/claude-haiku-4-5-20251001",
+        "memoryFlush": {
+          "enabled": true
+        }
+      },
+      "heartbeat": {
+        "every": "15m",
+        "model": "openai-codex/gpt-5.4",
+        "session": "agent:main:discord:channel:1489815795293749258",
+        "target": "last",
+        "ackMaxChars": 300,
+        "lightContext": false
+      },
+      "maxConcurrent": 8,
+      "subagents": {
+        "maxConcurrent": 16,
+        "maxSpawnDepth": 2,
+        "maxChildrenPerAgent": 6,
+        "model": "openai-codex/gpt-5.4",
+        "runTimeoutSeconds": 600
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "workspace": "/home/trajan/.openclaw/agents/main/workspace",
+        "identity": {
+          "name": "Right Hand",
+          "emoji": "\ud83e\udd1d"
+        },
+        "subagents": {
+          "allowAgents": [
+            "researcher",
+            "coder",
+            "codex",
+            "ops",
+            "security",
+            "vault-keeper",
+            "browser-automation",
+            "devils-advocate",
+            "prompt-engineer",
+            "concierge",
+            "strategist",
+            "universal-orchestrator",
+            "life-lead",
+            "business-lead",
+            "tech-lead",
+            "quality-lead",
+            "chief-of-staff",
+            "finance",
+            "wellness",
+            "biz-dev",
+            "account-manager",
+            "creative-director",
+            "marketer",
+            "architect",
+            "writer",
+            "analyst",
+            "pm",
+            "jarvis",
+            "toomanytools"
+          ]
+        }
+      },
+      {
+        "id": "researcher",
+        "workspace": "/home/trajan/.openclaw/agents/researcher/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/researcher/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Researcher",
+          "emoji": "\ud83d\udd2c"
+        }
+      },
+      {
+        "id": "security",
+        "workspace": "/home/trajan/.openclaw/agents/security/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/security/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Security",
+          "emoji": "\ud83d\udee1\ufe0f"
+        }
+      },
+      {
+        "id": "coder",
+        "workspace": "/home/trajan/.openclaw/agents/coder/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/coder/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Coder",
+          "emoji": "\ud83d\udcbb"
+        }
+      },
+      {
+        "id": "vault-keeper",
+        "workspace": "/home/trajan/.openclaw/agents/vault-keeper/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/vault-keeper/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Vault Keeper",
+          "emoji": "\ud83d\udcda"
+        }
+      },
+      {
+        "id": "ops",
+        "workspace": "/home/trajan/.openclaw/agents/ops/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/ops/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Ops",
+          "emoji": "\u2699\ufe0f"
+        }
+      },
+      {
+        "id": "browser-automation",
+        "workspace": "/home/trajan/.openclaw/agents/browser-automation/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/browser-automation/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Scout",
+          "emoji": "\ud83d\udd2d"
+        }
+      },
+      {
+        "id": "devils-advocate",
+        "workspace": "/home/trajan/.openclaw/agents/devils-advocate/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/devils-advocate/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Devil's Advocate",
+          "emoji": "\ud83d\ude08"
+        }
+      },
+      {
+        "id": "prompt-engineer",
+        "workspace": "/home/trajan/.openclaw/agents/prompt-engineer/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/prompt-engineer/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Prompt Engineer",
+          "emoji": "\ud83c\udfaf"
+        }
+      },
+      {
+        "id": "concierge",
+        "workspace": "/home/trajan/.openclaw/agents/concierge/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/concierge/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Concierge",
+          "emoji": "\ud83d\udece\ufe0f"
+        }
+      },
+      {
+        "id": "strategist",
+        "workspace": "/home/trajan/.openclaw/agents/strategist/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/strategist/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Strategist",
+          "emoji": "\ud83e\udde0"
+        }
+      },
+      {
+        "id": "universal-orchestrator",
+        "workspace": "/home/trajan/.openclaw/agents/universal-orchestrator/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/universal-orchestrator/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Orchestrator",
+          "emoji": "\ud83c\udfad"
+        }
+      },
+      {
+        "id": "chief-of-staff",
+        "workspace": "/home/trajan/.openclaw/agents/chief-of-staff/workspace"
+      },
+      {
+        "id": "finance",
+        "workspace": "/home/trajan/.openclaw/agents/finance/workspace"
+      },
+      {
+        "id": "wellness",
+        "workspace": "/home/trajan/.openclaw/agents/wellness/workspace"
+      },
+      {
+        "id": "biz-dev",
+        "workspace": "/home/trajan/.openclaw/agents/biz-dev/workspace"
+      },
+      {
+        "id": "account-manager",
+        "workspace": "/home/trajan/.openclaw/agents/account-manager/workspace"
+      },
+      {
+        "id": "creative-director",
+        "workspace": "/home/trajan/.openclaw/agents/creative-director/workspace"
+      },
+      {
+        "id": "marketer",
+        "workspace": "/home/trajan/.openclaw/agents/marketer/workspace"
+      },
+      {
+        "id": "architect",
+        "workspace": "/home/trajan/.openclaw/agents/architect/workspace"
+      },
+      {
+        "id": "writer",
+        "workspace": "/home/trajan/.openclaw/agents/writer/workspace"
+      },
+      {
+        "id": "analyst",
+        "workspace": "/home/trajan/.openclaw/agents/analyst/workspace"
+      },
+      {
+        "id": "pm",
+        "workspace": "/home/trajan/.openclaw/agents/pm/workspace"
+      },
+      {
+        "id": "life-lead",
+        "workspace": "/home/trajan/.openclaw/agents/life-lead/workspace",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Life Lead",
+          "emoji": "\ud83c\udfe0"
+        },
+        "subagents": {
+          "allowAgents": [
+            "chief-of-staff",
+            "finance",
+            "wellness"
+          ]
+        }
+      },
+      {
+        "id": "business-lead",
+        "workspace": "/home/trajan/.openclaw/agents/business-lead/workspace",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Business Lead",
+          "emoji": "\ud83d\udcbc"
+        },
+        "subagents": {
+          "allowAgents": [
+            "biz-dev",
+            "account-manager",
+            "creative-director",
+            "marketer",
+            "writer"
+          ]
+        }
+      },
+      {
+        "id": "tech-lead",
+        "workspace": "/home/trajan/.openclaw/agents/tech-lead/workspace",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Tech Lead",
+          "emoji": "\ud83d\udd27"
+        },
+        "subagents": {
+          "allowAgents": [
+            "coder",
+            "codex",
+            "architect",
+            "researcher",
+            "ops",
+            "security"
+          ]
+        }
+      },
+      {
+        "id": "quality-lead",
+        "workspace": "/home/trajan/.openclaw/agents/quality-lead/workspace",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Quality Lead",
+          "emoji": "\u2705"
+        },
+        "subagents": {
+          "allowAgents": [
+            "prompt-engineer",
+            "devils-advocate",
+            "strategist",
+            "vault-keeper",
+            "analyst",
+            "pm"
+          ]
+        }
+      },
+      {
+        "id": "jarvis",
+        "workspace": "/home/trajan/.openclaw/agents/jarvis/workspace",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Jarvis",
+          "emoji": "\ud83c\udf99\ufe0f"
+        }
+      },
+      {
+        "id": "codex",
+        "name": "codex",
+        "workspace": "/home/trajan/.openclaw/agents/codex/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/codex/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "Codex",
+          "emoji": "\ud83e\udde0"
+        }
+      },
+      {
+        "id": "toomanytools",
+        "name": "toomanytools",
+        "workspace": "/home/trajan/.openclaw/agents/toomanytools/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/toomanytools/agent",
+        "model": "openai-codex/gpt-5.4",
+        "identity": {
+          "name": "toomanytools",
+          "emoji": "\ud83e\uddf0"
+        }
+      }
+    ]
+  },
+  "tools": {
+    "media": {
+      "audio": {
+        "enabled": true,
+        "models": [
+          {
+            "type": "cli",
+            "command": "whisper-voice-fast",
+            "args": [
+              "-f",
+              "{{MediaPath}}"
+            ],
+            "timeoutSeconds": 15
+          }
+        ],
+        "echoTranscript": true,
+        "echoFormat": "\ud83c\udfa4 \"{transcript}\""
+      }
+    },
+    "agentToAgent": {
+      "enabled": true,
+      "allow": [
+        "browser-automation",
+        "coder",
+        "main",
+        "researcher",
+        "ops",
+        "vault-keeper",
+        "security",
+        "universal-orchestrator",
+        "concierge"
+      ]
+    },
+    "exec": {
+      "host": "gateway",
+      "security": "full",
+      "ask": "off"
+    }
+  },
+  "bindings": [
+    {
+      "type": "route",
+      "agentId": "ops",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1482256984811114688"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "coder",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1482899212889751745"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "researcher",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1482258431997116531"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "concierge",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1482997518362214422"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "strategist",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1482939106223853740"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "vault-keeper",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1483018390015709315"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "security",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1484014833790877716"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "strategist",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494498049337200862"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "vault-keeper",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494498045922906153"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "researcher",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494498048641077380"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "concierge",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494498005863239710"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "strategist",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494498045360865333"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "concierge",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494498045973364886"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "vault-keeper",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494499086089588809"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "strategist",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494499086273871893"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "concierge",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494499086374666250"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "researcher",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1494499086626328717"
+        },
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "main",
+      "match": {
+        "channel": "discord",
+        "guildId": "1482230800916287710"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "main",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1496212463727939816"
+        },
+        "guildId": "1495999478577238317"
+      }
+    },
+    {
+      "type": "route",
+      "agentId": "main",
+      "match": {
+        "channel": "discord",
+        "guildId": "1495999478577238317"
+      }
+    }
+  ],
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "reset": {
+      "mode": "daily",
+      "atHour": 9,
+      "idleMinutes": 10080
+    },
+    "threadBindings": {
+      "enabled": true,
+      "idleHours": 72,
+      "maxAgeHours": 0
+    },
+    "maintenance": {
+      "mode": "enforce",
+      "pruneAfter": "14d",
+      "maxEntries": 200,
+      "rotateBytes": "10mb",
+      "resetArchiveRetention": "7d",
+      "maxDiskBytes": "1gb",
+      "highWaterBytes": "800mb"
+    }
+  },
+  "cron": {},
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "desk-watcher": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "execApprovals": {
+        "enabled": false,
+        "approvers": [
+          "*"
+        ],
+        "target": "channel"
+      },
+      "enabled": true,
+      "dmPolicy": "open",
+      "botToken": "REDACTED",
+      "groups": {
+        "*": {
+          "requireMention": false
+        }
+      },
+      "allowFrom": [
+        "*"
+      ],
+      "groupPolicy": "open",
+      "streaming": {
+        "mode": "partial"
+      }
+    },
+    "discord": {
+      "markdown": {
+        "tables": "code"
+      },
+      "enabled": true,
+      "commands": {
+        "native": "auto",
+        "nativeSkills": "auto"
+      },
+      "token": "REDACTED",
+      "allowBots": true,
+      "groupPolicy": "open",
+      "historyLimit": 50,
+      "streaming": {
+        "mode": "partial"
+      },
+      "actions": {
+        "reactions": true,
+        "stickers": true,
+        "polls": true,
+        "threads": true,
+        "pins": true,
+        "search": true,
+        "roles": true,
+        "voiceStatus": true,
+        "events": true,
+        "moderation": true,
+        "channels": true,
+        "presence": true
+      },
+      "replyToMode": "first",
+      "dmPolicy": "open",
+      "allowFrom": [
+        "*"
+      ],
+      "guilds": {
+        "1482230800916287710": {
+          "requireMention": false
+        },
+        "1495999478577238317": {
+          "requireMention": false
+        }
+      },
+      "execApprovals": {
+        "enabled": false,
+        "approvers": [
+          "*"
+        ],
+        "cleanupAfterResolve": true,
+        "target": "channel"
+      },
+      "agentComponents": {
+        "enabled": true
+      },
+      "ui": {
+        "components": {
+          "accentColor": "#5865F2"
+        }
+      },
+      "threadBindings": {
+        "enabled": true,
+        "idleHours": 72,
+        "maxAgeHours": 0,
+        "spawnSubagentSessions": true,
+        "spawnAcpSessions": true
+      },
+      "voice": {
+        "enabled": true,
+        "autoJoin": [
+          {
+            "guildId": "1482230800916287710",
+            "channelId": "1482230801859875021"
+          }
+        ],
+        "daveEncryption": false,
+        "decryptionFailureTolerance": 100,
+        "tts": {
+          "provider": "edge"
+        }
+      },
+      "autoPresence": {
+        "enabled": true,
+        "healthyText": "Online \u2014 Right Hand"
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "controlUi": {
+      "allowedOrigins": [
+        "*"
+      ],
+      "dangerouslyDisableDeviceAuth": true
+    },
+    "auth": {
+      "mode": "token",
+      "token": "REDACTED",
+      "password": "REDACTED"
+    },
+    "remote": {
+      "password": "REDACTED"
+    }
+  },
+  "memory": {
+    "backend": "qmd",
+    "citations": "auto",
+    "qmd": {
+      "command": "/usr/bin/qmd",
+      "searchMode": "search",
+      "includeDefaultMemory": true,
+      "paths": [
+        {
+          "path": "/home/trajan/vault",
+          "name": "vault-root",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/vault/wiki",
+          "name": "vault-wiki",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/wiki",
+          "name": "wiki",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/wiki-mirror",
+          "name": "wiki-mirror",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/obsidian-vault",
+          "name": "obsidian-vault",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/staging/host-vault",
+          "name": "staging-host-vault",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/workspace",
+          "name": "workspace-docs",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/Projects/ema",
+          "name": "projects-ema-docs",
+          "pattern": "**/*.md"
+        },
+        {
+          "path": "/home/trajan/dispatch/results",
+          "name": "dispatch-results",
+          "pattern": "**/*.{md,txt,json}"
+        },
+        {
+          "path": "/home/trajan/dispatch/pipelines",
+          "name": "dispatch-pipelines",
+          "pattern": "**/*.{md,txt,json}"
+        },
+        {
+          "path": "/home/trajan/dispatch/done",
+          "name": "dispatch-done",
+          "pattern": "**/*.json"
+        },
+        {
+          "path": "/home/trajan/logs",
+          "name": "logs",
+          "pattern": "**/*.{md,txt,log,json}"
+        },
+        {
+          "path": "/home/trajan/bin",
+          "name": "bin-scripts",
+          "pattern": "**/*.{md,txt,sh,json}"
+        },
+        {
+          "path": "/home/trajan/skills",
+          "name": "skills",
+          "pattern": "**/*.{md,txt,json}"
+        },
+        {
+          "path": "/home/trajan/.agents/skills",
+          "name": "agents-skills",
+          "pattern": "**/*.{md,txt,json}"
+        },
+        {
+          "path": "/usr/lib/node_modules/openclaw/docs",
+          "name": "openclaw-docs",
+          "pattern": "**/*.md"
+        }
+      ],
+      "sessions": {
+        "enabled": true,
+        "retentionDays": 30
+      },
+      "update": {
+        "interval": "5m",
+        "debounceMs": 15000,
+        "onBoot": true,
+        "waitForBootSync": false,
+        "embedInterval": "30m",
+        "commandTimeoutMs": 120000,
+        "updateTimeoutMs": 600000,
+        "embedTimeoutMs": 600000
+      },
+      "limits": {
+        "maxResults": 10,
+        "maxSnippetChars": 600,
+        "maxInjectedChars": 6000,
+        "timeoutMs": 15000
+      },
+      "scope": {
+        "default": "allow",
+        "rules": []
+      }
+    }
+  },
+  "plugins": {
+    "allow": [
+      "llm-task",
+      "lobster",
+      "open-prose",
+      "telegram",
+      "discord",
+      "acpx",
+      "openai",
+      "anthropic"
+    ],
+    "slots": {},
+    "entries": {
+      "llm-task": {
+        "enabled": true
+      },
+      "lobster": {
+        "enabled": true
+      },
+      "diffs": {
+        "enabled": false
+      },
+      "open-prose": {
+        "enabled": true
+      },
+      "memory-core": {
+        "enabled": false
+      },
+      "memory-lancedb": {
+        "enabled": false
+      },
+      "acpx": {
+        "enabled": true,
+        "config": {
+          "permissionMode": "approve-all"
+        }
+      },
+      "telegram": {
+        "enabled": true
+      },
+      "openai": {
+        "enabled": true
+      },
+      "anthropic": {
+        "enabled": true
+      }
+    },
+    "installs": {
+      "openclaw-engram": {
+        "source": "npm",
+        "spec": "@joshuaswarren/openclaw-engram@9.0.80",
+        "installPath": "/home/trajan/.openclaw/extensions/openclaw-engram",
+        "version": "9.0.80",
+        "resolvedName": "@joshuaswarren/openclaw-engram",
+        "resolvedVersion": "9.0.80",
+        "resolvedSpec": "@joshuaswarren/openclaw-engram@9.0.80",
+        "integrity": "sha512-rGou3H7njPY3gEwVskiAhoHMSVlqisFb8pSvTOD0y4BobcYVVymdX9ICM+qg8MYcgfVp/3vqrC/l0NhCnnaB9Q==",
+        "shasum": "39c7f3a7b9db6091a5e7d8edb174b4eb37ff4757",
+        "resolvedAt": "2026-04-15T23:43:50.044Z",
+        "installedAt": "2026-04-15T23:44:43.267Z"
+      }
+    }
+  }
+}

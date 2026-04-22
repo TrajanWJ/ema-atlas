@@ -14,18 +14,19 @@
 
 ### Decision pressure surfaced
 
-5 of 10 open questions have decision matrix drafts ready for the user:
+**10 of 10** open questions now have decision matrix drafts ready for
+the user:
 
 - ✅ **Q1** — agents as first-class members
 - ✅ **Q2** — collab state location
 - ✅ **Q3** — Project ↔ Space cardinality
-- 🟡 **Q4** — Personal AI execution locus *(in flight)*
+- ✅ **Q4** — Personal AI execution locus
 - ✅ **Q5** — driver contract surface
-- ⏳ **Q6** — Discord direction *(matrix not yet drafted)*
-- ⏳ **Q7** — surface stack *(partly answered by atlas Next.js choice)*
-- ⏳ **Q8** — sync model *(matrix not yet drafted; option survey ready)*
-- 🟡 **Q9** — replication boundary *(in flight; will land at "deferred")*
-- ⏳ **Q10** — perm map *(matrix not yet drafted)*
+- ✅ **Q6** — Discord mirror direction
+- ✅ **Q7** — surface stack
+- ✅ **Q8** — sync model for docs/wiki/canvas
+- ✅ **Q9** — replication boundary (deferred-as-most-fully-specified)
+- ✅ **Q10** — org/space → runtime/tool perms
 
 All 5 drafted matrices follow `content/decision-matrix-template.md` —
 options named, criteria scored, bets/costs, reversibility plan,
@@ -111,12 +112,16 @@ The presentation layer expressing all of the above is now real:
 
 The user has to:
 
-1. **Pick a winner from each of the 5 drafted matrices** (Q1, Q2, Q3,
-   Q4, Q5). Use [`howto/resolve-an-open-question.md`](howto/resolve-an-open-question.md).
-2. **Decide if Q6, Q8, Q10 need matrices before v0.0.3 ships** or
-   can be deferred. (Q9 is already designed to land at "deferred";
-   the matrix is in flight.)
-3. **Approve the Gleam scaffold shape** in `research/scaffold/` — say
+1. **Pick a winner from each of the 10 drafted matrices.** Use
+   [`howto/resolve-an-open-question.md`](howto/resolve-an-open-question.md).
+   Tier 1 (gating v0.0.3 build) per
+   [`content/decisions/PRIORITY.md`](content/decisions/PRIORITY.md):
+   Q5 first (driver contract → unblocks build-step 03), then Q1
+   (agent identity → shrinks Q3/Q4/Q10), then Q3 (Project↔Space
+   cardinality → schema impact). Matrices for Q2, Q4, Q6, Q7, Q8,
+   Q9, Q10 can be picked in any order; many have explicit "for
+   v0.0.3 ship this safe option" notes.
+2. **Approve the Gleam scaffold shape** in `research/scaffold/` — say
    yes/no on the supervisor names, the boot order, the version pins.
 
 Once those happen, build-step 01 (control-plane-skeleton) can start
@@ -126,10 +131,8 @@ landing real code in `TrajanWJ/ema`.
 
 - Not the v0.0.3 ship. v0.0.3 lands when [`SHIP_CHECKLIST.md`](SHIP_CHECKLIST.md)
   is fully checked.
-- Not a recommendation for which option to pick on each question. The
-  decision matrices stay blank in the Decision section.
-- Not the end of the prep stage. Q9 matrix and the remaining 2 deeper
-  vApp briefs (hq-deep, virtual-desktop-deep) are still in flight.
+- Not a recommendation for which option to pick on each question. All
+  10 decision matrices stay blank in the Decision section.
 
 ## What to do with this milestone doc
 

@@ -165,12 +165,14 @@ Use this when you don't yet know what to search for.
 - [`howto/add-a-deliverable.md`](howto/add-a-deliverable.md) — A **deliverable** is anything the EMA Atlas presents that expresses the
 - [`howto/add-a-driver.md`](howto/add-a-driver.md) — Use this when you're adding a new harness driver to EMA: `claude-cli`,
 - [`howto/add-a-vapp.md`](howto/add-a-vapp.md) — A **vApp** is a virtual app inside the EMA shell, rendered by the Launchpad
+- [`howto/add-an-atlas-route.md`](howto/add-an-atlas-route.md) — Use this when you're adding a new top-level Next.js route to the EMA
 - [`howto/add-an-edge-topic.md`](howto/add-an-edge-topic.md) — Use this when a cross-cutting concept emerges that doesn't fit any of the
 - [`howto/deploy-atlas.md`](howto/deploy-atlas.md) — The atlas is a Next.js 15 / React 19 / TypeScript app that renders the
 - [`howto/extract-doctrine-from-a-legacy-branch.md`](howto/extract-doctrine-from-a-legacy-branch.md) — Use this when you want to mine an OpenClaw / place.org / ClaudeForge /
 - [`howto/gleam-fit-review.md`](howto/gleam-fit-review.md) — Use this when you propose a new EMA part, subsystem, or driver and want to
 - [`howto/load-context-for-a-task.md`](howto/load-context-for-a-task.md) — Use this when you're a fresh agent and you need to read **just enough** to
 - [`howto/promote-vault-term.md`](howto/promote-vault-term.md) — The "Vault candidate terms" section of [`GLOSSARY.md`](../GLOSSARY.md)
+- [`howto/refresh-snapshot-docs.md`](howto/refresh-snapshot-docs.md) — Several top-level docs in this repo are **hand-crafted snapshots**.
 - [`howto/resolve-an-open-question.md`](howto/resolve-an-open-question.md) — Use this when you're closing one of the entries in
 - [`howto/run-a-swarm-wave.md`](howto/run-a-swarm-wave.md) — Use this when you are orchestrating or joining an active EMA swarm wave and
 

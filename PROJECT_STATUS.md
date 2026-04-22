@@ -7,11 +7,11 @@ significant push. Last refresh: **2026-04-22, end of wave 9 (one deep brief stil
 
 The **prep stage for EMA v0.0.3** (Gleam/BEAM rewrite) is
 **substantially complete** — see [`MILESTONE_PREP_COMPLETE.md`](MILESTONE_PREP_COMPLETE.md).
-6 of 10 OPEN_QUESTIONS now have decision matrix drafts ready for the
-user (Q1, Q2, Q3, Q4, Q5, Q9). All 6 v0.0.3 build-step starters
-documented under `research/build-steps/`. The Gleam project scaffold
-sketch is at `research/scaffold/`. The atlas presents all of this
-through 30+ Next.js routes.
+**10 of 10** OPEN_QUESTIONS now have decision matrix drafts ready for
+the user (Q1 through Q10). All 6 v0.0.3 build-step starters documented
+under `research/build-steps/`. The Gleam project scaffold sketch is at
+`research/scaffold/`. The atlas presents all of this through 30+
+Next.js routes.
 
 ## Swarm control model
 

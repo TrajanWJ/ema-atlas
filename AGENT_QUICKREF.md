@@ -118,9 +118,18 @@ If you are joining active multi-agent work, read these before touching shared
 coordination state:
 
 1. [`content/swarm/README.md`](content/swarm/README.md)
-2. [`content/swarm/continuous-progress-protocol.md`](content/swarm/continuous-progress-protocol.md)
-3. [`content/swarm/orchestrator-alignment.md`](content/swarm/orchestrator-alignment.md)
-4. [`content/swarm/object-model.md`](content/swarm/object-model.md)
+2. [`content/swarm/fresh-orchestrator-read-order.md`](content/swarm/fresh-orchestrator-read-order.md)
+3. [`content/swarm/continuous-progress-protocol.md`](content/swarm/continuous-progress-protocol.md)
+4. [`content/swarm/orchestrator-alignment.md`](content/swarm/orchestrator-alignment.md)
+5. [`content/swarm/object-model.md`](content/swarm/object-model.md)
+
+If Claude is taking the main deliverables lane:
+
+- orchestrator prompt: [`content/swarm/claude-deliverables-orchestrator-prompt.md`](content/swarm/claude-deliverables-orchestrator-prompt.md)
+- worker prompt: [`content/swarm/claude-worker-prompt.md`](content/swarm/claude-worker-prompt.md)
+- support lanes: [`content/swarm/deliverables-support-lanes.md`](content/swarm/deliverables-support-lanes.md)
+- guardrails: [`content/swarm/vision-guardrails.md`](content/swarm/vision-guardrails.md)
+- anti-drift rules: [`content/swarm/no-drift-rules.md`](content/swarm/no-drift-rules.md)
 
 ## Numbers
 

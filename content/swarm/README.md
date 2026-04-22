@@ -7,8 +7,28 @@ orchestrators are supposed to align around the same truth.
 
 Start here if you need the short version:
 
-- [`ema-swarm-workspace.md`](./ema-swarm-workspace.md) - the doctrine, object
-  model, and alignment rules
+1. [`fresh-orchestrator-read-order.md`](./fresh-orchestrator-read-order.md) - the
+   lean read path for a new orchestrator
+2. [`ema-swarm-workspace.md`](./ema-swarm-workspace.md) - the doctrine and
+   workspace model
+3. [`continuous-progress-protocol.md`](./continuous-progress-protocol.md) - the
+   operating loop for active lanes
+4. [`orchestrator-alignment.md`](./orchestrator-alignment.md) - multi-orchestrator
+   coordination rules
+5. [`object-model.md`](./object-model.md) - canonical swarm vocabulary
+
+If Claude is taking the main deliverables lane:
+
+- [`claude-deliverables-orchestrator-prompt.md`](./claude-deliverables-orchestrator-prompt.md)
+  - clean orchestrator prompt aimed at EMA's actual product vision
+- [`claude-worker-prompt.md`](./claude-worker-prompt.md) - smaller worker-only
+  variant
+- [`deliverables-support-lanes.md`](./deliverables-support-lanes.md) - what the
+  rest of the swarm should do without competing on the main artifact
+- [`vision-guardrails.md`](./vision-guardrails.md) - anti-drift product shape
+  guardrails
+- [`no-drift-rules.md`](./no-drift-rules.md) - practical stop, handoff, and
+  anti-sprawl rules
 
 ## Canonical rule
 
@@ -27,6 +47,9 @@ EMA-owned facts.
 - how lane ownership, handoffs, queueing, schedules, and checkups fit together
 - how multiple orchestrators stay aligned without creating competing truth
   systems
+- how to join active work without drowning in the archive
+- how to keep support lanes aligned while a main deliverables lane is in motion
+- how to keep the product vision intact while the swarm is active
 
 ## Core object families
 
@@ -43,4 +66,3 @@ This pack is grounded in the EMA atlas doctrine and donor patterns from the
 Proslync/Autharis swarm routine, especially the lane registry, claim/hold
 lifecycle, planner/control-tower discipline, explicit handoffs, and drift
 audits.
-

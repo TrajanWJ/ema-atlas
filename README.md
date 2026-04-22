@@ -24,6 +24,7 @@ The repo root now contains a Next.js app that turns EMA into a living atlas of:
 - printable brief routes
 - a place-inspired desktop surface
 - linked local knowledge docs that keep accompanying development
+- a repo-native swarm workspace pack for multi-agent coordination and continuous progress
 
 Top-level app routes:
 
@@ -51,11 +52,15 @@ npm run dev
 3. [`AGENT_TRAVERSAL.md`](AGENT_TRAVERSAL.md) — how to load context from the graph efficiently
 4. [`AGENT_BOOTSTRAP.md`](AGENT_BOOTSTRAP.md) — fresh-machine setup (Path A: EMA installed; Path B: ecosystem from scratch)
 5. [`05-fresh-context-project-app-model.md`](05-fresh-context-project-app-model.md) — newest user PRD framing (project/space/org, named app surfaces)
-6. [`GLOSSARY.md`](GLOSSARY.md) — controlled vocabulary
-7. [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) — single canonical list of unresolved decisions
-8. [`TIMELINE.md`](TIMELINE.md) — chronological lineage skeleton
-9. [`CONTRIBUTING_TO_GRAPH.md`](CONTRIBUTING_TO_GRAPH.md) — rules for keeping the graph self-aware as it grows
-10. The four-doc handoff series:
+6. [`content/swarm/README.md`](content/swarm/README.md) — swarm workspace entrypoint for orchestrators, supervisors, and active workers
+7. [`content/swarm/continuous-progress-protocol.md`](content/swarm/continuous-progress-protocol.md) — the operating loop for lanes, claims, handoffs, and drift handling
+8. [`content/swarm/orchestrator-alignment.md`](content/swarm/orchestrator-alignment.md) — how multiple orchestrators avoid divergence without destructive resets
+9. [`content/swarm/object-model.md`](content/swarm/object-model.md) — canonical swarm vocabulary and object boundaries
+10. [`GLOSSARY.md`](GLOSSARY.md) — controlled vocabulary
+11. [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) — single canonical list of unresolved decisions
+12. [`TIMELINE.md`](TIMELINE.md) — chronological lineage skeleton
+13. [`CONTRIBUTING_TO_GRAPH.md`](CONTRIBUTING_TO_GRAPH.md) — rules for keeping the graph self-aware as it grows
+14. The four-doc handoff series:
    - [`01-best-prompt-and-answer.md`](01-best-prompt-and-answer.md)
    - [`02-project-transfer-brief.md`](02-project-transfer-brief.md)
    - [`03-architectural-evolution-and-major-decisions.md`](03-architectural-evolution-and-major-decisions.md)
@@ -67,6 +72,7 @@ npm run dev
 .                            # atlas app + lineage archive + graph docs
 ├─ app/                      # Next.js routes for atlas, parts, graph, canvas, slides, briefs, desktop, docs
 ├─ components/               # reusable UI building blocks
+├─ content/swarm/            # repo-native swarm workspace pack for coordination doctrine + protocols
 ├─ lib/                      # EMA atlas data model and route content
 ├─ MACBOOK_AGENT_HANDOFF_MASTER.md
 ├─ 0[1-5]-*.md               # high-signal handoff docs (numbered reading order)

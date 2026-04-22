@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-22T09:15:23Z",
+  "generated_at": "2026-04-22T09:17:40Z",
   "repo": "TrajanWJ/ema-transfer-pack-20260422-060938",
   "canonical_rule": "EMA owns truth. Hermes owns execution. Surfaces do not own state.",
   "entry_docs": [
@@ -63,7 +63,7 @@
     "lineage-openclaw-agent-workspaces": "6842b36301bb7bd3236bde2b58f1f716c0dcf0a9",
     "lineage-openclaw-archive-subprojects": "651ffb7a795f135a2074b390896d28cf29fdd9b2",
     "lineage-original-elixir-ema": "0ec1ddc2c124a6cffac817a8731f3403dda9fcdf",
-    "main": "641de1c9610fc77b5a22976fb62060a592718a47",
+    "main": "bdc63fdd363292f7cbce02f332cbf56e806910b0",
     "recovery-old-agent-vm-vault-system": "b04a780848d5a170bf983bcb79627925f52ebddc"
   },
   "nodes": [

@@ -9,16 +9,25 @@ another orchestrator.
 Before claiming work, read:
 
 1. [`../content/swarm/README.md`](../content/swarm/README.md)
-2. [`../content/swarm/continuous-progress-protocol.md`](../content/swarm/continuous-progress-protocol.md)
-3. [`../content/swarm/orchestrator-alignment.md`](../content/swarm/orchestrator-alignment.md)
-4. [`../content/swarm/object-model.md`](../content/swarm/object-model.md)
-5. [`../OPEN_QUESTIONS.md`](../OPEN_QUESTIONS.md) for unresolved swarm-adjacent decisions
+2. [`../content/swarm/fresh-orchestrator-read-order.md`](../content/swarm/fresh-orchestrator-read-order.md)
+3. [`../content/swarm/continuous-progress-protocol.md`](../content/swarm/continuous-progress-protocol.md)
+4. [`../content/swarm/orchestrator-alignment.md`](../content/swarm/orchestrator-alignment.md)
+5. [`../content/swarm/object-model.md`](../content/swarm/object-model.md)
+6. [`../content/swarm/no-drift-rules.md`](../content/swarm/no-drift-rules.md)
+7. [`../content/swarm/vision-guardrails.md`](../content/swarm/vision-guardrails.md)
+8. [`../OPEN_QUESTIONS.md`](../OPEN_QUESTIONS.md) for unresolved swarm-adjacent decisions
 
 If the wave is part of the current EMA 0.0.3 reconstruction pass, also read:
 
 - [`/Users/tawj/Desktop/ema 0.0.3/ema-003-workboard.md`](/Users/tawj/Desktop/ema 0.0.3/ema-003-workboard.md)
 - [`/Users/tawj/Desktop/ema 0.0.3/ema-003-shared-swarm-source-pack.md`](/Users/tawj/Desktop/ema 0.0.3/ema-003-shared-swarm-source-pack.md)
 - [`/Users/tawj/Desktop/ema 0.0.3/ema-003-knowledge-graph-hub.md`](/Users/tawj/Desktop/ema 0.0.3/ema-003-knowledge-graph-hub.md)
+
+If Claude owns the main deliverables lane, also read:
+
+- [`../content/swarm/claude-deliverables-orchestrator-prompt.md`](../content/swarm/claude-deliverables-orchestrator-prompt.md)
+- [`../content/swarm/claude-worker-prompt.md`](../content/swarm/claude-worker-prompt.md)
+- [`../content/swarm/deliverables-support-lanes.md`](../content/swarm/deliverables-support-lanes.md)
 
 ## When to use a swarm wave
 

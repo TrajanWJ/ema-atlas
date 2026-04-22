@@ -422,6 +422,54 @@ export const docRegistry: DocEntry[] = [
     feeds: ["docs", "graph", "program"]
   },
   {
+    title: "Fresh Orchestrator Read Order",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/fresh-orchestrator-read-order.md",
+    note: "Lean read path for a new orchestrator joining active EMA work without drowning in the archive.",
+    kind: "backlog",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Vision Guardrails",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/vision-guardrails.md",
+    note: "Short anti-drift guardrails that pin the swarm to EMA's real product shape and surface semantics.",
+    kind: "doctrine",
+    status: "active",
+    feeds: ["docs", "showroom", "program"]
+  },
+  {
+    title: "No Drift Rules",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/no-drift-rules.md",
+    note: "Practical stop, handoff, and anti-sprawl rules for active EMA swarms.",
+    kind: "backlog",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Deliverables Support Lanes",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/deliverables-support-lanes.md",
+    note: "Defines support lanes that strengthen alignment and repo hygiene while staying out of Claude's main deliverables write scope.",
+    kind: "backlog",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Claude Deliverables Orchestrator Prompt",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/claude-deliverables-orchestrator-prompt.md",
+    note: "Paste-ready prompt for a Claude orchestrator focused on EMA deliverables in drift-aware mode.",
+    kind: "doctrine",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Claude Worker Prompt",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/claude-worker-prompt.md",
+    note: "Smaller worker-only Claude prompt for one narrow lane inside the active EMA swarm.",
+    kind: "backlog",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
     title: "Lineage Architecture Synthesis",
     path: "/Users/tawj/Desktop/ema 0.0.3/ema-003-lineage-architecture-synthesis.md",
     note: "Doctrine, authority model, app topology, preserve vs redesign.",

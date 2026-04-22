@@ -1,29 +1,65 @@
-import { SiteShell } from "@/components/site-shell";
-import { docRegistry } from "@/lib/ema-atlas";
+import Link from "next/link";
 
-export default function DocsPage() {
+import { SiteShell } from "@/components/site-shell";
+
+import { loadTiers } from "./_tiers";
+
+export default async function DocsPage() {
+  const tiers = await loadTiers();
+  const total = tiers.reduce((acc, t) => acc + t.files.length, 0);
+
   return (
     <SiteShell
       eyebrow="Local Knowledge Pack"
       title="EMA Docs"
-      intro="The site sits at the center, but the markdown knowledge pack still matters. This route keeps the current working documents visible as first-class references."
+      intro="The whole markdown corpus, grouped by reading order. Tier 1 first; the rest as you need them. Each tile links to a rendered view of the file."
     >
-      <section className="doc-grid">
-        {docRegistry.map((doc) => (
-          <article className="panel list-card" key={doc.path}>
-            <p className="panel__tag">{doc.kind}</p>
-            <h2 className="list__title">{doc.title}</h2>
-            <p className="list__copy">{doc.note}</p>
-            <ul className="inline-list">
-              <li>{doc.status}</li>
-              {doc.feeds.map((feed) => (
-                <li key={feed}>feeds {feed}</li>
-              ))}
-            </ul>
-            <p className="list__copy">{doc.path}</p>
-          </article>
-        ))}
+      <section className="section-grid">
+        <article className="panel panel--hero">
+          <p className="panel__tag">Reading map</p>
+          <h2 className="panel__title">
+            {total} documents, five tiers, one path through the system.
+          </h2>
+          <p className="panel__lede">
+            Tiers are reading order, not importance ranking. Tier 1 sets
+            context; Tier 2 shows the decisions; Tier 3 maps the system;
+            Tier 4 is the handoff narrative; Tier 5 is operational.
+          </p>
+          <div className="stat-ribbon">
+            {tiers.map((t) => (
+              <div className="stat" key={t.key}>
+                <span className="stat__value">{t.files.length}</span>
+                <span>{t.label}</span>
+              </div>
+            ))}
+          </div>
+        </article>
       </section>
+
+      {tiers.map((tier) =>
+        tier.files.length === 0 ? null : (
+          <section className="docs-tier" key={tier.key}>
+            <header className="docs-tier__header">
+              <p className="docs-tier__label">{tier.label}</p>
+              <h2 className="docs-tier__title">{tier.title}</h2>
+              <p className="docs-tier__blurb">{tier.blurb}</p>
+            </header>
+            <div className="docs-tier__grid">
+              {tier.files.map((file) => (
+                <Link
+                  className="docs-tile"
+                  key={file.slug}
+                  href={`/docs/${file.slug}`}
+                >
+                  <p className="docs-tile__path">{file.rel}</p>
+                  <h3 className="docs-tile__name">{file.name}</h3>
+                  <p className="docs-tile__summary">{file.summary}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )
+      )}
     </SiteShell>
   );
 }

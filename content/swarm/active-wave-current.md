@@ -10,9 +10,16 @@
 
 - owner: Claude deliverables orchestrator
 - lane name: `main-deliverables`
+- authority note:
+  - the lead orchestrator approves the lane boundary for this wave; Claude chooses one deliverable inside that approved boundary and claims it before editing
 - exact scope:
-  - one narrow deliverables lane chosen by Claude
-  - likely an atlas route, HQ/Launchpad/Desktop surface, Wiki/semantic layer surface, Threads/Server deliverable, or Chat/harness-facing deliverable
+  - one narrow deliverables lane chosen by Claude after a visible claim
+  - Claude must pick exactly one category for the wave:
+    - HQ / Launchpad / Virtual Desktop
+    - Wiki / semantic layer
+    - Threads / Server
+    - Chat / harness-facing
+    - atlas support route around one of the surfaces above
 - touches:
   - the exact route, page, content, or artifact Claude claims
 - does not touch:
@@ -75,11 +82,13 @@
 - done-when:
   - support changes are safe and the main lane remains clear to continue
 
-## Recovery Lane
+## Recovery Posture
 
 - active: yes
 - reason:
-  - the swarm recently felt muddy and over-expanded, so a recovery posture is still active until the main lane stays narrow and stable
+  - the swarm recently felt muddy and over-expanded, so recovery stays on as a standing watch until the main lane stays narrow and stable
+- trigger to become an active recovery lane:
+  - only if the wave stops being describable as one objective, one main lane, and a few support lanes
 - owner: lead orchestrator
 - done-when:
   - the wave can be described cleanly as one objective, one main lane, and a few support lanes
@@ -92,6 +101,8 @@
   - main deliverables scope is not claimed narrowly enough and attracts parallel edits
 - unresolved question:
   - surface authority can still blur, especially around Threads/Discord, HQ/Desktop, and Chat/execution boundaries
+- current freeze:
+  - do not settle those surface-boundary questions inside this wave unless a blocked lane forces the smallest possible clarification
 
 ## Current Handoffs
 
@@ -120,6 +131,7 @@
 
 - If you are Claude, take the `main-deliverables` lane.
 - If you are support swarm, stay out of the main deliverable and help the next move land faster.
+- Claims and handoffs are the only accepted serialization point for coordination in this wave.
 - If the wave starts feeling muddy again, return to:
   - [Orchestration Kernel](./orchestration-kernel.md)
   - [No Drift Rules](./no-drift-rules.md)

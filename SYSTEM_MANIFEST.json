@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-22T08:39:54Z",
+  "generated_at": "2026-04-22T08:48:00Z",
   "repo": "TrajanWJ/ema-transfer-pack-20260422-060938",
   "canonical_rule": "EMA owns truth. Hermes owns execution. Surfaces do not own state.",
   "entry_docs": [
@@ -29,13 +29,13 @@
     "workspace"
   ],
   "branches": {
-    "codebase-agent-os-bridge": "b8be50127f616f0347df9ef2425bdb0acd1ab93a",
+    "codebase-agent-os-bridge": "3c2078700450e5e16066699a2490e806be34d3e5",
     "codebase-agent-os-demo": "1d29c0408b74a6148f1cbda82ecaef8142e2e218",
     "codebase-agent-os-demo-pages": "3e3fb3090191b2e59d9297b07f5679d846b20570",
     "codebase-agent-os-v8": "e482f75cf3b3ae043aea18275d7a6bfa42e5f9f6",
     "codebase-agentgpt": "0bcead041aac919f350fa0a75a4ea4840060628e",
     "codebase-claudeforge": "2c016f5f44236db621946ce123162e339b315080",
-    "codebase-ema": "f27a068c25bcae2be8561ed5ed7db79341abf83a",
+    "codebase-ema": "326e3cf2c39b0365126e8c520170be09d316c2df",
     "codebase-execudeck": "39e0e0507be6525ea9f90026ba91bf3895f18bab",
     "codebase-executive": "fb75485d4f4f9c4127e309a874091b3bb365fd1d",
     "codebase-frontend-layer": "fa0487aa23d538dfe8556540a3922a1def7bd83f",
@@ -63,7 +63,7 @@
     "lineage-openclaw-agent-workspaces": "6842b36301bb7bd3236bde2b58f1f716c0dcf0a9",
     "lineage-openclaw-archive-subprojects": "651ffb7a795f135a2074b390896d28cf29fdd9b2",
     "lineage-original-elixir-ema": "0ec1ddc2c124a6cffac817a8731f3403dda9fcdf",
-    "main": "764bcf069ac6095da07da0197efb6ac377a2853e",
+    "main": "afbd56db619a1dc8d88dd68bda17e89fe2c3e01b",
     "recovery-old-agent-vm-vault-system": "b04a780848d5a170bf983bcb79627925f52ebddc"
   },
   "nodes": [

@@ -8,7 +8,7 @@ Use this when you don't yet know what to search for.
 
 ## Always read first
 
-- [`README.md`](README.md) — Cross-machine handoff for the EMA / Hermes / place.org / OpenClaw lineage
+- [`README.md`](README.md) — This repo is now doing two jobs at once:
 - [`MACBOOK_AGENT_HANDOFF_MASTER.md`](MACBOOK_AGENT_HANDOFF_MASTER.md) — **Purpose:** single-file passover brief for another agent joining cold on a different machine.
 - [`SYSTEM_GRAPH.md`](SYSTEM_GRAPH.md) — Single rendered view of the lineage graph. Generated from `graph/nodes/` and
 - [`AGENT_TRAVERSAL.md`](AGENT_TRAVERSAL.md) — How to load context from this transfer pack **without** reading every branch.

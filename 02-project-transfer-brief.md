@@ -405,3 +405,49 @@ If synchronous collaboration becomes core, conflict resolution / event history /
 
 ### Avoid this trap
 Do not jump into broad implementation before authority, identity, and collaboration-state semantics are tight enough to prevent recreating historical drift.
+
+---
+
+<!-- xref-footer -->
+## See also (cross-references)
+
+This doc is part of the EMA / Hermes lineage transfer pack. For the full
+navigable view, start at:
+
+- [`README.md`](README.md) — entry point
+- [`SYSTEM_GRAPH.md`](SYSTEM_GRAPH.md) — lineage map and concept edges
+- [`INDEX.md`](INDEX.md) — one-page lookup of every term, node, doc
+- [`AGENT_TRAVERSAL.md`](AGENT_TRAVERSAL.md) — how to load context efficiently
+- [`AGENT_BOOTSTRAP.md`](AGENT_BOOTSTRAP.md) — fresh-machine setup
+
+Definitions of terms used here (EMA, Hermes, Surface, Workspace, Driver,
+Provider, Org, Project, Space, vApp, Launchpad, HQ, OpenClaw, ClaudeForge,
+place.org, ...) live in [`GLOSSARY.md`](GLOSSARY.md). Use those exact spellings.
+
+Unresolved decisions referenced here are tracked in
+[`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) (Q1–Q10). When you cite an
+"open question" inline, link by Q-number so it stays addressable.
+
+Concept edges (which branches/files participate in each topic) live under
+[`graph/edges/`](graph/edges/):
+
+| Topic | Edge file |
+|---|---|
+| authority / control plane | [`graph/edges/authority.md`](graph/edges/authority.md) |
+| execution / harness | [`graph/edges/execution.md`](graph/edges/execution.md) |
+| surfaces | [`graph/edges/surfaces.md`](graph/edges/surfaces.md) |
+| shared workspace | [`graph/edges/workspace.md`](graph/edges/workspace.md) |
+| collaboration objects | [`graph/edges/collab.md`](graph/edges/collab.md) |
+| identity (org/space/project/agent) | [`graph/edges/identity.md`](graph/edges/identity.md) |
+| orchestration | [`graph/edges/orchestration.md`](graph/edges/orchestration.md) |
+| memory / vault | [`graph/edges/memory.md`](graph/edges/memory.md) |
+| transport / p2p | [`graph/edges/transport.md`](graph/edges/transport.md) |
+| ux-metaphor | [`graph/edges/ux-metaphor.md`](graph/edges/ux-metaphor.md) |
+| recovery / fixtures | [`graph/edges/recovery.md`](graph/edges/recovery.md) |
+
+Per-branch nodes live under [`graph/nodes/<branch>.qmd`](graph/nodes/) — load
+the node first, then `git show origin/<branch>:<key_artifact>` for any path
+in its `key_artifacts:` frontmatter.
+
+> Canonical rule: **EMA owns truth. Hermes owns execution. Surfaces do not own state.**
+<!-- /xref-footer -->

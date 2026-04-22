@@ -1,0 +1,1957 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-22T08:48:00Z",
+  "repo": "TrajanWJ/ema-transfer-pack-20260422-060938",
+  "canonical_rule": "EMA owns truth. Hermes owns execution. Surfaces do not own state.",
+  "counts": {
+    "nodes": 36,
+    "triples": 91,
+    "topics": 11,
+    "questions": 10,
+    "glossary_terms": 33
+  },
+  "nodes": [
+    {
+      "id": "codebase-agent-os-bridge",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "driver",
+        "transport"
+      ],
+      "preserves_from": [
+        "codebase-agent-os-demo"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-agent-os-v8"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/agent-os-bridge/server.js",
+        "code/agent-os-bridge/db.js",
+        "code/agent-os-bridge/package.json",
+        "code/agent-os-bridge/routes/agents.js"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Bridge layer between the agent-OS surface and underlying runtimes. Worth\ninspecting when designing the harness/driver registry.",
+      "node_path": "graph/nodes/codebase-agent-os-bridge.qmd"
+    },
+    {
+      "id": "codebase-agent-os-demo-pages",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "ux-metaphor"
+      ],
+      "preserves_from": [
+        "codebase-agent-os-demo"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-agent-os-demo"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/agent-os-demo-pages/README.md",
+        "code/agent-os-demo-pages/index.html",
+        "code/agent-os-demo-pages/UPGRADE-PLAN.md",
+        "code/agent-os-demo-pages/local-server.js"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "Static/demo pages for the agent-OS demo. Mostly visual reference.",
+      "node_path": "graph/nodes/codebase-agent-os-demo-pages.qmd"
+    },
+    {
+      "id": "codebase-agent-os-demo",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-agent-os-v8",
+        "codebase-agent-os-bridge",
+        "codebase-agent-os-demo-pages"
+      ],
+      "adjacent_to": [
+        "codebase-agent-os-v8"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/agent-os-demo/README.md",
+        "code/agent-os-demo/index.html",
+        "code/agent-os-demo/app.js",
+        "code/agent-os-demo/AUDIT.md",
+        "code/agent-os-demo/local-server.js"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Conceptual AI-native OS demo. Donor of vApp / dashboard composition patterns.\nMostly inspirational.",
+      "node_path": "graph/nodes/codebase-agent-os-demo.qmd"
+    },
+    {
+      "id": "codebase-agent-os-v8",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-agent-os-demo"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-agent-os-demo",
+        "codebase-agent-os-bridge"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/agent-os-v8/CLAUDE.md",
+        "code/agent-os-v8/package.json",
+        "code/agent-os-v8/vite.config.ts",
+        "code/agent-os-v8/src/main.ts"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Iteration v8 of the agent-OS demo line.",
+      "node_path": "graph/nodes/codebase-agent-os-v8.qmd"
+    },
+    {
+      "id": "codebase-agentgpt",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "orchestration"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/AgentGPT/README.md",
+        "code/AgentGPT/package.json",
+        "code/AgentGPT/prisma/schema.prisma",
+        "code/AgentGPT/src/components/AutonomousAgent.ts"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "AgentGPT-derived experiment. Archive; no code reuse expected.",
+      "node_path": "graph/nodes/codebase-agentgpt.qmd"
+    },
+    {
+      "id": "codebase-claudeforge",
+      "type": "codebase",
+      "era": "claudeforge",
+      "status": "doctrine-only",
+      "contributes": [
+        "surface",
+        "execution",
+        "driver"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-ema",
+        "docs-clis-mcps-integrations"
+      ],
+      "superseded_by": [],
+      "adjacent_to": [
+        "codebase-frontend-layer",
+        "codebase-mission-control-claude"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md"
+      ],
+      "key_artifacts": [
+        "packages/server/src/providers/hermes-provider.ts",
+        "packages/server/test/session-manager-hermes.test.ts",
+        "packages/bot/test/hermes-commands.test.ts"
+      ],
+      "aliases": [
+        "claude-remote-discord",
+        "alfred"
+      ],
+      "load_priority": 2,
+      "summary": "TypeScript Discord/web operator surface. Proves the surface↔runtime seam:\n`hermes-provider.ts` already runs Hermes as a backend provider with\n`X-Hermes-Session-Id` continuity. Keep as **interface contract**, not as the\ncanonical surface — surfaces should not own state.",
+      "node_path": "graph/nodes/codebase-claudeforge.qmd"
+    },
+    {
+      "id": "codebase-ema",
+      "type": "codebase",
+      "era": "ema-daemon",
+      "status": "canonical",
+      "contributes": [
+        "authority",
+        "execution",
+        "workspace",
+        "identity",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "lineage-original-elixir-ema",
+        "lineage-openclaw",
+        "codebase-claudeforge"
+      ],
+      "inspires": [
+        "docs-ema-next-steps"
+      ],
+      "superseded_by": [],
+      "adjacent_to": [
+        "codebase-claudeforge"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "HERMES_EMA_LINEAGE_META_HARNESS_AUDIT_2026-04-22.md"
+      ],
+      "key_artifacts": [
+        "code/ema/daemon/lib/ema/control_plane",
+        "code/ema/daemon/lib/ema/babysitter",
+        "code/ema/daemon/lib/ema/sessions",
+        "code/ema/daemon/lib/ema/surfaces/hermes_client.ex",
+        "code/ema/docs/AGENT-CONTRACT.md",
+        "code/ema/docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md",
+        "code/ema/docs/HERMES_HARNESS_DRIVER_REGISTRY.md",
+        "code/ema/workspace/shared"
+      ],
+      "aliases": [
+        "/home/trajan/Projects/ema"
+      ],
+      "load_priority": 1,
+      "summary": "The canonical EMA daemon snapshot. Contains the live `control_plane/`\n(event_log, store, replay, execution_supervisor, incidents/*, proposal_events),\n`babysitter/`, `sessions/`, and `surfaces/hermes_client.ex` — i.e. the\nEMA-truth / Hermes-execution split is already real in code, not just doctrine.\nHolds ClaudeForge under `code/ema/claudeforge/` and the working\n`hermes-provider.ts` seam.",
+      "node_path": "graph/nodes/codebase-ema.qmd"
+    },
+    {
+      "id": "codebase-execudeck",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "ux-metaphor"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-executive"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/execudeck/CLAUDE.md",
+        "code/execudeck/app/page.tsx",
+        "code/execudeck/docs/ARCHITECTURE.md",
+        "code/execudeck/docs/plans/2026-02-18-phase1-scaffold-plan.md"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "Deck-style executive surface. Visual reference only.",
+      "node_path": "graph/nodes/codebase-execudeck.qmd"
+    },
+    {
+      "id": "codebase-executive",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "orchestration",
+        "workspace"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-mission-control-claude",
+        "codebase-multi-agent-expirements"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "README.md",
+        "SOURCE_CONTEXT.md"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Executive-functioning / personal-assistant experiments. Pattern donor for the\nbrain-dump / todo / time-block / pomodoro app family.",
+      "node_path": "graph/nodes/codebase-executive.qmd"
+    },
+    {
+      "id": "codebase-frontend-layer",
+      "type": "codebase",
+      "era": "claudeforge",
+      "status": "doctrine-only",
+      "contributes": [
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-claudeforge"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-claudeforge",
+        "codebase-mission-control-claude"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/frontend-layer/package.json",
+        "code/frontend-layer/next.config.ts",
+        "code/frontend-layer/pnpm-workspace.yaml",
+        "code/frontend-layer/src/app/api/system/full-status/route.ts"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Generic frontend layer experiments. Evaluate for component reuse only.",
+      "node_path": "graph/nodes/codebase-frontend-layer.qmd"
+    },
+    {
+      "id": "codebase-mission-control-claude",
+      "type": "codebase",
+      "era": "claudeforge",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "codebase-claudeforge"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-claudeforge",
+        "codebase-executive"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/mission-control-claude/README.md",
+        "code/mission-control-claude/Dockerfile",
+        "code/mission-control-claude/docker-compose.hardened.yml",
+        "code/mission-control-claude/SKILL.md"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Mission-control style dashboard layered over Claude. Pattern donor for HQ.",
+      "node_path": "graph/nodes/codebase-mission-control-claude.qmd"
+    },
+    {
+      "id": "codebase-multi-agent-expirements",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "inspiration",
+      "contributes": [
+        "orchestration"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-executive",
+        "codebase-superman"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "README.md",
+        "SOURCE_CONTEXT.md"
+      ],
+      "aliases": [
+        "multi-agent-experiments"
+      ],
+      "load_priority": 4,
+      "summary": "Multi-agent coordination experiments. Inspect when designing role assignment\nand dependency-graph orchestration.",
+      "node_path": "graph/nodes/codebase-multi-agent-expirements.qmd"
+    },
+    {
+      "id": "codebase-place-companion",
+      "type": "codebase",
+      "era": "place-org",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-place-org"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/place-companion/README.md",
+        "code/place-companion/package.json",
+        "code/place-companion/src-tauri/Cargo.toml",
+        "code/place-companion/src-tauri/src/main.rs",
+        "code/place-companion/src-tauri/tauri.conf.json"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Native window/companion bridge for place.org. Useful as reference for the\n\"native desktop app\" surface mentioned in `05-fresh-context-project-app-model.md`.",
+      "node_path": "graph/nodes/codebase-place-companion.qmd"
+    },
+    {
+      "id": "codebase-place-org-openclaw",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "codebase-place-org",
+        "lineage-openclaw"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-place-org",
+        "lineage-openclaw"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/place.org-openclaw/AGENTS.md",
+        "code/place.org-openclaw/CLAUDE.md",
+        "code/place.org-openclaw/README.md"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Hybrid era where the place.org surface met OpenClaw orchestration. Evidence\nthat the surface↔orchestrator question has been live for a long time.",
+      "node_path": "graph/nodes/codebase-place-org-openclaw.qmd"
+    },
+    {
+      "id": "codebase-place-org",
+      "type": "codebase",
+      "era": "place-org",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-place-companion",
+        "codebase-place-org-openclaw",
+        "docs-host-system-launchpad-hq",
+        "docs-vault-wiki"
+      ],
+      "superseded_by": [],
+      "adjacent_to": [
+        "codebase-place-companion",
+        "docs-place-org-era-research"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "05-fresh-context-project-app-model.md"
+      ],
+      "key_artifacts": [
+        "code/place.org/AGENTS.md",
+        "code/place.org/CLAUDE.md",
+        "code/place.org/README.md",
+        "code/place.org/app/(desktop)/layout.tsx",
+        "code/place.org/app/(desktop)/page.tsx"
+      ],
+      "aliases": [
+        "place.org",
+        "placeOS"
+      ],
+      "load_priority": 3,
+      "summary": "Browser-native workspace / virtual-desktop / local-first \"place\" lineage.\nDonor of the Launchpad/HQ/Virtual-Desktop UX metaphor that resurfaces in the\nfresh-context product framing. Not architectural; preserve as visual + spatial\nintent only.",
+      "node_path": "graph/nodes/codebase-place-org.qmd"
+    },
+    {
+      "id": "codebase-superman",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "orchestration"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-multi-agent-expirements"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/superman/package.json",
+        "code/superman/app/page.tsx",
+        "code/superman/codevault-mcp/index.ts",
+        "code/superman/docs/superpowers/specs/2026-03-25-retrieval-pipeline-design.md"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "\"Superman\" multi-agent experiment. Archive.",
+      "node_path": "graph/nodes/codebase-superman.qmd"
+    },
+    {
+      "id": "codebase-t3code-fork",
+      "type": "codebase",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "surface"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/t3code-fork/.docs/architecture.md",
+        "code/t3code-fork/.docs/quick-start.md",
+        "code/t3code-fork/.plans/01-shared-model-normalization.md",
+        "code/t3code-fork/.plans/17-claude-agent.md"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "Fork of t3-style code surface. Archive.",
+      "node_path": "graph/nodes/codebase-t3code-fork.qmd"
+    },
+    {
+      "id": "design-review-fresh-context",
+      "type": "meta",
+      "era": "meta",
+      "status": "active",
+      "contributes": [
+        "identity",
+        "workspace",
+        "collab",
+        "ux-metaphor"
+      ],
+      "preserves_from": [
+        "main"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-system-launchpad-hq",
+        "docs-frontend-interface-inspirations"
+      ],
+      "referenced_in_docs": [
+        "05-fresh-context-project-app-model.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "05-fresh-context-project-app-model.md",
+        "SOURCE_CONTEXT.md"
+      ],
+      "aliases": [
+        "fresh-context"
+      ],
+      "load_priority": 1,
+      "summary": "Latest direct-from-user product framing: project/space/org model, personal AI\naccess rules, named app interfaces (Wiki, Chat, Threads, Agent vEnv,\nBlueprint), Launchpad/HQ/Virtual-Desktop top surfaces. This is the *current*\nPRD substrate — newer than anything in the codebase- branches.",
+      "node_path": "graph/nodes/design-review-fresh-context.qmd"
+    },
+    {
+      "id": "docs-clis-mcps-integrations",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "driver",
+        "execution"
+      ],
+      "preserves_from": [
+        "lineage-openclaw",
+        "codebase-claudeforge"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-vault-agent-modules-routing",
+        "lineage-openclaw"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "agent-vm/archive-openclaw/control-ui/openclaw-control-ui-source/ARCHITECTURE.md",
+        "agent-vm/archive-openclaw/bin/refresh-openclaw-oauth.sh",
+        "agent-vm/archive-openclaw/bin/sync-cli-auth-to-openclaw.sh"
+      ],
+      "aliases": [],
+      "load_priority": 3,
+      "summary": "CLI/MCP integration material — claude-cli, codex-cli, OpenClaw control-ui\ngateway. Direct input to the harness/driver contract design.",
+      "node_path": "graph/nodes/docs-clis-mcps-integrations.qmd"
+    },
+    {
+      "id": "docs-ema-next-steps",
+      "type": "docs",
+      "era": "ema-daemon",
+      "status": "active",
+      "contributes": [
+        "authority",
+        "workspace",
+        "identity"
+      ],
+      "preserves_from": [
+        "codebase-ema"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-ema",
+        "design-review-fresh-context"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "host/EMA-v1.1-Next-Steps/01-PLANS/CURRENT-PRIORITIES.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/VERTICAL-SLICES-DRAFT.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/VAPP-FINAL-VISION-CHECKLIST.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/ULTIMATE-WIKI-ARCHITECTURE.qmd",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-SUBPROJECT-A-DAEMON-BACKBONE-SPEC-DRAFT.md"
+      ],
+      "aliases": [
+        "EMA-v1.1-Next-Steps"
+      ],
+      "load_priority": 1,
+      "summary": "EMA v1.1 next-step planning corpus. Holds the Vertical Slices draft, vApp\nfinal-vision checklist, Ultimate Wiki Architecture, daemon-backbone spec, and\ncurrent priorities. **Load this before doing any v1.1 design work.**",
+      "node_path": "graph/nodes/docs-ema-next-steps.qmd"
+    },
+    {
+      "id": "docs-frontend-interface-inspirations",
+      "type": "docs",
+      "era": "meta",
+      "status": "inspiration",
+      "contributes": [
+        "surface",
+        "ux-metaphor"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-system-launchpad-hq",
+        "design-review-fresh-context"
+      ],
+      "referenced_in_docs": [
+        "05-fresh-context-project-app-model.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "agent-vm/ema-docs/ARCHITECTURE.md",
+        "agent-vm/ema-docs/EMA-FULL-CONTEXT.md",
+        "agent-vm/ema-docs/ROADMAP_SYNTHESIS.md",
+        "agent-vm/ema-docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md",
+        "agent-vm/frontend-layer/README.md"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Curated visual/interaction inspirations for the frontend (Claude.ai design,\nNotion, Obsidian, etc).",
+      "node_path": "graph/nodes/docs-frontend-interface-inspirations.qmd"
+    },
+    {
+      "id": "docs-host-obsidian-vault",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "memory"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-vault-wiki",
+        "docs-host-vault-context"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "host/JarvisAI_vault/Welcome.md",
+        "host/JarvisAI_vault/Architecture/System Overview.md",
+        "host/JarvisAI_vault/Research/Self-Hosted AI Agent Platforms 2026.md",
+        "host/Trajans_Tech_Serious_Vault/Home.md"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Raw Obsidian vault export from host machine.",
+      "node_path": "graph/nodes/docs-host-obsidian-vault.qmd"
+    },
+    {
+      "id": "docs-host-system-launchpad-hq",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "ux-metaphor",
+        "surface"
+      ],
+      "preserves_from": [
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "design-review-fresh-context",
+        "docs-frontend-interface-inspirations"
+      ],
+      "referenced_in_docs": [
+        "05-fresh-context-project-app-model.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md",
+        "host/EMA-v1.1-Next-Steps/01-PLANS/OPENCLAW-DISCORD-VAULT-LOOP.qmd",
+        "host/EMA-v1.1-Next-Steps/00-INBOX/2026-04-14-ULTIMATE-WIKI-INBOX-CAPTURE.qmd"
+      ],
+      "aliases": [],
+      "load_priority": 3,
+      "summary": "Notes on the Launchpad and HQ surfaces. Read alongside\n`05-fresh-context-project-app-model.md` for the top-level surface PRD.",
+      "node_path": "graph/nodes/docs-host-system-launchpad-hq.qmd"
+    },
+    {
+      "id": "docs-host-vault-agent-modules-routing",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "orchestration",
+        "driver"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-vault-context",
+        "docs-clis-mcps-integrations"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-DAEMON-EXTRACTION-IMPL-NOTES.md",
+        "host/EMA-v1.1-Next-Steps/04-CANON/CATALOG.md",
+        "host/EMA-v1.1-Next-Steps/04-CANON/TS-RUNTIME-GAP-MAP-2026-04-13.md",
+        "host/EMA-v1.1-Next-Steps/05-WIKI/TOP-BAR-SPACES-ORGS-SPEC.md"
+      ],
+      "aliases": [],
+      "load_priority": 3,
+      "summary": "Agent-module routing notes — direct prior art for the harness/driver registry.",
+      "node_path": "graph/nodes/docs-host-vault-agent-modules-routing.qmd"
+    },
+    {
+      "id": "docs-host-vault-context",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "memory",
+        "doctrine"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-vault-wiki",
+        "docs-host-obsidian-vault"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "host-vault/AI Knowledge/Claude Code Plugins/Claude Code Configuration.md",
+        "host-vault/AI Knowledge/Claude Code Plugins/Claude Code Plugins MOC.md"
+      ],
+      "aliases": [
+        "/home/trajan/staging/host-vault"
+      ],
+      "load_priority": 3,
+      "summary": "Imported host-vault mirrors, session logs, and research docs.",
+      "node_path": "graph/nodes/docs-host-vault-context.qmd"
+    },
+    {
+      "id": "docs-place-org-era-research",
+      "type": "docs",
+      "era": "place-org",
+      "status": "doctrine-only",
+      "contributes": [
+        "ux-metaphor",
+        "doctrine"
+      ],
+      "preserves_from": [
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "codebase-place-org"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "host/place.org-openclaw/CLAUDE.md",
+        "host/place.org-openclaw/docs/openclaw/FORK-ARCHITECTURE.md",
+        "host/place.org-openclaw/docs/superpowers/specs/2026-03-20-place-org-design.md",
+        "host/place.org-openclaw/app/(desktop)/page.tsx"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Research collected during the place.org era.",
+      "node_path": "graph/nodes/docs-place-org-era-research.qmd"
+    },
+    {
+      "id": "docs-vault-wiki",
+      "type": "docs",
+      "era": "hybrid",
+      "status": "active",
+      "contributes": [
+        "memory",
+        "doctrine"
+      ],
+      "preserves_from": [
+        "lineage-openclaw",
+        "codebase-place-org"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "docs-host-vault-context",
+        "docs-host-obsidian-vault"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "vault/.archive/openclaw-notes/EMA-OpenClaw-Node-Integration-Spec-2026-04-03.md",
+        "vault/.archive/host-sessions/2026-03-20 - place.org v0.1 through v0.5 Build Session.md"
+      ],
+      "aliases": [
+        "/home/trajan/wiki"
+      ],
+      "load_priority": 3,
+      "summary": "Wiki/codebase summaries and architecture notes. Primary written\nself-awareness substrate; load before any specific codebase- branch.",
+      "node_path": "graph/nodes/docs-vault-wiki.qmd"
+    },
+    {
+      "id": "git-history-extracts",
+      "type": "recovery",
+      "era": "meta",
+      "status": "archive",
+      "contributes": [
+        "recovery"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "github-legacy-repos"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "agent-vm-ema.md",
+        "host-ema.md",
+        "host-mission-control-claude.md",
+        "host-place-org-openclaw.md",
+        "host-superman.md"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "Selected git-history extracts from prior repos. For archaeology.",
+      "node_path": "graph/nodes/git-history-extracts.qmd"
+    },
+    {
+      "id": "github-legacy-repos",
+      "type": "recovery",
+      "era": "meta",
+      "status": "archive",
+      "contributes": [
+        "recovery"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "git-history-extracts"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "README.md",
+        "REPOS.json",
+        "SOURCE_CONTEXT.md"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "Pointers / snapshots of legacy GitHub repos that fed the lineage. Cross-check\nagainst `inventory/GITHUB_REPOS.md` on `lineage-index`.",
+      "node_path": "graph/nodes/github-legacy-repos.qmd"
+    },
+    {
+      "id": "lineage-index",
+      "type": "meta",
+      "era": "meta",
+      "status": "meta",
+      "contributes": [
+        "authority"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [
+        "main"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md",
+        "BRANCH_MAP.md",
+        "BRANCH_MAP_EXPANDED.md"
+      ],
+      "key_artifacts": [
+        "BRANCH_MAP.md",
+        "inventory/GITHUB_REPOS.md",
+        "inventory/LOCAL_ROOTS.md"
+      ],
+      "aliases": [],
+      "load_priority": 1,
+      "summary": "Authoritative inventory: which GitHub repos and local roots fed this pack.\nUse this as the source-of-truth for \"where did this branch come from?\"",
+      "node_path": "graph/nodes/lineage-index.qmd"
+    },
+    {
+      "id": "lineage-openclaw-agent-workspaces",
+      "type": "lineage",
+      "era": "openclaw",
+      "status": "doctrine-only",
+      "contributes": [
+        "workspace",
+        "orchestration"
+      ],
+      "preserves_from": [
+        "lineage-openclaw"
+      ],
+      "inspires": [
+        "codebase-ema"
+      ],
+      "adjacent_to": [
+        "lineage-openclaw",
+        "lineage-openclaw-archive-subprojects"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "agents/analyst/AGENTS.md",
+        "agents/architect/IDENTITY.md",
+        "agents/chief-of-staff/SOUL.md",
+        "agents/coder/.openclaw/workspace-state.json"
+      ],
+      "aliases": [],
+      "load_priority": 4,
+      "summary": "Per-agent workspace residue from OpenClaw — directory shapes and continuity\npatterns. Useful when designing the v1 shared-workspace contract.",
+      "node_path": "graph/nodes/lineage-openclaw-agent-workspaces.qmd"
+    },
+    {
+      "id": "lineage-openclaw-archive-subprojects",
+      "type": "lineage",
+      "era": "openclaw",
+      "status": "archive",
+      "contributes": [
+        "recovery",
+        "doctrine"
+      ],
+      "preserves_from": [
+        "lineage-openclaw"
+      ],
+      "inspires": [],
+      "adjacent_to": [
+        "lineage-openclaw"
+      ],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/control-ui/openclaw-control-ui-source/ARCHITECTURE.md",
+        "code/control-ui/openclaw-control-ui-source/gateway-backend/auth.ts",
+        "code/bin/openclaw-doctor-safe.sh",
+        "code/backups/openclaw.json"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "Archived OpenClaw subprojects. Search-only; do not lift code.",
+      "node_path": "graph/nodes/lineage-openclaw-archive-subprojects.qmd"
+    },
+    {
+      "id": "lineage-openclaw",
+      "type": "lineage",
+      "era": "openclaw",
+      "status": "doctrine-only",
+      "contributes": [
+        "orchestration",
+        "doctrine",
+        "memory"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-ema",
+        "lineage-openclaw-agent-workspaces",
+        "lineage-openclaw-archive-subprojects",
+        "codebase-place-org-openclaw",
+        "docs-vault-wiki"
+      ],
+      "superseded_by": [
+        "codebase-ema"
+      ],
+      "adjacent_to": [
+        "docs-clis-mcps-integrations"
+      ],
+      "referenced_in_docs": [
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md"
+      ],
+      "key_artifacts": [
+        "docs/OpenClaw System Overview.md",
+        "docs/OpenClaw Protocols.md",
+        "docs/OpenClaw Agent Workspace Guide.md",
+        "runtime/openclaw.sanitized.json"
+      ],
+      "aliases": [
+        ".openclaw"
+      ],
+      "load_priority": 3,
+      "summary": "OpenClaw runtime/doc lineage. Donor of named-role/handoff/watchdog patterns\nand Discord-native operator feel. Already absorbed into EMA's\n`babysitter/` and incident model. **Mine for doctrine, do not resurrect.**",
+      "node_path": "graph/nodes/lineage-openclaw.qmd"
+    },
+    {
+      "id": "lineage-original-elixir-ema",
+      "type": "lineage",
+      "era": "ema-daemon",
+      "status": "canonical",
+      "contributes": [
+        "authority",
+        "execution",
+        "doctrine"
+      ],
+      "preserves_from": [],
+      "inspires": [
+        "codebase-ema"
+      ],
+      "superseded_by": [
+        "codebase-ema"
+      ],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "03-architectural-evolution-and-major-decisions.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "code/daemon/lib/ema/control_plane",
+        "code/daemon/lib/ema/babysitter",
+        "code/daemon/lib/ema/sessions",
+        "code/daemon/lib/ema/claude"
+      ],
+      "aliases": [],
+      "load_priority": 2,
+      "summary": "Isolated snapshot of the original Elixir/Phoenix EMA daemon plus\nTauri-era architecture docs. Confirms that the daemon-first authority model\npredates the current rewrite. Compare against `codebase-ema` to see what\nsurvived vs what got refactored.",
+      "node_path": "graph/nodes/lineage-original-elixir-ema.qmd"
+    },
+    {
+      "id": "main",
+      "type": "meta",
+      "era": "meta",
+      "status": "meta",
+      "contributes": [
+        "authority",
+        "doctrine"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "superseded_by": [],
+      "adjacent_to": [
+        "lineage-index",
+        "design-review-fresh-context"
+      ],
+      "referenced_in_docs": [
+        "README.md",
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "MACBOOK_AGENT_HANDOFF_MASTER.md",
+        "02-project-transfer-brief.md",
+        "03-architectural-evolution-and-major-decisions.md",
+        "04-agent-orchestration-and-shared-workspace-briefing.md",
+        "05-fresh-context-project-app-model.md"
+      ],
+      "aliases": [],
+      "load_priority": 1,
+      "summary": "Aggregation root for the transfer pack. Holds the five high-signal handoff\ndocuments and the branch maps. Every other branch is a satellite of this one.\nRead `MACBOOK_AGENT_HANDOFF_MASTER.md` first, then `SYSTEM_GRAPH.md`.",
+      "node_path": "graph/nodes/main.qmd"
+    },
+    {
+      "id": "recovery-old-agent-vm-vault-system",
+      "type": "recovery",
+      "era": "hybrid",
+      "status": "archive",
+      "contributes": [
+        "recovery"
+      ],
+      "preserves_from": [],
+      "inspires": [],
+      "adjacent_to": [],
+      "referenced_in_docs": [
+        "SYSTEM_GRAPH.md"
+      ],
+      "key_artifacts": [
+        "agent-vm/dispatch/active-tasks.json",
+        "agent-vm/dispatch/agent-status.json",
+        "agent-vm/dispatch/archive/cleared-20260422/"
+      ],
+      "aliases": [],
+      "load_priority": 5,
+      "summary": "Frozen agent-vm dispatch / status state. Useful as fixture data for\ncontrol-plane replay tests; not a runtime input.",
+      "node_path": "graph/nodes/recovery-old-agent-vm-vault-system.qmd"
+    }
+  ],
+  "triples": [
+    {
+      "source": "codebase-agent-os-bridge",
+      "kind": "preserves_from",
+      "target": "codebase-agent-os-demo"
+    },
+    {
+      "source": "codebase-agent-os-bridge",
+      "kind": "adjacent_to",
+      "target": "codebase-agent-os-v8"
+    },
+    {
+      "source": "codebase-agent-os-demo-pages",
+      "kind": "preserves_from",
+      "target": "codebase-agent-os-demo"
+    },
+    {
+      "source": "codebase-agent-os-demo-pages",
+      "kind": "adjacent_to",
+      "target": "codebase-agent-os-demo"
+    },
+    {
+      "source": "codebase-agent-os-demo",
+      "kind": "inspires",
+      "target": "codebase-agent-os-v8"
+    },
+    {
+      "source": "codebase-agent-os-demo",
+      "kind": "inspires",
+      "target": "codebase-agent-os-bridge"
+    },
+    {
+      "source": "codebase-agent-os-demo",
+      "kind": "inspires",
+      "target": "codebase-agent-os-demo-pages"
+    },
+    {
+      "source": "codebase-agent-os-demo",
+      "kind": "adjacent_to",
+      "target": "codebase-agent-os-v8"
+    },
+    {
+      "source": "codebase-agent-os-v8",
+      "kind": "preserves_from",
+      "target": "codebase-agent-os-demo"
+    },
+    {
+      "source": "codebase-agent-os-v8",
+      "kind": "adjacent_to",
+      "target": "codebase-agent-os-demo"
+    },
+    {
+      "source": "codebase-agent-os-v8",
+      "kind": "adjacent_to",
+      "target": "codebase-agent-os-bridge"
+    },
+    {
+      "source": "codebase-claudeforge",
+      "kind": "inspires",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "codebase-claudeforge",
+      "kind": "inspires",
+      "target": "docs-clis-mcps-integrations"
+    },
+    {
+      "source": "codebase-claudeforge",
+      "kind": "adjacent_to",
+      "target": "codebase-frontend-layer"
+    },
+    {
+      "source": "codebase-claudeforge",
+      "kind": "adjacent_to",
+      "target": "codebase-mission-control-claude"
+    },
+    {
+      "source": "codebase-ema",
+      "kind": "preserves_from",
+      "target": "lineage-original-elixir-ema"
+    },
+    {
+      "source": "codebase-ema",
+      "kind": "preserves_from",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "codebase-ema",
+      "kind": "preserves_from",
+      "target": "codebase-claudeforge"
+    },
+    {
+      "source": "codebase-ema",
+      "kind": "inspires",
+      "target": "docs-ema-next-steps"
+    },
+    {
+      "source": "codebase-ema",
+      "kind": "adjacent_to",
+      "target": "codebase-claudeforge"
+    },
+    {
+      "source": "codebase-execudeck",
+      "kind": "adjacent_to",
+      "target": "codebase-executive"
+    },
+    {
+      "source": "codebase-executive",
+      "kind": "adjacent_to",
+      "target": "codebase-mission-control-claude"
+    },
+    {
+      "source": "codebase-executive",
+      "kind": "adjacent_to",
+      "target": "codebase-multi-agent-expirements"
+    },
+    {
+      "source": "codebase-frontend-layer",
+      "kind": "preserves_from",
+      "target": "codebase-claudeforge"
+    },
+    {
+      "source": "codebase-frontend-layer",
+      "kind": "adjacent_to",
+      "target": "codebase-claudeforge"
+    },
+    {
+      "source": "codebase-frontend-layer",
+      "kind": "adjacent_to",
+      "target": "codebase-mission-control-claude"
+    },
+    {
+      "source": "codebase-mission-control-claude",
+      "kind": "preserves_from",
+      "target": "codebase-claudeforge"
+    },
+    {
+      "source": "codebase-mission-control-claude",
+      "kind": "adjacent_to",
+      "target": "codebase-claudeforge"
+    },
+    {
+      "source": "codebase-mission-control-claude",
+      "kind": "adjacent_to",
+      "target": "codebase-executive"
+    },
+    {
+      "source": "codebase-multi-agent-expirements",
+      "kind": "adjacent_to",
+      "target": "codebase-executive"
+    },
+    {
+      "source": "codebase-multi-agent-expirements",
+      "kind": "adjacent_to",
+      "target": "codebase-superman"
+    },
+    {
+      "source": "codebase-place-companion",
+      "kind": "preserves_from",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "codebase-place-companion",
+      "kind": "adjacent_to",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "codebase-place-org-openclaw",
+      "kind": "preserves_from",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "codebase-place-org-openclaw",
+      "kind": "preserves_from",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "codebase-place-org-openclaw",
+      "kind": "adjacent_to",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "codebase-place-org-openclaw",
+      "kind": "adjacent_to",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "codebase-place-org",
+      "kind": "inspires",
+      "target": "codebase-place-companion"
+    },
+    {
+      "source": "codebase-place-org",
+      "kind": "inspires",
+      "target": "codebase-place-org-openclaw"
+    },
+    {
+      "source": "codebase-place-org",
+      "kind": "inspires",
+      "target": "docs-host-system-launchpad-hq"
+    },
+    {
+      "source": "codebase-place-org",
+      "kind": "inspires",
+      "target": "docs-vault-wiki"
+    },
+    {
+      "source": "codebase-place-org",
+      "kind": "adjacent_to",
+      "target": "codebase-place-companion"
+    },
+    {
+      "source": "codebase-place-org",
+      "kind": "adjacent_to",
+      "target": "docs-place-org-era-research"
+    },
+    {
+      "source": "codebase-superman",
+      "kind": "adjacent_to",
+      "target": "codebase-multi-agent-expirements"
+    },
+    {
+      "source": "design-review-fresh-context",
+      "kind": "preserves_from",
+      "target": "main"
+    },
+    {
+      "source": "design-review-fresh-context",
+      "kind": "adjacent_to",
+      "target": "docs-host-system-launchpad-hq"
+    },
+    {
+      "source": "design-review-fresh-context",
+      "kind": "adjacent_to",
+      "target": "docs-frontend-interface-inspirations"
+    },
+    {
+      "source": "docs-clis-mcps-integrations",
+      "kind": "preserves_from",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "docs-clis-mcps-integrations",
+      "kind": "preserves_from",
+      "target": "codebase-claudeforge"
+    },
+    {
+      "source": "docs-clis-mcps-integrations",
+      "kind": "adjacent_to",
+      "target": "docs-host-vault-agent-modules-routing"
+    },
+    {
+      "source": "docs-clis-mcps-integrations",
+      "kind": "adjacent_to",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "docs-ema-next-steps",
+      "kind": "preserves_from",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "docs-ema-next-steps",
+      "kind": "adjacent_to",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "docs-ema-next-steps",
+      "kind": "adjacent_to",
+      "target": "design-review-fresh-context"
+    },
+    {
+      "source": "docs-frontend-interface-inspirations",
+      "kind": "adjacent_to",
+      "target": "docs-host-system-launchpad-hq"
+    },
+    {
+      "source": "docs-frontend-interface-inspirations",
+      "kind": "adjacent_to",
+      "target": "design-review-fresh-context"
+    },
+    {
+      "source": "docs-host-obsidian-vault",
+      "kind": "adjacent_to",
+      "target": "docs-vault-wiki"
+    },
+    {
+      "source": "docs-host-obsidian-vault",
+      "kind": "adjacent_to",
+      "target": "docs-host-vault-context"
+    },
+    {
+      "source": "docs-host-system-launchpad-hq",
+      "kind": "preserves_from",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "docs-host-system-launchpad-hq",
+      "kind": "adjacent_to",
+      "target": "design-review-fresh-context"
+    },
+    {
+      "source": "docs-host-system-launchpad-hq",
+      "kind": "adjacent_to",
+      "target": "docs-frontend-interface-inspirations"
+    },
+    {
+      "source": "docs-host-vault-agent-modules-routing",
+      "kind": "adjacent_to",
+      "target": "docs-host-vault-context"
+    },
+    {
+      "source": "docs-host-vault-agent-modules-routing",
+      "kind": "adjacent_to",
+      "target": "docs-clis-mcps-integrations"
+    },
+    {
+      "source": "docs-host-vault-context",
+      "kind": "adjacent_to",
+      "target": "docs-vault-wiki"
+    },
+    {
+      "source": "docs-host-vault-context",
+      "kind": "adjacent_to",
+      "target": "docs-host-obsidian-vault"
+    },
+    {
+      "source": "docs-place-org-era-research",
+      "kind": "preserves_from",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "docs-place-org-era-research",
+      "kind": "adjacent_to",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "docs-vault-wiki",
+      "kind": "preserves_from",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "docs-vault-wiki",
+      "kind": "preserves_from",
+      "target": "codebase-place-org"
+    },
+    {
+      "source": "docs-vault-wiki",
+      "kind": "adjacent_to",
+      "target": "docs-host-vault-context"
+    },
+    {
+      "source": "docs-vault-wiki",
+      "kind": "adjacent_to",
+      "target": "docs-host-obsidian-vault"
+    },
+    {
+      "source": "git-history-extracts",
+      "kind": "adjacent_to",
+      "target": "github-legacy-repos"
+    },
+    {
+      "source": "github-legacy-repos",
+      "kind": "adjacent_to",
+      "target": "git-history-extracts"
+    },
+    {
+      "source": "lineage-index",
+      "kind": "adjacent_to",
+      "target": "main"
+    },
+    {
+      "source": "lineage-openclaw-agent-workspaces",
+      "kind": "preserves_from",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "lineage-openclaw-agent-workspaces",
+      "kind": "inspires",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "lineage-openclaw-agent-workspaces",
+      "kind": "adjacent_to",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "lineage-openclaw-agent-workspaces",
+      "kind": "adjacent_to",
+      "target": "lineage-openclaw-archive-subprojects"
+    },
+    {
+      "source": "lineage-openclaw-archive-subprojects",
+      "kind": "preserves_from",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "lineage-openclaw-archive-subprojects",
+      "kind": "adjacent_to",
+      "target": "lineage-openclaw"
+    },
+    {
+      "source": "lineage-openclaw",
+      "kind": "inspires",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "lineage-openclaw",
+      "kind": "inspires",
+      "target": "lineage-openclaw-agent-workspaces"
+    },
+    {
+      "source": "lineage-openclaw",
+      "kind": "inspires",
+      "target": "lineage-openclaw-archive-subprojects"
+    },
+    {
+      "source": "lineage-openclaw",
+      "kind": "inspires",
+      "target": "codebase-place-org-openclaw"
+    },
+    {
+      "source": "lineage-openclaw",
+      "kind": "inspires",
+      "target": "docs-vault-wiki"
+    },
+    {
+      "source": "lineage-openclaw",
+      "kind": "superseded_by",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "lineage-openclaw",
+      "kind": "adjacent_to",
+      "target": "docs-clis-mcps-integrations"
+    },
+    {
+      "source": "lineage-original-elixir-ema",
+      "kind": "inspires",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "lineage-original-elixir-ema",
+      "kind": "superseded_by",
+      "target": "codebase-ema"
+    },
+    {
+      "source": "main",
+      "kind": "adjacent_to",
+      "target": "lineage-index"
+    },
+    {
+      "source": "main",
+      "kind": "adjacent_to",
+      "target": "design-review-fresh-context"
+    }
+  ],
+  "topics": [
+    {
+      "topic": "authority",
+      "edge_path": "graph/edges/authority.md",
+      "rule": "Rule:** EMA owns truth. Authority lives in the Elixir daemon's",
+      "cited_nodes": [
+        "codebase-ema",
+        "docs-ema-next-steps",
+        "lineage-original-elixir-ema"
+      ]
+    },
+    {
+      "topic": "collab",
+      "edge_path": "graph/edges/collab.md",
+      "rule": "Rule:** Live collaboration objects need their own sync substrate, separate",
+      "cited_nodes": [
+        "design-review-fresh-context",
+        "docs-ema-next-steps",
+        "docs-host-obsidian-vault",
+        "docs-host-vault-context",
+        "docs-vault-wiki"
+      ]
+    },
+    {
+      "topic": "execution",
+      "edge_path": "graph/edges/execution.md",
+      "rule": "Rule:** Hermes owns execution. Drivers live above providers. Drivers must",
+      "cited_nodes": [
+        "codebase-agent-os-bridge",
+        "codebase-claudeforge",
+        "codebase-ema",
+        "docs-clis-mcps-integrations",
+        "docs-host-vault-agent-modules-routing"
+      ]
+    },
+    {
+      "topic": "identity",
+      "edge_path": "graph/edges/identity.md",
+      "rule": "Rule:** Each EMA instance lives within a Project. Projects belong to an Org",
+      "cited_nodes": [
+        "design-review-fresh-context",
+        "docs-ema-next-steps"
+      ]
+    },
+    {
+      "topic": "memory",
+      "edge_path": "graph/edges/memory.md",
+      "rule": "",
+      "cited_nodes": [
+        "codebase-ema",
+        "docs-ema-next-steps",
+        "docs-host-obsidian-vault",
+        "docs-host-vault-context",
+        "docs-vault-wiki"
+      ]
+    },
+    {
+      "topic": "orchestration",
+      "edge_path": "graph/edges/orchestration.md",
+      "rule": "Rule:** Coordination through control-plane records + shared workspace",
+      "cited_nodes": [
+        "codebase-ema",
+        "codebase-executive",
+        "codebase-mission-control-claude",
+        "codebase-multi-agent-expirements",
+        "codebase-superman",
+        "lineage-openclaw"
+      ]
+    },
+    {
+      "topic": "recovery",
+      "edge_path": "graph/edges/recovery.md",
+      "rule": "",
+      "cited_nodes": [
+        "git-history-extracts",
+        "github-legacy-repos",
+        "lineage-openclaw-archive-subprojects",
+        "recovery-old-agent-vm-vault-system"
+      ]
+    },
+    {
+      "topic": "surfaces",
+      "edge_path": "graph/edges/surfaces.md",
+      "rule": "Rule:** Surfaces mirror and control. They do not own durable state.",
+      "cited_nodes": [
+        "codebase-agent-os-demo",
+        "codebase-agent-os-demo-pages",
+        "codebase-agent-os-v8",
+        "codebase-claudeforge",
+        "codebase-execudeck",
+        "codebase-frontend-layer",
+        "codebase-mission-control-claude",
+        "codebase-place-companion",
+        "codebase-place-org",
+        "docs-frontend-interface-inspirations",
+        "docs-host-system-launchpad-hq"
+      ]
+    },
+    {
+      "topic": "transport",
+      "edge_path": "graph/edges/transport.md",
+      "rule": "Rule:** Distributed semantics must not precede single-node clarity.",
+      "cited_nodes": [
+        "codebase-ema",
+        "docs-host-vault-agent-modules-routing"
+      ]
+    },
+    {
+      "topic": "ux-metaphor",
+      "edge_path": "graph/edges/ux-metaphor.md",
+      "rule": "",
+      "cited_nodes": [
+        "codebase-agent-os-demo",
+        "codebase-agent-os-demo-pages",
+        "codebase-agent-os-v8",
+        "codebase-execudeck",
+        "codebase-place-companion",
+        "codebase-place-org",
+        "design-review-fresh-context",
+        "docs-ema-next-steps",
+        "docs-frontend-interface-inspirations",
+        "docs-host-system-launchpad-hq"
+      ]
+    },
+    {
+      "topic": "workspace",
+      "edge_path": "graph/edges/workspace.md",
+      "rule": "Rule:** Repo-/space-owned. Addressable. Linkable to control-plane records.",
+      "cited_nodes": [
+        "codebase-ema",
+        "docs-ema-next-steps",
+        "lineage-openclaw-agent-workspaces"
+      ]
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q1",
+      "title": "Are agent identities first-class members of Org/Space?",
+      "status": "open",
+      "blast_radius": "entire identity model, attribution on collab objects,"
+    },
+    {
+      "id": "Q2",
+      "title": "Is collaboration state in `event_log` or adjacent?",
+      "status": "open",
+      "blast_radius": "entire docs/wiki/canvas subsystem, sync model,"
+    },
+    {
+      "id": "Q3",
+      "title": "Project ↔ Space cardinality",
+      "status": "open",
+      "blast_radius": "schema design, navigation UI, permission model, personal-AI access resolution"
+    },
+    {
+      "id": "Q4",
+      "title": "Where does the Personal AI execute?",
+      "status": "open",
+      "blast_radius": "P2P design, capability locality, latency budget, secret handling"
+    },
+    {
+      "id": "Q5",
+      "title": "Harness/driver contract surface",
+      "status": "open",
+      "blast_radius": "every non-`hermes-native` driver, including planned"
+    },
+    {
+      "id": "Q6",
+      "title": "Discord mirror direction",
+      "status": "open",
+      "blast_radius": "Threads/Server in EMA, webhook design, permission gating"
+    },
+    {
+      "id": "Q7",
+      "title": "Surface stack for Launchpad/HQ",
+      "status": "open (no commits yet)",
+      "blast_radius": "native vs web parity story, deployment story (Vercel?),"
+    },
+    {
+      "id": "Q8",
+      "title": "Sync model for docs/wiki/canvas",
+      "status": "open (subset of Q2)",
+      "blast_radius": ""
+    },
+    {
+      "id": "Q9",
+      "title": "Replication boundary (which records replicate P2P vs stay central)",
+      "status": "open, deliberately deferred",
+      "blast_radius": ""
+    },
+    {
+      "id": "Q10",
+      "title": "How org/space permissions map onto runtime/tool permissions",
+      "status": "open",
+      "blast_radius": ""
+    }
+  ],
+  "glossary": [
+    {
+      "term": "EMA",
+      "definition": "The Elixir/Phoenix daemon that owns canonical truth (control plane, lineage, routing). System of record.",
+      "source": "`codebase-ema/code/ema/daemon/lib/ema/`"
+    },
+    {
+      "term": "EMA daemon",
+      "definition": "The OTP application that boots the control plane, sessions, babysitter, and surfaces supervisors. \"If you run one thing, run this.\"",
+      "source": "`codebase-ema/code/ema/daemon/lib/ema/application.ex`"
+    },
+    {
+      "term": "Hermes",
+      "definition": "The execution substrate / API server. Runs sessions, tools, memory, skills, delegation. Strongest current candidate for the meta-harness router.",
+      "source": "`codebase-ema/code/ema/docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md`"
+    },
+    {
+      "term": "Surface",
+      "definition": "A user-facing shell (Discord / web / CLI / native desktop / editor). Mirrors and controls; **does not own state.**",
+      "source": "`codebase-claudeforge`, `codebase-frontend-layer`, `docs-host-system-launchpad-hq`"
+    },
+    {
+      "term": "Workspace (shared)",
+      "definition": "Repo-/space-owned durable artifacts (plans, handoffs, notes, exports, context bundles). Human-readable AND agent-readable.",
+      "source": "`codebase-ema/code/ema/workspace/shared/`"
+    },
+    {
+      "term": "Collaboration object",
+      "definition": "A live multi-user / multi-agent editable artifact: doc, wiki page, canvas, thread. Distinct from workspace artifacts and from control-plane records.",
+      "source": "`graph/edges/collab.md`"
+    },
+    {
+      "term": "Control-plane record",
+      "definition": "An append-only authoritative event in EMA: proposal, execution, dispatch_update, incident, host_transition, etc.",
+      "source": "`codebase-ema/code/ema/daemon/lib/ema/control_plane/event_log.ex`"
+    },
+    {
+      "term": "Execution lineage",
+      "definition": "The chain of control-plane records linking an intent to its runtime outcome. Must remain explicit and replayable.",
+      "source": "`control_plane/replay.ex`"
+    },
+    {
+      "term": "Session",
+      "definition": "Live runtime continuity for an actor (human or agent) talking to a runtime. Has a session_id distinct from execution_id and from provider_session_id.",
+      "source": "`codebase-ema/code/ema/daemon/lib/ema/sessions/`"
+    },
+    {
+      "term": "Driver",
+      "definition": "A typed adapter that takes an EMA dispatch and runs it on a specific harness/runtime. Sits **above** raw model providers.",
+      "source": "`codebase-ema/code/ema/docs/HERMES_HARNESS_DRIVER_REGISTRY.md`"
+    },
+    {
+      "term": "Driver targets",
+      "definition": "`hermes-native`, `claude-cli`, `codex-cli`, `peer-remote`, `simulated-tui`.",
+      "source": "`graph/edges/execution.md`"
+    },
+    {
+      "term": "Provider",
+      "definition": "A model API endpoint (Anthropic, OpenAI, local). Strictly below drivers. **Not interchangeable with \"driver\" or \"runtime\".**",
+      "source": "`codebase-ema/code/ema/daemon/lib/ema/claude/provider_registry.ex`"
+    },
+    {
+      "term": "Harness",
+      "definition": "The execution shell around a model invocation (CLI, in-process runtime, peer worker). A driver picks one.",
+      "source": "`HERMES_HARNESS_DRIVER_REGISTRY.md`"
+    },
+    {
+      "term": "Babysitter",
+      "definition": "Watchdog/scheduler tier that supervises long-running execution chains and takes over stalled work. OpenClaw doctrine, crystallized in Elixir.",
+      "source": "`codebase-ema/code/ema/daemon/lib/ema/babysitter/`"
+    },
+    {
+      "term": "Capability locality",
+      "definition": "The principle that tools/auth/resources differ across human shells, agent turns, daemons, surfaces, and machines. Orchestration must respect this.",
+      "source": "`codebase-ema/code/ema/docs/AGENT-CONTRACT.md`"
+    },
+    {
+      "term": "Placement",
+      "definition": "Explicit choice of where a dispatch runs: `local` / `daemon` / `peer` / host-affinity. Not a hidden implementation detail.",
+      "source": "`graph/edges/transport.md`"
+    },
+    {
+      "term": "Organization (Org)",
+      "definition": "Top-level administrative + security boundary. Owns members, projects, billing, policy bundles, peer-trust roots.",
+      "source": "`graph/edges/identity.md`"
+    },
+    {
+      "term": "Project",
+      "definition": "The unit each EMA instance binds to. Owns an event_log shard, a workspace root, sessions, harness policy, datasets. Belongs to one Org or one User (personal).",
+      "source": "`05-fresh-context-project-app-model.md`"
+    },
+    {
+      "term": "Space",
+      "definition": "Collaboration scope inside an Org, orthogonal to Projects. Owns membership-with-roles, channels/threads, collaboration objects.",
+      "source": "`05-fresh-context-project-app-model.md`"
+    },
+    {
+      "term": "Dataset",
+      "definition": "Versioned, addressable input bundle bound to a Project (or Org-shared). Distinct from workspace artifacts.",
+      "source": "`05-fresh-context-project-app-model.md`"
+    },
+    {
+      "term": "Member",
+      "definition": "Human or agent identity participating in an Org/Space, with role and permissions. Agent identities may be first-class — see Open Question Q1.",
+      "source": "`OPEN_QUESTIONS.md` Q1"
+    },
+    {
+      "term": "Personal AI",
+      "definition": "A user-level agent identity with implicit access to all Projects/Spaces the user belongs to, gated by per-Org policy.",
+      "source": "`05-fresh-context-project-app-model.md`"
+    },
+    {
+      "term": "vApp",
+      "definition": "A virtual app inside the EMA shell (Wiki, Chat, Threads, Agent vEnv, Blueprint, Code, etc.). Rendered inside Launchpad / Virtual Desktop.",
+      "source": "`docs-ema-next-steps/.../VAPP-FINAL-VISION-CHECKLIST.md`"
+    },
+    {
+      "term": "Launchpad",
+      "definition": "Top-level launcher surface (Win8/Start-style) hosting vApps.",
+      "source": "`docs-host-system-launchpad-hq`"
+    },
+    {
+      "term": "HQ",
+      "definition": "Per-user, per-project dashboard surface. Personal HQ aggregates across all Projects/Orgs.",
+      "source": "`docs-host-system-launchpad-hq`"
+    },
+    {
+      "term": "Virtual Desktop",
+      "definition": "The main interface metaphor inherited from place.org — accessible as a native desktop app or as a website.",
+      "source": "`codebase-place-org`, `05-fresh-context-project-app-model.md`"
+    },
+    {
+      "term": "Threads / Server",
+      "definition": "EMA-native replacement for Discord channels/threads, mirrored back to Discord via webhook during transition.",
+      "source": "`05-fresh-context-project-app-model.md` §3"
+    },
+    {
+      "term": "Blueprint",
+      "definition": "Knowledge-structuring artifact (Karpathy-style) that integrates with the Wiki and intent capture.",
+      "source": "`05-fresh-context-project-app-model.md` §5"
+    },
+    {
+      "term": "OpenClaw",
+      "definition": "Earlier multi-agent / Discord-native operator system. Doctrine donor (roles, handoffs, watchdogs), not the final architecture.",
+      "source": "`lineage-openclaw`, `lineage-openclaw-agent-workspaces`"
+    },
+    {
+      "term": "ClaudeForge",
+      "definition": "Earlier TypeScript Discord/web operator surface. Donor of the surface↔Hermes interface contract.",
+      "source": "`codebase-claudeforge`"
+    },
+    {
+      "term": "place.org / placeOS",
+      "definition": "Earliest browser-native virtual-desktop / \"place\" lineage. Donor of UX metaphor (Launchpad, HQ, Desktop).",
+      "source": "`codebase-place-org`, `codebase-place-companion`"
+    },
+    {
+      "term": "Mesh / P2P",
+      "definition": "Strategic future direction — peer-aware execution and collaboration on a BEAM-family base. Deferred until local semantics pin down.",
+      "source": "`graph/edges/transport.md`"
+    },
+    {
+      "term": "Doctrine",
+      "definition": "Lessons/patterns extracted from a prior era; carried forward as design principles, not as code.",
+      "source": "`03-architectural-evolution-and-major-decisions.md` §7"
+    }
+  ]
+}

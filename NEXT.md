@@ -1,9 +1,12 @@
 # Next
 
 What to do next, in priority order. Single source of "if you have one
-hour to push EMA forward, do this." Refreshed when priorities shift.
+hour to keep the current wave clean, do this." Refreshed when priorities
+shift.
 
-> Last refresh: **2026-04-22, end of wave 6 + wave 7 in flight.**
+> Last refresh: **2026-04-22, live wave support pass.**
+> Current main-lane owner: **Claude deliverables orchestrator**.
+> Codex posture: **support lanes only**.
 > Re-write this file on each significant push so it stays specific.
 
 ---
@@ -12,89 +15,64 @@ hour to push EMA forward, do this." Refreshed when priorities shift.
 
 **Pick one of:**
 
-1. Read [`AGENT_QUICKREF.md`](AGENT_QUICKREF.md) and
-   [`PROJECT_STATUS.md`](PROJECT_STATUS.md). You'll know enough to
-   converse precisely.
-2. Open [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) and pick one Q whose
-   answer you can write in the [decision matrix template](content/decision-matrix-template.md)
-   without consulting anyone. Save the matrix to
-   `content/decisions/Q<n>-<slug>.md`.
-3. Run the atlas: `npm install && npm run dev`, open `localhost:3000/parts`,
-   click through one part to its briefs/slides/canvas/diagrams.
+1. Read [`content/swarm/orchestration-kernel.md`](content/swarm/orchestration-kernel.md)
+   and [`content/swarm/active-wave-current.md`](content/swarm/active-wave-current.md).
+   Confirm the one objective, one main lane, and main-lane owner are still clear.
+2. Check your current support-lane claims and handoffs for drift. Keep only
+   alignment, context curation, repo hygiene, handoff packaging, and verification
+   in scope.
+3. Open [`PROJECT_STATUS.md`](PROJECT_STATUS.md) and this file, then trim any
+   wording that makes the wave sound broader than it is.
 
 ## If you have an hour
 
 **The single highest-value hour right now:**
 
-> **Fill in the Q5 decision matrix** (driver contract surface).
-> Q5 is the keystone for v0.0.3 build-step 03 — the moment Q5 is
-> decided, `simulated-tui` and `claude-cli` drivers can start landing.
-> Read [`research/build-steps/03-driver-registry-skeleton.md`](research/build-steps/03-driver-registry-skeleton.md)
-> first, then the Driver section of [`research/GLEAM_BEAM_FIT.md`](research/GLEAM_BEAM_FIT.md),
-> then write the matrix.
+> Keep the live wave legible: make sure every visible status note still reads
+> as one objective, one main lane, one owner, and support lanes only.
+> Use the kernel and active-wave docs as the source of truth, then clean up any
+> stale phrasing in the swarm-facing docs you own.
 
 **Or, runner-up:**
 
-- Fill in the Q1 matrix (agents as first-class members). Q1's blast
-  radius is the largest. Settling it shrinks Q3, Q4, and Q10 simultaneously.
-- Fill in the Q3 matrix (Project ↔ Space cardinality). Required to
-  start [`research/build-steps/02-identity-registry-skeleton.md`](research/build-steps/02-identity-registry-skeleton.md).
+- Package a tight handoff note for the next support worker: objective,
+  main-lane owner, current lane name, and what support work is safe.
+- Remove stale references that imply multiple active objectives or a broader
+  support mandate than the wave actually allows.
 
 ## If you have a day
 
 **Three coherent slices, pick one:**
 
-### Slice A — Land Q1 + Q3 + Q5 minimum answers, kick off v0.0.3
+### Slice A — Tighten the swarm-facing docs
 
-End state: `TrajanWJ/ema` has a fresh Gleam project that compiles to a
-booted supervision tree with stub actors, and the four type sketches
-from build-steps 01-04 are landed as real `*.gleam` files.
-
-Path:
-1. Hour 1-2: write matrices for Q1, Q3, Q5; mark them resolved using
-   [`howto/resolve-an-open-question.md`](howto/resolve-an-open-question.md).
-2. Hour 3: copy `research/scaffold/` (when wave-7 lands it) into
-   `TrajanWJ/ema` as `gleam new ema && cp ...`.
-3. Hour 4-6: replace the `todo as "..."` bodies in event_log,
-   identity/registry, drivers/registry, sessions with the real loops
-   from build-steps 01-04.
-4. Hour 7-8: write the gleam_qcheck properties from each build-step's
-   "Property tests" section. Make them green.
-
-### Slice B — Make the atlas self-presenting
-
-End state: a fresh viewer can open `localhost:3000/`, walk through
-`/demo` (now driven by [`content/demo/narrative.md`](content/demo/narrative.md)),
-and exit knowing the project, the parts, the open questions, and what
-they'd need to decide.
+End state: the current wave reads cleanly to a fresh orchestrator or support
+worker without extra backstory.
 
 Path:
-1. Wire `/demo` to render `content/demo/narrative.md` paginated by act.
-2. Wire `/briefs/[slug]` to actually read `content/briefs/<slug>.md`
-   (it currently uses Part data — the markdown briefs are richer).
-3. Embed the 24 SVGs onto `/canvas/[slug]` (wave-7 subagent is doing
-   this — confirm landed before duplicating).
-4. Add a stable `/showroom` route that lists every shipped deliverable
-   from `content/artifacts/inventory.md`.
+1. Review `content/swarm/orchestration-kernel.md` and
+   `content/swarm/active-wave-current.md` side by side.
+2. Update `PROJECT_STATUS.md` and `NEXT.md` so they say the same thing.
+3. Trim stale cross-references that make the support posture sound like a
+   second main lane.
 
-### Slice C — Push the prep stage further
+### Slice B — Package the next handoff
 
-End state: the unanswered questions have **clearer** options
-(narrower) even if not resolved.
+End state: another worker can resume without re-reading everything.
 
 Path:
-1. Fill `content/decisions/Q2-collab-substrate.md` matrix using the
-   options enumerated in [`research/COLLAB_PLANE_OPTIONS.md`](research/COLLAB_PLANE_OPTIONS.md).
-2. Fill `content/decisions/Q4-personal-ai-placement.md` matrix using
-   capability-locality framing from [`graph/edges/transport.md`](graph/edges/transport.md)
-   and the "Distributed AI Delegation" vault candidate term.
-3. Fill `content/decisions/Q9-replication-boundary.md` matrix —
-   intentionally hold the answer at "deferred" but document **what
-   single-node clarity must hold first** before P2P is even considered.
-4. Update [`SECURITY_PRIVACY.md`](SECURITY_PRIVACY.md) — promote
-   working assumptions to confidence-style as their gating Q resolves.
+1. Write a compact handoff note with objective, owner, lane name, and safe scope.
+2. List only the support work that is still valid.
+3. Call out any drift risks or scope collisions.
 
----
+### Slice C — Verify consistency
+
+End state: status docs, claims, and the live wave all agree.
+
+Path:
+1. Compare `PROJECT_STATUS.md` against `content/swarm/orchestration-kernel.md`.
+2. Compare this file against `content/swarm/active-wave-current.md`.
+3. Fix any mismatch before adding new guidance.
 
 ## If you have a week
 
@@ -102,39 +80,32 @@ The week's shape:
 
 | Day | Focus |
 |---|---|
-| Mon | Slice A hour 1-3 (matrices for Q1, Q3, Q5) |
-| Tue | Slice A hour 4-8 (Gleam scaffold + real event_log + identity registry) |
-| Wed | Slice A continued (drivers + sessions/babysitter) |
-| Thu | Slice B (atlas self-presenting) |
-| Fri | Slice C (matrices for Q2, Q4, Q9 — even if resolutions are deferred) |
+| Mon | Reconcile swarm docs with the live wave |
+| Tue | Remove stale wording from support-facing notes |
+| Wed | Package a crisp handoff for the next support worker |
+| Thu | Verify the current objective, owner, and lane names still match |
+| Fri | Do one last drift check across swarm-facing docs |
 
 End-of-week state:
-- v0.0.3 has a real OTP supervision tree booting in `TrajanWJ/ema`,
-  with all 4 build-step skeletons compiled and a small set of property
-  tests green.
-- The atlas is a viewable, paginated narrative anyone can walk through.
-- 6 of 10 open questions have decision matrices on disk (resolved or
-  parked-with-rationale).
+- The current wave still reads as one objective, one main lane, one owner.
+- Support lanes are clearly scoped and do not pretend to own the main artifact.
+- A fresh worker can pick up the wave without re-deriving the control model.
 
 ---
 
 ## Standing rules
 
-- **Don't make decisions on behalf of the user.** Decision matrices
-  surface options; the user picks.
-- **Update [`PROJECT_STATUS.md`](PROJECT_STATUS.md)** after any
-  significant push.
-- **Update this file (`NEXT.md`)** when the priority order changes
-  (e.g., Q1 lands → Slice A demotes; Q5 still open → it stays
-  highest-value).
+- **Don't make decisions on behalf of the user.**
+- Keep the active wave narrowed to one objective and one main lane.
+- Support work stays around the main lane, not inside it.
+- **Update [`PROJECT_STATUS.md`](PROJECT_STATUS.md)** after any significant push.
+- **Update this file (`NEXT.md`)** when the live wave changes shape or the
+  wording starts drifting.
 
 ---
 
 ## Cross-references
 
-- [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — what's shippable today
-- [`ROADMAP.md`](ROADMAP.md) — long-horizon stages
-- [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) — what's not yet decided
-- [`EMA_V0_0_3_PREP.md`](EMA_V0_0_3_PREP.md) — Gleam build readiness
-- [`content/decision-matrix-template.md`](content/decision-matrix-template.md) — for matrix shape
-- [`howto/resolve-an-open-question.md`](howto/resolve-an-open-question.md) — for the resolution flow
+- [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — current project and swarm snapshot
+- [`content/swarm/orchestration-kernel.md`](content/swarm/orchestration-kernel.md) — control model
+- [`content/swarm/active-wave-current.md`](content/swarm/active-wave-current.md) — live wave

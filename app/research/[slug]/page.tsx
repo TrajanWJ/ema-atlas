@@ -239,6 +239,7 @@ export default async function ResearchDocPage({ params }: ResearchDocPageProps) 
   }
 
   const blocks = parseBlocks(md!);
+  const terms = await loadGlossaryTerms();
   const name = path.basename(rel).replace(/\.md$/i, "");
 
   return (
@@ -247,7 +248,7 @@ export default async function ResearchDocPage({ params }: ResearchDocPageProps) 
       title={name}
       intro={`research/${rel}`}
     >
-      <section className="research-doc">{renderBlocks(blocks)}</section>
+      <section className="research-doc">{renderBlocks(blocks, terms)}</section>
 
       <section className="panel">
         <p className="panel__tag">Navigate</p>

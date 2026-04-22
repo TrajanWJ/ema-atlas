@@ -31,3 +31,17 @@ Demonstrates the **native desktop companion** half of the place.org era — the 
 git show origin/codebase-place-companion:code/place-companion/src-tauri/src/main.rs
 git show origin/codebase-place-companion:code/place-companion/src-tauri/tauri.conf.json
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Localhost-only, origin-checked transport** — the companion exposes a WebSocket on a bounded port range (27182–27189) and validates every connection against an allowlist; it never reaches the public internet (`code/place-companion/README.md` "Architecture" + "Security"; `src-tauri/src/origin_check.rs`). EMA's daemon-to-surface channel must hold the same locality and explicit-origin discipline.
+- **Tray-resident background process, not a window** — the companion sets `ActivationPolicy::Accessory` on macOS, declares `"windows": []` in `tauri.conf.json`, and lives entirely in the tray (`code/place-companion/src-tauri/src/main.rs` macOS branch; `code/place-companion/src-tauri/tauri.conf.json` `app.windows`). EMA's daemon should default to invisible-but-discoverable — never claim a foreground surface unless asked.
+- **Broadcast channel for IPC fan-out** — a `tokio::sync::broadcast::channel` carries reattach events from Tauri commands to the WS server, so multiple consumers stay in sync without shared mutable state (`code/place-companion/src-tauri/src/main.rs` `reattach_tx` setup). EMA's control-plane events should flow on a similar fan-out bus rather than per-subscriber callbacks.
+- **Self-healing autostart** — on Windows the companion re-enables its own autostart entry on every launch to work around a known plugin bug (`code/place-companion/src-tauri/src/main.rs` `#[cfg(target_os = "windows")]` autolaunch block). EMA babysitter logic should treat OS-level persistence as adversarial and re-assert intent on every boot.
+
+Leaves behind (residue):
+- The Tauri-specific webview transparency tricks (`macOSPrivateApi: true`, NSWindow objc2 fix).
+- The platform-by-platform install matrix (SmartScreen, Gatekeeper, AppImage chmod) — packaging detail, not architecture.
+
+Topic relevance: `transport`, `placement`, `surface`, `driver`, `doctrine`.

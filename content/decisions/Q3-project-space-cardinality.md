@@ -53,92 +53,76 @@ interchangeable.
 
 | Criterion | Why it matters | A `N:M` | B `Project-inside-Space` | C `Space-inside-Project` | D `disjoint-with-shared-membership` |
 |---|---|---|---|---|---|
-| Aligns with canonical rule (P1) | Surfaces don't own state; the registry is the authority. | + | + | + | + |
-| Compatible with Q-deps if open | Q1 (agents-as-Members), Q4 (Personal AI placement), Q10 (perms mapping) are all open. | 0 (does not constrain Q1; complicates Q10 because two scopes inherit) | 0 (Spaces dominate; Q10 inherits from Space → Project) | 0 (Projects dominate; matches the 05- doc's "EMA instance is within a project" line) | + (least entangled — each tree resolves Q10 independently) |
-| Smallest provable slice | Can we exercise it in a 2-week vertical? | – (join table + dual reads + cross-scope tests) | + (single SpaceId per Project; tests are unidirectional) | + (single ProjectId per Space; matches Step 2's Project record naturally) | 0 (two trees, no join — but two separate property-test surfaces) |
-| Reversible | Can we migrate off it cleanly later? | + (most general → can collapse to B, C, or D) | – (Project → Space promotion needed if N:M is chosen later) | – (Space → Project promotion needed if N:M is chosen later) | 0 (D → A is easy via union; D → B/C is awkward) |
-| Gleam-native | Can we express it in typed Gleam without FFI escapes? | + (`List(SpaceId)` + `List(ProjectId)` are vanilla types) | + (`SpaceId` field on Project — clean) | + (`ProjectId` field on Space — clean) | + (no cross-references at all in the type) |
-| Auditability | Does it produce control-plane-visible records? | 0 (cross-scope writes need to record both Project and Space context) | + (writes are unambiguously scoped — Space is canonical) | + (writes are unambiguously scoped — Project is canonical) | + (each tree's `event_log` is independent; collab references are explicit) |
-| Tests writable in v0.0.3 | gleam_qcheck properties + example tests | – (membership round-trip property doubles to "for any Project, all Spaces it's joined to ↔ for any Space, all Projects in it"; Step 2's `registry_property_test.gleam` becomes a 4-way invariant) | + (single direction; matches Step 2's existing property exactly) | + (single direction; matches Step 2's existing property exactly) | 0 (two property tests, but each is simple) |
-| Identity-model-clean (Q1) | Doesn't constrain Q1 resolution. | + | + | + | + |
-| P10 compliance (Org/Space first-class) | Multi-tenant scoping in v1, not v2. | + (both are first-class peers) | + (Space is canonical; Project lives "under" it) | 0 (Space becomes a sub-scope of Project — risk of being treated as v2 furniture) | + (both are first-class and independent) |
-| Match to 05- doc framing | "EMA instance is within a project"; "Projects/spaces can have different datasets"; "personal AI can access all projects/spaces" — the 05- doc names both, treats Project as instance-binding, and gives Space its own datasets. | 0 (allows the 05- doc reading but does more than required) | – (collides with "EMA instance is within a project" — Spaces would be the larger thing) | + (matches "EMA instance is within a project" verbatim; Spaces are sub-scopes for collaboration) | 0 (matches "orthogonal to Projects" from `GLOSSARY.md` literally; doesn't directly match "EMA instance is within a project") |
-| Personal AI scope resolution | Personal AI must "access all projects/spaces they are part of" (`05-fresh-context-project-app-model.md`); resolver per `personal_ai_resolver.gleam` (Step 2). | 0 (resolver must walk both directions; potential for accidental scope leak across Projects via shared Space) | + (resolver walks Space → Projects; one direction) | + (resolver walks Project → Spaces; one direction) | + (resolver does set-union over the member's Project memberships and Space memberships separately) |
-| Collaboration object placement (P9) | Per `ARCHITECTURE.md`, the collab plane is adjacent to the control plane. Where does a Wiki/Canvas/Threads object live? | – (a Collaboration object in a Space spans multiple Projects' event_log shards — substrate must reconcile) | + (Collaboration objects clearly live in the Space; Projects under it inherit) | + (Collaboration objects clearly live in the Project; Spaces decompose it) | 0 (Collaboration objects key by Space; Project-side artifacts key by Project; clean) |
-| `event_log` shard story | Per `ARCHITECTURE.md`, "every control-plane record carries `project_id` from day one"; `event_log` is sharded by `project_id`. | 0 (Spaces span shards — cross-Project Space write needs a fan-out) | – (Space-level writes have no canonical shard until they pick a Project; either invent a Space shard or pick one Project as canonical) | + (Spaces are inside one Project; Space-level writes go to that Project's shard naturally) | 0 (Spaces get their own shards — separate but symmetric) |
-| Discord migration / Threads model | Per [`05-fresh-context-project-app-model.md`](../../05-fresh-context-project-app-model.md) §3, Threads/Server is "EMA-integrated, EMA-first mirror of what Discord does now" — Discord servers/channels map to Spaces. | 0 (multi-server-per-project and multi-project-per-server are both possible — flexible but ambiguous in UI) | + (one Discord server ↔ one Space, multiple Projects in it — matches Discord's "server contains many channels which serve many topics" intuition) | 0 (one Project owns its Discord server — works but limits cross-Project Threads) | 0 (Discord servers map to Spaces; Projects don't appear in Discord at all) |
-| Build-step alignment | Step 2 currently codes the assumption (`Project.spaces` + `Space.projects` lists). | + (no change to Step 2) | – (collapse `Project.spaces` to `Option(SpaceId)` or `SpaceId`; rewrite Step 2's `RegistryMsg` for `PutSpace` to require an Org instead of a Project list) | – (collapse `Space.projects` to `Option(ProjectId)` or `ProjectId`; rewrite Step 2's `Space` record similarly) | – (Drop the cross-references entirely from both records; rewrite the `project_spaces` join table out of `schema.gleam`) |
-| Navigation / UI cost | Launchpad / HQ / Virtual Desktop have to render the relationship. | – (UI must show "this Project is in N Spaces; this Space contains N Projects" — two browse axes) | + (browse Spaces, drill into Projects) | + (browse Projects, drill into Spaces — most aligned with "EMA instance is within a project") | 0 (two independent browse axes; UX must teach the user that they're separate) |
+| Aligns with canonical rule (P1) | Registry is authority. | + | + | + | + |
+| Compatible with Q-deps if open | Q1, Q4, Q10. | 0 (Q10 inherits from two scopes) | 0 (Q10 inherits Space→Project) | 0 (Q10 inherits Project→Space) | + (each tree resolves Q10 independently) |
+| Smallest provable slice | 2-week vertical. | – (join table + dual reads + cross-scope tests) | + (single `SpaceId` per Project) | + (single `ProjectId` per Space) | 0 (two trees, no join) |
+| Reversible | Migrate off cleanly. | + (most general → collapse to B/C/D) | – (Project→Space promotion needed for N:M) | – (Space→Project promotion needed for N:M) | 0 (D→A easy; D→B/C awkward) |
+| Gleam-native | Typed without FFI. | + (`List` types) | + (`SpaceId` field) | + (`ProjectId` field) | + (no cross-references) |
+| Auditability | Control-plane-visible. | 0 (cross-scope writes record both contexts) | + (Space canonical) | + (Project canonical) | + (each `event_log` independent) |
+| Tests writable in v0.0.3 | gleam_qcheck. | – (membership property becomes 4-way) | + (single direction) | + (single direction) | 0 (two simple property tests) |
+| Identity-model-clean (Q1) | Doesn't constrain Q1. | + | + | + | + |
+| P10 (Org/Space first-class) | v1, not v2. | + (both peers) | + (Space canonical) | 0 (Space risks v2 furniture) | + (both independent) |
+| Match to 05- doc framing | "EMA instance is within a project" + "Projects/spaces can have different datasets" + "personal AI can access all projects/spaces". | 0 (allows but exceeds) | – (Spaces become larger — collides with "EMA instance is within a project") | + (matches verbatim) | 0 (matches "orthogonal to Projects" from `GLOSSARY.md`) |
+| Personal AI scope resolution | Resolver per `personal_ai_resolver.gleam`. | 0 (walks both directions; potential cross-Project scope leak via shared Space) | + (Space→Projects, one direction) | + (Project→Spaces, one direction) | + (set-union over both memberships) |
+| Collaboration object placement (P9) | Where do Wiki/Canvas/Threads live? | – (Collab object in a Space spans multiple Project shards) | + (lives in Space; Projects inherit) | + (lives in Project; Spaces decompose) | 0 (collab keyed by Space; Project artifacts by Project) |
+| `event_log` shard story | Per `ARCHITECTURE.md`, every record carries `project_id`; sharded by `project_id`. | 0 (Spaces span shards — fan-out needed) | – (Space writes have no canonical shard) | + (Space inside one Project — uses parent shard) | 0 (Spaces get own shards) |
+| Discord migration / Threads model | Per `05-...-model.md` §3, Discord servers/channels map to Spaces. | 0 (multi-server / multi-project both possible — ambiguous UI) | + (server↔Space; matches Discord intuition) | 0 (one Project owns its server — limits cross-Project Threads) | 0 (servers map to Spaces; Projects absent) |
+| Build-step alignment | Step 2 codes N:M with `Project.spaces` + `Space.projects` lists. | + (no change) | – (collapse `Project.spaces`, rewrite `RegistryMsg`) | – (collapse `Space.projects`, rewrite `Space` record) | – (drop cross-references; remove `project_spaces` from schema) |
+| Navigation / UI cost | Launchpad/HQ/Virtual Desktop. | – (two browse axes; "in N Spaces / contains N Projects") | + (browse Spaces, drill in) | + (browse Projects, drill in) | 0 (two independent axes; UX must teach the split) |
 
 ## Costs and bets
 
 For each option, two bullets each.
 
 ### Option A — `N:M`
-- **Bet:** Real product usage will demand cross-Project Spaces (a
-  shared design system Space across three Projects) and cross-Space
-  Projects (a Project that participates in both an "engineering"
-  Space and a "client A" Space). Schema flexibility now is cheaper
-  than a migration later.
-- **Cost:** Every `event_log` write that is "in a Space" needs a
-  rule for which Project's shard it lands in (or a separate Space
-  shard, breaking the "everything keys by `project_id`"
-  architecture). The `personal_ai_resolver` has to walk two
-  relations and de-duplicate. Property tests double. Permission
-  inheritance becomes lattice-shaped (a Member can reach an object
-  via Project membership *or* Space membership; collisions and
-  contradictions become possible). Q10 inherits this complexity.
+- **Bet:** Product usage will demand cross-Project Spaces (shared
+  design system across three Projects) and cross-Space Projects
+  (one Project in both "engineering" and "client A" Spaces).
+  Schema flexibility now is cheaper than a migration.
+- **Cost:** Every Space-scoped `event_log` write needs a rule for
+  which Project shard receives it (or a separate Space shard,
+  breaking the `project_id`-key architecture).
+  `personal_ai_resolver` walks two relations and de-duplicates.
+  Permission inheritance becomes lattice-shaped — a Member can
+  reach an object via Project *or* Space membership, with
+  collision potential. Q10 inherits this complexity.
 
 ### Option B — `Project-inside-Space`
-- **Bet:** Spaces are the long-lived organizing unit (think:
-  organizations, communities, tenants). Projects are work units
-  inside them. The Discord-replacement framing supports this:
-  Discord servers (Spaces) contain channels that are organized by
-  topic (Projects). One Project lives in exactly one Space because
-  changing tenant is a destructive operation anyway.
-- **Cost:** Collides with the explicit 05- doc statement that "each
-  EMA instance is within a project" — Spaces become the larger
-  thing, which inverts the doc's framing. The `event_log` shard
-  question becomes awkward: Space-level writes have no canonical
-  shard. Personal AI scope resolution from a user who is a Space
-  member but not a member of any of its Projects is undefined.
+- **Bet:** Spaces are long-lived organizing units (organizations,
+  communities, tenants); Projects are work units inside them.
+  Discord-replacement framing supports this: server (Space) →
+  channels by topic (Projects). Changing tenant is destructive
+  anyway.
+- **Cost:** Collides with the 05- doc's "EMA instance is within a
+  project" — Spaces become the larger thing, inverting the
+  framing. Space-level writes have no canonical `event_log` shard.
+  Personal AI scope from a user who is a Space member but not a
+  member of any contained Project is undefined.
 
 ### Option C — `Space-inside-Project`
-- **Bet:** Project is the canonical EMA-instance-binding unit, as
-  the 05- doc states. Spaces are how a Project decomposes its
-  collaboration surface — "the engineering Space inside Project
-  Acme", "the design Space inside Project Acme". One Space lives in
-  exactly one Project. This keeps `event_log` shard story trivial
-  (Space writes go to the parent Project's shard) and keeps
-  Personal AI scope resolution one-directional.
-- **Cost:** Spaces lose their independent first-class character —
-  they become "subdivisions of a Project". This collides with the
-  `GLOSSARY.md` definition that calls Space "orthogonal to
-  Projects". Cross-Project Spaces (a shared "ops" Space across all
-  Projects in an Org) become impossible without a separate
-  cross-Project mechanism. Threads/Server cross-Project visibility
-  has to be invented (e.g. a special Org-level "Space" that doesn't
-  fit the schema).
+- **Bet:** Project is the canonical EMA-instance-binding unit per
+  the 05- doc. Spaces decompose a Project's collaboration surface
+  ("engineering Space inside Project Acme"). Space writes go to
+  the parent Project's shard naturally; Personal AI scope
+  resolution is one-directional.
+- **Cost:** Spaces lose first-class character — "subdivisions of a
+  Project" collides with `GLOSSARY.md`'s "orthogonal to Projects."
+  Cross-Project Spaces (a shared "ops" Space across an Org) need
+  a separate mechanism. Threads/Server cross-Project visibility
+  has to be invented.
 
 ### Option D — `disjoint-with-shared-membership`
-- **Bet:** Project and Space solve different problems. Project owns
-  the EMA instance, the workspace root, the `event_log` shard, the
-  default harness policy (per Step 2's `Project` record). Space owns
-  collaboration scope, Threads, and Collaboration objects (per the
-  05- doc and `GLOSSARY.md`). Forcing a containment relationship is
-  modelling friction that doesn't reflect the actual semantics.
-  Collaboration objects in a Space reference Project-shard rows by
-  id; Project records reference Space ids only when an artifact
-  explicitly bridges them.
-- **Cost:** Two trees means two indexes, two browse axes in the UI,
-  and two separate "where does this thing live?" answers for any
-  artifact. The user has to understand the distinction.
-  `personal_ai_resolver` must do explicit set-union over both
-  membership types. Permission inheritance is two stories (Project
-  perms, Space perms) that policy bundles must compose. Cross-tree
-  references (a Wiki page in a Space that references an
-  `event_log` row in a Project) become first-class — and need their
-  own type and reversibility story.
+- **Bet:** Project and Space solve different problems. Project
+  owns the EMA instance, workspace root, `event_log` shard,
+  default harness policy. Space owns collaboration scope, Threads,
+  Collaboration objects. Forcing containment is friction that
+  doesn't reflect the semantics. Cross-tree references are
+  explicit ids when needed.
+- **Cost:** Two trees = two indexes, two browse axes, two "where
+  does this live?" stories. `personal_ai_resolver` does explicit
+  set-union. Permission inheritance is two stories that policy
+  bundles must compose. Cross-tree references become first-class
+  and need their own typed shape.
 
 ## Open questions this decision creates
 

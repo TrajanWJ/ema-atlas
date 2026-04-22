@@ -43,3 +43,17 @@ Original Next.js implementation of the place.org virtual desktop. Read `AGENTS.m
 git show origin/codebase-place-org:code/place.org/AGENTS.md
 git show origin/codebase-place-org:code/place.org/app/'(desktop)'/layout.tsx
 ```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Boot before surface** — the desktop never renders apps until an explicit `boot-desktop` event fires; a separate `BootSequence` component owns the gate (`code/place.org/app/(desktop)/page.tsx` `DesktopPage` `useEffect` + `if (!booted)` branch). EMA's daemon should refuse surface mounts until control-plane health is confirmed.
+- **Capability detection is its own lifecycle step** — `useCapabilitiesDetect` and `requestPersistentStorage` are first-class effects sitting alongside data wiring, not buried in components (`code/place.org/app/(desktop)/page.tsx` `Desktop()` hook stack). EMA should expose runtime capability probes as named init steps, not implicit checks.
+- **Optional native bridge with graceful fallback** — `companionBridge.connect()` is wired unconditionally and the sustained-use nudge only fires after real activity, never blocking the browser-only path (`code/place.org/app/(desktop)/page.tsx` `useCompanionBridge` + `useCompanionSustainedNudge`). EMA's host-affinity placement must degrade the same way: daemon-absent surfaces still work.
+- **Trust runtime-shipped docs over training data** — `AGENTS.md` instructs every agent to read `node_modules/next/dist/docs/` before writing code (`code/place.org/AGENTS.md` "This is NOT the Next.js you know"). EMA's harness drivers should pin their own protocol docs and require agents to load them per-session.
+
+Leaves behind (residue):
+- The 30+ React hook composition in one `Desktop()` body (window manager, glass intensity, font weight, screensaver) — UX surface detail, not authority.
+- The browser-side `serviceWorker` + share-target plumbing (`useShareReceiver`, `sw.js` registration).
+
+Topic relevance: `surface`, `ux-metaphor`, `placement`, `doctrine`, `driver`.

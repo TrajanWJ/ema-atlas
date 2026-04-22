@@ -1,0 +1,23 @@
+{
+  "name": "codevault-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for AI-powered codebase intelligence — index, analyze, modify, and query any codebase",
+  "main": "index.ts",
+  "bin": {
+    "codevault-mcp": "index.ts"
+  },
+  "scripts": {
+    "start": "tsx index.ts",
+    "dev": "tsx watch index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": ["mcp", "code-intelligence", "codebase", "analysis", "ai"],
+  "license": "MIT"
+}

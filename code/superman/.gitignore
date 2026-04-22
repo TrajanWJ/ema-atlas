@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.next/
+.env
+*.tsbuildinfo
+.superpowers/
+*.DS_Store
+.codevault-cache.json
+.claude/worktrees/

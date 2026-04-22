@@ -6,6 +6,7 @@ import { ReactNode } from "react";
 
 import { SiteShell } from "@/components/site-shell";
 import { loadMarkdown } from "@/lib/markdown";
+import { decorate, loadGlossaryTerms } from "@/lib/text-decorate";
 import { loadTiers } from "../_tiers";
 
 type DocPageProps = {
@@ -162,7 +163,9 @@ function renderInline(input: string): ReactNode[] {
   return nodes;
 }
 
-function renderBlocks(blocks: Block[]): ReactNode[] {
+function renderBlocks(blocks: Block[], terms: string[]): ReactNode[] {
+  // Auto-link glossary + Q-refs only inside paragraph and list-item text.
+  const deco = (text: string) => decorate(renderInline(text), terms);
   return blocks.map((b, idx) => {
     switch (b.kind) {
       case "heading": {
@@ -177,12 +180,12 @@ function renderBlocks(blocks: Block[]): ReactNode[] {
           </pre>
         );
       case "quote":
-        return <blockquote key={idx}>{renderInline(b.text)}</blockquote>;
+        return <blockquote key={idx}>{deco(b.text)}</blockquote>;
       case "ul":
         return (
           <ul key={idx}>
             {b.items.map((it, i) => (
-              <li key={i}>{renderInline(it)}</li>
+              <li key={i}>{deco(it)}</li>
             ))}
           </ul>
         );
@@ -190,12 +193,12 @@ function renderBlocks(blocks: Block[]): ReactNode[] {
         return (
           <ol key={idx}>
             {b.items.map((it, i) => (
-              <li key={i}>{renderInline(it)}</li>
+              <li key={i}>{deco(it)}</li>
             ))}
           </ol>
         );
       case "p":
-        return <p key={idx}>{renderInline(b.text)}</p>;
+        return <p key={idx}>{deco(b.text)}</p>;
       case "hr":
         return <hr key={idx} />;
     }
@@ -244,6 +247,7 @@ export default async function DocsDocPage({ params }: DocPageProps) {
   }
 
   const blocks = parseBlocks(md!);
+  const terms = await loadGlossaryTerms();
 
   return (
     <SiteShell
@@ -261,7 +265,7 @@ export default async function DocsDocPage({ params }: DocPageProps) {
         </div>
       </section>
 
-      <section className="research-doc">{renderBlocks(blocks)}</section>
+      <section className="research-doc">{renderBlocks(blocks, terms)}</section>
 
       <section className="panel">
         <p className="panel__tag">Navigate</p>

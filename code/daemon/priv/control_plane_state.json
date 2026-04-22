@@ -1,0 +1,440 @@
+{
+  "proposals": {
+    "prp_1487998a7b19": {
+      "id": "prp_1487998a7b19",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T08:21:58.478642Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T08:21:58.478642Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_1febf70f413f": {
+      "id": "prp_1febf70f413f",
+      "status": "pending_review",
+      "context": {
+        "source": "openclaw",
+        "surface": "discord"
+      },
+      "metadata": {
+        "source": "openclaw",
+        "stage": "staged-daemon-bootstrap"
+      },
+      "project": "ema",
+      "updated_at": "2026-04-14T14:52:25.596182Z",
+      "summary": "Finish project/operator context packaging so OpenClaw can request bounded context instead of scraping repo state or vaults.",
+      "intent": "project-context-packages",
+      "created_at": "2026-04-14T14:52:25.596182Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_2c61ab7ff1e8": {
+      "id": "prp_2c61ab7ff1e8",
+      "status": "approved",
+      "context": {},
+      "metadata": {
+        "approval_note": null,
+        "approved_at": "2026-04-13T09:32:23.860130Z"
+      },
+      "project": "ema",
+      "updated_at": "2026-04-13T09:32:23.860130Z",
+      "summary": "Make approval explicit",
+      "intent": "queue-clarity",
+      "created_at": "2026-04-13T09:32:23.857117Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_3be6153ca730": {
+      "id": "prp_3be6153ca730",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T08:17:56.655317Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T08:17:56.655317Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_5e8707477adc": {
+      "id": "prp_5e8707477adc",
+      "status": "pending_review",
+      "context": {
+        "source": "openclaw",
+        "surface": "discord"
+      },
+      "metadata": {
+        "source": "openclaw",
+        "stage": "staged-daemon-bootstrap"
+      },
+      "project": "ema",
+      "updated_at": "2026-04-14T14:52:25.642340Z",
+      "summary": "Finish the operator review/approval queue so EMA can expose pending review, approved-ready, and in-flight work cleanly to OpenClaw and Discord.",
+      "intent": "operator-review-queue",
+      "created_at": "2026-04-14T14:52:25.642340Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_5f5688cf67b7": {
+      "id": "prp_5f5688cf67b7",
+      "status": "pending_review",
+      "context": {
+        "source": "openclaw",
+        "surface": "discord"
+      },
+      "metadata": {
+        "source": "openclaw",
+        "stage": "staged-daemon-bootstrap"
+      },
+      "project": "ema",
+      "updated_at": "2026-04-14T14:52:25.512959Z",
+      "summary": "Build the session surfaces, host-session sync, and binding flow so OpenClaw lanes can be mirrored and resumed against EMA-native truth.",
+      "intent": "session-surfaces-and-binding",
+      "created_at": "2026-04-14T14:52:25.512959Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_6734d5566003": {
+      "id": "prp_6734d5566003",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:04:50.575028Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:04:50.575028Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_77c24d300ad7": {
+      "id": "prp_77c24d300ad7",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T08:17:58.389875Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T08:17:58.389875Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_87293dd5e777": {
+      "id": "prp_87293dd5e777",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T08:17:57.293582Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T08:17:57.293582Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_8cfa1eb39b18": {
+      "id": "prp_8cfa1eb39b18",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:02:49.108033Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:02:49.108033Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_9305420a83bc": {
+      "id": "prp_9305420a83bc",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T08:17:58.412135Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T08:17:58.412135Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_9c32cd8378fb": {
+      "id": "prp_9c32cd8378fb",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:02:47.544262Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:02:47.544262Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_a99a401618e0": {
+      "id": "prp_a99a401618e0",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:02:48.133528Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:02:48.133528Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_b035b44cf595": {
+      "id": "prp_b035b44cf595",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:02:49.072583Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:02:49.072583Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_b08b05cc80f9": {
+      "id": "prp_b08b05cc80f9",
+      "status": "pending_review",
+      "context": {
+        "source": "openclaw",
+        "surface": "discord"
+      },
+      "metadata": {
+        "source": "openclaw",
+        "stage": "staged-daemon-bootstrap"
+      },
+      "project": "ema",
+      "updated_at": "2026-04-14T14:52:25.553994Z",
+      "summary": "Finish proposal→execution lineage so OpenClaw can create, run, update, and complete tracked work with durable execution state.",
+      "intent": "proposal-execution-lineage",
+      "created_at": "2026-04-14T14:52:25.553994Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_bdb86df6a4b7": {
+      "id": "prp_bdb86df6a4b7",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:00:47.429552Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:00:47.429552Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_c853be824a03": {
+      "id": "prp_c853be824a03",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T08:19:58.458744Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T08:19:58.458744Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_cbb7eebac410": {
+      "id": "prp_cbb7eebac410",
+      "status": "pending_review",
+      "context": {
+        "source": "openclaw",
+        "surface": "discord"
+      },
+      "metadata": {
+        "source": "openclaw",
+        "stage": "staged-daemon-bootstrap"
+      },
+      "project": "ema",
+      "updated_at": "2026-04-14T14:52:25.445571Z",
+      "summary": "Finish the OpenClaw-facing control-plane wrapper so status/context/propose/run/complete are stable and degrade cleanly across daemon builds.",
+      "intent": "openclaw-control-plane",
+      "created_at": "2026-04-14T14:52:25.445571Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_cbf230bedf8b": {
+      "id": "prp_cbf230bedf8b",
+      "status": "pending_review",
+      "context": {
+        "source": "openclaw",
+        "surface": "discord"
+      },
+      "metadata": {
+        "source": "openclaw",
+        "stage": "staged-daemon-bootstrap"
+      },
+      "project": "ema",
+      "updated_at": "2026-04-14T14:52:25.470337Z",
+      "summary": "Finish and verify host-truth surface coverage, including observer health, dispatch state, and OpenClaw-readable operator snapshots.",
+      "intent": "host-truth-surface",
+      "created_at": "2026-04-14T14:52:25.470337Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_dcb94f238d26": {
+      "id": "prp_dcb94f238d26",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:04:49.589955Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:04:49.589955Z",
+      "execution_ids": [],
+      "approved_by": null
+    },
+    "prp_e7e4575d4a14": {
+      "id": "prp_e7e4575d4a14",
+      "status": "pending_review",
+      "context": {
+        "model": "haiku",
+        "source": "openclaw-anthropic-proxy",
+        "streaming": true
+      },
+      "metadata": {
+        "path": "/v1/messages",
+        "source": "openclaw-anthropic-proxy"
+      },
+      "project": "openclaw",
+      "updated_at": "2026-04-20T15:04:49.129585Z",
+      "summary": "openclaw-anthropic-proxy via haiku: System: You are Claude Code, Anthropic's official CLI for Claude. You are a context summarization assistant. Your task i",
+      "intent": "anthropic-proxy-request",
+      "created_at": "2026-04-20T15:04:49.129585Z",
+      "execution_ids": [],
+      "approved_by": null
+    }
+  },
+  "executions": {},
+  "outcomes": {},
+  "projects": {
+    "ema": {
+      "proposal": [
+        "prp_cbb7eebac410",
+        "prp_cbf230bedf8b",
+        "prp_5f5688cf67b7",
+        "prp_b08b05cc80f9",
+        "prp_1febf70f413f",
+        "prp_5e8707477adc"
+      ]
+    },
+    "openclaw": {
+      "proposal": [
+        "prp_bdb86df6a4b7",
+        "prp_9c32cd8378fb",
+        "prp_a99a401618e0",
+        "prp_b035b44cf595",
+        "prp_8cfa1eb39b18",
+        "prp_e7e4575d4a14",
+        "prp_dcb94f238d26",
+        "prp_6734d5566003"
+      ]
+    }
+  }
+}

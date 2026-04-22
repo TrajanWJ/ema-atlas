@@ -7,6 +7,43 @@ Each entry names the commit purpose, not the file diff — for diffs see `git lo
 > was renamed to `TrajanWJ/ema-atlas` on 2026-04-22 once the atlas Next.js
 > app became the center of gravity. The old URL still redirects.
 
+## 2026-04-22 — wave 5: v0.0.3 build-step starters + atlas detail routes (in flight)
+
+- 3 background subagents:
+  - K — `/vapps/[slug]` detail route wiring `content/vapps/*.md` (in flight)
+  - L — `/docs` 4-tier route + per-doc renderer (in flight)
+  - M — `research/build-steps/01-04-*.md` v0.0.3 build-step starter docs (in flight)
+- Foreground: ARCHITECTURE.md, CONTRIBUTORS.md, content/demo/narrative.md
+- Foreground: GLEAM_NOTES.md, howto/gleam-fit-review.md
+- Foreground: scripts/build-pdfs.sh, scripts/build-mermaid-svg.sh
+- Foreground: DESIGN_PRINCIPLES.md (P1-P10 invariants), DELIVERABLES_INDEX.md (live tracker)
+
+## 2026-04-22 — wave 3+4: Gleam/BEAM research + atlas /research + /vapps + 8 vApp briefs
+
+- 4 background subagents:
+  - G — research/GLEAM_BEAM_FIT.md (4413 words). Gleam OTP v1.2.0,
+    mist v6, wisp v2, lustre v5, sqlight, parrot, pog, glixir v1.5.0,
+    y_ex, riak_dt, partisan, iroh_ex. Per-claim citations.
+    Gaps flagged: no macros, no idiomatic ETS bindings, no
+    LiveDashboard equivalent.
+  - I — research/COLLAB_PLANE_OPTIONS.md (3401 words). Pure CRDT
+    options, OT alternatives, hybrids; per-option identity/permission/
+    testing/migration story. Sharpest migration risk is identity-driven
+    (Q1), not substrate-driven.
+  - H — 8 part Gleam mappings under research/parts/<slug>.md. Type
+    sketches, actor sketches, supervision-tree fragments, FFI
+    boundaries, gleam_qcheck property tests, Gleam-side open-question
+    pressure named without resolving.
+  - J — app/research/, app/research/[slug]/, app/vapps/ pages;
+    8 content/vapps/<slug>.md briefs (Wiki, Chat, Threads/Server, Agent
+    vEnv, Blueprint, Launchpad, HQ, Virtual Desktop). lib/ema-atlas.ts
+    topLevelRoutes += /research, /vapps. CSS additions.
+
+User-side parallel additions integrated:
+- content/swarm/ (README + 5 coordination docs) — user-owned doctrine
+- howto/run-a-swarm-wave.md — user-authored
+- AGENT_QUICKREF.md "Swarm default" section, ATLAS_NOTES.md route additions
+
 ## 2026-04-22 — wave 2: atlas deliverables + EMA v0.0.3 prep
 
 - 6 background subagents dispatched in parallel:

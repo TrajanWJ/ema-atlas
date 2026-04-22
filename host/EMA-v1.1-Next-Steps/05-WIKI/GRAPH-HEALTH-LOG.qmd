@@ -1,0 +1,22 @@
+---
+title: "Graph Health Log"
+format: gfm
+---
+
+# Graph Health Log
+
+## Purpose
+Track quality, connectedness, and maintenance over time.
+
+## Candidate fields
+- date
+- frontmatter coverage
+- qmd coverage
+- average related-links/page
+- orphan count
+- pages missing provenance
+- pages missing freshness
+- pages with no inbound hub
+
+## Inspiration
+Directly inspired by the old vault quality baseline and health log pattern.

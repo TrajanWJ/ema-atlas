@@ -1,0 +1,32 @@
+---
+title: "Ultimate Wiki Bootstrap Index"
+type: hub
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - knowledge
+format: gfm
+---
+
+# Ultimate Wiki Bootstrap Index
+
+## Core docs created so far
+- [Ultimate Wiki Architecture](../01-PLANS/ULTIMATE-WIKI-ARCHITECTURE.qmd)
+- [Ultimate Wiki Source Map](../01-PLANS/ULTIMATE-WIKI-SOURCE-MAP.qmd)
+- [OpenClaw Knowledge Ingest Plan](../01-PLANS/OPENCLAW-KNOWLEDGE-INGEST-PLAN.qmd)
+- [OpenClaw EMA Write Paths](../01-PLANS/OPENCLAW-EMA-WRITE-PATHS.qmd)
+- [OpenClaw Discord Vault Loop](../01-PLANS/OPENCLAW-DISCORD-VAULT-LOOP.qmd)
+- [QMD and Vault as EMA Substrate](QMD-AND-VAULT-AS-EMA-SUBSTRATE.qmd)
+- [Workspace Query Habits](WORKSPACE-QUERY-HABITS.qmd)
+- [QMD Query and Maintenance for Ultimate Wiki](QMD-QUERY-AND-MAINTENANCE-FOR-ULTIMATE-WIKI.qmd)
+- [Ultimate Wiki Index and Hubs](ULTIMATE-WIKI-INDEX-AND-HUBS.qmd)
+- [Source of Truth Reconciliation](../04-CANON/SOURCE-OF-TRUTH-RECONCILIATION.qmd)
+- [Chronicle Writeback Rules](../20-CHRONICLE-REVIEW/CHRONICLE-WRITEBACK-RULES.qmd)
+- [Current OpenClaw Truth 2026-04-14](../04-CANON/CURRENT-OPENCLAW-TRUTH-2026-04-14.qmd)
+- [2026-04-14 OpenClaw Ultimate Wiki Bootstrap Session](../20-CHRONICLE-REVIEW/2026-04-14-OPENCLAW-ULTIMATE-WIKI-BOOTSTRAP-SESSION.qmd)
+
+## Purpose
+This hub is the first live entrypoint for turning the current session and current OpenClaw system into a real Ultimate Wiki backbone.

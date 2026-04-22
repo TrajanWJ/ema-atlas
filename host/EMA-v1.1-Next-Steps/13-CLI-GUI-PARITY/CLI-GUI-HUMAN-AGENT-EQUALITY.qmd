@@ -1,0 +1,29 @@
+---
+title: "CLI GUI Human Agent Equality"
+type: principle
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - shell-hq
+  - agent-work
+  - code-vapp
+format: gfm
+---
+
+# CLI GUI Human Agent Equality
+
+## Principle
+EMA should be designed around a shared workspace where:
+- humans can use GUI and CLI
+- agents can use GUI and CLI where appropriate
+- no important object is trapped in one surface
+- no critical workflow is exclusive to one actor type
+
+## Practical meaning
+- a human can review a code session in GUI or inspect via CLI
+- an agent can query graph knowledge or workstreams via CLI and potentially render/drive GUI surfaces indirectly
+- a workstream remains the same workstream regardless of access path
+- approvals, review state, bindings, chronicle, and memory are shared truth

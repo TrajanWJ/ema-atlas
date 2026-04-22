@@ -1,0 +1,39 @@
+---
+title: "QMD Query Index"
+format: gfm
+---
+
+# QMD Query Index
+
+## Query by object
+- code-session
+- workstream
+- planning-node
+- research-item
+- machine
+- repo-binding
+- memory
+- review
+
+## Query by track
+- shell-hq
+- control-plane
+- agent-work
+- host-ops
+- knowledge
+- productivity
+- code-vapp
+
+## Query by provenance
+- repo-read
+- host-inspected
+- cross-pollination-mined
+- planning-synthesis
+- legacy-reference
+
+## Query by plane
+- canon
+- planning
+- reality
+- gap
+- chronicle

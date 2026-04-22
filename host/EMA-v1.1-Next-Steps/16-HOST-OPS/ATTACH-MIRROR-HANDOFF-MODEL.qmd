@@ -1,0 +1,28 @@
+---
+title: "Attach Mirror Handoff Model"
+type: interaction-model
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - cross-pollination-mined
+  - planning-synthesis
+tracks:
+  - host-ops
+  - code-vapp
+  - agent-work
+format: gfm
+---
+
+# Attach Mirror Handoff Model
+
+## Core operations
+- attach to existing session
+- mirror live session into another surface
+- hand off from agent to human
+- hand off from human to agent
+- reattach after interruption
+- preserve workstream identity across handoffs
+
+## Why
+The workspace should feel persistent and joinable, not like each surface spawns a new disconnected flow.

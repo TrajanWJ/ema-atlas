@@ -1,0 +1,18 @@
+---
+title: "EMA Artifact Index"
+format: gfm
+---
+
+# EMA Artifact Index
+
+## Orientation
+- [Self-describing deliverable](./SELF-DESCRIBING-DELIVERABLE.qmd)
+- [Capability replacement map](./CAPABILITY-REPLACEMENT-MAP.qmd)
+- [EMA graph navigation](../05-WIKI/NAVIGATING-THE-EMA-GRAPH.qmd)
+
+## Core graph / wiki system
+- [EMA QMD graph system](../05-WIKI/QMD-GRAPH-SYSTEM.qmd)
+- [QMD metadata convention](../05-WIKI/QMD-METADATA-CONVENTION.qmd)
+- [QMD query patterns](../05-WIKI/QMD-QUERY-PATTERNS.qmd)
+- [Object registry](../05-WIKI/OBJECT-REGISTRY.qmd)
+- [Connected graph best practices](../05-WIKI/CONNECTED-GRAPH-BEST-PRACTICES.qmd)

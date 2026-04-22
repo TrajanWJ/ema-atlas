@@ -1,0 +1,25 @@
+---
+title: "QMD Usage and Querying"
+format: gfm
+---
+
+# QMD Usage and Querying
+
+## How to talk to the graph
+Even before a dedicated UI exists, you can query this graph by asking for:
+- pages by object
+- pages by track
+- pages by plane
+- pages by provenance
+- pages related to a specific file
+- all backlinks or all imports for a concept
+
+## Example asks
+- "show me all code-session pages"
+- "what planning pages touch host bindings?"
+- "what imports influenced the graph knowledge system?"
+- "what canon pages define review and chronicle?"
+- "which pages are repo-read and code-vapp related?"
+
+## Why QMD helps
+Once the folder uses frontmatter consistently, these become much easier to answer with simple metadata searches and later with rendered listings.

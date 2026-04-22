@@ -1,0 +1,42 @@
+---
+title: "Specific Migration Map First Pass"
+type: migration-map
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - knowledge
+format: gfm
+---
+
+# Specific Migration Map First Pass
+
+## Candidate old docs -> likely new homes
+
+### System Obsidian
+- old role: vault/tooling/system note
+- new home: system truth / substrate docs
+- likely links: QMD and vault substrate, OpenClaw ops, knowledge substrate
+
+### Vault Health Log
+- old role: maintenance metrics
+- new home: graph/workspace health system
+- likely links: QMD maintenance, freshness, health scoring
+
+### Vault Maintenance Log
+- old role: active maintenance record
+- new home: chronicle + maintenance operations
+- likely links: chronicle writeback, maintenance loops
+
+### Knowledge Vault
+- old role: high-level knowledge-system reference
+- new home: Ultimate Wiki architecture / substrate docs
+- likely links: source map, architecture, QMD query docs
+
+### Obsidian Ontology Sync
+- old role: graph extraction and sync ambition
+- new home: graph/query/object extraction docs
+- likely links: substrate and future graph/object model work

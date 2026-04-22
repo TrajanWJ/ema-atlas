@@ -1,0 +1,41 @@
+---
+title: "QMD Query Patterns"
+format: gfm
+---
+
+# QMD Query Patterns
+
+## Goal
+Make the graph legible through repeatable query habits, even before a full graph UI exists.
+
+## Useful query styles
+### By object
+Examples:
+- all pages mentioning `code-session`
+- all pages mentioning `workstream`
+- all pages mentioning `planning-node`
+
+### By plane
+Examples:
+- all `plane: canon` pages
+- all `plane: planning` pages
+- all `plane: gap` pages
+
+### By provenance
+Examples:
+- all `repo-read` pages
+- all `cross-pollination-mined` pages
+- all `host-inspected` pages
+
+### By track
+Examples:
+- all `tracks: [code-vapp]` pages
+- all host-ops pages
+- all knowledge-system pages
+
+## Query rule of thumb
+A good answer usually crosses:
+- one canon page
+- one planning page
+- one implementation or gap page
+- one import/comparison page

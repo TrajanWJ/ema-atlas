@@ -1,0 +1,38 @@
+---
+title: "Old System Inventory"
+type: recovery-inventory
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - knowledge
+  - agent-work
+  - productivity
+format: gfm
+---
+
+# Old System Inventory
+
+## Major recoverable layers
+- Discord as live command and ops surface
+- OpenClaw as agent/runtime/orchestration layer
+- vault as durable filesystem knowledge base
+- QMD as indexing/query/search substrate
+- session summaries and persistent memory habits
+- inbox/capture/promote workflows
+- graph/ontology extraction ambitions
+- maintenance/freshness/health scoring loops
+
+## Practical old-system strengths
+- real ambient usage through Discord
+- agent-readable workspace continuity
+- direct filesystem truth
+- QMD-backed search/query habits
+- durable session memory instead of disposable chat
+- maintenance culture around staleness and quality
+
+## Main reconciliation question
+How do these become EMA-native capabilities rather than detached legacy systems?

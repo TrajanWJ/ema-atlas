@@ -1,0 +1,39 @@
+---
+title: "EMA Language Translation from Vault"
+type: language-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - knowledge
+  - shell-hq
+  - productivity
+format: gfm
+---
+
+# EMA Language Translation from Vault
+
+## Main point
+A lot of the old vault's useful structure should survive, but the language should shift.
+
+## Old language -> EMA language
+- vault -> shared workspace
+- note -> page / object page / artifact / capture
+- Obsidian graph -> EMA graph / workspace graph
+- session memory file -> chronicle / recall / memory object
+- agent knowledge -> shared knowledge / imported capability / reference
+- system note -> canon / host reality / implementation note
+- hub/MOC -> hub / index / launchpad / graph entrypoint
+- daily note -> daily capture / log / chronicle segment
+- inbox -> capture inbox
+
+## Why this matters
+Language shapes architecture.
+If EMA keeps talking like a notes vault, it will drift toward being a notes vault.
+If it talks like a shared workspace with graph truth and live bindings, the product identity gets much cleaner.
+
+## Rule
+Translate the old vault's mechanisms forward, but do not let its vocabulary constrain EMA's identity.

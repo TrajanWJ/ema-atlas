@@ -1,0 +1,57 @@
+{
+  "id": "ema-v1.1-next-steps",
+  "kind": "bootstrap_database",
+  "version": 1,
+  "status": "active",
+  "ingest_priority": 1,
+  "title": "EMA v1.1 Next Steps Bootstrap Database",
+  "description": "Primary bootstrap corpus for EMA v1.1 daemon/backbone/backend planning, convergence, and recovery.",
+  "entrypoints": [
+    "README.md",
+    "04-CANON/BOOTSTRAP-DATABASE-CONTRACT.md",
+    "04-CANON/SOURCE-OF-TRUTH-HIERARCHY.md",
+    "10-DECISIONS/2026-04-13-META-BOOTSTRAP-T3CODE-AS-EMA-BACKBONE.md",
+    "01-PLANS/META-BOOTSTRAP-POINTER.md",
+    "01-PLANS/2026-04-13-SUBPROJECT-A-DAEMON-BACKBONE-SPEC-DRAFT.md",
+    "01-PLANS/v1.1-EXECUTION-ROADMAP-2026-04-13.md",
+    "11-GAPS/CONVERGENCE-DEBT-SUMMARY.md",
+    "09-HANDOFFS/NEXT-CODING-AGENT-HANDOFF.md"
+  ],
+  "truth_boundaries": [
+    "This folder is the bootstrap corpus for planning, reconciliation, architecture, recovery, and handoff context.",
+    "This folder is not the live operational store; runtime writes remain in ~/.local/share/ema/ema.db.",
+    "This folder does not override active code truth in ~/Projects/ema.",
+    "This folder must preserve plane separation across canon, planning, runtime, gaps, handoffs, and imports."
+  ],
+  "planes": {
+    "00-INBOX": "rough intake and parking lot",
+    "01-PLANS": "active plans, staged implementation, sequencing",
+    "02-ARTIFACTS": "generated planning outputs and indexes",
+    "03-OPS": "operational notes and recovery context",
+    "04-CANON": "canon extracts, trust rules, target-shape notes",
+    "05-WIKI": "object/page/model definitions",
+    "06-IMPLEMENTATION": "implementation notes and module maps",
+    "07-TRACKS": "major planning lanes",
+    "08-IMPORTS": "borrow/adapt/reference imports",
+    "09-HANDOFFS": "agent/user handoff packets",
+    "10-DECISIONS": "architectural and sequencing decisions",
+    "11-GAPS": "canon-vs-reality and convergence debt ledgers",
+    "12-RUNTIME": "runtime truth summaries",
+    "13-CLI-GUI-PARITY": "surface-convergence contracts",
+    "14-WORKSTREAMS": "workstream identity and execution context",
+    "15-PRODUCTIVITY": "operator productivity layer",
+    "20-CHRONICLE-REVIEW": "chronicle/review carry-forward context"
+  },
+  "indexing_rules": [
+    "Ingest this folder before broader archival or import datasets.",
+    "Preserve file path, frontmatter id, and layer/type metadata as provenance keys.",
+    "Create graph links across related plans, decisions, gaps, and runtime notes instead of flattening them.",
+    "Write back new material into the correct plane rather than appending to unrelated documents."
+  ],
+  "preferred_outputs": [
+    "bootstrap graph",
+    "plan-decision-gap links",
+    "daemon/backbone workstream queue",
+    "agent handoff packets"
+  ]
+}

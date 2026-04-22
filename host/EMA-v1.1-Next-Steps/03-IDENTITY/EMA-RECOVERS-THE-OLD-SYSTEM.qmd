@@ -1,0 +1,29 @@
+---
+title: "EMA Recovers the Old System"
+type: identity-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - shell-hq
+  - knowledge
+  - agent-work
+format: gfm
+---
+
+# EMA Recovers the Old System
+
+## Principle
+EMA should not act as though the old Discord/OpenClaw/QMD/vault system was a wrong turn.
+
+## Better framing
+EMA should recover:
+- the old system's practical strengths
+- its operational feel
+- its continuity mechanisms
+- its query and memory substrate
+
+and then reconcile those into a cleaner, more explicit, more native EMA shape.

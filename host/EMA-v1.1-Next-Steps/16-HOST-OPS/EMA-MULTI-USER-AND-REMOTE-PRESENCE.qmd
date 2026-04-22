@@ -1,0 +1,52 @@
+---
+title: "EMA Multi-User and Remote Presence"
+type: architecture-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - cross-pollination-mined
+tracks:
+  - host-ops
+  - shell-hq
+  - agent-work
+format: gfm
+---
+
+# EMA Multi-User and Remote Presence
+
+## Goal
+EMA should support a mode that feels closer to:
+- shared workspace presence
+- remote attach
+- SSH-native access
+- TeamViewer-like visibility/control
+- multi-user collaboration
+- peer-aware session/workspace participation
+
+than to a single-user local notes app.
+
+## Important distinction
+EMA is not literally TeamViewer.
+But it should borrow the useful feeling of:
+- “I can see the same thing”
+- “I can attach to the live thing”
+- “I can work with you in the same context”
+- “the session is already there; we join it”
+
+## Core capabilities
+- attach to active session/workspace
+- live shared terminal/session mirroring
+- multi-user presence on workstreams and spaces
+- host-aware remote access
+- peer/device awareness
+- safe permission/approval boundaries
+- recoverable session reattachment
+
+## Best imports
+- tmate / attach semantics
+- Zellij / workspace semantics
+- Tabby / transport convergence
+- ttyd / PTY transport boundary
+- Coder / workspace-control-plane separation

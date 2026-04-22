@@ -1,0 +1,53 @@
+---
+title: "Ultimate Wiki Source Map"
+type: source-map
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - knowledge
+format: gfm
+---
+
+# Ultimate Wiki Source Map
+
+## Main source families
+### Old vault
+Source of:
+- legacy system docs
+- QMD habits
+- graph/link conventions
+- session summaries
+- maintenance and freshness systems
+- agent learnings
+- projects / research / reference material
+
+### OpenClaw current system
+Source of:
+- gateway/runtime truth
+- channel configs
+- agent setup
+- active workspace conventions
+- heartbeat/cron/use patterns
+- current operational problems and fixes
+
+### EMA folder / current synthesis
+Source of:
+- reconciliation concepts
+- object/plane framing
+- shared workspace identity
+- graph/chronicle/review ideas
+- native UI concepts
+
+### Live host/runtime reality
+Source of:
+- actual deployed services
+- real machine facts
+- actual repos and paths
+- current broken and working states
+
+## Rule
+Every important page should ideally be traceable back to one or more of these source families.

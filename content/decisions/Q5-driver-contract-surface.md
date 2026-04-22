@@ -132,125 +132,85 @@ For each option, two bullets each.
 
 ## Open questions this decision creates
 
-Resolving Q5 almost always opens new questions. Candidates the matrix
-surfaces:
-
 - **Q5.a — Backpressure.** If B is chosen, what happens when
-  `bridge_to_event_log` falls behind a fast-emitting driver? Mailbox
-  growth? Drop heartbeats? The `DriverEvent` sum has no
-  flow-control message today.
-- **Q5.b — Continuation tokens (the third
-  `OPEN_QUESTIONS.md` variant phrasing).** The `Dispatch` record
-  in `ARCHITECTURE.md` already carries `continuation_id:
-  Option(ContinuationId)`. Whatever Q5 picks, the semantics of
-  resuming a dispatch — across a daemon restart, across a peer
-  takeover, across a `cancel`-then-retry — needs a separate
-  decision. (Especially load-bearing for `peer-remote`.)
-- **Q5.c — Tool call routing.** `DriverEvent.DriverToolCall(...)`
-  is currently a notification. Are tool calls answered by the
-  driver itself (it talks to MCP), by EMA's `MCP Gateway` (per
-  `GLOSSARY.md`), or both? The contract surface determines who
-  initiates the round trip.
-- **Q5.d — Per-driver versioning.** `DriverInfo.version: String`
-  exists in Step 3. How is contract-version skew handled when a
-  peer-remote driver is on an older protocol?
-- **Q5.e — Q5 + `peer-remote` (Q9 interaction).** If B is
-  chosen, what is the cross-node serialization story for
-  `Subject(DriverEvent)` when Q9 lands? Erlang distribution +
-  `:erpc`? `partisan`? A second contract surface (gRPC/JSON-RPC) for
-  peer-only?
+  `bridge_to_event_log` falls behind a fast-emitting driver? The
+  `DriverEvent` sum has no flow-control message today.
+- **Q5.b — Continuation tokens.** `Dispatch.continuation_id`
+  already exists; semantics for resuming a dispatch across daemon
+  restart, peer takeover, or `cancel`-then-retry need a separate
+  decision (especially load-bearing for `peer-remote`).
+- **Q5.c — Tool call routing.** `DriverToolCall` is a notification
+  today; are tool calls answered by the driver, by EMA's `MCP
+  Gateway`, or both? The contract determines round-trip initiation.
+- **Q5.d — Per-driver versioning.** How is `DriverInfo.version`
+  skew handled across peer-remote drivers on older protocols?
+- **Q5.e — Q5 × Q9.** If B is chosen, what's the cross-node
+  serialization story for `Subject(DriverEvent)`? Erlang
+  distribution + `:erpc`? `partisan`? A second contract for peer?
 
-If any of these deserves an entry in
-[`OPEN_QUESTIONS.md`](../../OPEN_QUESTIONS.md), file it with a
-Q-number greater than the current max.
+File any of these in
+[`OPEN_QUESTIONS.md`](../../OPEN_QUESTIONS.md) with a Q-number
+greater than the current max.
 
 ## Reversibility plan
 
 If we pick the chosen option and it turns out wrong, what's the
 migration shape?
 
-- **From `sync-RPC` to `streaming-events-Subject`.** Wrap each
-  sync `start` call in a small actor that returns the final
-  `DriverEvent` list as a single batch into a `Subject`. The
-  registry surface does not change. Estimate: days, plus operator
-  UX changes if intermediate event visibility now matters.
-- **From `sync-RPC` to `gRPC` or `JSON-RPC`.** Effectively a
-  rewrite — drivers are now external services. Estimate: weeks per
-  driver kind.
-- **From `streaming-events-Subject` to `sync-RPC`.** Per Step 3:
-  "the `start` signature collapses to return a final `DriverEvent`
-  list; the registry surface does not change." Easy mechanically,
-  but the operator UX loses intermediate visibility; takeover
-  detection has to be reworked. Estimate: 1-2 weeks.
-- **From `streaming-events-Subject` to `gRPC` or `JSON-RPC`.** The
-  `Driver` record-of-functions becomes a network client; per Step
-  3, "if Q5 picks gRPC or JSON-RPC, the change is in
-  `hermes_native.gleam` only" — *for hermes_native specifically*.
-  For `claude-cli` / `codex-cli` / `peer-remote`, the migration is
-  per-driver and includes adding a wrapper or upgrading the driver
-  to speak the chosen wire protocol. Estimate: 2-4 weeks per
-  driver kind, plus the toolchain bring-up cost (protoc for gRPC,
-  hand-written JSON-RPC codecs for D).
-- **From `gRPC` to `JSON-RPC` (or vice versa).** Both are wire
-  protocols; map method-by-method. Easier than going to/from
-  `streaming-events-Subject`. Estimate: 1-2 weeks per driver kind.
-- **From `gRPC` or `JSON-RPC` to `streaming-events-Subject`.** Each
-  driver becomes a Gleam actor again; for `claude-cli` /
-  `codex-cli`, the wrapper layer disappears and `:erlang.open_port`
-  takes over directly. Estimate: 2-4 weeks per driver kind.
-- **What records does the chosen option produce that would have
-  to be rewritten on migration?** For A: only `event_log` rows for
-  the start/end of each dispatch — minimal. For B: `event_log` rows
-  for every `DriverEvent` (per Step 3 bridge); migration to a
-  different contract preserves these because the bridge format is
-  contract-independent. For C: `.proto` files in source, generated
-  stubs in the build directory, and any operator runbook entries
-  that reference gRPC endpoints. For D: JSON-RPC schema documents
-  and any client code that hand-decodes the wire format.
+- **A → B.** Wrap sync `start` in an actor that emits the final
+  list as a single batch into `Subject`. Registry unchanged. Days,
+  plus operator UX work.
+- **A → C / D.** Rewrite — drivers become external services.
+  Weeks per driver kind.
+- **B → A.** Per Step 3: "`start` signature collapses to return a
+  final `DriverEvent` list; registry surface does not change."
+  Mechanically easy; operator loses intermediate visibility;
+  takeover detection reworked. 1-2 weeks.
+- **B → C / D.** Per Step 3: "If Q5 picks gRPC or JSON-RPC, the
+  change is in `hermes_native.gleam` only" — for hermes_native.
+  For `claude-cli`/`codex-cli`/`peer-remote`, per-driver wrapper
+  or protocol upgrade. 2-4 weeks per driver kind, plus toolchain
+  bring-up.
+- **C ↔ D.** Both wire protocols; map method-by-method. 1-2 weeks
+  per driver kind.
+- **C / D → B.** Each driver becomes a Gleam actor; CLI wrappers
+  disappear, `:erlang.open_port` takes over. 2-4 weeks per driver.
+- **What records does the chosen option produce that would have to
+  be rewritten on migration?** A: only start/end `event_log` rows
+  per dispatch. B: `event_log` rows for every `DriverEvent` —
+  contract-independent so they survive migration. C: `.proto`
+  files, generated stubs, any operator runbook gRPC endpoints. D:
+  JSON-RPC schema docs and any hand-decoded wire-format call sites.
 
 ## Provenance
 
-Cite every external doc, vault note, or branch read while filling this
-in. The matrix is only as good as its grounding.
-
-- [`OPEN_QUESTIONS.md`](../../OPEN_QUESTIONS.md) — Q5 wording,
-  blast radius, the four named variants.
-- [`DESIGN_PRINCIPLES.md`](../../DESIGN_PRINCIPLES.md) — P1, P2,
-  P5, P8 (and the canonical rule); the named architecture mistake
-  "Treating providers, runtimes, and agents as the same
-  abstraction."
+- [`OPEN_QUESTIONS.md`](../../OPEN_QUESTIONS.md) — Q5 wording, blast
+  radius, four named variants.
+- [`DESIGN_PRINCIPLES.md`](../../DESIGN_PRINCIPLES.md) — canonical
+  rule; P1, P2, P5, P8; "providers/runtimes/agents same
+  abstraction" architecture mistake.
 - [`ARCHITECTURE.md`](../../ARCHITECTURE.md) — driver contract
-  sketch ("Q5 open on shape"); `DispatchUpdate` stream lands in
-  `event_log` via `execution_supervisor`; `Dispatch` carries
-  `continuation_id: Option(ContinuationId)`; the `DriverMsg` Subject
-  shape.
+  sketch ("Q5 open on shape"); `DispatchUpdate` stream into
+  `event_log` via `execution_supervisor`; `Dispatch.continuation_id:
+  Option(ContinuationId)`; `DriverMsg` Subject shape.
 - [`research/parts/harness-execution.md`](../../research/parts/harness-execution.md)
-  — the `Driver` record-of-functions; `start: fn(DispatchEnvelope,
+  — `Driver` record-of-functions; `start: fn(DispatchEnvelope,
   Subject(DriverEvent)) -> Result(RunHandle, StartError)`; `:gun`
-  for streaming; `:erlang.open_port` for `claude-cli` / `codex-cli`;
-  the explicit Q5 note: "until the harness contract surface is
-  chosen, the `Driver` record cannot freeze its `start` signature."
+  streaming; `:erlang.open_port` for CLIs; explicit Q5 note that
+  `Driver.start` can't freeze until Q5 settles.
 - [`research/build-steps/03-driver-registry-skeleton.md`](../../research/build-steps/03-driver-registry-skeleton.md)
-  — the coded assumption ("streaming events with a per-execution
-  `Subject(DriverEvent)` sink"); Step 3 acceptance criteria #3, #4,
-  #6, #8; the explicit "if Q5 picks sync RPC instead, the `start`
-  signature collapses... if Q5 picks gRPC or JSON-RPC, the change
-  is in `hermes_native.gleam` only" gloss.
+  — coded assumption (per-execution `Subject(DriverEvent)` sink);
+  acceptance criteria #3/#4/#6/#8; the "sync collapses signature";
+  "gRPC/JSON-RPC change is in hermes_native.gleam only" gloss.
 - [`research/GLEAM_BEAM_FIT.md`](../../research/GLEAM_BEAM_FIT.md)
-  — driver registry section: "Typed actor per driver, contract via
-  `Subject(DriverMsg)`"; "One actor + behaviour-style trait via
-  dispatch on a sum type"; "Driver as port / external process";
-  "What Gleam DOESN'T have": "No native gRPC / Protobuf libraries
-  comparable to Elixir's `grpc` package"; `Subject(msg)` as "the
-  unit of addressable identity at the actor level"; `:gun` as
-  "canonical BEAM streaming HTTP lib"; `gleam_json` as the
-  encode/decode boundary.
-- [`GLOSSARY.md`](../../GLOSSARY.md) — Driver ("typed adapter that
-  takes an EMA dispatch and runs it on a specific harness/runtime;
-  sits **above** raw model providers"); Driver targets
-  (`hermes-native`, `claude-cli`, `codex-cli`, `peer-remote`,
-  `simulated-tui`); Provider; Harness; MCP Gateway; Distributed AI
-  Delegation; Auto-Resolve Gate.
+  — driver registry options ("Typed actor per driver", "One actor
+  + behaviour-style trait", "Driver as port / external process");
+  "No native gRPC / Protobuf libraries"; `Subject(msg)` as
+  addressable-identity unit; `:gun` as canonical BEAM streaming
+  HTTP; `gleam_json` as encode/decode boundary.
+- [`GLOSSARY.md`](../../GLOSSARY.md) — Driver, Driver targets,
+  Provider, Harness, MCP Gateway, Distributed AI Delegation,
+  Auto-Resolve Gate.
 
 ## Decision
 

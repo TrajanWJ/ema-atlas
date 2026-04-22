@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-arxiv-feed-001_20260326_221701",
+  "key": "subconscious-arxiv-feed-001",
+  "content": "5 papers posted to `#research-feed` (all new per dedup). Note: `WEBHOOK_RESEARCHER` was stale (Discord 10015), so I posted directly via bot API + channel ID. All threads created successfully.",
+  "agent": "subconscious",
+  "updated": "2026-03-26T22:17:01Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-02T22:17:01Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-26T22:17:01.853295+00:00",
+  "tier": "warm",
+  "salience": 0.5,
+  "importance": 0.5
+}

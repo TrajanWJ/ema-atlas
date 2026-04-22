@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sessions": {
+    "test-session-1": {
+      "intent": "Search the codebase for security vulnerabilities and report findings",
+      "intentHash": "2aa2a4facfa62dbff45789536fbfea1caf37b25013b8789e66167d0925cdd97b",
+      "createdAt": "2026-03-24T21:22:09Z"
+    },
+    "test-session-2": {
+      "intent": "Search the codebase for security vulnerabilities and report findings",
+      "intentHash": "2aa2a4facfa62dbff45789536fbfea1caf37b25013b8789e66167d0925cdd97b",
+      "createdAt": "2026-03-24T21:23:51Z"
+    }
+  }
+}

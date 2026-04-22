@@ -1,0 +1,15 @@
+{
+  "id": "test-tiered_20260324_212140",
+  "key": "test-tiered",
+  "content": "Testing tiered memory v4 architecture",
+  "agent": "agent-c",
+  "updated": "2026-03-24T21:21:40Z",
+  "type": "fact",
+  "is_latest": true,
+  "version": "v2",
+  "access_count": 3,
+  "last_accessed": "2026-03-24T21:24:34.954991+00:00",
+  "tier": "warm",
+  "salience": 0.5,
+  "importance": 0.5
+}

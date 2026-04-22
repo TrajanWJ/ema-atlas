@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-04-04",
+  "sample_size": 50,
+  "note": "Files with spaces in paths handled properly",
+  "fields": {
+    "title": {
+      "count": 34,
+      "percent": 68
+    },
+    "type": {
+      "count": 36,
+      "percent": 72
+    },
+    "summary": {
+      "count": 32,
+      "percent": 64
+    },
+    "tags": {
+      "count": 35,
+      "percent": 70
+    }
+  },
+  "no_frontmatter": {
+    "count": 12,
+    "percent": 24,
+    "files": [
+      "Session Summaries/c9ff47b4-508b-4402-9106-f0d6c212bcb7.md",
+      "System/Intelligence Notes/graceful-missing-directory-handling-handoff-histor.md",
+      "Research/AI Video Trends - Platform Analysis.md",
+      "Session Summaries/6f25bcc5-eddc-4754-81a3-d93972b24e85.md",
+      "Session Summaries/5432ba53-ff9e-4a54-9d8b-048d2c1ee123.md",
+      "Session Summaries/f85b101b-9a35-4063-8239-0ec11f284626.md",
+      "System/vault-reference-snippet.md",
+      "Session Summaries/3e844f79-86d6-4657-bfc9-66110d57f39d.md",
+      "Session Summaries/d4be2fde-324d-47b2-915c-adf6a9e65f8a.md",
+      "Session Summaries/5efe23b8-555a-446b-97ee-65282dd1843d.md",
+      "System/Intelligence Notes/proposal-lifecycle-state-machine-in-proposal-state.md",
+      "Session Summaries/4457cafb-0168-4163-923a-f3a8e89a2707.md"
+    ]
+  },
+  "concerns": [
+    "Session Summaries have NO frontmatter (they're raw indexed files, not proper notes)",
+    "Intelligence Notes lack frontmatter (auto-captured content)",
+    "24% no-frontmatter rate is primarily driven by Session Summaries and auto-gen content",
+    "Among non-session-summary pages, frontmatter coverage is likely much higher"
+  ]
+}

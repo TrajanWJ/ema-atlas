@@ -1,0 +1,15 @@
+{
+  "id": "mem-arch-v4_20260324_212434",
+  "key": "mem-arch-v4",
+  "content": "Tiered memory architecture deployed: hot/warm/cold with salience scoring",
+  "agent": "agent-c",
+  "updated": "2026-03-24T21:24:34Z",
+  "type": "fact",
+  "is_latest": true,
+  "version": "v2",
+  "access_count": 2,
+  "last_accessed": "2026-03-24T21:24:34.955337+00:00",
+  "tier": "warm",
+  "salience": 0.5,
+  "importance": 0.5
+}

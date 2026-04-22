@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-cross-poll-megaplan-_20260404_031552",
+  "key": "subconscious-cross-poll-megaplan-",
+  "content": "- Executor (Hermes/GLM via OpenRouter) reads *only* `finalize.json` \u2014 never the full plan",
+  "agent": "subconscious",
+  "updated": "2026-04-04T03:15:52Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-11T03:15:52Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-04-04T03:15:52.441618+00:00",
+  "tier": "warm",
+  "salience": 0.5,
+  "importance": 0.5
+}

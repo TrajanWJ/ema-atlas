@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-9d51ce2e_20260327_062703",
+  "key": "subconscious-9d51ce2e",
+  "content": "**Infrastructure note:** `WEBHOOK_RESEARCHER` is returning Discord error 10015 (Unknown Webhook). The webhook has been deleted or expired \u2014 needs to be regenerated and updated in `discord-webhooks-v2.env`. Posts went through via bot token direct API instead.",
+  "agent": "subconscious",
+  "updated": "2026-03-27T06:27:03Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-03T06:27:03Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-27T06:27:03.610253+00:00",
+  "tier": "hot",
+  "salience": 0.5,
+  "importance": 0.5
+}

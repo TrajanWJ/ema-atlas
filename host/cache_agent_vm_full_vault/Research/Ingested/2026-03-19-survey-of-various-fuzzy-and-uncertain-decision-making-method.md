@@ -1,0 +1,50 @@
+---
+title: "Survey of Various Fuzzy and Uncertain Decision-Making Methods"
+url: "https://arxiv.org/abs/2603.15709"
+author: "Takaaki Fujita, Florentin Smarandache"
+date: 2026-03-19
+score: 70
+tags:
+  - agent
+  - agents
+  - ai
+  - model
+  - research
+type: research
+confidence: 0.60
+source: "url:https://arxiv.org/abs/2603.15709"
+summary: "arXiv:2603.15709v1 Announce Type: new Abstract: Decision-making in real applications is often affected by vagueness, incomplete information, heterogen"
+summary: "arXiv:2603.15709v1 Announce Type: new Abstract: Decision-making in real applications is often affected by vagueness, incomplete information, heterogen"
+domain: research
+aliases:
+  - "survey-of-various-fuzzy-and-uncertain-decision-making-method"
+---
+
+# Survey of Various Fuzzy and Uncertain Decision-Making Methods
+
+## Summary
+
+arXiv:2603.15709v1 Announce Type: new Abstract: Decision-making in real applications is often affected by vagueness, incomplete information, heterogeneous data, and conflicting expert opinions. This survey reviews uncertainty-aware multi-criteria decision-making (MCDM) and organizes the field into a concise, task-oriented taxonomy. We summarize problem-level settings (discrete, group/consensus, dynamic, multi-stage, multi-level, multiagent, and multi-scenario), weight elicitation (subjective and objective schemes under fuzzy/linguistic inputs), and inter-criteria structure and causality modelling.
+
+## Key Takeaways
+
+- arXiv:2603.15709v1 Announce Type: new Abstract: Decision-making in real applications is often affected by vagueness, incomplete information, heterogeneous data, and conflicting expert opinions.
+- This survey reviews uncertainty-aware multi-criteria decision-making (MCDM) and organizes the field into a concise, task-oriented taxonomy.
+- We summarize problem-level settings (discrete, group/consensus, dynamic, multi-stage, multi-level, multiagent, and multi-scenario), weight elicitation (subjective and objective schemes under fuzzy/linguistic inputs), and inter-criteria structure and causality modelling.
+
+## Source
+
+- [Original Article](https://arxiv.org/abs/2603.15709)
+- Author: Takaaki Fujita, Florentin Smarandache
+- Relevance Score: 70/100
+
+## Related Notes
+
+- [[Serena MCP]]
+- [[Code Review Skills Landscape]]
+- [[karpathy-digest-2026-03-19]]
+- [[AI Landscape 2026-03-16]]
+- [[Reddit Intel - OpenClaw Focus]]
+
+---
+*Auto-ingested on 2026-03-19 23:52 UTC*

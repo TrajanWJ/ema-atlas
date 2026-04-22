@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-b87ea3e3_20260331_003701",
+  "key": "subconscious-b87ea3e3",
+  "content": "| Cache bugs PSA | r/ClaudeAI \u2605651 | Two confirmed bugs: stale KV after compaction + near-zero hit rate in v2.1.70, workarounds included |",
+  "agent": "subconscious",
+  "updated": "2026-03-31T00:37:01Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-07T00:37:01Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-31T00:37:02.066420+00:00",
+  "tier": "warm",
+  "salience": 0.5,
+  "importance": 0.5
+}

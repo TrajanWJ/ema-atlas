@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-new-source-001_20260326_221003",
+  "key": "subconscious-new-source-001",
+  "content": "Posted 3 items to #research-feed (with threads). Note: `WEBHOOK_RESEARCHER` was stale (404), posted via bot API directly.",
+  "agent": "subconscious",
+  "updated": "2026-03-26T22:10:03Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-02T22:10:03Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-26T22:10:04.361165+00:00",
+  "tier": "hot",
+  "salience": 0.5,
+  "importance": 0.5
+}

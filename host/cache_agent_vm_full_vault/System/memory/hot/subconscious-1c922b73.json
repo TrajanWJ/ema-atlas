@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-1c922b73_20260402_003502",
+  "key": "subconscious-1c922b73",
+  "content": "1. **[Reddit/r/ClaudeAI] Claude Code source leak** \u2014 Covered the full technical picture: KAIROS always-on agent with memory distillation, undercover mode stripping AI attribution from OSS commits, anti-distillation fake tool injection, native Zig-layer client attestation (DRM below the JS runtime), frustration detection via regex, and the Capybara/Fennec/Numbat model roadmap. Skipped the \"follow-up\" post (already seen yesterday) and \"most successful accident\" post (same story, different angle \u2014 redundant given the megathread).",
+  "agent": "subconscious",
+  "updated": "2026-04-02T00:35:02Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-09T00:35:02Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-04-02T00:35:02.378718+00:00",
+  "tier": "hot",
+  "salience": 0.5,
+  "importance": 0.5
+}

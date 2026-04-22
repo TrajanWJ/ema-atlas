@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-a2ecdfe4_20260326_023202",
+  "key": "subconscious-a2ecdfe4",
+  "content": "**Follow-up recommended:** Install `yt-dlp` for future YouTube tasks, and refresh the researcher webhook URL in `discord-webhooks-v2.env`.",
+  "agent": "subconscious",
+  "updated": "2026-03-26T02:32:02Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-02T02:32:02Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-26T02:32:03.197976+00:00",
+  "tier": "hot",
+  "salience": 0.5,
+  "importance": 0.5
+}

@@ -1,0 +1,15 @@
+{
+  "id": "security-test_20260324_212358",
+  "key": "security-test",
+  "content": "Testing auto-sign integration",
+  "agent": "security-agent",
+  "updated": "2026-03-24T21:23:58Z",
+  "type": "fact",
+  "is_latest": true,
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-24T21:23:59.102318+00:00",
+  "tier": "warm",
+  "salience": 0.5,
+  "importance": 0.5
+}

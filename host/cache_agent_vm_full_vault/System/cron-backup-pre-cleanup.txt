@@ -1,0 +1,50 @@
+
+# === Vault Maintenance (added 2026-03-18) ===
+# Backlink builder - weekly on Fridays at 3am
+# Frontmatter enforcement - daily at 4am
+# Inbox classification - daily at 4:30am
+# Self-Learning System (2026-03-16)
+# Semantic links - weekly on Wednesdays at 3am (limit 100 per run)
+# Staleness scan - weekly on Mondays at 5am
+# Tag backfill - weekly on Sundays at 3am (catch new files)
+# Vault health monitor - weekly on Mondays at 2am
+*/1 * * * * /home/trajan/bin/dispatch-engine.sh >> /dev/null 2>&1
+*/10 * * * * /home/trajan/bin/auto-resume.sh >> /var/log/auto-resume.log 2>&1
+*/10 * * * * /home/trajan/bin/session-guardian.sh
+*/15 * * * * /home/trajan/bin/dispatch-heartbeat.sh >> /home/trajan/.openclaw/logs/dispatch-heartbeat.log 2>&1
+*/2 * * * * /home/trajan/bin/gateway-watchdog.sh >> /var/log/gateway-watchdog.log 2>&1
+*/20 * * * * /home/trajan/bin/session-health.sh >> /home/trajan/.openclaw/logs/session-health.log 2>&1
+*/24 * * * * /home/trajan/bin/research-implement-pipeline.sh >> /home/trajan/.openclaw/logs/research-pipeline.log 2>&1
+*/30 * * * * /home/trajan/bin/memory-pressure.sh --quiet >> /tmp/memory-pressure.log 2>&1
+*/30 * * * * cd /home/trajan && flock -n /tmp/qmd.lock timeout 300 bash -c "/usr/bin/qmd update && /usr/bin/qmd embed" 2>&1 | tail -5 >> /tmp/qmd-cron.log
+*/5 * * * * /home/trajan/bin/system-watchdog.sh >> /tmp/watchdog.log 2>&1
+0 */2 * * * /home/trajan/bin/message-harvester.sh >> /tmp/message-harvester.log 2>&1
+0 */2 * * * /home/trajan/scripts/vault-autocommit.sh >> /home/trajan/logs/vault-autocommit.log 2>&1
+0 */3 * * * bash /home/trajan/bin/auto-knowledge-gated.sh
+0 */3 * * * python3 /home/trajan/skills/obsidian-ontology-sync/scripts/sync.py --config /home/trajan/skills/obsidian-ontology-sync/config.yaml extract >> /tmp/ontology-sync.log 2>&1
+0 */6 * * * /home/trajan/bin/vault-task-ingestion.sh >> /home/trajan/.openclaw/logs/vault-task-ingestion.log 2>&1
+0 */6 * * * crontab -l > /home/trajan/vault/System/cron-backup.txt
+0 0 * * 0 python3 /home/trajan/skills/auto-knowledge/scripts/agent-roster-review.py >> /tmp/roster-review.log 2>&1
+0 12 * * * bash /home/trajan/bin/overnight-digest.sh >> /tmp/overnight-digest.log 2>&1  # 7 AM EST daily
+0 14 * * * bash /home/trajan/bin/morning-briefing-v2.sh 2>&1 | head -200 >> /tmp/morning-briefing.log  # 9 AM EST daily
+0 2 * * 1 /home/trajan/bin/vault-growth-monitor.sh >> /tmp/vault-growth-monitor.log 2>&1
+0 3 * * 0 /home/trajan/bin/vault-tag-backfill.sh >> /tmp/vault-tag-backfill.log 2>&1
+0 3 * * 0 /home/trajan/bin/weekly-synthesis.sh >> /tmp/weekly-synthesis.log 2>&1
+0 3 * * 3 /home/trajan/bin/vault-semantic-links.sh --limit 100 >> /tmp/vault-semantic-links.log 2>&1
+0 3 * * 5 /home/trajan/bin/vault-backlink.sh >> /tmp/vault-backlink.log 2>&1
+0 4 * * * /home/trajan/bin/memory-promote.sh --dry-run >> /tmp/memory-promote.log 2>&1
+0 4 * * * /home/trajan/bin/vault-frontmatter-enforce.sh >> /tmp/vault-frontmatter.log 2>&1
+0 4 * * * /home/trajan/scripts/session-janitor.sh >> /home/trajan/logs/session-janitor.log 2>&1
+0 4 * * 1 /home/trajan/bin/prompt-archaeologist.sh >> /tmp/prompt-archaeologist.log 2>&1
+0 5 * * 0 /home/trajan/bin/dispatch-optimizer.sh --apply >> /home/trajan/.openclaw/logs/dispatch-optimizer.log 2>&1
+0 5 * * 1 /home/trajan/bin/vault-staleness-scan.sh >> /tmp/vault-staleness.log 2>&1
+0 6 * * 1 /home/trajan/bin/vault-quality-score.sh >> /tmp/vault-quality.log 2>&1  # Weekly quality report
+0 9 * * * bash /home/trajan/bin/vault-janitor.sh >> /tmp/vault-janitor.log 2>&1  # 4 AM EST daily
+15 */2 * * * /home/trajan/bin/correction-tracker.sh >> /tmp/correction-tracker.log 2>&1
+30 */4 * * * /home/trajan/bin/reddit-intel.sh >> /tmp/reddit-intel.log 2>&1  # Reddit research feed every 4h
+30 */6 * * * bash /home/trajan/skills/evolution-loop/scripts/run-loop.sh --all >> /tmp/evolution-loop.log 2>&1  # Evolution loop every 6h
+30 */6 * * * python3 /home/trajan/skills/auto-knowledge/scripts/pattern-detector.py >> /tmp/pattern-detector.log 2>&1
+30 4 * * * /home/trajan/bin/vault-classify.sh >> /tmp/vault-classify.log 2>&1
+@reboot sleep 30 && /home/trajan/bin/cron-restore.sh >> /tmp/cron-restore.log 2>&1
+*/2 * * * * /home/trajan/bin/session-watchdog.sh
+0 */2 * * * /home/trajan/bin/proactive-task-generator.sh >> /tmp/proactive-task-generator.log 2>&1

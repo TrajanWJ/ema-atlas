@@ -1,0 +1,27 @@
+---
+type: session-summary
+wiki_id: sessions/2026-03-19-unknown-topic-1
+imported_from: vault/Session Summaries/1eee62de-db73-4307-904a-97abda1be872.md
+imported_at: '2026-04-04T00:23:57.180Z'
+tags: []
+summary: ''
+---
+# Session 2026-03-19
+
+**Session ID:** `1eee62de-db73-4307-904a-97abda1be872`
+
+## Topic
+
+I’m not sure that my system really encapsulates what I want the knowledge graph/Obsidian involved to fully be, I want something that holds the entire configuration and all relevant data for my entire 
+
+## Key Messages
+
+1. I’m not sure that my system really encapsulates what I want the knowledge graph/Obsidian involved to fully be, I want something that holds the entire configuration and all relevant data for my entire system to the point where it’s plug-in play with other agents, including config, just from all the v…
+2. I’m not sure that my system really encapsulates what I want the knowledge graph/Obsidian involved to fully be, I want something that holds the entire configuration and all relevant data for my entire system to the point where it’s plug-in play with other agents, including config, just from all the v…
+3. That idea is it needs more credibility than any personality and advocate find similar things online and poke as many holes that you can in this idea to the point that we can have realistic, implementable steps that result in an overall productive and effective system, refer to vault and analyze curr…
+4. That idea is it needs more credibility than any personality and advocate find similar things online and poke as many holes that you can in this idea to the point that we can have realistic, implementable steps that result in an overall productive and effective system, refer to vault and analyze curr…
+5. Ok implement
+6. Ok implement
+
+---
+*Indexed from: 1eee62de-db73-4307-904a-97abda1be872.jsonl*

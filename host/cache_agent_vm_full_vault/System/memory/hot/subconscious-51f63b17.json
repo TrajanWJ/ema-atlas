@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-51f63b17_20260330_123802",
+  "key": "subconscious-51f63b17",
+  "content": "1. **Cache bugs PSA** (\u2605148) \u2014 Two Claude Code bugs causing 10-20x API cost inflation: broken cache writes (v2.1.59, #28899) and stale KV cache after compaction (v2.1.62, #29230). Both have workarounds.",
+  "agent": "subconscious",
+  "updated": "2026-03-30T12:38:02Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-06T12:38:02Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-30T12:38:02.295739+00:00",
+  "tier": "hot",
+  "salience": 0.5,
+  "importance": 0.5
+}

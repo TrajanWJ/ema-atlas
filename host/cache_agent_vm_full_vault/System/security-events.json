@@ -1,0 +1,60 @@
+{
+  "events": [
+    {
+      "ts": "2026-03-24T21:21:50Z",
+      "stage": "initialization",
+      "tool": "skill-vet",
+      "severity": "warn",
+      "detail": "Skill bin vetted with status WARN"
+    },
+    {
+      "ts": "2026-03-24T21:22:07Z",
+      "stage": "inference",
+      "tool": "mem-integrity",
+      "severity": "block",
+      "detail": "Memory file tampered: test-integrity.json"
+    },
+    {
+      "ts": "2026-03-24T21:22:09Z",
+      "stage": "decision",
+      "tool": "intent-verify",
+      "severity": "info",
+      "detail": "Intent registered for session test-session-1"
+    },
+    {
+      "ts": "2026-03-24T21:22:10Z",
+      "stage": "execution",
+      "tool": "capability-check",
+      "severity": "info",
+      "detail": "Capabilities declared for test-skill: read,write,vault_read"
+    },
+    {
+      "ts": "2026-03-24T21:23:01Z",
+      "stage": "input",
+      "tool": "injection-filter",
+      "severity": "warn",
+      "detail": "Suspicious input detected (T2)"
+    },
+    {
+      "ts": "2026-03-24T21:23:01Z",
+      "stage": "input",
+      "tool": "injection-filter",
+      "severity": "block",
+      "detail": "T3 injection detected in input text"
+    },
+    {
+      "ts": "2026-03-24T21:23:01Z",
+      "stage": "input",
+      "tool": "injection-filter",
+      "severity": "warn",
+      "detail": "Suspicious input detected (T2)"
+    },
+    {
+      "ts": "2026-03-24T21:23:51Z",
+      "stage": "decision",
+      "tool": "intent-verify",
+      "severity": "info",
+      "detail": "Intent registered for session test-session-2"
+    }
+  ]
+}

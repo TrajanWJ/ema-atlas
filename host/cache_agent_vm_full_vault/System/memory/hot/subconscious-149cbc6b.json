@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-149cbc6b_20260326_023201",
+  "key": "subconscious-149cbc6b",
+  "content": "**Note:** The `WEBHOOK_RESEARCHER` webhook returned 404 (deleted/expired). Posting succeeded via direct bot token API calls. The `thread-response-wrapper.sh` script will need its researcher webhook regenerated to work again.",
+  "agent": "subconscious",
+  "updated": "2026-03-26T02:32:01Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-02T02:32:01Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-26T02:32:01.680169+00:00",
+  "tier": "hot",
+  "salience": 0.5,
+  "importance": 0.5
+}

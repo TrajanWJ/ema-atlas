@@ -1,0 +1,16 @@
+{
+  "id": "subconscious-d1ad31b6_20260326_003802",
+  "key": "subconscious-d1ad31b6",
+  "content": "**Recommendation:** If Reddit access is needed for this pipeline, the feed dispatcher should either (a) pre-fetch and cache Reddit post bodies before passing to the researcher agent, or (b) whitelist a working Redlib mirror for this agent's environment.",
+  "agent": "subconscious",
+  "updated": "2026-03-26T00:38:02Z",
+  "type": "fact",
+  "is_latest": true,
+  "expires_at": "2026-04-02T00:38:02Z",
+  "version": "v2",
+  "access_count": 0,
+  "last_accessed": "2026-03-26T00:38:02.611453+00:00",
+  "tier": "hot",
+  "salience": 0.5,
+  "importance": 0.5
+}

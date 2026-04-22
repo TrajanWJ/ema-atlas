@@ -1,0 +1,22 @@
+---
+type: session-summary
+wiki_id: sessions/2026-03-25-task-topic
+imported_from: vault/Session Summaries/36f3e7d5-610f-48f9-97ea-19c69430e771.md
+imported_at: '2026-04-04T00:23:57.181Z'
+tags: []
+summary: ''
+---
+# Session 2026-03-25
+
+**Session ID:** `36f3e7d5-610f-48f9-97ea-19c69430e771`
+
+## Topic
+
+[Wed 2026-03-25 20:50 UTC]   [Subagent Task]: Build a vault-to-session bridging system using vector search.  Context: The Obsidian vault at /home/trajan/vault/ (930 notes) and session logs at ~/.openc
+
+## Key Messages
+
+1. [Wed 2026-03-25 20:50 UTC]   [Subagent Task]: Build a vault-to-session bridging system using vector search.  Context: The Obsidian vault at /home/trajan/vault/ (930 notes) and session logs at ~/.openclaw/agents/main/sessions/ (183 logs) currently live in completely separate search spaces. QMD indexe…
+
+---
+*Indexed from: 36f3e7d5-610f-48f9-97ea-19c69430e771.jsonl*

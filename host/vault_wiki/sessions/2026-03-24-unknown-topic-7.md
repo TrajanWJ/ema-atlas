@@ -1,0 +1,38 @@
+---
+type: session-summary
+wiki_id: sessions/2026-03-24-unknown-topic-7
+imported_from: vault/Session Summaries/f85b101b-9a35-4063-8239-0ec11f284626.md
+imported_at: '2026-04-04T00:23:57.201Z'
+tags: []
+summary: ''
+---
+# Session 2026-03-24
+
+**Session ID:** `f85b101b-9a35-4063-8239-0ec11f284626`
+
+## Topic
+
+Let’s get speech to text for free on this system. It is best if it does not have a heavy load.
+
+## Key Messages
+
+1. Let’s get speech to text for free on this system. It is best if it does not have a heavy load.
+2. System: [2026-03-24 21:30:30 UTC] Exec completed (grand-ze, code 0) :: User sessions running outdated binaries: trajan @ user manager service: gvfsd[2297], systemd[1866] No VM guests are running outdated hypervisor (qemu) binaries on this host. System: [2026-03-24 21:31:37 UTC] Exec completed (kind-…
+3. See the general voice channel in this discord? Can you make the openclaw bot always be in there and use speech to text to process requests?
+4. Every time you restart the gateway, you don’t respond and just leave me hanging
+5. It actually did connect, is it listening if I give it instructions in that channel? If so, how will it respond?  Can you move it to a category called voice interface, I want you to have one pack channel right now in that category where it will also respond to what I tell it in the voice
+6. He left the channel when I joined
+7. He’s in general now and he’s not leaving, but he isn’t responding and nothing showing up in the tech channel either
+8. Fixed yet?
+9. Can you look for anything else could be wrong?
+10. When I assign him big task he doesn’t respond anymore
+11. He left channel and you missed my last message
+12. He’s not responding
+13. Wait he did
+14. Takes very long though plz speed response up
+15. Missed messages review
+16. He’s in the vc, set up voice log channel better
+17. Make him not stop talking when I start he can talk and listen and he picks up background from my mic then stops interacting
+
+---
+*Indexed from: f85b101b-9a35-4063-8239-0ec11f284626.jsonl*

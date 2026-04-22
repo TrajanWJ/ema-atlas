@@ -7,6 +7,26 @@ Each entry names the commit purpose, not the file diff — for diffs see `git lo
 > was renamed to `TrajanWJ/ema-atlas` on 2026-04-22 once the atlas Next.js
 > app became the center of gravity. The old URL still redirects.
 
+## 2026-04-22 — wave 8: Vercel deploy scaffolding + atlas CI
+
+- `vercel.ts` (typed `VercelConfig` from `@vercel/config`) pins
+  `framework: nextjs` and overrides `buildCommand` to run
+  `./scripts/regen-all.sh && next build` so every Vercel deploy
+  renders against a freshly-regenerated graph (matches the
+  `ATLAS_NOTES.md` "Build pipeline" contract). `@vercel/config`
+  added to `package.json` devDependencies but not yet installed —
+  user runs `npm i` to materialize.
+- `.github/workflows/atlas-ci.yml`: on push/PR to `main`,
+  installs deps, runs the regen chain, runs `npx next build`. No
+  deploy from CI — Vercel's GitHub integration owns deploys.
+- `howto/deploy-atlas.md`: three deploy paths (dashboard, CLI,
+  self-host with documented RSC/dynamic-route/route-handler
+  caveats), `/api/graph` count verification, env-var conventions
+  (none today), and dashboard rollback procedure.
+- README "On a fresh machine" gains a "Deploy" subsection
+  pointing at the howto. No real Vercel project provisioned;
+  scaffolding only.
+
 ## 2026-04-22 — wave 7: Gleam scaffold + canvas SVG embed + collab+surfaces build-steps + /api/graph + frontier doctrine
 
 - 5 background subagents (all delivered):

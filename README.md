@@ -112,6 +112,14 @@ git fetch --all
 
 Then follow [`AGENT_BOOTSTRAP.md`](AGENT_BOOTSTRAP.md).
 
+### Deploy
+
+The atlas deploys to Vercel. Config lives in `vercel.ts` at the repo
+root and runs the regen chain before `next build`. See
+[`howto/deploy-atlas.md`](howto/deploy-atlas.md) for the dashboard
+flow (Path A), CLI flow (Path B), self-host caveats (Path C),
+verification, env var conventions, and rollback.
+
 ## Notes on the atlas pack
 
 - Public + intentionally over-included. Pruning happens later, not now.

@@ -1,0 +1,132 @@
+# LCM Summary sum_fa315ef75c4731ea
+
+Created: 2026-03-20 07:55:56
+Kind: leaf
+Depth: 0
+Conversation: 716
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-20T07:53:33.000Z
+Latest: 2026-03-20T07:53:34.000Z
+
+## Content
+
+[2026-03-20 07:53 UTC]
+import express from 'express';
+import cors from 'cors';
+import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
+import { readFile, writeFile, readdir, unlink, appendFile, stat } from 'fs/promises';
+import { existsSync, mkdirSync } from 'fs';
+import { join, dirname, basename, extname } from 'path';
+import { execFile, exec as execCb } from 'child_process';
+import { fileURLToPath } from 'url';
+
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+const PORT = parseInt(process.env.PORT || '18790', 10);
+const GATEWAY_URL = process.env.GATEWAY_URL || 'http://127.0.0.1:18789';
+const AUTH_TOKEN = process.env.OPENCLAW_GATEWAY_PASSWORD || process.env.OPENCLAW_GATEWAY_TOKEN || '';
+const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || '';
+const DISCORD_API = 'https://discord.com/api/v10';
+const DISPATCH = join(process.env.HOME, 'dispatch');
+const CHANNEL_IDS_PATH = join(DISPATCH, 'channel-ids.json');
+const QUEUE_DIR = join(DISPATCH, 'queue');
+const DONE_DIR = join(DISPATCH, 'done');
+const FEED_PATH = join(DISPATCH, 'feed.jsonl');
+const ANSWERS_PATH = join(DISPATCH, 'answers.jsonl');
+const POLL_INTERVAL_MS = 5000; // 5s — balances real-time feel vs Discord rate limits (20 channels)
+
+// Ensure dirs exist
+for (const dir of [QUEUE_DIR, DONE_DIR]) {
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+}
+
+// ---------------------------------------------------------------------------
+// Express app
+// ---------------------------------------------------------------------------
+const app = express();
+
+app.use(express.json());
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin) return cb(null, true); // allow non-browser (curl, etc.)
+    if (
+      origin.startsWith('http://localhost') ||
+      origin.startsWith('https://trajanwj.github.io') ||
+      /^http:\/\/192\.168\.122\.\d{1,3}(:\d+)?$/.test(origin)
+    ) {
+      return cb(null, true);
+    }
+    cb(new Error('CORS not allowed'));
+  }
+}));
+
+// ---------------------------------------------------------------------------
+// Static frontend — serve demo pages if present (same origin = no CORS/auth needed)
+// ---------------------------------------------------------------------------
+const DEMO_DIR = process.env.DEMO_DIR || join(dirname(fileURLToPath(import.meta.url)), '..', 'agent-os-demo-pages');
+if (existsSync(DEMO_DIR)) {
+  app.use('/app', express.static(DEMO_DIR));
+  console.log(`[bridge] Serving frontend at /app from ${DEMO_DIR}`);
+}
+
+// ---------------------------------------------------------------------------
+// Auth middleware
+// ---------------------------------------------------------------------------
+function requireAuth(req, res, next) {
+  if (!AUTH_TOKEN) return next(); // no token configured = open (dev mode)
+  // Allow same-origin requests from /app (served by this bridge)
+  const referer = req.headers.referer || '';
+  const origin = req.headers.origin || '';
+  if (referer.includes('/app') || origin.includes('localhost') || origin.includes('192.168.122.')) {
+    return next();
+  }
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing Authorization header' });
+  }
+  const provided = header.slice(7);
+  // Accept either the gateway password or the gateway token
+  const GATEWAY_TOKEN = process.env.OPENCLAW_GATEWAY_TOKEN || '';
+  if (provided !== AUTH_TOKEN && provided !== GATEWAY_TOKEN) {
+    return res.status(403).json({ error: 'Invalid token' });
+  }
+  next();
+}
+
+app.use('/api', requireAuth);
+
+// ---------------------------------------------------------------------------
+// Health
+// ---------------------------------------------------------------------------
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+
+// ---------------------------------------------------------------------------
+// Gateway proxy helper
+// ---------------------------------------------------------------------------
+async function invokeGateway(tool, args) {
+  const resp = await fetch(`${GATEWAY_URL}/tools/invoke`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {}),
+    },
+    body: JSON.stringify({ tool, args }),
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Gateway error ${resp.status}: ${text}`);
+  }
+  return resp.json();
+}
+
+// ---------------------------------------------------------------------------
+// Discord Message Proxy
+// ---------------------------------------------------------------------------
+
+// GET /api/chann
+[LCM fallback summary; truncated for context management]

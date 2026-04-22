@@ -1,0 +1,195 @@
+# LCM Summary sum_afb8c07fcf28b8e4
+
+Created: 2026-03-18 04:14:32
+Kind: leaf
+Depth: 0
+Conversation: 245
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-18T03:28:54.000Z
+Latest: 2026-03-18T03:32:06.000Z
+
+## Content
+
+[2026-03-18 03:28 UTC]
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.13",
+    "lastTouchedAt": "2026-03-18T01:42:14.578Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-16T07:22:48.290Z",
+    "lastRunVersion": "2026.3.12",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
+  },
+  "update": {
+    "channel": "stable"
+  },
+  "browser": {
+    "enabled": true,
+    "executablePath": "/usr/bin/google-chrome-stable",
+    "headless": false,
+    "noSandbox": true
+  },
+  "secrets": {
+    "providers": {
+      "default": {
+        "source": "env"
+      }
+    }
+  },
+  "models": {
+    "providers": {
+      "anthropic": {
+        "baseUrl": "https://api.anthropic.com/v1",
+        "apiKey": "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",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "anthropic/claude-opus-4-6",
+            "name": "Claude Opus 4.6"
+          },
+          {
+            "id": "anthropic/claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6"
+          },
+          {
+            "id": "anthropic/claude-haiku-4-5-20251001",
+            "name": "Claude Haiku 4.5"
+          }
+        ]
+      },
+      "anthropic-backup": {
+        "baseUrl": "https://api.anthropic.com/v1",
+        "apiKey": "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",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "anthropic-backup/claude-opus-4-6",
+            "name": "Claude Opus 4.6 (backup)"
+          },
+          {
+            "id": "anthropic-backup/claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6 (backup)"
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-opus-4-6",
+        "fallbacks": [
+          "anthropic-backup/claude-opus-4-6"
+        ]
+      },
+      "models": {
+        "anthropic-backup/claude-opus-4-6": {},
+        "anthropic/claude-opus-4-6": {
+          "alias": "opus",
+          "params": {
+            "cacheRetention": "short"
+          }
+        }
+      },
+      "memorySearch": {
+        "enabled": true,
+        "sources": [
+          "memory",
+          "sessions"
+        ],
+        "experimental": {
+          "sessionMemory": true
+        }
+      },
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "1h"
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "memoryFlush": {
+          "enabled": true
+        }
+      },
+      "heartbeat": {
+        "every": "60m",
+        "model": "anthropic/claude-sonnet-4-6"
+      },
+      "maxConcurrent": 8,
+      "subagents": {
+        "maxConcurrent": 8,
+        "model": "anthropic/claude-sonnet-4-6",
+        "runTimeoutSeconds": 600
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "workspace": "/home/trajan/.openclaw/agents/main/workspace",
+        "identity": {
+          "name": "Right Hand",
+          "emoji": "🤝"
+        },
+        "subagents": {
+          "allowAgents": [
+            "researcher",
+            "coder",
+            "ops",
+            "security",
+            "vault-keeper",
+            "browser-automation",
+            "devils-advocate",
+            "prompt-engineer",
+            "concierge",
+            "strategist",
+            "universal-orchestrator"
+          ]
+        }
+      },
+      {
+        "id": "researcher",
+        "workspace": "/home/trajan/.openclaw/agents/researcher/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/researcher/agent",
+        "model": "anthropic/claude-sonnet-4-6",
+        "identity": {
+          "name": "Researcher",
+          "emoji": "🔬"
+        }
+      },
+      {
+        "id": "security",
+        "workspace": "/home/trajan/.openclaw/agents/security/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/security/agent",
+        "model": "anthropic/claude-sonnet-4-6",
+        "identity": {
+          "name": "Security",
+          "emoji": "🛡️"
+        }
+      },
+      {
+        "id": "coder",
+        "workspace": "/home/trajan/.openclaw/agents/coder/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/coder/agent",
+        "model": "anthropic/claude-sonnet-4-6",
+        "identity": {
+          "name": "Coder",
+          "emoji": "💻"
+        }
+      },
+      {
+        "id": "vault-keeper",
+        "workspace": "/home/trajan/.openclaw/agents/vault-keeper/workspace",
+        "agentDir": "/home/trajan/.openclaw/agents/vault-keeper/agent",
+        "model": "anthropic/claude-sonnet-4-6",
+        "identity": {
+          "name": "Vault Keeper",
+          "emoji": "📚"
+        }
+      },
+      {
+        "id": "ops",
+        "workspace": "/home/trajan/.openclaw/a
+[LCM fallback summary; truncated for context management]

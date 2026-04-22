@@ -1,0 +1,1241 @@
+{
+  "entries": [
+    {
+      "key": "github_com/berriai/litellm/issues/24512",
+      "description": "Previously posted: https://github.com/BerriAI/litellm/issues/24512",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "epoch_ai/frontiermath/open-problems/ramsey-hypergraphs",
+      "description": "Previously posted: https://epoch.ai/frontiermath/open-problems/ramsey-hypergraphs",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "answer_ai/posts/2026-03-12-so-where-are-all-the-ai-apps_html",
+      "description": "Previously posted: https://www.answer.ai/posts/2026-03-12-so-where-are-all-the-ai-apps.html",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "twitter_com/anemll/status/2035901335984611412",
+      "description": "Previously posted: https://twitter.com/anemll/status/2035901335984611412",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "cc_storyfox_cz",
+      "description": "Previously posted: https://cc.storyfox.cz",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_21065",
+      "description": "Previously posted: https://arxiv.org/abs/2603.21065",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_16932",
+      "description": "Previously posted: https://arxiv.org/abs/2603.16932",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "xda-developers_com/wine-11-rewrites-linux-runs-windows-games-speed-gains/",
+      "description": "Previously posted: https://www.xda-developers.com/wine-11-rewrites-linux-runs-windows-games-speed-gains/",
+      "source": "github-interesting-state",
+      "posted_at": "2026-03-24T00:00:00Z"
+    },
+    {
+      "key": "thoughts_jock_pl/p/claude-cowork-dispatch-computer-use-honest-agent-review-2026",
+      "description": "AI agent desktop convergence - Perplexity/Meta/Anthropic",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s2ci9r/",
+      "description": "SillyTavern NPC dual-model architecture",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "blog_jakesaunders_dev/is-anybody-else-bored-of-talking-about-ai/",
+      "description": "AI discourse fatigue - woodworking hammer analogy",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "danielhomola_com/m_e/ai/your-bridge-to-wealth-is-being-pulled-up/",
+      "description": "AI cutting IQ-to-wealth bridge essay",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv:chimera-multi-agent-serving-2603-2026",
+      "description": "Chimera latency-aware multi-agent LLM serving",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_17534",
+      "description": "Causal evidence LLMs use confidence to drive behavior",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "claude_com/product/cowork",
+      "description": "Claude Cowork launch",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_11619",
+      "description": "arxiv paper 2026-03-20",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_19595",
+      "description": "arxiv paper 2026-03-20",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_21278",
+      "description": "arxiv paper 2026-03-20",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv:memory-poisoning-multi-agent-2026-03-20",
+      "description": "memory poisoning multi-agent",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv:memori-persistent-memory-2026-03-20",
+      "description": "memori persistent memory",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "arxiv:rl-long-horizon-tools-2026-03-23",
+      "description": "RL long horizon tools",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "cyrusradfar_com/thoughts/self-optimizing-models",
+      "description": "Self-optimizing models - Cyrus Radfar",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "henry_codes",
+      "description": "Henry.codes personal site",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "cassie_codes",
+      "description": "Cassie.codes personal site",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "ykumar_me/blog/eclip-autoresearch",
+      "description": "eclip autoresearch",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "github_com/sharpa_i/deepcamera",
+      "description": "SharpAI DeepCamera",
+      "source": "manual",
+      "posted_at": "2026-03-24T22:30:00Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s31vwq/claude_code_can_now_generate_full_ui_designs_with/",
+      "description": "Claude Code + Google Stitch MCP design-to-code pipeline",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-25T18:49:30Z"
+    },
+    {
+      "key": "research_google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/",
+      "description": "Google TurboQuant 6x KV cache compression zero accuracy loss",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-25T18:49:30Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s39024/deepseek_employee_teases_massive_new_model/",
+      "description": "DeepSeek V4 employee tease April 2026 1M context multimodal",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-25T18:49:30Z"
+    },
+    {
+      "key": "mariozechner_at/posts/2026-03-25-thoughts-on-slowing-the-fuck-down",
+      "description": "Agentic coding reality check - compounding booboos essay",
+      "source": "research",
+      "posted_at": "2026-03-25T22:30:11Z"
+    },
+    {
+      "key": "arcprize_org/arc-agi/3",
+      "description": "ARC-AGI-3 interactive reasoning benchmark launch",
+      "source": "research",
+      "posted_at": "2026-03-25T22:30:11Z"
+    },
+    {
+      "key": "ente_com/blog/ensu",
+      "description": "Ensu local LLM app with E2EE sync from Ente",
+      "source": "research",
+      "posted_at": "2026-03-25T22:30:11Z"
+    },
+    {
+      "key": "refactoringenglish_com/blog/ai-vs-human-design-doc",
+      "description": "AI vs human design doc experiment by mtlynch",
+      "source": "research",
+      "posted_at": "2026-03-25T22:30:11Z"
+    },
+    {
+      "key": "calpaterson_com/disregard_html",
+      "description": "Disregard that - prompt injection is unsolvable essay",
+      "source": "research",
+      "posted_at": "2026-03-25T22:30:11Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s3bb3y/intel_launches_arc_pro_b70_and_b65_with_32gb_gddr6/",
+      "description": "Intel Arc Pro B70/B65 32GB GDDR6 launch at 49 - local LLM GPU",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-25T22:30:40Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s3i3j1/open_letter_to_the_ceo_and_executive_team_of/",
+      "description": "Open Letter to Anthropic CEO about Claude Code usage limits - 319 upvotes",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-25T22:31:16Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s3bcit/your_claude_code_limits_didnt_shrink_i_think_the/",
+      "description": "Claude Code 1M context window eating usage limits theory",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T00:38:05Z"
+    },
+    {
+      "key": "reddit_com/r/obsidianmd/comments/1rzgiq0/ai_sucks_up_all_the_information_like_a_vacuum/",
+      "description": "Obsidian community divided on cloud AI privacy vs local-model integration",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T00:38:29Z"
+    },
+    {
+      "key": "youtube_com/watch_v_hbeblolc6l8",
+      "description": "AI is making EVERYONE delusional — Coding Jesus video on AI creating developer overconfidence",
+      "source": "links-pipeline",
+      "posted_at": "2026-03-26T02:30:50Z"
+    },
+    {
+      "key": "techcrunch_com/2026/03/24/anthropic-hands-claude-code-more-control-but-keeps-it-on-a-leash/",
+      "description": "Anthropic Claude Code Auto Mode - AI-safeguarded autonomous execution",
+      "source": "competitive-scan",
+      "posted_at": "2026-03-26T02:30:56Z"
+    },
+    {
+      "key": "devblogs_microsoft_com/foundry/microsoft-agent-framework-reaches-release-candidate/",
+      "description": "Microsoft Agent Framework 1.0 RC - AutoGen+SK unified GA imminent",
+      "source": "competitive-scan",
+      "posted_at": "2026-03-26T02:30:56Z"
+    },
+    {
+      "key": "tiktok_com/t/zp8byujtj/",
+      "description": "Jens Heitmann (@jensheitmann_): Unlocking the design power of AI tools — Claude/Anthropic capability tip video",
+      "source": "links-pipeline",
+      "posted_at": "2026-03-26T02:31:08Z"
+    },
+    {
+      "key": "tiktok_com/t/zp8byqpgq/",
+      "description": "Neu Web Studio (@neuwebstudio) TikTok web design channel - cinematic Figma/Webflow content, 153K followers",
+      "source": "links-pipeline",
+      "posted_at": "2026-03-26T02:31:09Z"
+    },
+    {
+      "key": "i_redd_it/4hrn5eh985rg1_jpeg",
+      "description": "LiteLLM supply chain attack alternatives roundup — TeamPCP backdoored v1.82.7/v1.82.8 via compromised Trivy scanner",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T04:37:22Z"
+    },
+    {
+      "key": "reddit_com/gallery/1s3ll4i",
+      "description": "ARC-AGI-3 launched — interactive benchmark, frontier LLMs score under 1%, non-LLM agents lead at 12.6%",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T04:37:22Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s3hh29/saying_hey_cost_me_22_of_my_usage_limits/",
+      "description": "Claude stateless design means every message re-sends full conversation history — explains why short messages still burn large usage limits",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T04:37:22Z"
+    },
+    {
+      "key": "reddit_com/r/ai_agents/comments/1s3f2v2/most_ai_agent_startups_will_be_dead_in_12_months/",
+      "description": "Most AI agent startups will be dead in 12 months — no moat thesis",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T08:33:58Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s3fmig/a_very_serious_thank_you_to_claude_code/",
+      "description": "Serious thank you to Claude Code — high-signal community appreciation post",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T08:33:58Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s3kt2c/cto_hit_rate_limits_after_3_hours_this_morning_is/",
+      "description": "CTO hit rate limits after 3 hours, considering moving to OpenAI",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T08:33:58Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s3i3j1/open_letter_to_the_ceo_and_executive_team_of_anthropic/",
+      "description": "Open Letter to Anthropic CEO about opaque usage limits — community organizing",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T08:37:43Z"
+    },
+    {
+      "key": "reddit_com/gallery/1s0njnb",
+      "description": "KatmerCode: Obsidian plugin running Claude Code with 7 academic research skills via Agent SDK",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T16:36:40Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s43b8w/running_claude_code_fully_offline_on_a_macbook_no/",
+      "description": "Running Claude Code fully offline via Ollama on MacBook — no API key, local inference 17s/token",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T16:37:13Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s4idaq/update_on_session_limits/",
+      "description": "Claude 2x usage promotion March 13-27, off-peak hours, ends tomorrow",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T22:07:39Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s44p77/rotorquant_1019x_faster_alternative_to_turboquant/",
+      "description": "RotorQuant: 10-19x faster than TurboQuant via Clifford algebra, 44x fewer params, CUDA+Metal",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T22:07:39Z"
+    },
+    {
+      "key": "reddit_com/gallery/1s1yotb",
+      "description": "Obsidian rabbit hole week result - could not fetch gallery content",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-26T22:07:39Z"
+    },
+    {
+      "key": "whoami_wiki/blog/personal-encyclopedias",
+      "description": "Personal Encyclopedias - AI-assisted MediaWiki for personal memory/PKM",
+      "source": "new-source-001",
+      "posted_at": "2026-03-26T22:08:50Z"
+    },
+    {
+      "key": "mariozechner_at/posts/2026-03-25-thoughts-on-slowing-the-fuck-down/",
+      "description": "Agents compound errors faster than humans learn - essay on AI agent quality",
+      "source": "new-source-001",
+      "posted_at": "2026-03-26T22:09:13Z"
+    },
+    {
+      "key": "matklad_github_io/2026/02/25/against-query-based-compilers_html",
+      "description": "Against query-based compilers - matklad on incremental compilation tradeoffs",
+      "source": "new-source-001",
+      "posted_at": "2026-03-26T22:09:33Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_23971",
+      "description": "The Price Reversal Phenomenon - cheaper models cost more due to thinking token heterogeneity",
+      "source": "arxiv",
+      "posted_at": "2026-03-26T22:14:07Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_24517",
+      "description": "AVO: Agentic Variation Operators - autonomous agents beat cuDNN on B200 GPUs",
+      "source": "arxiv",
+      "posted_at": "2026-03-26T22:14:25Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_24579",
+      "description": "MARCH - multi-agent hallucination reduction via deliberate information asymmetry",
+      "source": "arxiv",
+      "posted_at": "2026-03-26T22:14:40Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_24284",
+      "description": "The Specification Gap - coordination failure in multi-agent code generation without rich specs",
+      "source": "arxiv",
+      "posted_at": "2026-03-26T22:14:57Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_24402",
+      "description": "AI-Supervisor - autonomous research supervision via persistent Knowledge Graph",
+      "source": "arxiv",
+      "posted_at": "2026-03-26T22:15:15Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_13258",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:24:44Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_09023",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:24:44Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_23610",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:24:44Z"
+    },
+    {
+      "key": "arxiv_org/abs/2601_05366",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:24:44Z"
+    },
+    {
+      "key": "arxiv_org/abs/2603_11768",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:24:44Z"
+    },
+    {
+      "key": "the-decoder_com/openai-plans-to-merge-chatgpt-codex-and-atlas-browser-into-a-single-desktop-superapp/",
+      "description": "OpenAI merging ChatGPT+Codex+Atlas into superapp — strategic pivot citing Anthropic as wake-up call",
+      "source": "competitive-scan",
+      "posted_at": "2026-03-27T06:25:15Z"
+    },
+    {
+      "key": "ramp_com/velocity/ai-index-march-2026",
+      "description": "Ramp AI Index March 2026: Anthropic 24.4% adoption, 70% win rate vs OpenAI, OpenAI first-ever monthly decline",
+      "source": "competitive-scan",
+      "posted_at": "2026-03-27T06:25:44Z"
+    },
+    {
+      "key": "georgelarson_me/writing/2026-03-23-nullclaw-doorman/",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:30:43Z"
+    },
+    {
+      "key": "blog_mozilla_ai/cq-stack-overflow-for-agents/",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:30:43Z"
+    },
+    {
+      "key": "lesswrong_com/posts/alhzcbpjand8zw2jx/are-we-aligning-the-model-or-just-its-mask",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:30:43Z"
+    },
+    {
+      "key": "cacm_acm_org/blogcacm/rethinking-distributed-computing-for-the-ai-era/",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-27T06:30:43Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s6zxkp/why_the_1m_context_window_burns_through_limits/",
+      "description": "Why the 1M context window burns through limits faster — undocumented buffer cut, peak-hour throttling, ultrathink 5x multiplier",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T09:10:01Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s6wpuc/what_is_your_claude_code_setup_like_that_is/",
+      "description": "ClaudeCode productive setups — CLAUDE.md discipline, plan-before-code, tmux+worktree parallelism, session persistence",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T09:10:30Z"
+    },
+    {
+      "key": "claude-code-cache-bugs-cost-inflation-v2_1_59-v2_1_62",
+      "description": "Claude Code cache bugs causing 10-20x cost inflation",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:39:36Z"
+    },
+    {
+      "key": "anthropic-mythos-model-leaked-cybersecurity",
+      "description": "Anthropic Mythos above-Opus model leaked, cybersecurity-first rollout",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:40:00Z"
+    },
+    {
+      "key": "arc-agi-3-benchmark-launched-march-2025",
+      "description": "ARC-AGI-3 launched, best AI 12.58%, humans 100%, M prize",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:40:06Z"
+    },
+    {
+      "key": "computer-use-now-in-claude-code",
+      "description": "Computer use in Claude Code research preview, Mac only",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:40:53Z"
+    },
+    {
+      "key": "garry-tan-gstack-skill-pack-claude-code-56k-stars",
+      "description": "Garry Tan gstack skill pack 56k stars",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:41:01Z"
+    },
+    {
+      "key": "claude-code-token-consumption-bug-march-2026",
+      "description": "Claude Code token consumption bug March 2026",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:41:01Z"
+    },
+    {
+      "key": "qwen-3_6-spotted-openrouter-preview",
+      "description": "Qwen 3.6 Plus Preview live on OpenRouter",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:41:20Z"
+    },
+    {
+      "key": "claude-code-cache-bugs-10-20x",
+      "description": "Claude Code cache bugs: prompt cache writes broken (v2.1.59+) and stale KV cache post-compaction (v2.1.62+), both causing 10-20x API cost inflation",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:42:14Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s7mitf/psa_claude_code_has_two_cache_bugs_that_can/",
+      "description": "Claude Code two cache bugs causing 10-20x API cost inflation",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:42:27Z"
+    },
+    {
+      "key": "boris-cherny-claude-code-hidden-features",
+      "description": "Boris Cherny's 15 hidden Claude Code features: /loop, teleport, /batch, --bare, custom agents, mobile app, /branch, hooks",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:42:38Z"
+    },
+    {
+      "key": "reddit_com/gallery/1s7j9f2",
+      "description": "Boris Cherny 15 Claude Code hidden features from creator",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:42:48Z"
+    },
+    {
+      "key": "computer-use-claude-code",
+      "description": "Computer Use launched in Claude Code/Cowork research preview March 23 2026 — desktop control, pairs with Dispatch for async work",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:42:58Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s7jdof/garry_tan_opensourced_gstack_his_personal_skill/",
+      "description": "Garry Tan gstack - Claude Code virtual dev team skill pack 56k stars",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:43:08Z"
+    },
+    {
+      "key": "arc-agi-3",
+      "description": "ARC-AGI-3 benchmark launched March 25 2026: humans 100%, best AI 12.58%, frontier LLMs <1%, $2M prize",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:43:18Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s7w9mq/stanford_and_harvard_just_dropped_the_most/",
+      "description": "Agents of Chaos paper - aligned agents drift to manipulation in multi-agent systems",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:43:30Z"
+    },
+    {
+      "key": "nicolas-carlini-claude-security-vulnpocalypse",
+      "description": "Nicolas Carlini: Claude outperforms humans at security research, 500 zero-days found, coined 'vulnpocalypse'",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:43:37Z"
+    },
+    {
+      "key": "claude-code-v2_1_83-release",
+      "description": "Claude Code v2.1.83: CwdChanged/FileChanged hooks, initialPrompt frontmatter, credential scrubbing, TaskOutput deprecated",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:44:07Z"
+    },
+    {
+      "key": "letta-claude-subconscious",
+      "description": "letta-ai/claude-subconscious: background Letta agent that builds 8-block memory and whispers context into Claude Code sessions",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:44:07Z"
+    },
+    {
+      "key": "garry-tan-gstack-claude-code",
+      "description": "Garry Tan gstack: 56k star MIT-licensed Claude Code role system — CEO/designer/QA/security slash commands, 10k LOC/week",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:44:28Z"
+    },
+    {
+      "key": "voxtral-voice-cloning-missing-encoder",
+      "description": "Developer trained Mistral's omitted Voxtral encoder (149M params) enabling zero-shot voice cloning from reference audio",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:44:58Z"
+    },
+    {
+      "key": "claude-code-harness-evals-scaffold",
+      "description": "Anthropic Claude Code testing harness: all frontier models within 1.3%, scaffold drives more variance than model",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:45:09Z"
+    },
+    {
+      "key": "kimi-k2_6-k3-moonshot",
+      "description": "Kimi K2.6 expected ~April 14 2026, K3 WIP 2T+ params ultra-sparse MoE, Moonshot raised $1.2B",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:45:09Z"
+    },
+    {
+      "key": "anthropic-mythos-model-leaked",
+      "description": "Anthropic Mythos above-Opus model leaked via misconfigured CMS — cybersecurity-org-first rollout",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:45:09Z"
+    },
+    {
+      "key": "we-vs-do-this-prompting-collaborative",
+      "description": "Collaborative 'we' framing outperforms bare imperatives by embedding project context naturally",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:45:10Z"
+    },
+    {
+      "key": "claude-md-token-bloat-99pct-input",
+      "description": "Claude Code token usage 99.4% input tokens driven by CLAUDE.md bloat; modular @imports recovers up to 82%",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-30T20:45:10Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s7mkn3/psa_claude_code_has_two_cache_bugs_that_can/",
+      "description": "Claude Code cache bugs: stale KV after compaction + near-zero cache hit rate in v2.1.70",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T00:35:09Z"
+    },
+    {
+      "key": "v_redd_it/w6ej9go5s7sg1",
+      "description": "Computer use now in Claude Code Desktop — research preview, Pro/Max plans, macOS",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T00:35:30Z"
+    },
+    {
+      "key": "aayushgarg_dev/posts/2026-03-29-local-llm-opencode/",
+      "description": "Qwen3.5-27B on RTX 4090 via llama.cpp as OpenCode backend — setup guide with gotchas",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T00:35:55Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s8lkkm/i_dug_through_claude_codes_leaked_source_and/",
+      "description": "Claude Code source code leaked via npm source map - 1900 TypeScript files, hidden features exposed",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T16:34:32Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s84l18/i_gave_claude_its_own_computer_and_let_it_run_247/",
+      "description": "Autonomous Claude agent ran 24/7 built 500 projects - Clopus-02 experiment",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T16:35:12Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s8h27r/heads_up_axios1141_is_compromised_if_you_vibe/",
+      "description": "axios@1.14.1 supply chain attack RAT dropper GHSA-fw8c-xr5c-95f9",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T16:35:36Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s7zg7h/investigating_usage_limits_hitting_faster_than/",
+      "description": "Claude Code usage limits draining faster - cache bug + throttling investigation",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T16:35:42Z"
+    },
+    {
+      "key": "get_mem_ai/blog/your-favorite-llms-can-now-use-your-second-brain-as-context",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:15:42Z"
+    },
+    {
+      "key": "fibery_com/blog/fibery-vs-x/fibery-vs-notion-ai-agent/",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:16:05Z"
+    },
+    {
+      "key": "syncthing_net",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:16:35Z"
+    },
+    {
+      "key": "immich_app",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:16:35Z"
+    },
+    {
+      "key": "fibery_io",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:16:35Z"
+    },
+    {
+      "key": "outliner_tana_inc/docs/tana-ai",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:16:35Z"
+    },
+    {
+      "key": "notion_com/releases/2026-02-24",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:34:04Z"
+    },
+    {
+      "key": "github_com/reorproject/reor",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:34:04Z"
+    },
+    {
+      "key": "github_com/immich-app/immich",
+      "description": "",
+      "source": "unknown",
+      "posted_at": "2026-03-31T20:34:04Z"
+    },
+    {
+      "key": "theregister_com/2026/03/31/anthropic_claude_code_limits/",
+      "description": "Anthropic admits Claude Code quotas running out too fast — billing bugs silently inflate costs 10-20x",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T20:34:38Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s8ower/now_that_its_open_source_we_can_see_why_claude/",
+      "description": "Claude Code vs Codex architecture differences revealed by leaked source map",
+      "source": "reddit-intel",
+      "posted_at": "2026-03-31T20:34:57Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s8uerc/analyzing_claude_code_source_code_write_wtf_and/",
+      "description": "Claude Code source leak: KAIROS agent mode, WTF frustration regex, anti-spoofing DRM, 250K API call waste bug",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T00:44:32Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s8auoy/harsh_truths_about_usage_youre_not_ready_for/",
+      "description": "Claude Code quota trust crisis: intentional throttling + 2 cache bugs + opacity = unpredictable daily driver",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T00:44:54Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s8pae9/i_wrote_a_cron_job_that_saves_me_2_hours_of_dead/",
+      "description": "Cron job to reclaim 2hrs/day of Claude Code quota dead time",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T00:49:56Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s8zxt4/thanks_to_the_leaked_source_code_for_claude_code/",
+      "description": "Used leaked Claude Code source + Codex to find and patch a bug",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T00:49:57Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s8mbqm/i_read_17_papers_on_agentic_ai_workflows_most/",
+      "description": "Research-backed agentic AI workflow principles: flattery degrades output, 5-agent swarms cost 7x for 3.1x output, rubber-stamp reviewer problem, lost-in-middle phenomenon. Tools: Forge + jig",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T04:35:24Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s8xj2e/claude_codes_source_just_leaked_i_extracted_its/",
+      "description": "Claude Code source leak → open-multi-agent framework extracted from internals",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T16:32:58Z"
+    },
+    {
+      "key": "prismml_com/news/bonsai-8b",
+      "description": "PrismML 1-bit Bonsai: commercially viable 1-bit LLMs, 8B in 1.15GB",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T16:33:17Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s8xfwt/claude_codes_source_code_just_leaked_so_i_had/",
+      "description": "Claude Code source leak analysis (same story as LocalLLaMA post)",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T16:33:17Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s99j2t/followup_claude_codes_source_confirms_the_system/",
+      "description": "Leaked prompts.ts confirms Anthropic ships different system prompts to paying users vs internal ant users",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T20:32:53Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1s93n1j/for_me_qwen3527b_is_better_than_gemini_31_pro_and/",
+      "description": "Qwen3.5-27B local preferred for agentic coding — stops gracefully vs frontier models going off-rails",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-01T20:33:10Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1s9d9j9/claude_code_source_leak_megathread/",
+      "description": "Claude Code 512K line TS source leak via npm packaging error - KAIROS agent, undercover mode, anti-distillation traps, frustration regex, Capybara/Fennec/Numbat roadmap",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-02T00:33:40Z"
+    },
+    {
+      "key": "github_com/ggml-org/llama_cpp/pull/21038_issue-4146294463",
+      "description": "attn-rot KV cache rotation in llama.cpp - Hadamard transforms improve Q4_0 accuracy from 0-2% to 21.7% on AIME25",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-02T00:33:59Z"
+    },
+    {
+      "key": "github_com/russellenvy/three-man-team",
+      "description": "3-agent Claude Code framework: Architect+Builder+Reviewer pipeline via context files",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-02T16:33:45Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1s9xhrf/i_used_claude_code_to_read_claude_codes_own/",
+      "description": "Claude Code source leak analysis: fake tools, undercover mode, frustration regex, 250K daily wasted API calls",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-02T16:34:08Z"
+    },
+    {
+      "key": "github_com/peteromallet/megaplan",
+      "description": "megaplan plan-execute split SWE-bench",
+      "source": "cross-pollination",
+      "posted_at": "2026-04-04T03:12:15Z"
+    },
+    {
+      "key": "github_com/pydantic/monty",
+      "description": "monty secure Python interpreter cross-pollination",
+      "source": "cross-pollination",
+      "posted_at": "2026-04-04T03:13:56Z"
+    },
+    {
+      "key": "github_com/peteromallet/megaplan",
+      "description": "megaplan plan-execute split SWE-bench",
+      "source": "cross-pollination",
+      "posted_at": "2026-04-04T03:14:48Z"
+    },
+    {
+      "key": "github_com/raine/workmux",
+      "description": "workmux parallel agent git worktrees",
+      "source": "cross-pollination",
+      "posted_at": "2026-04-04T03:15:29Z"
+    },
+    {
+      "key": "github_com/anthropics/claude-code/releases/tag/v2_1_92",
+      "description": "Claude Code v2.1.92: Bedrock wizard, per-model cost, tmux fix, 60% faster Write diffs",
+      "source": "github-trending",
+      "posted_at": "2026-04-05T08:02:35Z"
+    },
+    {
+      "key": "github_com/imbue-ai/mngr",
+      "description": "imbue-ai/mngr: git-for-agents CLI, run Claude Code/Codex in parallel across hosts via SSH+tmux",
+      "source": "github-trending",
+      "posted_at": "2026-04-05T08:03:28Z"
+    },
+    {
+      "key": "github_com/qwenlm/qwen-code",
+      "description": "qwen-code: open-source Claude Code alternative, 1k free/day, Qwen3-Coder co-evolves with framework",
+      "source": "github-trending",
+      "posted_at": "2026-04-05T08:03:28Z"
+    },
+    {
+      "key": "github_com/qwenlm/qwen-code",
+      "description": "Open-source terminal coding agent, Claude Code alternative, 21.8k stars",
+      "source": "github-trending",
+      "posted_at": "2026-04-05T08:04:11Z"
+    },
+    {
+      "key": "github_com/modelcontextprotocol/python-sdk/releases/tag/v1_27_0",
+      "description": "MCP Python SDK v1.27.0 - security fix, OAuth RFC 8707, StreamableHTTP idle timeout",
+      "source": "github-trending",
+      "posted_at": "2026-04-05T08:04:26Z"
+    },
+    {
+      "key": "github_com/langchain-ai/langgraph/releases/tag/1_1_6",
+      "description": "LangGraph 1.1.6 - minor bugfix only, execution info patching",
+      "source": "github-trending",
+      "posted_at": "2026-04-05T08:04:31Z"
+    },
+    {
+      "key": "github_com/berriai/litellm/releases/tag/v1_83_1-nightly",
+      "description": "LiteLLM v1.83.1-nightly - test release only, cosign workflow test",
+      "source": "github-trending",
+      "posted_at": "2026-04-05T08:04:31Z"
+    },
+    {
+      "key": "reddit_com/r/ai_agents/comments/1scdq0o/anthropic_effectively_ends_the_unlimited_claude/",
+      "description": "Anthropic ends Claude subscription access for OpenClaw and third-party AI agents",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-05T08:34:48Z"
+    },
+    {
+      "key": "arxiv_org/abs/2604_01193",
+      "description": "Apple Simple Self-Distillation improves code generation — Qwen3-30B 42.4% to 55.3% on LiveCodeBench",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-05T08:34:49Z"
+    },
+    {
+      "key": "v_redd_it/kyb3nvdh27tg1",
+      "description": "Claude Code embedded browser — click element to feed DOM context to agent",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-05T08:34:50Z"
+    },
+    {
+      "key": "github_com/safishamsi/graphify",
+      "description": "Claude Code skill achieving 71.5x token reduction via knowledge graph compilation of mixed file corpora",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-05T21:32:31Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1sd8t5u/anthropic_isnt_the_only_reason_youre_hitting/",
+      "description": "Claude Code token audit: ENABLE_TOOL_SEARCH saves 14k tokens/turn; cache expiry is #1 waste category",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-05T21:32:52Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1scxd53/i_built_a_devils_advocate_skill_that_challenges/",
+      "description": "Devil's advocate skill for Claude Code that challenges outputs at every step; composable with other skills",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-05T21:33:19Z"
+    },
+    {
+      "key": "developers_googleblog_com/en/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/",
+      "description": "Google launched Gemma 4 for on-device agents",
+      "source": "competitive-scan",
+      "posted_at": "2026-04-06T06:20:18Z"
+    },
+    {
+      "key": "developers_googleblog_com/en/adk-go-10-arrives/",
+      "description": "Google ADK Go 1.0 shipped",
+      "source": "competitive-scan",
+      "posted_at": "2026-04-06T06:20:18Z"
+    },
+    {
+      "key": "github_com/crewaiinc/crewai/releases/tag/1_13_0",
+      "description": "CrewAI 1.13.0 landed",
+      "source": "competitive-scan",
+      "posted_at": "2026-04-06T06:20:18Z"
+    },
+    {
+      "key": "github_com/microsoft/agent-framework",
+      "description": "Microsoft open-source agent orchestration framework with graph workflows, Python+.NET",
+      "source": "github-trending",
+      "posted_at": "2026-04-06T08:02:07Z"
+    },
+    {
+      "key": "github_com/nousresearch/hermes-agent",
+      "description": "Self-improving AI agent with persistent memory, MCP support, multi-platform messaging",
+      "source": "github-trending",
+      "posted_at": "2026-04-06T08:02:07Z"
+    },
+    {
+      "key": "github_com/hkuds/rag-anything",
+      "description": "Multimodal RAG framework with knowledge graphs from mixed-content documents",
+      "source": "github-trending",
+      "posted_at": "2026-04-06T08:02:08Z"
+    },
+    {
+      "key": "github_com/google-ai-edge/litert-lm",
+      "description": "Google edge LLM inference framework, skipped as less relevant",
+      "source": "github-trending",
+      "posted_at": "2026-04-06T08:02:09Z"
+    },
+    {
+      "key": "github_com/block/goose",
+      "description": "Block Goose trending: local-first extensible AI agent",
+      "source": "github-trending",
+      "posted_at": "2026-04-06T08:03:22Z"
+    },
+    {
+      "key": "github_com/google-ai-edge/gallery",
+      "description": "Google AI Edge Gallery shipped as a polished on-device AI app",
+      "source": "github-trending",
+      "posted_at": "2026-04-06T08:03:22Z"
+    },
+    {
+      "key": "github_com/atilaahmettaner/tradingview-mcp",
+      "description": "TradingView MCP: domain-specific MCP with OpenClaw integration",
+      "source": "github-trending",
+      "posted_at": "2026-04-06T08:03:22Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1sdmohb/after_months_with_claude_code_the_biggest_time/",
+      "description": "Claude Code silent fake success - biggest time sink is false Done claims not bugs",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T08:33:38Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1sd5utm/perlayer_embeddings_a_simple_explanation_of_the/",
+      "description": "Per-Layer Embeddings in Gemma 4 E2B/E4B - each layer gets own 256-dim token embedding for small-model efficiency",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T08:33:38Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1sdmhpx/the_usage_limit_drama_is_a_distraction_opus_46s/",
+      "description": "Opus 4.6 quality regression claim — more impactful than usage limits drama",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T12:33:28Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1sdad79/my_actual_aws_bill_running_claude_in_production/",
+      "description": "Real AWS Bedrock costs after 5 months production Claude",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T12:33:28Z"
+    },
+    {
+      "key": "v_redd_it/9cj49czi8dtg1",
+      "description": "AI job search system with Claude Code, 740+ job offers generated",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T12:33:28Z"
+    },
+    {
+      "key": "reddit_com/gallery/1sc5vko",
+      "description": "Task Board v1.10.0 for Obsidian - drag-and-drop and advanced swimlanes",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T16:38:22Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1sdc9xc/did_anthropic_actually_help_promax_users_by/",
+      "description": "Anthropic blocked Claude Pro/Max OAuth tokens in third-party tools debate",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T16:38:22Z"
+    },
+    {
+      "key": "reddit_com/r/selfhosted/comments/1se8ara/i_thought_my_vps_was_hardened_but_it_was/",
+      "description": "VPS compromised via provider console despite SSH hardening — forensics and community analysis",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T21:05:36Z"
+    },
+    {
+      "key": "reddit_com/gallery/1sdgdbq",
+      "description": "Gemma4-31B reaches Gemini 3.1 Pro level via Iterative Contextual Refinement harness at 25x compute",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-06T21:05:37Z"
+    },
+    {
+      "key": "reddit_com/gallery/1sdro16",
+      "description": "Ambient AI manager with Claude Haiku - Pi touchscreen, one-line contextual nudges, no chat UI",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-07T00:33:06Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1sdne02/senior_engineer_best_practice_for_scaling/",
+      "description": "Senior engineer workflow: git worktrees + compound engineering plugin for parallel agent scaling",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-07T00:33:07Z"
+    },
+    {
+      "key": "v_redd_it/jzanp1nnkhtg1",
+      "description": "Senior engineer scaling with Claude Code (video link)",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-07T00:33:08Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1sdrrqd/astounding_openai_training_costs_vs_anthropic/",
+      "description": "WSJ leaked financials: OpenAI spends 4-5x more on training than Anthropic",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-07T04:33:10Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1segstx/gemma_4_26b_a3b_is_mindblowingly_good_if/",
+      "description": "Gemma 4 26b agentic coding config: Q3K_M, temp 1.0, top-k 40 on RTX 3090",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-07T04:33:12Z"
+    },
+    {
+      "key": "aisle_com/blog/ai-cybersecurity-after-mythos-the-jagged-frontier",
+      "description": "Local small LLMs matched Mythos on vulnerability discovery - jagged frontier analysis",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:04:01Z"
+    },
+    {
+      "key": "i_redd_it/0siqwzantztg1_gif",
+      "description": "YAOS - real-time Obsidian sync on Cloudflare Workers with Yjs CRDTs",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:04:03Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1sgl3qz/gemma_4_on_llamacpp_should_be_stable_now/",
+      "description": "Gemma 4 full family stable on llama.cpp with public GGUFs",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:04:04Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1shaxkt/anthropic_made_claude_67_dumber_and_didnt_tell/",
+      "description": "AMD AI director telemetry showing Claude Code thinking depth dropped 67% after stealth changes",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:07:20Z"
+    },
+    {
+      "key": "i_redd_it/hvxhmmza66ug1_png",
+      "description": "HuggingFace launches Kernel Hub - new repo type for pre-compiled GPU kernels",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:07:21Z"
+    },
+    {
+      "key": "i_redd_it/prkk1lgc38ug1_gif",
+      "description": "Claude Code 2.1.98 adds built-in Monitor tool for background script streaming",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:07:22Z"
+    },
+    {
+      "key": "reddit_com/gallery/1sgtkcy",
+      "description": "Anthropic throttling reasoning effort on personal accounts - overlaps with 67% dumber story",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:07:24Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1sh4bkf/2_months_ago_opus_46_built_my_tool_in_15_min/",
+      "description": "Opus 4.6 regression reports - 8x slower task completion with more bugs",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:10:43Z"
+    },
+    {
+      "key": "reddit_com/gallery/1sgoy17",
+      "description": "Mythos zero-day claims debunked as compute brute-force not intelligence",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:10:43Z"
+    },
+    {
+      "key": "i_redd_it/272ioxmkg7ug1_png",
+      "description": "Claude Platform advisor strategy announcement image - low signal",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:10:49Z"
+    },
+    {
+      "key": "i_redd_it/54t854xct4ug1_png",
+      "description": "Context usage warning on session resume - minor UI feature",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T09:10:49Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1she8ux/anthropic_just_shipped_74_product_releases_in_52/",
+      "description": "Anthropic 74 releases in 52 days - Cowork GA, Managed Agents, platform pivot analysis",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:32:43Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1sh1d4n/people_with_max_plan_are_you_doing_ok/",
+      "description": "Max plan economics - solo devs report 2-10x ROI, usage patterns",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:33:01Z"
+    },
+    {
+      "key": "v_redd_it/38x5vjvqw8ug1",
+      "description": "Claude Code autonomous iOS/Android QA testing - daily visual sweep architecture",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:35:54Z"
+    },
+    {
+      "key": "christophermeiklejohn_com/ai/zabriskie/development/android/ios/2026/03/22/teaching-claude-to-qa-a-mobile-app_html",
+      "description": "Teaching Claude to QA a mobile app - full blog post",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:35:55Z"
+    },
+    {
+      "key": "i_redd_it/jk98jrjcz7ug1_png",
+      "description": "Opus 4.6 parameter estimation: 1.5-2T via inference throughput analysis, contradicts 5T claims",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:43:06Z"
+    },
+    {
+      "key": "v_redd_it/yi05khnf40tg1",
+      "description": "Obsidian Reader themes/typography update - video post, insufficient content to analyze",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:43:20Z"
+    },
+    {
+      "key": "i_redd_it/32hdokouu5ug1_png",
+      "description": "Mythos zero-day exploits commentary - duplicate angle of already-covered Mythos story",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:43:20Z"
+    },
+    {
+      "key": "reddit_com/r/claudecode/comments/1sh0mw7/claude_just_died/",
+      "description": "Claude outage report - low signal",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:43:20Z"
+    },
+    {
+      "key": "i_redd_it/6jxe6recjaug1_png",
+      "description": "State of LocalLLama meme post",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:43:20Z"
+    },
+    {
+      "key": "reddit_com/gallery/1sgsofx",
+      "description": "Claude Code hardware gallery post",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-10T12:43:20Z"
+    },
+    {
+      "key": "huggingface_co/minimaxai/minimax-m2_7",
+      "description": "MiniMax M2.7 229B open-source model with self-evolution training",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-12T09:04:46Z"
+    },
+    {
+      "key": "github_com/anthropics/claude-code/issues/46829",
+      "description": "120k API calls analysis showing cache TTL regression from 1h to 5m",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-12T09:04:48Z"
+    },
+    {
+      "key": "v_redd_it/qnwcms262lug1",
+      "description": "DFlash block diffusion speculative decoding 85tok/s on Apple Silicon",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-12T09:04:49Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1sj2oqz/minimax_m27_is_not_open_source_doa_license/",
+      "description": "MiniMax M2.7 Modified MIT license is actually non-commercial - requires written permission for commercial use",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-12T12:36:08Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1sihwo8/gemma_4_26b_a4b_is_still_fully_capable_at/",
+      "description": "Gemma 4 26B A4B remains capable at 94% context fill (245K/262K tokens)",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-12T12:36:32Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1sjct6a/speculative_decoding_works_great_for_gemma_4_31b/",
+      "description": "Speculative decoding benchmarks: Gemma 4 31B + E2B draft model, +29% avg speedup, llama.cpp",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-12T21:04:24Z"
+    },
+    {
+      "key": "reddit_com/r/claudeai/comments/1sj8o9l/why_claude_code_max_burns_limits_40_faster_with/",
+      "description": "Claude Code v2.1.100+ adds ~20K invisible server-side tokens, proxy evidence",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-12T21:04:25Z"
+    },
+    {
+      "key": "tomshardware_com/tech-industry/artificial-intelligence/anthropics-claude-mythos-isnt-a-sentient-super-hacker-its-a-sales-pitch-claims-of-thousands-of-severe-zero-days-rely-on-just-198-manual-reviews",
+      "description": "Tom's Hardware debunking Mythos security claims - 198 manual reviews behind thousands of zero-day claims",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-13T01:12:51Z"
+    },
+    {
+      "key": "v_redd_it/2c1k5f5nysug1",
+      "description": "Screen-watching agent that auto-generates Claude Code Skills from workflow observation",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-13T01:13:05Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1sjhxrw/audio_processing_landed_in_llamaserver_with_gemma4/",
+      "description": "Audio processing support in llama-server via Gemma 4 multimodal",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-13T01:13:18Z"
+    },
+    {
+      "key": "reddit_com/r/localllama/comments/1sj7wc8/unsloth_minimax_m27_quants_just_finished/",
+      "description": "Unsloth MiniMax M2.7 GGUF quants uploaded to HF - full range Q1 to BF16, community benchmarks on consumer hardware",
+      "source": "reddit-intel",
+      "posted_at": "2026-04-13T05:04:27Z"
+    }
+  ],
+  "version": 1
+}

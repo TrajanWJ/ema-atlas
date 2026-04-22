@@ -1,0 +1,84 @@
+# === EMA Cron Configuration (v5 — 2026-04-06 UTC) ===
+# Migrated from EMA v4. All .ema/ paths removed.
+# Canonical source. Restored at boot by cron-restore.sh.
+# Edit HERE, not crontab directly.
+#
+# Design: crons are SIGNAL GENERATORS. They detect conditions and
+# queue tasks. Dispatch engine executes tasks during heartbeats.
+# No cron should spawn Claude Code or do heavy work directly.
+
+# === Core System Health (4 crons) ===
+*/2 * * * * /home/trajan/bin/gateway-watchdog.sh >> /var/log/gateway-watchdog.log 2>&1
+*/2 * * * * /home/trajan/bin/session-watchdog.sh
+*/5 * * * * /home/trajan/bin/system-watchdog.sh >> /tmp/watchdog.log 2>&1
+*/10 * * * * /home/trajan/bin/auto-resume.sh >> /var/log/auto-resume.log 2>&1
+
+# === Knowledge Indexing (3 crons) ===
+*/30 * * * * /home/trajan/bin/memory-pressure.sh --quiet >> /tmp/memory-pressure.log 2>&1
+*/30 * * * * flock -n /tmp/qmd.lock timeout 300 bash -c "/usr/bin/qmd update && /usr/bin/qmd embed" 2>&1 | tail -5 >> /tmp/qmd-cron.log
+*/30 * * * * sha256sum -c /home/trajan/config/integrity-checksums.txt --quiet 2>/dev/null || echo "$(date -u +\%Y-\%m-\%dT\%H:\%M:\%SZ) INTEGRITY ALERT" >> /var/log/integrity.log
+
+# === Signal Generators → Queue (2 crons) ===
+0 */3 * * * /home/trajan/bin/signal-to-queue.sh >> /tmp/signal-to-queue.log 2>&1
+0 */3 * * * flock -n /tmp/ontology-sync.lock python3 /home/trajan/skills/obsidian-ontology-sync/scripts/sync.py --config /home/trajan/skills/obsidian-ontology-sync/config.yaml extract >> /tmp/ontology-sync.log 2>&1
+
+# === Scheduled Queue Loader (1 cron) ===
+0 * * * * /home/trajan/bin/dispatch.sh schedule >> /tmp/dispatch-schedule.log 2>&1
+
+# === Intel Feeds (1 cron) ===
+30 */4 * * * /home/trajan/bin/reddit-intel.sh >> /home/trajan/logs/reddit-intel.log 2>&1
+
+# === Daily Maintenance (5 crons) ===
+0 */2 * * * /home/trajan/scripts/vault-autocommit.sh >> /home/trajan/logs/vault-autocommit.log 2>&1
+0 4 * * * /home/trajan/scripts/session-janitor.sh >> /home/trajan/logs/session-janitor.log 2>&1
+0 4 * * * find /tmp -name "*.log" -user trajan -size +10M -exec truncate -s 1M {} \; 2>/dev/null; find ~/dispatch/done -name "*.json" -mtime +14 -delete 2>/dev/null
+0 12 * * * bash /home/trajan/bin/overnight-digest.sh >> /tmp/overnight-digest.log 2>&1
+0 14 * * * bash /home/trajan/bin/morning-briefing-v2.sh 2>&1 | head -200 >> /tmp/morning-briefing.log
+
+# === Backup & Boot (2 crons) ===
+0 */6 * * * crontab -l > /home/trajan/vault/System/cron-backup.txt
+@reboot sleep 30 && /home/trajan/bin/cron-restore.sh >> /tmp/cron-restore.log 2>&1
+
+# === Dispatch Engine (2 crons) ===
+*/1 * * * * /home/trajan/bin/dispatch-engine.sh >> /tmp/dispatch-engine.log 2>&1
+0 */2 * * * /home/trajan/bin/proactive-task-generator.sh >> /tmp/proactive-task-generator.log 2>&1
+
+# === Research & Pipeline (2 crons) ===
+0 2 * * * /home/trajan/bin/research-implement-pipeline.sh >> /home/trajan/logs/research-pipeline.log 2>&1
+0 9 * * * bash /home/trajan/bin/vault-janitor.sh >> /tmp/vault-janitor.log 2>&1
+
+# === Agent Pipeline (9 crons) ===
+# Links monitor: scan #links channel, dispatch URLs to researcher
+*/5 * * * * flock -n /tmp/links-pipeline.lock /home/trajan/bin/links-pipeline.sh >> /home/trajan/logs/links-pipeline.log 2>&1
+# Proposals: post pending proposals + prune expired
+*/5 * * * * /home/trajan/bin/proposal-cron.sh >> /home/trajan/logs/proposal-cron.log 2>&1
+# Competitive intel: weekly scan on Mondays at 6am
+0 6 * * 1 flock -n /tmp/competitive-scan.lock /home/trajan/bin/competitive-scan.sh >> /home/trajan/logs/competitive-scan.log 2>&1
+# Vault research loop: scan vault for gaps, generate proposals
+0 */4 * * * flock -n /tmp/vault-research-loop.lock /home/trajan/bin/vault-research-loop.sh >> /home/trajan/logs/vault-research-loop.log 2>&1
+# Evolution loop: weekly SOUL.md review + evolution report (Sundays 2am)
+0 2 * * 0 flock -n /tmp/evolution-loop.lock /home/trajan/bin/evolution-loop.sh >> /home/trajan/logs/evolution-loop.log 2>&1
+# Agent learning sync: cross-agent stats sync (daily 3am)
+0 3 * * * flock -n /tmp/agent-learning-sync.lock /home/trajan/bin/agent-learning-sync.sh >> /home/trajan/logs/agent-learning-sync.log 2>&1
+# Desk dispatch: scan #github-interesting for tasks
+*/15 * * * * flock -n /tmp/desk-dispatch.lock /home/trajan/bin/desk-dispatch.sh --scan >> /home/trajan/logs/desk-dispatch.log 2>&1
+# Transcript scanner: mine session transcripts for knowledge
+0 */6 * * * flock -n /tmp/transcript-scanner.lock /home/trajan/bin/transcript-scanner.sh >> /home/trajan/logs/transcript-scanner.log 2>&1
+# Stale task cleanup
+*/30 * * * * /home/trajan/bin/stale-task-cleanup.sh >> /home/trajan/logs/stale-task-cleanup.log 2>&1
+
+# === Session Tree (1 cron) ===
+*/30 * * * * /home/trajan/bin/session-tree.sh volatile-check >> /home/trajan/vault/System/session-tree-expiry.log 2>&1
+
+# === Intel (2 crons) ===
+0 8 * * * /home/trajan/bin/github-trending-intel.sh >> /home/trajan/logs/github-trending.log 2>&1
+0 */2 * * * /home/trajan/bin/system-integrity-scan.sh --fix --quiet >> /home/trajan/logs/integrity-scan.log 2>&1
+
+# === Dispatch Heartbeat (1 cron) ===
+*/15 * * * * /home/trajan/bin/dispatch-heartbeat.sh >> /home/trajan/logs/dispatch-heartbeat.log 2>&1
+
+# === OAuth Token Management (2 crons) ===
+# Host → VM credential sync
+*/30 * * * * flock -n /tmp/host-oauth-sync.lock /home/trajan/bin/sync-host-oauth.sh >> /home/trajan/logs/host-oauth-sync.log 2>&1
+# OAuth auto-approve: detect Chrome OAuth pages and auto-approve
+* * * * * flock -n /tmp/oauth-auto-approve.lock /home/trajan/bin/oauth-auto-approve.sh >> /home/trajan/logs/oauth-auto-approve.log 2>&1

@@ -1,0 +1,141 @@
+# LCM Summary sum_ba09bb608aad7465
+
+Created: 2026-03-18 01:42:23
+Kind: leaf
+Depth: 0
+Conversation: 252
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-18T01:42:22.000Z
+Latest: 2026-03-18T01:42:22.000Z
+
+## Content
+
+[2026-03-18 01:42 UTC]
+[cron:45107626-7fdf-4092-9b31-ba2647f96e8b github-interesting] You are a research engine for #github-interesting. Find the BEST GitHub repos, tools, HN discussions, and forum conversations relevant to Trajan's agent stack.
+
+SOURCES TO SCAN (rotate through these):
+- GitHub Trending (all languages + Python/TypeScript/Rust)
+- GitHub Topics: mcp-server, ai-agent, claude-code, obsidian-plugin, prompt-engineering, llm-tools
+- Hacker News front page + Show HN
+- GitHub Discussions in key repos (anthropics/claude-code, openclaw/openclaw, obsidianmd)
+- Dev.to, lobste.rs for agent/AI content
+
+INTERESTS (prioritize these):
+- Claude Code extensions, workflows, tips
+- MCP servers (new ones, interesting patterns)
+- OpenClaw skills, plugins, community projects
+- Obsidian plugins, PKM automation, vault tools
+- Agent architectures, multi-agent patterns, orchestration
+- Prompt engineering, meta-prompting, system prompts
+- Self-hosted AI tools, local LLMs
+- Security tools for AI agents
+- Self-evolving/self-improving agent systems
+
+STEP 1 - Load state:
+- Read /home/trajan/.openclaw/agents/main/workspace/github-interesting-state.json for previously posted items
+
+STEP 2 - Research:
+- Use web_search to find 5-10 interesting items across the sources above
+- Go DEEP — read READMEs, check stars, look at recent commits, read discussions
+- Find things that are GENUINELY interesting and relevant, not generic
+
+STEP 3 - Post a DEEP DIVE to Discord:
+Use message tool (action=send, channel=discord, target=1482258431997116531) with components.
+
+Format like reddit-intel deep dives:
+- Rich components v2 with accent color #5865F2
+- Numbered items with emoji categories
+- For each item: name, stars, description, WHY IT MATTERS FOR US
+- Key takeaways section connecting findings to our setup
+- Save the best finds to vault
+
+Example components structure:
+{"container": {"accentColor": "#5865F2"}, "blocks": [{"type": "text", "text": "## 🔍 GitHub Intel — [Topic]\n\nScanned [sources]. Here's what's hot:"}, {"type": "separator", "divider": true}, {"type": "text", "text": "### 🔥 Category\n\n**1. Project Name** (stars⭐)\nDescription and why it matters.\n🔗 [GitHub](url)"}, {"type": "separator", "divider": true}, {"type": "text", "text": "### 💡 Takeaways for Us\n• Key insight 1\n• Key insight 2"}]}
+
+STEP 4 - Save favorites to vault:
+Create/update /home/trajan/vault/Research/GitHub Intel - Favorites.md with the best finds. Include: name, URL, stars, category, why it matters, date found.
+
+STEP 5 - Update state:
+Add all posted items to github-interesting-state.json
+
+After posting via message tool, reply with ONLY: NO_REPLY
+Current time: Wednesday, March 18th, 2026 — 1:38 AM (UTC) / 2026-03-18 01:38 UTC
+
+Return your summary as plain text; it will be delivered automatically. If the task explicitly calls for messaging a specific external recipient, note who/where it should go instead of sending it yourself.
+
+[2026-03-18 01:42 UTC]
+
+
+[2026-03-18 01:42 UTC]
+{
+  "posted": [
+    {
+      "name": "claude-contrib",
+      "url": "https://github.com/claude-contrib/claude-services",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "need-tool-discovery",
+      "url": "https://github.com/tuckerschreiber/need",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "claude-3d-tips",
+      "url": "https://www.davesnider.com/posts/claude-3d",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "presenton",
+      "url": "https://github.com/presenton/presenton",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "cherry-studio",
+      "url": "https://github.com/CherryHQ/cherry-studio",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "mcp-malware-cognio",
+      "url": "https://github.com/Thianvelaz/Cognio",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "mcp-malware-homelab-mcp",
+      "url": "https://github.com/myraffy/homelab-mcp",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "mcp-malware-bb-applescript",
+      "url": "https://github.com/pachipalabharath/bb-applescript-mcp-server",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "mcp-graph-memory",
+      "url": "https://github.com/prih/mcp-graph-memory",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "kgn",
+      "url": "https://github.com/baobab00/kgn",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "rust-mcp-sdk",
+      "url": "https://github.com/rust-mcp-stack/rust-mcp-sdk",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "fluxer",
+      "url": "https://github.com/fluxerapp/fluxer",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "ai-autonomous-learning",
+      "url": "https://arxiv.org/abs/2603.15381",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "linear-regex-all-matches",
+      "url": "https://iev.ee/blog/all-longest-regex-matches-i
+[LCM fallback summary; truncated for context management]

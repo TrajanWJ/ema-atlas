@@ -582,6 +582,8 @@ export const topLevelRoutes = [
   { href: "/futures-board", label: "Futures" },
   { href: "/decisions", label: "Decisions" },
   { href: "/research", label: "Research" },
+  { href: "/surface-index", label: "Index" },
+  { href: "/canonical-rule", label: "Rule" },
   { href: "/vapps", label: "vApps" },
   { href: "/launchpad", label: "Launchpad" },
   { href: "/hq", label: "HQ" },

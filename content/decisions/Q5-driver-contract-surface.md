@@ -59,96 +59,76 @@ interchangeable.
 
 | Criterion | Why it matters | A `sync-RPC` | B `streaming-events-Subject` | C `gRPC` | D `JSON-RPC` |
 |---|---|---|---|---|---|
-| Aligns with canonical rule (P1) | Surfaces don't own state; drivers emit into `event_log` only. | + (driver returns; bridge writes events afterward) | + (per `ARCHITECTURE.md`: "DispatchUpdate stream lands in event_log via execution_supervisor, never on a surface socket directly") | + (server-stream lands in `bridge_to_event_log`) | + (responses land in the bridge) |
-| Compatible with Q-deps if open | Q1 (agent-as-Member), Q4 (Personal AI placement), Q9 (replication boundary), Q10 (perms) all open. | + (least surface area; nothing depends on Q9) | 0 (the `Subject` is local; `peer-remote` needs a serializable equivalent — Q9 pressure) | 0 (network protocol; Q9 ready by construction but Q10 perm-checking lives in EMA before the call) | 0 (similar to gRPC; runs anywhere a JSON-RPC client/server pair runs) |
-| Smallest provable slice | Can we exercise it in a 2-week vertical? | + (fewest moving parts; `simulated-tui` returns a fixed list) | + (Step 3 is already written against this; `simulated_tui_conformance_test.gleam` and `hermes_native_conformance_test.gleam` use it) | – (proto generation, stub generation, server runtime — no native Gleam gRPC per `GLEAM_BEAM_FIT.md` "What Gleam DOESN'T have": "No native gRPC / Protobuf libraries comparable to Elixir's `grpc` package") | 0 (JSON-RPC over stdio is simple but no idiomatic Gleam library; build it) |
-| Reversible | Can we migrate off it cleanly later? | + (sync → streaming is the easiest direction; you wrap the sync call in an actor that emits a single batch event) | 0 (per Step 3: "If Q5 picks sync RPC instead, the `start` signature collapses to return a final `DriverEvent` list; the registry surface does not change") | – (gRPC code-gen is sticky; once `.proto` lives in source, replacing it is a multi-week migration) | 0 (JSON-RPC schema is portable but the wire format leaks into call sites if not encapsulated) |
-| Gleam-native | Can we express it in typed Gleam without FFI escapes? | + (synchronous functions returning `Result` are the most natural Gleam shape) | + (per `GLEAM_BEAM_FIT.md`: `Subject(msg)` is "the unit of addressable identity at the actor level" — first-class in `gleam_otp`) | – (no native Gleam gRPC; FFI to Elixir `grpc` package, which means Elixir + protoc in the build) | 0 (JSON-RPC is just JSON over a transport; `gleam_json` per `GLEAM_BEAM_FIT.md` works but every method gets two hand-written codecs) |
-| Auditability | Does it produce control-plane-visible records? | – (no intermediate events — only start and end land in `event_log`; `DriverChunk` / `DriverHeartbeat` / `DriverToolCall` history is lost) | + (`bridge_to_event_log` folds every `DriverEvent` into `EventBody.DispatchUpdate`; full lineage preserved per Step 3 acceptance criterion #6) | + (server-stream events land in the bridge same as B; auditability is identical) | + (each JSON-RPC notification lands in the bridge) |
-| Tests writable in v0.0.3 | gleam_qcheck properties + example tests | + (fixture in, list out — trivial) | + (Step 3 already lists property test #1: "Order preservation through the bridge — for any DriverEvent stream emitted by `simulated_tui`, the corresponding EventBody.DispatchUpdate sequence is a monotonic prefix-extension") | – (need a stub gRPC server for tests; brittle on CI) | 0 (need a stub JSON-RPC peer for tests; less brittle than gRPC) |
-| Identity-model-clean (Q1) | Doesn't constrain Q1 resolution. | + | + | + | + |
-| P2 compliance (Execution is a substrate) | Drivers must not become a shadow state machine. | + (sync return = no in-flight state) | 0 (per-run `Subject(DriverEvent)` is in-flight state, but it's *typed* and bounded by the driver's lifetime; bridge folds into authority) | 0 (server-stream is in-flight state on the wire; same shape as B) | 0 (same as gRPC) |
-| P5 compliance (Harnesses are not just providers) | Driver contract is above the provider layer; must not collapse them. | + (the contract is a Gleam function — clearly not a provider API) | + (the contract is `Driver` record-of-functions per `harness-execution.md`; provider lives below) | 0 (proto file becomes the contract; risk of drift toward "this is just the OpenAI proto") | 0 (JSON-RPC schema becomes the contract; risk of drift toward "this is just the provider's JSON shape") |
-| P8 compliance (Capability locality) | Tools/auth/resources differ across human shells, agent turns, daemons, surfaces, machines. | – (sync RPC has no natural place to negotiate capability per-call beyond the envelope; long calls block the caller) | + (the `Subject` lives in the daemon; placement and capability are both first-class on the envelope per `ARCHITECTURE.md`'s `Dispatch` record) | 0 (gRPC metadata can carry capability set; but per-call negotiation is awkward over server-stream) | 0 (JSON-RPC params can carry capability set; same as gRPC) |
-| Streaming fidelity | Does the driver produce intermediate `DriverChunk` / `DriverToolCall` / `DriverHeartbeat` events visible to the operator? | – blocker for `claude-cli` (every keystroke of stream is hidden until end) | + (matches `DriverEvent` sum exactly, including `DriverHeartbeat` and `DriverChunk(_, Reasoning, _)`) | + (server-stream supports it natively) | + (JSON-RPC notifications support it; ordering is application-layer) |
-| Cancellation | Per Step 3 acceptance #8: `DriverEnded(Cancelled)` must arrive within 1s of `cancel/1`. | – (sync calls are not naturally cancellable in Gleam; need a separate kill channel which defeats sync simplicity) | + (`cancel(handle)` sends a typed `Cancel` to the driver actor; tested via Step 3 `simulated_tui_conformance_test.gleam`) | + (gRPC supports client-side cancellation natively) | 0 (JSON-RPC has no standardized cancel; implement an extension) |
-| `peer-remote` fit (Q9-aware) | Per Step 3: `peer-remote` is "typeable but not implementable; `start` returns `Error(Deferred)`". The contract must allow a peer driver to slot in once Q9 settles. | – (sync call across the network has timeout / partition / retry semantics that have to be added later) | – (`Subject(DriverEvent)` is process-local on the BEAM; making it cross-node requires a typed peer-bridge per `GLEAM_BEAM_FIT.md` "P2P / mesh substrate" section — non-trivial) | + (gRPC was designed for cross-machine; `peer-remote` is the canonical use case) | + (JSON-RPC over WebSocket is the natural shape for `peer-remote`) |
-| `claude-cli` / `codex-cli` fit | These drivers wrap external CLI processes. Per `harness-execution.md`: "`:erlang.open_port/2` for claude-cli and codex-cli drivers." | – (CLIs stream stdout token-by-token; sync RPC discards that until end) | + (`open_port` events fold directly into `DriverEvent`; matches Step 3's coded shape) | – (CLIs don't speak gRPC natively; need a wrapper process) | + (claude-cli already has a JSON output mode; JSON-RPC over stdio is a natural fit) |
-| `hermes-native` fit | Per Step 3: `hermes_native` uses `gleam_httpc` for sync, FFI to `:gun` for streaming. | + (sync HTTP works) | + (`:gun` streams chunks straight into the `Subject`) | 0 (Hermes server would need to learn gRPC; doable but requires server-side work) | + (JSON-RPC over HTTP is a thin wrapper) |
-| Build-step alignment | Step 3 currently codes the assumption (`Subject(DriverEvent)` sink). | – (every driver module rewrites its `start` signature; `bridge_to_event_log` simplifies; tests change) | + (no change to Step 3) | – (Step 3 entirely rewritten; new `proto/` directory; new build-time codegen step) | – (Step 3's `start` signature changes to a JSON-RPC client setup; conformance tests rewritten) |
-| Operator visibility (Auto-Resolve Gate, babysitter takeover) | Per Step 3 acceptance #6 + Step 4 babysitter takeover: stalled runs must emit no `DriverHeartbeat` for N seconds, then trigger handoff. Requires intermediate event visibility. | – blocker for takeover detection (no heartbeat in sync RPC) | + (`DriverHeartbeat` is a first-class `DriverEvent` constructor; takeover_manager observes its absence) | + (heartbeat as server-stream message) | + (heartbeat as JSON-RPC notification) |
+| Aligns with canonical rule (P1) | Drivers emit into `event_log` only. | + | + | + | + |
+| Compatible with Q-deps if open | Q1, Q4, Q9, Q10. | + (least surface) | 0 (`Subject` is local; Q9 pressure for `peer-remote`) | 0 (Q9-ready; Q10 lives pre-call) | 0 (similar to gRPC) |
+| Smallest provable slice | 2-week vertical. | + (fewest parts) | + (Step 3 already coded; conformance tests written) | – (no native Gleam gRPC per `GLEAM_BEAM_FIT.md`; needs protoc + Elixir `grpc`) | 0 (JSON-RPC simple but no idiomatic library) |
+| Reversible | Migrate off cleanly. | + (sync → streaming is easiest direction) | 0 (Step 3: collapse `start` signature to final list, registry unchanged) | – (`.proto` is sticky once in source) | 0 (wire format leaks if not encapsulated) |
+| Gleam-native | Typed without FFI. | + (sync `Result`) | + (`Subject(msg)` is first-class in `gleam_otp`) | – (no native gRPC; Elixir + protoc) | 0 (`gleam_json` works; hand-written codec per method) |
+| Auditability | Control-plane-visible. | – (only start/end land; no `DriverChunk`/`DriverHeartbeat`/`DriverToolCall` history) | + (`bridge_to_event_log` folds every `DriverEvent` per Step 3 #6) | + (server-stream lands in bridge) | + (notifications land in bridge) |
+| Tests writable in v0.0.3 | gleam_qcheck. | + (trivial) | + (Step 3 property test #1) | – (stub gRPC server brittle on CI) | 0 (stub JSON-RPC peer; less brittle) |
+| Identity-model-clean (Q1) | Doesn't constrain Q1. | + | + | + | + |
+| P2 (execution is substrate) | No shadow state machine. | + (sync = no in-flight state) | 0 (typed in-flight, bounded by driver) | 0 (in-flight on wire) | 0 (same as gRPC) |
+| P5 (harnesses ≠ providers) | Above provider layer. | + (Gleam function) | + (`Driver` record-of-functions) | 0 (proto risks drifting to provider proto) | 0 (JSON-RPC risks provider-shape drift) |
+| P8 (capability locality) | Tools/auth differ across shells. | – (no per-call negotiation beyond envelope; blocks caller) | + (`Subject` in daemon; placement & capability first-class per `Dispatch`) | 0 (gRPC metadata works but awkward) | 0 (JSON-RPC params work) |
+| Streaming fidelity | Intermediate `DriverChunk`/`DriverToolCall`/`DriverHeartbeat` visible. | – blocker for `claude-cli` (token stream hidden until end) | + (matches `DriverEvent` sum exactly) | + (server-stream native) | + (notifications; ordering is app-layer) |
+| Cancellation | Step 3 #8: `DriverEnded(Cancelled)` within 1s of `cancel/1`. | – (sync not naturally cancellable; needs side kill channel) | + (typed `Cancel` to driver actor) | + (gRPC client cancel native) | 0 (JSON-RPC has no standard cancel) |
+| `peer-remote` fit (Q9-aware) | Per Step 3: `start` returns `Deferred` until Q9. | – (timeout/partition/retry semantics deferred) | – (`Subject` is process-local; cross-node bridge non-trivial per `GLEAM_BEAM_FIT.md`) | + (designed for cross-machine) | + (WebSocket natural for peer) |
+| `claude-cli` / `codex-cli` fit | `:erlang.open_port/2` per `harness-execution.md`. | – (CLI tokens hidden until end) | + (port events fold into `DriverEvent`) | – (CLIs don't speak gRPC; need wrapper) | + (claude-cli has JSON output; JSON-RPC stdio fits) |
+| `hermes-native` fit | `gleam_httpc` sync + `:gun` streaming. | + (sync HTTP works) | + (`:gun` streams into `Subject`) | 0 (Hermes needs gRPC server work) | + (JSON-RPC over HTTP is thin) |
+| Build-step alignment | Step 3 codes `Subject(DriverEvent)` sink. | – (every driver rewrites `start`) | + (no change) | – (entire rewrite + `proto/` codegen) | – (`start` becomes JSON-RPC client) |
+| Operator visibility (Auto-Resolve Gate, babysitter takeover) | Stalls detected via heartbeat absence. | – blocker (no heartbeat in sync) | + (`DriverHeartbeat` first-class) | + (server-stream message) | + (JSON-RPC notification) |
 
 ## Costs and bets
 
 For each option, two bullets each.
 
 ### Option A — `sync-RPC`
-- **Bet:** Most drivers will be short-lived and the operator does
-  not need intermediate visibility. The babysitter's takeover
-  doctrine can rely on out-of-band timeouts ("the call hasn't
-  returned in N seconds, kill it") rather than heartbeat events.
-  Auditability of intermediate `DriverChunk` / `DriverToolCall`
-  events is a "nice to have", not a v0.0.3 requirement.
+- **Bet:** Most drivers are short-lived; operator doesn't need
+  intermediate visibility. Babysitter takeover relies on
+  out-of-band timeouts ("call hasn't returned in N seconds, kill")
+  rather than heartbeat events. Intermediate event auditability is
+  nice-to-have, not v0.0.3 critical.
 - **Cost:** Hard blocker for `claude-cli` / `codex-cli` (no
-  streamed reasoning visible), for the babysitter's
-  `takeover_manager` (no `DriverHeartbeat` to observe absence of),
-  and for the Auto-Resolve Gate (no intermediate events to feed the
-  confidence signal). Cancellation is awkward. The "every
-  `DispatchUpdate` lands in event_log" auditability story collapses
-  to "only start and end land".
+  streamed reasoning), for `takeover_manager` (no `DriverHeartbeat`
+  to observe absence of), and for Auto-Resolve Gate (no
+  intermediate signal). Cancellation awkward. Auditability collapses
+  to start/end only.
 
 ### Option B — `streaming-events-Subject`
-- **Bet:** The BEAM's typed `Subject(msg)` is a cheap, fast,
-  type-safe in-process channel and that is exactly what most
-  drivers actually need. The daemon hosts the driver actor; the
-  driver actor emits events into a `Subject` owned by
-  `bridge_to_event_log`; the bridge writes them into `event_log`.
-  `peer-remote` is deferred behind `Error(Deferred)` until Q9
-  settles, so we don't pay the cross-node serialization cost yet.
-  Every other driver kind in
-  [`HERMES_HARNESS_DRIVER_REGISTRY.md`](../../codebase-ema/code/ema/docs/HERMES_HARNESS_DRIVER_REGISTRY.md)
-  fits this shape natively.
-- **Cost:** `Subject(DriverEvent)` is process-local and not
-  serializable. When Q9 lands, `peer-remote` will need a typed
-  cross-node bridge — either via Erlang distribution +
-  `gleam/erlang/node` (per `GLEAM_BEAM_FIT.md`), or via `partisan`,
-  or via a separate transport (probably gRPC or JSON-RPC under the
-  hood) — and the daemon will end up running both contracts in
-  parallel until migration. Step 3 acknowledges this: the
-  `peer_remote` driver record exists today but `start` returns
-  `Deferred`. We inherit the cost of a second contract surface
-  later.
+- **Bet:** BEAM's typed `Subject(msg)` is a cheap, type-safe
+  in-process channel — exactly what drivers need. Daemon hosts
+  driver actor; driver emits into `Subject` owned by
+  `bridge_to_event_log`; bridge writes `event_log`. `peer-remote`
+  deferred behind `Error(Deferred)` until Q9. Every other driver
+  kind in `HERMES_HARNESS_DRIVER_REGISTRY.md` fits natively.
+- **Cost:** `Subject(DriverEvent)` is process-local, not
+  serializable. When Q9 lands, `peer-remote` needs a typed
+  cross-node bridge — Erlang distribution + `gleam/erlang/node`,
+  `partisan`, or a separate transport — and daemon may run two
+  contracts in parallel during migration.
 
 ### Option C — `gRPC`
-- **Bet:** The driver layer is *strategically* a network protocol.
-  Once `peer-remote` is real, every driver should be reachable the
-  same way regardless of placement (`Local` / `Daemon` / `Peer`).
-  Picking gRPC up front means the daemon, the CLI wrappers, and
-  remote peer workers all speak the same protocol; placement
-  becomes "what's the gRPC endpoint?" with no special-casing.
-- **Cost:** Per `GLEAM_BEAM_FIT.md`, there is no native Gleam gRPC
-  library; this means an Elixir `grpc` dep + protoc in the build,
-  plus FFI wrappers. CLI drivers don't speak gRPC natively, so
-  `claude-cli` / `codex-cli` need a sidecar wrapper. The
-  `simulated-tui` test-double becomes heavier. Code-gen is sticky:
-  once `.proto` files exist, replacing them is expensive. Step 3
-  is rewritten end-to-end.
+- **Bet:** Driver layer is strategically a network protocol. Once
+  `peer-remote` is real, every driver is reachable the same way
+  regardless of placement (`Local` / `Daemon` / `Peer`). Picking
+  gRPC up front: daemon, CLI wrappers, and peer workers speak one
+  protocol; placement is just an endpoint.
+- **Cost:** No native Gleam gRPC per `GLEAM_BEAM_FIT.md` — needs
+  Elixir `grpc` dep + protoc + FFI wrappers. CLI drivers don't
+  speak gRPC; `claude-cli`/`codex-cli` need sidecars.
+  `simulated-tui` test-double becomes heavier. Code-gen sticky.
+  Step 3 rewritten end-to-end.
 
 ### Option D — `JSON-RPC`
-- **Bet:** JSON-RPC is the lowest-common-denominator: every
-  language has a client and a server, claude-cli already has a
-  JSON output mode, the wire format is human-readable for
-  debugging, and the same protocol works over stdio (CLIs), HTTP
-  (`hermes-native`), and WebSocket (`peer-remote`). EMA's daemon
-  speaks one protocol to all drivers regardless of transport.
-- **Cost:** No idiomatic Gleam JSON-RPC library — every method
-  gets two hand-written codecs (per `GLEAM_BEAM_FIT.md` "no
-  automatic derivation" cost). JSON-RPC has no standard
-  cancellation or heartbeat semantics; both have to be invented as
-  protocol extensions. JSON over the wire is fatter than typed
-  `Subject` messages on the same VM. Step 3's `Driver` record-of-
-  functions is replaced by a JSON-RPC client; conformance tests
-  rewritten.
+- **Bet:** Lowest common denominator. Every language has client +
+  server; claude-cli has JSON output mode; same protocol works
+  over stdio (CLIs), HTTP (`hermes-native`), WebSocket
+  (`peer-remote`). Daemon speaks one protocol to all drivers.
+- **Cost:** No idiomatic Gleam JSON-RPC library — every method =
+  two hand-written codecs (per `GLEAM_BEAM_FIT.md` "no automatic
+  derivation"). No standard cancellation or heartbeat — both are
+  protocol extensions. JSON wire fatter than typed `Subject` on the
+  same VM. Step 3 conformance tests rewritten.
 
 ## Open questions this decision creates
 

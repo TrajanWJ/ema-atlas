@@ -33,6 +33,7 @@ Two things at once:
 | How to load context efficiently | [`AGENT_TRAVERSAL.md`](AGENT_TRAVERSAL.md) |
 | Set up a fresh machine | [`AGENT_BOOTSTRAP.md`](AGENT_BOOTSTRAP.md) |
 | Newest user PRD framing | [`05-fresh-context-project-app-model.md`](05-fresh-context-project-app-model.md) |
+| Swarm workspace doctrine + protocol | [`content/swarm/README.md`](content/swarm/README.md) |
 | Recipes (add a driver, vApp, branch...) | [`howto/`](howto/) |
 | Rules for changing the graph | [`CONTRIBUTING_TO_GRAPH.md`](CONTRIBUTING_TO_GRAPH.md) |
 | Machine-readable graph (for the atlas app) | [`graph.json`](graph.json) |
@@ -111,6 +112,16 @@ Glossary entries in [`GLOSSARY.md`](GLOSSARY.md).
 3. Building distributed sync/orchestration before local/shared-state
    semantics are crisp.
 
+## Swarm default
+
+If you are joining active multi-agent work, read these before touching shared
+coordination state:
+
+1. [`content/swarm/README.md`](content/swarm/README.md)
+2. [`content/swarm/continuous-progress-protocol.md`](content/swarm/continuous-progress-protocol.md)
+3. [`content/swarm/orchestrator-alignment.md`](content/swarm/orchestrator-alignment.md)
+4. [`content/swarm/object-model.md`](content/swarm/object-model.md)
+
 ## Numbers
 
 - **36 branches** in this transfer pack — see [`SYSTEM_GRAPH.md`](SYSTEM_GRAPH.md)
@@ -119,7 +130,7 @@ Glossary entries in [`GLOSSARY.md`](GLOSSARY.md).
 - **11 topic edges** under [`graph/edges/`](graph/edges/)
 - **10 open questions**
 - **33 glossary terms**
-- **7 howto playbooks**
+- **8 howto playbooks**
 - **5 utility scripts** (`probe`, `check-graph`, `manifest`, `index`, `graph-json`)
 
 (Numbers above auto-derivable from [`graph.json`](graph.json) — counts may

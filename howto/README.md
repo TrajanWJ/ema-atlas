@@ -10,6 +10,7 @@ pass `scripts/check-graph.sh`.
 | [`add-a-branch.md`](add-a-branch.md) | You're adding a new lineage/codebase/docs branch to the transfer pack |
 | [`add-a-driver.md`](add-a-driver.md) | You're adding a new harness driver (claude-cli, codex-cli, peer-remote, ...) to EMA |
 | [`add-a-vapp.md`](add-a-vapp.md) | You're proposing a new vApp inside the EMA shell (Wiki, Chat, Threads, ...) |
+| [`run-a-swarm-wave.md`](run-a-swarm-wave.md) | You're orchestrating or joining active multi-agent work and need the shared coordination contract |
 | [`add-an-edge-topic.md`](add-an-edge-topic.md) | You're introducing a cross-cutting concept that doesn't fit any existing `graph/edges/*.md` |
 | [`resolve-an-open-question.md`](resolve-an-open-question.md) | You're closing one of the entries in `OPEN_QUESTIONS.md` |
 | [`load-context-for-a-task.md`](load-context-for-a-task.md) | You're a fresh agent and need to load just enough context to act on a task |

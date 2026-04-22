@@ -382,6 +382,46 @@ export const docRegistry: DocEntry[] = [
     feeds: ["desktop", "showroom", "parts"]
   },
   {
+    title: "Swarm Workspace Pack",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/README.md",
+    note: "Repo-native entrypoint for the shared swarm workspace, its doctrine, object families, and alignment rules.",
+    kind: "doctrine",
+    status: "active",
+    feeds: ["docs", "program", "showroom"]
+  },
+  {
+    title: "Continuous Progress Protocol",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/continuous-progress-protocol.md",
+    note: "Operational loop for lanes, claims, handoffs, drift handling, refresh cadence, and protected zones.",
+    kind: "backlog",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Orchestrator Alignment",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/orchestrator-alignment.md",
+    note: "Contract for multiple orchestrators and supervisors sharing one swarm workspace without forking truth.",
+    kind: "doctrine",
+    status: "active",
+    feeds: ["docs", "program"]
+  },
+  {
+    title: "Swarm Object Model",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/object-model.md",
+    note: "Canonical coordination vocabulary for lane, claim, handoff, queue, cadence, planner, and workstream objects.",
+    kind: "implementation",
+    status: "active",
+    feeds: ["docs", "parts", "program"]
+  },
+  {
+    title: "Swarm Repo Integration Map",
+    path: "/Users/tawj/Desktop/ema 0.0.3/ema-atlas/content/swarm/repo-integration-map.md",
+    note: "Backlink and routing contract tying the swarm pack into atlas routes, graph docs, questions, and playbooks.",
+    kind: "evidence",
+    status: "active",
+    feeds: ["docs", "graph", "program"]
+  },
+  {
     title: "Lineage Architecture Synthesis",
     path: "/Users/tawj/Desktop/ema 0.0.3/ema-003-lineage-architecture-synthesis.md",
     note: "Doctrine, authority model, app topology, preserve vs redesign.",
@@ -468,7 +508,9 @@ export const topLevelRoutes = [
   { href: "/questions", label: "Questions" },
   { href: "/timeline", label: "Timeline" },
   { href: "/futures-board", label: "Futures" },
-  { href: "/decisions", label: "Decisions" }
+  { href: "/decisions", label: "Decisions" },
+  { href: "/research", label: "Research" },
+  { href: "/vapps", label: "vApps" }
 ];
 
 export function getPart(slug: string) {

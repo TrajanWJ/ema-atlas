@@ -22,6 +22,9 @@ Per `README.md`, the app's intended top-level routes:
 | `/` | atlas landing page | `AGENT_QUICKREF.md`, `GLOSSARY.md` |
 | `/parts` | the EMA system by part | `graph.json#nodes`, filtered by `era` and `status` |
 | `/artifacts` | deliverable formats | the handoff docs (`0[1-5]-*.md`, `MACBOOK_AGENT_HANDOFF_MASTER.md`) plus `howto/` |
+| `/showroom` | gallery-like deliverables wall | `lib/ema-atlas.ts`, `graph.json`, current local knowledge pack |
+| `/program` | cross-part program map | `lib/ema-atlas.ts`, local `ema-003-*.md` program/backlog docs |
+| `/demo` | staged narrative walkthrough | current part narratives plus unresolved question pressure |
 | `/graph` | constellation view | `graph.json#triples` (force-directed or sankey) |
 | `/desktop` | place-inspired spatial surface | `codebase-place-org` and `codebase-place-companion` nodes; UX metaphor edge |
 | `/docs` | linked local knowledge pack | the full `*.md` set + `graph/edges/` + `graph/nodes/` |

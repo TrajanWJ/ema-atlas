@@ -857,6 +857,173 @@ a {
   background: currentColor;
 }
 
+/* --- Research listing --------------------------------------------------- */
+
+.research-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.research-list__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.research-list__item:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.research-list__item h3 {
+  margin: 0 0 4px;
+  font-family: var(--font-display), serif;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.research-list__item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.research-list__size {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-cool);
+  white-space: nowrap;
+}
+
+.research-doc {
+  border-radius: 26px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+
+.research-doc h1,
+.research-doc h2,
+.research-doc h3,
+.research-doc h4 {
+  font-family: var(--font-display), serif;
+  line-height: 1.15;
+  margin: 1.4em 0 0.4em;
+}
+
+.research-doc h1 { font-size: 2rem; }
+.research-doc h2 { font-size: 1.5rem; color: var(--accent); }
+.research-doc h3 { font-size: 1.2rem; color: var(--accent-cool); }
+
+.research-doc p,
+.research-doc li {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.research-doc pre {
+  overflow-x: auto;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(8, 9, 12, 0.78);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.86rem;
+  color: var(--text);
+}
+
+.research-doc code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.88em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.research-doc pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.research-doc blockquote {
+  margin: 1em 0;
+  padding: 8px 16px;
+  border-left: 3px solid var(--accent);
+  color: var(--text);
+  background: var(--accent-soft);
+  border-radius: 0 12px 12px 0;
+}
+
+/* --- vApp cards --------------------------------------------------------- */
+
+.vapp-card {
+  display: grid;
+  gap: 12px;
+  min-height: 280px;
+}
+
+.vapp-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.vapp-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+}
+
+.vapp-card__status--planned {
+  color: #a8b1c2;
+  border-color: rgba(168, 177, 194, 0.45);
+  background: rgba(168, 177, 194, 0.12);
+}
+
+.vapp-card__status--sketched {
+  color: #8db4d6;
+  border-color: rgba(141, 180, 214, 0.55);
+  background: rgba(141, 180, 214, 0.14);
+}
+
+.vapp-card__status--partial {
+  color: #f3c269;
+  border-color: rgba(243, 194, 105, 0.55);
+  background: rgba(243, 194, 105, 0.14);
+}
+
+.vapp-card__status--shipped {
+  color: #8fd6a4;
+  border-color: rgba(143, 214, 164, 0.55);
+  background: rgba(143, 214, 164, 0.14);
+}
+
 @media print {
   .masthead__topline,
   .nav,

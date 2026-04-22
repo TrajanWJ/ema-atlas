@@ -583,7 +583,11 @@ export const topLevelRoutes = [
   { href: "/decisions", label: "Decisions" },
   { href: "/research", label: "Research" },
   { href: "/vapps", label: "vApps" },
-  { href: "/launchpad", label: "Launchpad" }
+  { href: "/launchpad", label: "Launchpad" },
+  { href: "/hq", label: "HQ" },
+  { href: "/wiki", label: "Wiki" },
+  { href: "/chat", label: "Chat" },
+  { href: "/threads", label: "Threads" }
 ];
 
 export function getPart(slug: string) {

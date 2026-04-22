@@ -1,0 +1,43 @@
+# EMA v0.0.3 — Gleam project manifest (SCAFFOLD SKETCH)
+#
+# Reference file. Copy into a real `gleam new ema` project, then run
+# `gleam deps download`. Versions are pinned to what
+# research/GLEAM_BEAM_FIT.md identified; anything marked UNVERIFIED
+# should be re-checked against hex.pm before use.
+
+name = "ema"
+version = "0.0.3"
+description = "EMA — typed authority + collab daemon on the BEAM"
+licences = ["Apache-2.0"]
+target = "erlang"
+
+# OTP 27+ required by gleam_erlang 1.3.0
+gleam = ">= 1.6.0"  # UNVERIFIED — verify against hex
+
+[dependencies]
+# Foundational stdlib + OTP libraries (per GLEAM_BEAM_FIT.md "Core stdlib + OTP libraries")
+gleam_stdlib = ">= 0.40.0 and < 2.0.0"  # 1.0.0 line per GLEAM_BEAM_FIT
+gleam_otp = ">= 1.2.0 and < 2.0.0"
+gleam_erlang = ">= 1.3.0 and < 2.0.0"
+
+# JSON encode/decode (per GLEAM_BEAM_FIT.md "Serialization / contracts")
+gleam_json = ">= 3.1.0 and < 4.0.0"
+
+# HTTP / web (per GLEAM_BEAM_FIT.md "HTTP / web servers")
+mist = ">= 6.0.3 and < 7.0.0"
+wisp = ">= 2.2.2 and < 3.0.0"
+
+# Persistence — single-node SQLite event_log + typed query gen
+sqlight = ">= 1.1.0 and < 2.0.0"
+parrot = ">= 0.1.0"  # UNVERIFIED — verify against hex; the only Gleam
+                     # SQL gen that supports SQLite per GLEAM_BEAM_FIT
+
+# Note: `gleam_dynamic` is not a separate hex package — `gleam/dynamic`
+# and `gleam/dynamic/decode` ship as modules inside `gleam_stdlib`.
+# Listed here in the original ask for completeness; nothing to add.
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"
+gleam_qcheck = ">= 0.0.7"  # UNVERIFIED — verify against hex; package name
+                            # may be `qcheck` (per GLEAM_BEAM_FIT link
+                            # https://hexdocs.pm/qcheck/)

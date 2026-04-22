@@ -1,0 +1,176 @@
+# CLI Changelog
+
+## 2026-04-06
+
+- Started native CLI/TUI build documentation.
+- Removed exposed OpenClaw HTTP routes and Phoenix channel wiring from the daemon surface.
+- Removed OpenClaw startup hooks from `Ema.Application`.
+- Removed OpenClaw-specific runtime config blocks.
+- Simplified `bin/ema` task/proposal dispatch to use `/api/executions` directly and removed the `sync openclaw` command.
+- Removed stale migration backup file `20260407000001_add_agent_intent_to_tasks.exs.bak`.
+- Verified `mix compile` succeeds and `mix phx.routes` contains no OpenClaw routes.
+- Verified `mix test` passes: `562 tests, 0 failures, 8 excluded`.
+- Attempted to add Ratatouille/ExTermbox for TUI work, but reverted the dependency add after `ex_termbox` failed to build under Python 3.12 because its waf toolchain imports the removed `imp` module.
+- Files:
+  - `bin/ema`
+  - `daemon/config/runtime.exs`
+  - `daemon/lib/ema/application.ex`
+  - `daemon/lib/ema_web/router.ex`
+  - `daemon/lib/ema_web/user_socket.ex`
+  - `daemon/lib/ema_web/controllers/openclaw_controller.ex`
+  - `daemon/lib/ema_web/channels/openclaw_channel.ex`
+  - `daemon/priv/repo/migrations/20260407000001_add_agent_intent_to_tasks.exs.bak`
+  - `docs/cli/changelog.md`
+  - `docs/cli/command-tree.md`
+  - `docs/cli/decisions/001-reuse-existing-native-cli.md`
+  - `docs/cli/decisions/002-tui-dependency-blocker.md`
+
+## 2026-04-06 Phase 1
+
+- Added corrective migration `20260412000008_align_actor_container_contract.exs` to align the live SQLite schema with the additive actor/container contract.
+- Rebuilt empty actor-side support tables for tags, entity data, container config, phase transitions, and actor commands to the new contract.
+- Added missing container fields in Ecto schemas for spaces, projects, tasks, goals, inbox items, executions, and proposals.
+- Added `Ema.Tags`, `Ema.EntityData`, `Ema.ContainerConfig`, and `Ema.PhaseTransitions` wrapper modules over the actor context.
+- Added actor/container HTTP controllers for tags, entity data, container config, and phase transitions, and expanded actor routes.
+- Added default human-actor bootstrap on app start outside test.
+- Preserved test stability by avoiding implicit `actor_id` defaults on legacy endpoints and by suppressing brain-dump async side effects in test mode.
+- Verified:
+  - `mix ecto.migrate` applied `20260412000008`
+  - `mix phx.routes` includes `/api/actors`, `/api/tags`, `/api/entity-data`, `/api/container-config`, `/api/phase-transitions`, `/api/spaces`
+  - `mix compile` succeeds
+  - `Application.ensure_all_started(:ema)` seeds actor `{"human", "human", "human"}`
+- Residual blocker:
+  - `mix test` remains flaky with 1 failure because unrelated async/background codepaths still hit unresolved OpenClaw and sandbox ownership issues outside this actor/container slice.
+- Files:
+  - `daemon/priv/repo/migrations/20260412000008_align_actor_container_contract.exs`
+  - `daemon/lib/ema/actors/actor.ex`
+  - `daemon/lib/ema/actors/actor_command.ex`
+  - `daemon/lib/ema/actors/actors.ex`
+  - `daemon/lib/ema/actors/bootstrap.ex`
+  - `daemon/lib/ema/actors/container_config.ex`
+  - `daemon/lib/ema/actors/entity_data.ex`
+  - `daemon/lib/ema/actors/phase_transition.ex`
+  - `daemon/lib/ema/actors/tag.ex`
+  - `daemon/lib/ema/container_config.ex`
+  - `daemon/lib/ema/entity_data.ex`
+  - `daemon/lib/ema/phase_transitions.ex`
+  - `daemon/lib/ema/tags.ex`
+  - `daemon/lib/ema/brain_dump/brain_dump.ex`
+  - `daemon/lib/ema/brain_dump/item.ex`
+  - `daemon/lib/ema/goals/goal.ex`
+  - `daemon/lib/ema/tasks/task.ex`
+  - `daemon/lib/ema_web/controllers/actor_controller.ex`
+  - `daemon/lib/ema_web/controllers/container_config_controller.ex`
+  - `daemon/lib/ema_web/controllers/entity_data_controller.ex`
+  - `daemon/lib/ema_web/controllers/phase_transition_controller.ex`
+  - `daemon/lib/ema_web/controllers/tag_controller.ex`
+  - `docs/cli/changelog.md`
+
+## 2026-04-06 Phase 2
+
+- Extended the existing `Ema.CLI` parser surface for actor/container scope flags on `task`, `proposal`, `goal`, `project`, `brain-dump`, `actor`, `space`, and `config`.
+- Added native command groups for `em`, `tag`, and `data`.
+- Reworked `actor`, `space`, and `config` commands to match the new actor/container schemas and routes.
+- Wired `task`, `proposal`, `project`, `goal`, and `brain-dump` commands to pass `actor_id`, `space_id`, and container-scoping params where the backing contexts support them.
+- Added shared CLI helpers for entity refs like `task:123` and JSON-ish value parsing.
+- Kept the transport model pragmatic:
+  - `mix run` exercises direct in-node context calls when the app is already started
+  - the packaged escript still prefers HTTP fallback unless a direct runtime is already present
+- Verified:
+  - `mix compile` succeeds
+  - `mix escript.build` succeeds
+  - `ema --help` includes `em`, `tag`, `data`, `actor`, `space`, and `config`
+  - `mix run -e 'Ema.CLI.main([\"em\",\"status\",\"--json\"])'` returns actor EM JSON in the app runtime
+- Residual blockers:
+  - the packaged escript still cannot boot the full app directly because the bundled `exqlite` NIF path breaks under `app: nil`
+  - direct `actor list --json` exposed tuple-shaped data in runtime structs, so JSON normalization now coerces tuples to lists; broader CLI output cleanup may still be needed on other legacy domains
+  - running the CLI inside `mix run` still emits heavy background log noise from unrelated app startup processes
+- Files:
+  - `daemon/lib/ema/cli/cli.ex`
+  - `daemon/lib/ema/cli/helpers.ex`
+  - `daemon/lib/ema/cli/output.ex`
+  - `daemon/lib/ema/cli/transport.ex`
+  - `daemon/lib/ema/cli/commands/actor.ex`
+  - `daemon/lib/ema/cli/commands/brain_dump.ex`
+  - `daemon/lib/ema/cli/commands/config.ex`
+  - `daemon/lib/ema/cli/commands/data.ex`
+  - `daemon/lib/ema/cli/commands/em.ex`
+  - `daemon/lib/ema/cli/commands/goal.ex`
+  - `daemon/lib/ema/cli/commands/project.ex`
+  - `daemon/lib/ema/cli/commands/proposal.ex`
+  - `daemon/lib/ema/cli/commands/space.ex`
+  - `daemon/lib/ema/cli/commands/tag.ex`
+  - `daemon/lib/ema/cli/commands/task.ex`
+  - `docs/cli/changelog.md`
+
+## 2026-04-06 Phase 3
+
+- Added direct actor-command dispatch at the CLI root for any non-builtin first token, so registered commands can resolve as `ema <actor> <command...>` instead of only through explicit subcommand groups.
+- Added `Ema.CLI.ActorCommands` as the first native handler module for actor-registered commands and verified `human status --json` through the `actor_commands` table.
+- Reworked the direct actor-command path to parse the live `actor_commands` schema correctly:
+  - the database still stores `command`, `handler`, and `args_schema`
+  - the Ecto schema now maps those columns instead of assuming `command_name`, `handler_module`, and `handler_function` exist physically
+- Reworked `actor register` and actor-command listing around the live `handler` field instead of the aspirational split module/function columns.
+- Added direct PubSub watch mode for `watch`; it subscribes to Phoenix topics and streams events without polling.
+- Added scoped quick-capture support to `dump` and fixed the source enum to use `shortcut`.
+- Fixed the `inbox_items` schema to actually cast and persist `space_id`, `actor_id`, `container_type`, and `container_id`, which the Phase 2/3 CLI was already sending.
+- Added project scoping to `campaign list`.
+- Verified:
+  - `mix run -e 'Ema.CLI.main(["dump", ...])'` now creates a brain dump with persisted `actor_id` and container fields
+  - `sqlite3 ~/.local/share/ema/ema_dev.db` shows the scoped dump row as `shortcut|human|task|task_42`
+  - `timeout 5 mix run -e ... Ema.CLI.main(["watch","--channel=goals","--format=compact"]) ...` prints a live PubSub event
+  - `mix run --no-compile -e ... Ema.CLI.main(["human","status","--json"]) ...` resolves through `actor_commands` and returns actor EM JSON
+- Residual blocker:
+  - full `mix compile` became blocked by unrelated worktree changes in `daemon/lib/ema/sessions/orchestrator.ex` during this session; the Phase 3 verification after that point used targeted `elixirc` recompilation plus `mix run --no-compile` to avoid touching the user’s unrelated broken file
+- Files:
+  - `daemon/lib/ema/actors/actor_command.ex`
+  - `daemon/lib/ema/brain_dump/item.ex`
+  - `daemon/lib/ema/cli/actor_commands.ex`
+  - `daemon/lib/ema/cli/cli.ex`
+  - `daemon/lib/ema/cli/commands/actor.ex`
+  - `daemon/lib/ema/cli/commands/campaign.ex`
+  - `daemon/lib/ema/cli/commands/dump.ex`
+  - `daemon/lib/ema/cli/commands/em.ex`
+  - `daemon/lib/ema/cli/commands/watch.ex`
+  - `daemon/lib/ema_web/controllers/actor_controller.ex`
+  - `docs/cli/changelog.md`
+
+## 2026-04-06 Phase 3b
+
+- Finished the deferred actor/container cleanup pass for the existing native CLI domains that were only partially wired in earlier phases.
+- Fixed direct-mode schema drift so the live additive columns are now represented in Ecto for:
+  - `projects.space_id`
+  - `goals.space_id`
+  - `proposals.space_id` and `proposals.actor_id`
+  - `executions.space_id` and `executions.actor_id`
+- Fixed direct-mode context support so the CLI flags now map to real filters instead of no-op attrs:
+  - `Ema.Projects.list_projects/1` now exists and filters by `status` and `space_id`
+  - `Ema.Goals.list_goals/1` now filters by `project_id`, `space_id`, and `actor_id`
+  - `Ema.Proposals.list_proposals/1` now filters by `project_id`, `status`, `space_id`, and `actor_id`
+  - `Ema.Executions.list_executions/1` now filters by `project_slug`, `status`, `space_id`, `actor_id`, and `limit`
+- Fixed command-level correctness issues:
+  - `project list` in direct mode no longer crashes on an undefined `list_projects/1`
+  - `exec list/create` now passes `actor_id` and `space_id`
+  - `proposal redirect` now correctly handles the direct return shape `{:ok, proposal, seeds}`
+  - `goal show` now receives a map from the context instead of a tuple payload
+- Verification:
+  - targeted recompilation of the touched modules via `elixirc` into `daemon/_build/dev/lib/ema/ebin`
+  - `mix run --no-compile -e 'Ema.CLI.main(["project","list","--json"])'` now succeeds in direct mode
+  - `mix run --no-compile -e 'Ema.CLI.main(["exec","list","--project=ema","--json"])'` now succeeds in direct mode
+- Residual blocker:
+  - full `mix compile` is still blocked by unrelated user-worktree errors in `daemon/lib/ema/sessions/orchestrator.ex`
+  - some JSON output still leaks association placeholder metadata on unloaded associations; this is a serializer cleanup follow-up, not a scope/filter correctness blocker
+- Files:
+  - `daemon/lib/ema/projects/project.ex`
+  - `daemon/lib/ema/projects/projects.ex`
+  - `daemon/lib/ema/goals/goal.ex`
+  - `daemon/lib/ema/goals/goals.ex`
+  - `daemon/lib/ema/proposals/proposal.ex`
+  - `daemon/lib/ema/proposals/proposals.ex`
+  - `daemon/lib/ema/executions/execution.ex`
+  - `daemon/lib/ema/executions/executions.ex`
+  - `daemon/lib/ema/cli/commands/proposal.ex`
+  - `daemon/lib/ema/cli/commands/goal.ex`
+  - `daemon/lib/ema/cli/commands/exec.ex`
+  - `daemon/lib/ema/cli/output.ex`
+  - `docs/cli/changelog.md`

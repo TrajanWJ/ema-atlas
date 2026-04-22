@@ -1,0 +1,2 @@
+[console_scripts]
+ontoclaw = compiler.cli:main

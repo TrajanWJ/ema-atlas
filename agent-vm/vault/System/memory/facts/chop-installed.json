@@ -1,0 +1,11 @@
+{
+  "key": "chop-installed",
+  "content": "chop CLI at /home/trajan/bin/chop, hooked into Claude Code PreToolUse for bash output compression. 50-90% token savings on CLI output.",
+  "agent": "scout",
+  "updated": "2026-03-18T02:53:00Z",
+  "type": "fact",
+  "access_count": 1,
+  "last_accessed": "2026-03-24T21:23:20.187031+00:00",
+  "tier": "warm",
+  "salience": 0.65
+}

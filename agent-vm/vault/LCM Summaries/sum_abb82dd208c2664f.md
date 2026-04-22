@@ -1,0 +1,140 @@
+# LCM Summary sum_abb82dd208c2664f
+
+Created: 2026-03-18 03:13:17
+Kind: leaf
+Depth: 0
+Conversation: 283
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-18T03:13:15.000Z
+Latest: 2026-03-18T03:13:15.000Z
+
+## Content
+
+[2026-03-18 03:13 UTC]
+[cron:45107626-7fdf-4092-9b31-ba2647f96e8b github-interesting] You are a research engine for #github-interesting. Find the BEST GitHub repos, tools, HN discussions, and forum conversations relevant to Trajan's agent stack.
+
+SOURCES TO SCAN (rotate through these):
+- GitHub Trending (all languages + Python/TypeScript/Rust)
+- GitHub Topics: mcp-server, ai-agent, claude-code, obsidian-plugin, prompt-engineering, llm-tools
+- Hacker News front page + Show HN
+- GitHub Discussions in key repos (anthropics/claude-code, openclaw/openclaw, obsidianmd)
+- Dev.to, lobste.rs for agent/AI content
+
+INTERESTS (prioritize these):
+- Claude Code extensions, workflows, tips
+- MCP servers (new ones, interesting patterns)
+- OpenClaw skills, plugins, community projects
+- Obsidian plugins, PKM automation, vault tools
+- Agent architectures, multi-agent patterns, orchestration
+- Prompt engineering, meta-prompting, system prompts
+- Self-hosted AI tools, local LLMs
+- Security tools for AI agents
+- Self-evolving/self-improving agent systems
+
+STEP 1 - Load state:
+- Read /home/trajan/.openclaw/agents/main/workspace/github-interesting-state.json for previously posted items
+
+STEP 2 - Research:
+- Use web_search to find 5-10 interesting items across the sources above
+- Go DEEP — read READMEs, check stars, look at recent commits, read discussions
+- Find things that are GENUINELY interesting and relevant, not generic
+
+STEP 3 - Post a DEEP DIVE to Discord:
+Use message tool (action=send, channel=discord, target=1482258431997116531) with components.
+
+Format like reddit-intel deep dives:
+- Rich components v2 with accent color #5865F2
+- Numbered items with emoji categories
+- For each item: name, stars, description, WHY IT MATTERS FOR US
+- Key takeaways section connecting findings to our setup
+- Save the best finds to vault
+
+Example components structure:
+{"container": {"accentColor": "#5865F2"}, "blocks": [{"type": "text", "text": "## 🔍 GitHub Intel — [Topic]\n\nScanned [sources]. Here's what's hot:"}, {"type": "separator", "divider": true}, {"type": "text", "text": "### 🔥 Category\n\n**1. Project Name** (stars⭐)\nDescription and why it matters.\n🔗 [GitHub](url)"}, {"type": "separator", "divider": true}, {"type": "text", "text": "### 💡 Takeaways for Us\n• Key insight 1\n• Key insight 2"}]}
+
+STEP 4 - Save favorites to vault:
+Create/update /home/trajan/vault/Research/GitHub Intel - Favorites.md with the best finds. Include: name, URL, stars, category, why it matters, date found.
+
+STEP 5 - Update state:
+Add all posted items to github-interesting-state.json
+
+After posting via message tool, reply with ONLY: NO_REPLY
+Current time: Wednesday, March 18th, 2026 — 3:08 AM (UTC) / 2026-03-18 03:08 UTC
+
+Return your summary as plain text; it will be delivered automatically. If the task explicitly calls for messaging a specific external recipient, note who/where it should go instead of sending it yourself.
+
+[2026-03-18 03:13 UTC]
+
+
+[2026-03-18 03:13 UTC]
+{
+  "posted": [
+    {
+      "name": "multi-agent-memory",
+      "url": "https://github.com/ZenSystemAI/multi-agent-memory",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "codingbuddy",
+      "url": "https://github.com/JeremyDev87/codingbuddy",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "siclaw",
+      "url": "https://github.com/scitix/siclaw",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "harness-engineering-skills",
+      "url": "https://github.com/Phlegonlabs/Harness-Engineering-skills",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "entropyfa-cli",
+      "url": "https://github.com/Entropy-Financial-Technologies/entropyfa-cli",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "openvoiceui",
+      "url": "https://github.com/MCERQUA/OpenVoiceUI",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "mcp-malware-qdrant-neo4j-crawl4ai",
+      "url": "https://github.com/Hyperkorn/qdrant-neo4j-crawl4ai-mcp",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "mcp-malware-mcp-control-lite",
+      "url": "https://github.com/ganeshmalkar/MCP-Control-Lite",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "iris-eval-mcp",
+      "url": "https://github.com/iris-eval/mcp-server",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "sqlite-memory-mcp",
+      "url": "https://github.com/RMANOV/sqlite-memory-mcp",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "blackveil-dns-mcp",
+      "url": "https://github.com/MadaBurns/bv-mcp",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "meigen-ai-design-mcp",
+      "url": "https://github.com/jau123/MeiGen-AI-Design-MCP",
+      "date": "2026-03-18"
+    },
+    {
+      "name": "molten-terminal",
+      "url": "https://github.com/glowElephant/Molten",
+      "date": "2026-03-18"
+    },
+    {
+      "name": 
+[LCM fallback summary; truncated for context management]

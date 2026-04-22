@@ -1,0 +1,304 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.12",
+    "lastTouchedAt": "2026-03-14T17:52:16.301Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-14T05:09:18.646Z",
+    "lastRunVersion": "2026.3.12",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
+  },
+  "update": {
+    "channel": "stable"
+  },
+  "browser": {
+    "enabled": true,
+    "executablePath": "/usr/bin/google-chrome-stable",
+    "headless": false,
+    "noSandbox": true
+  },
+  "models": {
+    "providers": {
+      "anthropic": {
+        "baseUrl": "https://api.anthropic.com/v1",
+        "apiKey": "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",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "anthropic/claude-opus-4-6",
+            "name": "Claude Opus 4.6"
+          },
+          {
+            "id": "anthropic/claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6"
+          },
+          {
+            "id": "anthropic/claude-haiku-4-5-20251001",
+            "name": "Claude Haiku 4.5"
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-opus-4-6",
+        "fallbacks": []
+      },
+      "models": {
+        "anthropic-backup/claude-opus-4-6": {}
+      },
+      "memorySearch": {
+        "enabled": true,
+        "sources": [
+          "memory",
+          "sessions"
+        ],
+        "experimental": {
+          "sessionMemory": true
+        }
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "memoryFlush": {
+          "enabled": true
+        }
+      },
+      "heartbeat": {
+        "every": "30m"
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "workspace": "/home/trajan/.openclaw/agents/main/workspace"
+      },
+      {
+        "id": "interviewer",
+        "name": "The Interviewer",
+        "workspace": "/home/trajan/.openclaw/workspace-interviewer",
+        "model": {
+          "primary": "anthropic/claude-opus-4-6",
+          "fallbacks": [
+            "anthropic-backup/claude-opus-4-6"
+          ]
+        }
+      },
+      {
+        "id": "browser-automation",
+        "workspace": "/home/trajan/.openclaw/agents/browser-automation/workspace"
+      },
+      {
+        "id": "discord-setup",
+        "workspace": "/home/trajan/.openclaw/agents/discord-setup/workspace"
+      },
+      {
+        "id": "security-audit",
+        "workspace": "/home/trajan/.openclaw/agents/security-audit/workspace"
+      },
+      {
+        "id": "config-change",
+        "workspace": "/home/trajan/.openclaw/agents/config-change/workspace"
+      },
+      {
+        "id": "troubleshooting",
+        "workspace": "/home/trajan/.openclaw/agents/troubleshooting/workspace"
+      },
+      {
+        "id": "vault-management",
+        "workspace": "/home/trajan/.openclaw/agents/vault-management/workspace"
+      },
+      {
+        "id": "cron-automation",
+        "workspace": "/home/trajan/.openclaw/agents/cron-automation/workspace"
+      },
+      {
+        "id": "coding-delegation",
+        "workspace": "/home/trajan/.openclaw/agents/coding-delegation/workspace"
+      },
+      {
+        "id": "research-tool",
+        "workspace": "/home/trajan/.openclaw/agents/research-tool/workspace"
+      }
+    ]
+  },
+  "tools": {
+    "exec": {
+      "host": "gateway",
+      "security": "full",
+      "ask": "off"
+    }
+  },
+  "bindings": [
+    {
+      "agentId": "interviewer",
+      "match": {
+        "channel": "discord",
+        "peer": {
+          "kind": "channel",
+          "id": "1482284691007471810"
+        }
+      }
+    }
+  ],
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "channels": {
+    "telegram": {
+      "execApprovals": {
+        "enabled": true,
+        "approvers": [
+          "*"
+        ],
+        "target": "channel"
+      },
+      "enabled": true,
+      "dmPolicy": "open",
+      "botToken": "8672424403:AAE73Ku7-EzJXDRXDKSunRCqYPbvmCnQl7M",
+      "groups": {
+        "*": {
+          "requireMention": false
+        }
+      },
+      "allowFrom": [
+        "*"
+      ],
+      "groupPolicy": "open",
+      "streaming": "partial"
+    },
+    "discord": {
+      "markdown": {
+        "tables": "code"
+      },
+      "enabled": true,
+      "commands": {
+        "native": "auto",
+        "nativeSkills": "auto"
+      },
+      "token": "REDACTED_TOKEN",
+      "groupPolicy": "open",
+      "historyLimit": 50,
+      "streaming": "partial",
+      "actions": {
+        "reactions": true,
+        "stickers": true,
+        "polls": true,
+        "threads": true,
+        "pins": true,
+        "search": true,
+        "roles": true,
+        "voiceStatus": true,
+        "events": true,
+        "moderation": true
+      },
+      "dmPolicy": "open",
+      "allowFrom": [
+        "*"
+      ],
+      "guilds": {
+        "1482230800916287710": {
+          "requireMention": false,
+          "channels": {}
+        }
+      },
+      "execApprovals": {
+        "enabled": true,
+        "approvers": [
+          "*"
+        ],
+        "cleanupAfterResolve": true,
+        "target": "channel"
+      },
+      "agentComponents": {
+        "enabled": true
+      },
+      "threadBindings": {
+        "enabled": true,
+        "idleHours": 48,
+        "spawnSubagentSessions": true
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "controlUi": {
+      "allowedOrigins": [
+        "http://localhost:18789",
+        "http://127.0.0.1:18789",
+        "http://192.168.122.10:18789"
+      ],
+      "dangerouslyDisableDeviceAuth": true
+    },
+    "auth": {
+      "mode": "token",
+      "token": "6b23e14bf2c97a7e8494a1e5e6df61e841b663cb8bdd3c57"
+    }
+  },
+  "plugins": {
+    "allow": [
+      "openclaw-engram",
+      "llm-task",
+      "lobster",
+      "open-prose",
+      "telegram",
+      "discord"
+    ],
+    "slots": {
+      "memory": "openclaw-engram"
+    },
+    "entries": {
+      "llm-task": {
+        "enabled": true
+      },
+      "lobster": {
+        "enabled": true
+      },
+      "diffs": {
+        "enabled": false
+      },
+      "open-prose": {
+        "enabled": true
+      },
+      "openclaw-engram": {
+        "enabled": true,
+        "config": {
+          "memoryOsPreset": "balanced",
+          "nativeKnowledge": {
+            "enabled": true
+          },
+          "fileHygiene": {
+            "enabled": true
+          }
+        }
+      },
+      "memory-core": {
+        "enabled": false
+      },
+      "memory-lancedb": {
+        "enabled": false
+      }
+    },
+    "installs": {
+      "openclaw-engram": {
+        "source": "npm",
+        "spec": "@joshuaswarren/openclaw-engram@9.0.80",
+        "installPath": "/home/trajan/.openclaw/extensions/openclaw-engram",
+        "version": "9.0.80",
+        "resolvedName": "@joshuaswarren/openclaw-engram",
+        "resolvedVersion": "9.0.80",
+        "resolvedSpec": "@joshuaswarren/openclaw-engram@9.0.80",
+        "integrity": "sha512-rGou3H7njPY3gEwVskiAhoHMSVlqisFb8pSvTOD0y4BobcYVVymdX9ICM+qg8MYcgfVp/3vqrC/l0NhCnnaB9Q==",
+        "shasum": "39c7f3a7b9db6091a5e7d8edb174b4eb37ff4757",
+        "resolvedAt": "2026-03-14T06:34:36.239Z",
+        "installedAt": "2026-03-14T06:35:09.152Z"
+      }
+    }
+  }
+}

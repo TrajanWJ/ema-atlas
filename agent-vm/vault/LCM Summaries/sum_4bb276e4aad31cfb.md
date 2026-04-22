@@ -1,0 +1,136 @@
+# LCM Summary sum_4bb276e4aad31cfb
+
+Created: 2026-03-18 02:55:25
+Kind: leaf
+Depth: 0
+Conversation: 245
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-18T01:36:28.000Z
+Latest: 2026-03-18T02:55:19.000Z
+
+## Content
+
+[2026-03-18 01:36 UTC]
+{"detail":"Not Found"}
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+    <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/favicon.png">
+    <title>chrome_devtools - Swagger UI</title>
+    </head>
+    <body>
+    <div id="swagger-ui">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <!-- `SwaggerUIBundle` is now available on the page -->
+    <script>
+    const ui = SwaggerUIBundle({
+        url: '/openapi.json',
+    "dom_id": "#swagger-ui",
+"layout": "BaseLayout",
+"deepLinking": true,
+
+[2026-03-18 01:36 UTC]
+
+
+[2026-03-18 01:36 UTC]
+---
+read_when:
+  - 你想全面了解 OpenClaw 的 OAuth 流程
+  - 你遇到了令牌失效/登出问题
+  - 你想了解 setup-token 或 OAuth 认证流程
+  - 你想使用多账户或配置文件路由
+summary: OpenClaw 中的 OAuth：令牌交换、存储和多账户模式
+title: OAuth
+x-i18n:
+  generated_at: "2026-02-01T20:23:29Z"
+  model: claude-opus-4-5
+  provider: pi
+  source_hash: af714bdadc4a89295a18da1eba5f5b857c8d533ebabe9b0758b722fe60c36124
+  source_path: concepts/oauth.md
+  workflow: 14
+---
+
+# OAuth
+
+OpenClaw 支持通过 OAuth 进行"订阅认证"，适用于提供此功能的提供商（特别是 **OpenAI Codex（ChatGPT OAuth）**）。对于 Anthropic 订阅，请使用 **setup-token** 流程。本页说明：
+
+- OAuth **令牌交换**的工作原理（PKCE）
+- 令牌**存储**在哪里（以及原因）
+- 如何处理**多账户**（配置文件 + 按会话覆盖）
+
+OpenClaw 还支持**提供商插件**，它们自带 OAuth 或 API 密钥流程。通过以下命令运行：
+
+```bash
+openclaw models auth login --provider <id>
+```
+
+## 令牌汇聚点（为什么需要它）
+
+OAuth 提供商通常在登录/刷新流程中发放**新的刷新令牌**。某些提供商（或 OAuth 客户端）在为同一用户/应用发放新令牌时，可能会使旧的刷新令牌失效。
+
+实际症状：
+
+- 你通过 OpenClaw _和_ Claude Code / Codex CLI 登录 → 其中一个稍后会随机"登出"
+
+为减少这种情况，OpenClaw 将 `auth-profiles.json` 视为**令牌汇聚点**：
+/usr/lib/node_modules/openclaw/docs/zh-CN/concepts/oauth.md
+/usr/lib/node_modules/openclaw/docs/concepts/oauth.md
+
+[2026-03-18 01:36 UTC]
+
+
+[2026-03-18 01:36 UTC]
+- You want setup-token or OAuth auth flows
+OpenClaw supports “subscription auth” via OAuth for providers that offer it (notably **OpenAI Codex (ChatGPT OAuth)**). For Anthropic subscriptions, use the **setup-token** flow. Anthropic subscription use outside Claude Code has been restricted for some users in the past, so treat it as a user-choice risk and verify current Anthropic policy yourself. OpenAI Codex OAuth is explicitly supported for use in external tools like OpenClaw. This page explains:
+For Anthropic in production, API key auth is the safer recommended path over subscription setup-token auth.
+To reduce that, OpenClaw treats `auth-profiles.json` as a **token sink**:
+- Auth profiles (OAuth + API keys + optional value-level refs): `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+- `~/.openclaw/credentials/oauth.json` (imported into `auth-profiles.json` on first use)
+## Anthropic setup-token (subscription auth)
+Anthropic setup-token support is technical compatibility, not a policy guarantee.
+Run `claude setup-token` on any machine, then paste it into OpenClaw:
+openclaw models auth setup-token --provider anthropic
+---
+summary: "OAuth in OpenClaw: token exchange, storage, and multi-account patterns"
+read_when:
+  - You want to understand OpenClaw OAuth end-to-end
+  - You hit token invalidation / logout issues
+  - You want setup-token or OAuth auth flows
+  - You want multiple accounts or profile routing
+title: "OAuth"
+---
+
+# OAuth
+
+OpenClaw supports “subscription auth” via OAuth for providers that offer it (notably **OpenAI Codex (ChatGPT OAuth)**). For Anthropic subscriptions, use the **setup-token** flow. Anthropic subscription use outside Claude Code has been restricted for some users in the past, so treat it as a user-choice risk and verify current Anthropic policy yourself. OpenAI Codex OAuth is explicitly supported for use in external tools like OpenClaw. This page explains:
+
+For Anthropic in production, API key auth is the safer recommended path over subscription setup-token auth.
+
+- how the OAuth **token exchange** works (PKCE)
+- where tokens are **stored** (and why)
+- how to handle **multiple accounts** (profiles + per-session overrides)
+
+OpenClaw also supports **provider plugins** that ship their own OAuth or API‑key
+flows. Run them via:
+
+```bash
+openclaw models auth login --provider <id>
+```
+
+## The token sink (why it exists)
+
+OAuth providers commonly mint a **new refresh token** during login/refresh flows. Some providers (or OAuth clients) can invalidate older refresh tokens when a new one is issued for the same user/app.
+
+Practical symptom:
+
+- you log in via OpenClaw _and_ via Claude Code / Codex CLI → one of them randomly gets “logged out” later
+
+To reduce that, OpenClaw treats `auth-profiles.json` as a **token sink**:
+
+- the runtime reads credentials from **one place**
+- we can keep multiple profiles and 
+[LCM fallback summary; truncated for context management]

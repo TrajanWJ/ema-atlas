@@ -1,0 +1,116 @@
+# LCM Summary sum_f5a51c0e22a6eaa1
+
+Created: 2026-03-16 08:54:52
+Kind: leaf
+Depth: 0
+Conversation: 19
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-16T08:48:59.000Z
+Latest: 2026-03-16T08:48:59.000Z
+
+## Content
+
+[2026-03-16 08:48 UTC]
+System: [2026-03-16 04:31:46 UTC] Done: Built agent-factory skill with generate/list/promote scripts
+System: [2026-03-16 04:31:52 UTC] Done: Built context-evolution skill with reflect/propose/snapshot/rollback/status scripts
+System: [2026-03-16 04:32:03 UTC] Done: Built feedback-loop skill with review/generate/usage/heartbeat scripts
+System: [2026-03-16 04:32:52 UTC] Done: Built agent-performance skill with log/score/dashboard/feed scripts
+System: [2026-03-16 04:33:16 UTC] Done: Built prompt-compiler skill with 11 modules and compile/list/add scripts
+
+Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.
+When reading HEARTBEAT.md, use workspace file /home/trajan/.openclaw/agents/main/workspace/HEARTBEAT.md (exact case). Do not read docs/heartbeat.md.
+Current time: Monday, March 16th, 2026 — 4:37 AM (UTC) / 2026-03-16 04:37 UTC
+
+[2026-03-16 08:48 UTC]
+
+
+[2026-03-16 08:48 UTC]
+# HEARTBEAT.md
+
+## Periodic Checks (rotate through these)
+
+1. **Auth health** — Check token expiry: `python3 -c "import json,time; c=json.load(open('/home/trajan/.claude/.credentials.json'))['claudeAiOauth']; print(f'{int((c[\"expiresAt\"]/1000-time.time())/60)} min')"`. Check guardian: `systemctl is-active oauth-guardian`. Check logs: `tail -5 /var/log/oauth-guardian.log`. If token < 30min or guardian down → `sudo systemctl restart oauth-guardian`. If expired and refresh fails → `DISPLAY=:0 python3 ~/bin/auto-login.py`.
+2. **Gateway health** — Verify `openclaw status` and `systemctl is-active openclaw-gateway`. If down → `sudo systemctl restart openclaw-gateway`. Guardian also auto-restarts it.
+3. **Disk space** — `df -h /` — alert if >85% used.
+4. **System load** — `uptime` — alert if load average > 5.
+5. **Vault health** — Quick check that `/home/trajan/vault/` is accessible and recent notes exist.
+
+## Auto-Knowledge (every other heartbeat)
+
+Run `/home/trajan/skills/auto-knowledge/scripts/capture.sh` and review the output. If there are:
+- **Daily notes with topics not in vault** → Create a vault note for the most important one
+- **Stale vault files** → Update if you have new context
+- **Patterns in sessions** → Consider if a skill should exist for repeated tasks
+
+Keep it lightweight — pick ONE thing per heartbeat at most. Don't burn tokens processing everything.
+
+The capture script also runs `skill-vault-sync.sh` which keeps `vault/Skills/` in sync with installed skills. New skills get vault notes, removed skills get marked.
+
+After any vault write, run `qmd update && qmd embed` to keep search fresh.
+
+## Usage Pace Tracking (every heartbeat)
+
+Always update `/home/trajan/.claude-pace.json` with current usage data from session_status. Extract the 5h usage percentage and time remaining, calculate pace. Format:
+```json
+{
+  "timestamp": <unix_epoch>,
+  "remaining_pct": <number>,
+  "minutes_left": <number>,
+  "used_pct": <number>,
+  "elapsed_min": <number>,
+  "pace": <number>
+}
+```
+This powers the `pace` CLI command and Claude Code statusline.
+
+## Cross-Channel Scan (EVERY heartbeat — PRIORITY)
+
+Scan for unanswered Trajan messages across ALL channels:
+
+```bash
+# Search guild for Trajan's messages in last 2 hours
+curl -s "https://discord.com/api/v10/guilds/1482230800916287710/messages/search?author_id=1482230345909932168&limit=10" \
+  -H "Authorization: Bot REDACTED_TOKEN"
+```
+
+For each message:
+1. Check if there's a bot reply after it (from traclaw1)
+2. If no reply and message is >2 minutes old → respond immediately
+3. If in a forum thread → check if the bound agent responded
+4. Log any gaps to memory file
+
+**Nothing from Trajan should go unanswered.** This is the #1 executive functioning need.
+
+## If nothing needs attention
+
+Reply HEARTBEAT_OK.
+
+
+[2026-03-16 08:48 UTC]
+
+
+[2026-03-16 08:48 UTC]
+190 min
+
+[2026-03-16 08:48 UTC]
+
+
+[2026-03-16 08:48 UTC]
+active
+
+[2026-03-16 08:48 UTC]
+
+
+[2026-03-16 08:48 UTC]
+Config warnings:\n- plugins.entries.openclaw-engram: plugin disabled (disabled in config) but config is present
+Config warnings:\n- plugins.entries.openclaw-engram: plugin disabled (disabled in config) but config is present
+OpenClaw status
+
+Overview
+┌─────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Item            │ Value                                                                                              │
+├─────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Dashboard       │ http://192.168.122.10:18789/                                                                       │
+│ OS              │ linux
+[LCM fallback summary; truncated for context management]

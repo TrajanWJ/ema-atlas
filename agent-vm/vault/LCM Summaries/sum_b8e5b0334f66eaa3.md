@@ -1,0 +1,111 @@
+# LCM Summary sum_b8e5b0334f66eaa3
+
+Created: 2026-03-19 03:32:23
+Kind: leaf
+Depth: 0
+Conversation: 4
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-19T02:59:34.000Z
+Latest: 2026-03-19T03:26:07.000Z
+
+## Content
+
+[2026-03-19 02:59 UTC]
+---
+title: "Claude Code Internals Study"
+created: 2026-03-16
+updated: 2026-03-16
+type: research
+status: active
+confidence: 0.80
+confidence_updated: 2026-03-18
+source: external-research
+tags: [knowledge, openclaw, prompts, research, security, skills]
+summary: "The official Claude Code repository (now at `anthropics/claude-code`) contains not just the CLI tool but a rich **plugin ecosystem** with agents, comm"
+---
+# Claude Code Internals Study
+
+> **Source:** [anthropics/claude-code](https://github.com/anthropics/claude-code) (official repo, previously shareAI-lab/learn-claude-code)
+> **Date:** 2026-03-16
+> **Purpose:** Extract implementation patterns for our [[OpenClaw]] multi-agent system
+
+## Overview
+
+The official Claude Code repository (now at `anthropics/claude-code`) contains not just the CLI tool but a rich **plugin ecosystem** with agents, commands, skills, and hooks. The plugin system is the most relevant part for our work — it defines patterns for:
+- Multi-agent orchestration (feature-dev plugin)
+- Code review pipelines (pr-review-toolkit)
+- Hook-based automation (hookify)
+- Agent development best practices (plugin-dev)
+
+## Pattern 1: Feature Development Multi-Agent Pipeline
+
+The `feature-dev` plugin implements a **5-phase multi-agent workflow** for building features:
+
+### Phase Structure
+```
+Phase 1: Discovery      → Understand what needs to be built
+Phase 2: Exploration     → 2-3 code-explorer agents analyze codebase in parallel
+Phase 3: Clarification   → Ask ALL questions before designing (critical phase)
+Phase 4: Architecture    → 2-3 code-architect agents propose different approaches
+Phase 5: Implementation  → Build based on chosen architecture
+```
+
+### Agent Roles
+
+| Agent | Model | Tools | Purpose |
+|-------|-------|-------|---------|
+| `code-explorer` | Sonnet | Glob, Grep, Read, WebFetch | Trace execution paths, map architecture, find patterns |
+| `code-architect` | Sonnet | Glob, Grep, Read, WebFetch | Design implementation blueprints with file:line specificity |
+| `code-reviewer` | Sonnet | Glob, Grep, Read, WebFetch | Review PRs for quality, security, patterns |
+
+### Key Design Decisions
+- **Explorers return file lists** — "include a list of 5-10 key files to read". The orchestrator then reads those files to build context before proceeding. This avoids bloating agent context.
+- **Architects make confident choices** — "Make decisive choices - pick one approach and commit." No wishy-washy "here are 3 options." The architect recommends one.
+- **Clarification is mandatory** — Phase 3 explicitly says "DO NOT SKIP." All ambiguities resolved before design begins.
+- **[[Diverge]] then converge** — Multiple agents explore different angles, then results are synthesized.
+
+**Relevance to us:** Our specialist dispatch is ad-hoc. The feature-dev pattern of Discovery → Exploration → Clarification → Architecture → Implementation is more disciplined. We should adopt the "explorers return file lists, orchestrator reads files" pattern — it prevents subagents from accumulating too much context.
+
+## Pattern 2: Agent Definition Format (Frontmatter + System Prompt)
+
+Claude Code plugins define agents as Markdown files with YAML frontmatter:
+
+```yaml
+---
+name: code-reviewer
+description: Use this agent when [triggering conditions]...
+  <example>
+  Context: [scenario]
+  user: "[request]"
+  assistant: "[response]"
+  <commentary>[why this agent triggers]</commentary>
+  </example>
+model: sonnet
+color: green
+tools: ["Read", "Write", "Grep", "Glob"]
+---
+
+You are [role]. Your core responsibilities: ...
+```
+
+### Critical Fields
+- **`description`** — The most important field. Defines triggering conditions with concrete examples. Uses `<example>` blocks with `<commentary>` explaining why.
+- **`tools`** — Explicit tool allow-list per agent. Agents only get the tools they need.
+- **`model`** — Can specify different models per agent (e.g., Sonnet for fast analysis, Opus for complex work).
+- **`color`** — Visual identifier in the UI.
+
+**Relevance to us:** Our [[agent roster]] in AGENTS.md lists skills but doesn't define triggering conditions with examples. The `<example>` + `<commentary>` pattern would make routing more reliable. Also, our agents all share the same tool set — per-agent tool filtering would reduce error surface.
+
+## Pattern 3: Hook-Based Automation (Event System)
+
+The `hookify` plugin implements an event-driven automation system:
+
+### Hook Events
+| Event | When | Use For |
+|-------|------|---------|
+| `PreToolUse` | Before tool execution | Validate operations, block dangerous commands |
+| `PostToolUse` | After tool execution | React to results, log changes |
+| `Stop` | Agent wants to stop | Enforce completion standards |
+| `SubagentStop` | Subagent wants to stop | Quality gate for subagent out
+[LCM fallback summary; truncated for context management]

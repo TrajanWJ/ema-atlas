@@ -1,0 +1,141 @@
+# === EMA Cron Configuration (v5 — 2026-04-06 UTC) ===
+# Migrated from EMA v4. All .ema/ paths removed.
+# Canonical source. Restored at boot by cron-restore.sh.
+# Edit HERE, not crontab directly.
+#
+# Design: crons are SIGNAL GENERATORS. They detect conditions and
+# queue tasks. Dispatch engine executes tasks during heartbeats.
+# No cron should spawn Claude Code or do heavy work directly.
+
+# === Core System Health (4 crons) ===
+# DISABLED 2026-04-19 during OpenClaw recovery: old EMA watchdog was rewriting state across mismatched runtime
+# */2 * * * * /home/trajan/bin/gateway-watchdog.sh >> /var/log/gateway-watchdog.log 2>&1
+# DISABLED 2026-04-19 during OpenClaw recovery: old EMA session watchdog on legacy topology
+# */2 * * * * /home/trajan/bin/session-watchdog.sh
+*/5 * * * * /home/trajan/bin/system-watchdog.sh >> /tmp/watchdog.log 2>&1
+# DISABLED 2026-04-19 during OpenClaw recovery: old auto-resume depended on legacy EMA state
+# */10 * * * * /home/trajan/bin/auto-resume.sh >> /var/log/auto-resume.log 2>&1
+
+# === Knowledge Indexing (3 crons) ===
+*/30 * * * * /home/trajan/bin/memory-pressure.sh --quiet >> /tmp/memory-pressure.log 2>&1
+*/30 * * * * flock -n /tmp/qmd.lock timeout 300 bash -c "/usr/bin/qmd update && /usr/bin/qmd embed" 2>&1 | tail -5 >> /tmp/qmd-cron.log
+*/30 * * * * sha256sum -c /home/trajan/config/integrity-checksums.txt --quiet 2>/dev/null || echo "$(date -u +\%Y-\%m-\%dT\%H:\%M:\%SZ) INTEGRITY ALERT" >> /var/log/integrity.log
+
+# === Signal Generators → Queue (2 crons) ===
+0 */3 * * * /home/trajan/bin/signal-to-queue.sh >> /tmp/signal-to-queue.log 2>&1
+0 */3 * * * flock -n /tmp/ontology-sync.lock python3 /home/trajan/skills/obsidian-ontology-sync/scripts/sync.py --config /home/trajan/skills/obsidian-ontology-sync/config.yaml extract >> /tmp/ontology-sync.log 2>&1
+
+# === Scheduled Queue Loader (1 cron) ===
+0 * * * * /home/trajan/bin/dispatch.sh schedule >> /tmp/dispatch-schedule.log 2>&1
+
+# === Intel Feeds (1 cron) ===
+30 */4 * * * /home/trajan/bin/reddit-intel.sh >> /home/trajan/logs/reddit-intel.log 2>&1
+
+# === Daily Maintenance (5 crons) ===
+0 */2 * * * /home/trajan/scripts/vault-autocommit.sh >> /home/trajan/logs/vault-autocommit.log 2>&1
+0 4 * * * /home/trajan/scripts/session-janitor.sh >> /home/trajan/logs/session-janitor.log 2>&1
+0 4 * * * find /tmp -name "*.log" -user trajan -size +10M -exec truncate -s 1M {} \; 2>/dev/null; find ~/dispatch/done -name "*.json" -mtime +14 -delete 2>/dev/null
+0 12 * * * bash /home/trajan/bin/overnight-digest.sh >> /tmp/overnight-digest.log 2>&1
+0 14 * * * bash /home/trajan/bin/morning-briefing-v2.sh 2>&1 | head -200 >> /tmp/morning-briefing.log
+
+# === Backup & Boot (2 crons) ===
+0 */6 * * * crontab -l > /home/trajan/vault/System/cron-backup.txt
+@reboot sleep 30 && /home/trajan/bin/cron-restore.sh >> /tmp/cron-restore.log 2>&1
+
+# === Dispatch Engine (2 crons) ===
+*/1 * * * * /home/trajan/bin/dispatch-engine.sh >> /tmp/dispatch-engine.log 2>&1
+0 */2 * * * /home/trajan/bin/proactive-task-generator.sh >> /tmp/proactive-task-generator.log 2>&1
+
+# === Research & Pipeline (2 crons) ===
+0 2 * * * /home/trajan/bin/research-implement-pipeline.sh >> /home/trajan/logs/research-pipeline.log 2>&1
+0 9 * * * bash /home/trajan/bin/vault-janitor.sh >> /tmp/vault-janitor.log 2>&1
+
+# === Agent Pipeline (9 crons) ===
+# Links monitor: scan #links channel, dispatch URLs to researcher
+*/5 * * * * flock -n /tmp/links-pipeline.lock /home/trajan/bin/links-pipeline.sh >> /home/trajan/logs/links-pipeline.log 2>&1
+# Proposals: post pending proposals + prune expired
+*/5 * * * * /home/trajan/bin/proposal-cron.sh >> /home/trajan/logs/proposal-cron.log 2>&1
+# Competitive intel: weekly scan on Mondays at 6am
+0 6 * * 1 flock -n /tmp/competitive-scan.lock /home/trajan/bin/competitive-scan.sh >> /home/trajan/logs/competitive-scan.log 2>&1
+# Vault research loop: scan vault for gaps, generate proposals
+0 */4 * * * flock -n /tmp/vault-research-loop.lock /home/trajan/bin/vault-research-loop.sh >> /home/trajan/logs/vault-research-loop.log 2>&1
+# Evolution loop: weekly SOUL.md review + evolution report (Sundays 2am)
+0 2 * * 0 flock -n /tmp/evolution-loop.lock /home/trajan/bin/evolution-loop.sh >> /home/trajan/logs/evolution-loop.log 2>&1
+# Agent learning sync: cross-agent stats sync (daily 3am)
+0 3 * * * flock -n /tmp/agent-learning-sync.lock /home/trajan/bin/agent-learning-sync.sh >> /home/trajan/logs/agent-learning-sync.log 2>&1
+# Desk dispatch: scan #github-interesting for tasks
+*/15 * * * * flock -n /tmp/desk-dispatch.lock /home/trajan/bin/desk-dispatch.sh --scan >> /home/trajan/logs/desk-dispatch.log 2>&1
+# Transcript scanner: mine session transcripts for knowledge
+0 */6 * * * flock -n /tmp/transcript-scanner.lock /home/trajan/bin/transcript-scanner.sh >> /home/trajan/logs/transcript-scanner.log 2>&1
+# Stale task cleanup
+*/30 * * * * /home/trajan/bin/stale-task-cleanup.sh >> /home/trajan/logs/stale-task-cleanup.log 2>&1
+
+# === Session Tree (1 cron) ===
+*/30 * * * * /home/trajan/bin/session-tree.sh volatile-check >> /home/trajan/vault/System/session-tree-expiry.log 2>&1
+
+# === Intel (2 crons) ===
+0 8 * * * /home/trajan/bin/github-trending-intel.sh >> /home/trajan/logs/github-trending.log 2>&1
+0 */2 * * * /home/trajan/bin/system-integrity-scan.sh --fix --quiet >> /home/trajan/logs/integrity-scan.log 2>&1
+
+# === Dispatch Heartbeat (1 cron) ===
+*/15 * * * * /home/trajan/bin/dispatch-heartbeat.sh >> /home/trajan/logs/dispatch-heartbeat.log 2>&1
+
+# === OAuth Token Management (2 crons) ===
+# Host → VM credential sync
+*/30 * * * * flock -n /tmp/host-oauth-sync.lock /home/trajan/bin/sync-host-oauth.sh >> /home/trajan/logs/host-oauth-sync.log 2>&1
+# OAuth auto-approve: detect Chrome OAuth pages and auto-approve
+* * * * * flock -n /tmp/oauth-auto-approve.lock /home/trajan/bin/oauth-auto-approve.sh >> /home/trajan/logs/oauth-auto-approve.log 2>&1
+
+# === Discord Self-Nudge / Babysitter + Lanes ===
+*/5 * * * * /home/trajan/bin/babysitter-monitor.sh >> /home/trajan/logs/babysitter-monitor.log 2>&1
+
+# discord-self-nudge-babysitter-sprint
+17 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/babysitter_signal_check.sh >> /home/trajan/logs/discord-self-nudge-babysitter-sprint.log 2>&1
+# discord-lane-continue-command
+7,37 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1489815803023851682 command /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/command.txt >> /home/trajan/logs/discord-self-nudge-command.log 2>&1
+# discord-lane-continue-orchestrator-control
+12,42 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1490610026145124402 orchestrator-control /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/orchestrator-control.txt >> /home/trajan/logs/discord-self-nudge-orchestrator-control.log 2>&1
+# discord-lane-continue-orchestrator-ema
+22 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1490610033954914325 orchestrator-ema /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/orchestrator-ema.txt >> /home/trajan/logs/discord-self-nudge-orchestrator-ema.log 2>&1
+# discord-lane-continue-orchestrator-implementation
+27 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1490610977736097792 orchestrator-implementation /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/orchestrator-implementation.txt >> /home/trajan/logs/discord-self-nudge-orchestrator-implementation.log 2>&1
+# discord-lane-continue-brain-synthesis
+32 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494498049337200862 brain-synthesis /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/brain-synthesis.txt >> /home/trajan/logs/discord-self-nudge-brain-synthesis.log 2>&1
+# discord-lane-continue-brain-project-seeds
+47 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494498045360865333 brain-project-seeds /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/brain-project-seeds.txt >> /home/trajan/logs/discord-self-nudge-brain-project-seeds.log 2>&1
+# discord-lane-continue-brain-memory-ops
+52 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494498045922906153 brain-memory-ops /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/brain-memory-ops.txt >> /home/trajan/logs/discord-self-nudge-brain-memory-ops.log 2>&1
+# discord-lane-continue-brain-ideas-to-ship
+57 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494498045973364886 brain-ideas-to-ship /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/brain-ideas-to-ship.txt >> /home/trajan/logs/discord-self-nudge-brain-ideas-to-ship.log 2>&1
+
+# discord-lane-continue-recovery-chronology
+11,41 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494582287872823337 recovery-chronology /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/recovery-chronology.txt >> /home/trajan/logs/discord-self-nudge-recovery-chronology.log 2>&1
+# discord-lane-continue-recovery-config-runtime
+14,44 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494582287893925998 recovery-config-runtime /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/recovery-config-runtime.txt >> /home/trajan/logs/discord-self-nudge-recovery-config-runtime.log 2>&1
+# discord-lane-continue-recovery-session-lineage
+17,47 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494582288044916747 recovery-session-lineage /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/recovery-session-lineage.txt >> /home/trajan/logs/discord-self-nudge-recovery-session-lineage.log 2>&1
+# discord-lane-continue-recovery-lost-threads
+20,50 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494582288317415564 recovery-lost-threads /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/recovery-lost-threads.txt >> /home/trajan/logs/discord-self-nudge-recovery-lost-threads.log 2>&1
+# discord-lane-continue-recovery-rebuild-plan
+23,53 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1494582288128938056 recovery-rebuild-plan /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/recovery-rebuild-plan.txt >> /home/trajan/logs/discord-self-nudge-recovery-rebuild-plan.log 2>&1
+
+# discord-lane-continue-ops-continuity
+1,31 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495275665644060734 ops-continuity /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/ops-continuity.txt >> /home/trajan/logs/discord-self-nudge-ops-continuity.log 2>&1
+# discord-lane-continue-ops-blockers
+4,34 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495275665690329258 ops-blockers /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/ops-blockers.txt >> /home/trajan/logs/discord-self-nudge-ops-blockers.log 2>&1
+# discord-lane-continue-ops-verification
+8,38 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495275665769889882 ops-verification /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/ops-verification.txt >> /home/trajan/logs/discord-self-nudge-ops-verification.log 2>&1
+# discord-lane-continue-project-flow
+18,48 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495275665702780990 project-flow /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/project-flow.txt >> /home/trajan/logs/discord-self-nudge-project-flow.log 2>&1
+# discord-lane-continue-synthesis-desk
+28,58 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495275665677750436 synthesis-desk /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/synthesis-desk.txt >> /home/trajan/logs/discord-self-nudge-synthesis-desk.log 2>&1
+
+# discord-lane-continue-lane-expansion
+2,32 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495278023321325700 lane-expansion /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/lane-expansion.txt >> /home/trajan/logs/discord-self-nudge-lane-expansion.log 2>&1
+# discord-lane-continue-lane-family-map
+6,36 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495278023216468108 lane-family-map /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/lane-family-map.txt >> /home/trajan/logs/discord-self-nudge-lane-family-map.log 2>&1
+# discord-lane-continue-lane-init-rollout
+16,46 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495278023358808247 lane-init-rollout /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/lane-init-rollout.txt >> /home/trajan/logs/discord-self-nudge-lane-init-rollout.log 2>&1
+
+# discord-lane-continue-ralph-loop
+9,39 * * * * /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh 1495280151062118512 ralph-loop /home/trajan/.openclaw/agents/main/workspace/scripts/prompts/ralph-loop.txt >> /home/trajan/logs/discord-self-nudge-ralph-loop.log 2>&1

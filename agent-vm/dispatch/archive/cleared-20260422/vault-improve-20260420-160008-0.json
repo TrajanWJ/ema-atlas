@@ -1,0 +1,26 @@
+{
+  "id": "vault-improve-20260420-160008-0",
+  "description": "Vault improvement: Backfill/improve 'CloudCLI' (missing-frontmatter). Current content is insufficient — research the topic and write substantive content.",
+  "agent": "researcher",
+  "priority": 3,
+  "status": "failed",
+  "created": "2026-04-20T16:00:08Z",
+  "timeout_minutes": 10,
+  "context": "File: Research/AI-Knowledge/Archive/CloudCLI.md\\nReason: missing-frontmatter\\nCurrent preview: # CloudCLI (Claude Code UI)  > ~~My current web UI for Claude Code.~~ **REPLACED** — see [[builderz-labs Mission Control]] (JarvisAI VM). > > Verified 2026-04-13: Not installed. Replaced by Mission \\n\\nResearch this topic and produce a well-written vault note with: proper frontmatter, substantive content (500+ words), wikilinks to related notes, and sources where applicable.\\n\\nIMPORTANT: Do NOT post to #research-feed unless there is a genuinely novel finding worth Trajan's attention. Vault improvement tasks are internal — write to vault only.",
+  "success_criteria": "The file at vault/Research/AI-Knowledge/Archive/CloudCLI.md should have: 1) Valid frontmatter with confidence/source/summary, 2) Substantive content covering the topic, 3) At least 2 wikilinks, 4) 500+ bytes minimum",
+  "vault_refs": [
+    "Research/AI-Knowledge/Archive/CloudCLI.md"
+  ],
+  "tags": [
+    "research-loop",
+    "vault-improvement",
+    "missing-frontmatter"
+  ],
+  "source": "vault-research-loop",
+  "post_to_feed": false,
+  "claimed_at": "2026-04-20T16:01:02Z",
+  "locked_by": "researcher",
+  "pid": 222858,
+  "failed_at": "2026-04-20T16:03:01Z",
+  "failure_reason": "exit code 1"
+}

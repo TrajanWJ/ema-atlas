@@ -1,0 +1,11 @@
+DONE
+
+**Files modified:**
+- `vault/System/Intelligence Notes/scope-clarity--task-success-maximally-specific-tas.md` — fully rewritten
+
+**What was done:**
+- Added proper YAML frontmatter (title, type, confidence, source, summary, tags)
+- Expanded from ~18 lines of sparse notes to ~100 lines of substantive content (~3500 bytes)
+- Structured sections: Core Finding, Why This Matters, Specificity Framework, Measured Impact table, Implementation quality gates, Decomposition heuristics
+- Added 2 wikilinks to related intelligence notes: `[[4-section-structured-spec-template-for-all-dispatc]]` and `[[5-agent-teams-produce-31x-output-improvement-at-7x]]`
+- `qmd update && embed` failed with exit code 1 (likely a qmd environment issue, non-blocking)

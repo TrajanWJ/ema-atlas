@@ -1,0 +1,244 @@
+{
+  "updated_at": "2026-03-20T22:27:19Z",
+  "active": [
+    {
+      "id": "task-36bed2a5",
+      "agent": "coder",
+      "description": "For each action item identified: create a dispatch task or vault note capturing the implementation plan. Link back to so",
+      "priority": 3,
+      "claimed_at": "2026-03-20T22:27:14Z",
+      "status": "active"
+    },
+    {
+      "id": "pipeline-research-20260320-204801",
+      "agent": "researcher",
+      "description": "Research loop: Investigate best practices for 'performance_optimization' in AI agent systems. Find 3-5 concrete, impleme",
+      "priority": 3,
+      "claimed_at": "2026-03-20T22:27:08Z",
+      "status": "active"
+    },
+    {
+      "id": "pipeline-research-20260320-210001",
+      "agent": "researcher",
+      "description": "Research loop: Investigate best practices for 'content_gaps' in AI agent systems. Find 3-5 concrete, implementable impro",
+      "priority": 3,
+      "claimed_at": "2026-03-20T22:27:10Z",
+      "status": "active"
+    },
+    {
+      "id": "proposal-prop-1774033545-280d18c9",
+      "agent": "utility",
+      "description": "Weekly synthesis: what did the system learn?",
+      "priority": 3,
+      "claimed_at": "2026-03-20T22:27:03Z",
+      "status": "active"
+    },
+    {
+      "id": "proposal-prop-1774033904-197a1791",
+      "agent": "utility",
+      "description": "Weekly synthesis: what did the system learn?",
+      "priority": 3,
+      "claimed_at": "2026-03-20T22:27:06Z",
+      "status": "active"
+    },
+    {
+      "id": "proposal-prop-1774034197-4d535856",
+      "agent": "utility",
+      "description": "Weekly synthesis: what did the system learn?",
+      "priority": 3,
+      "claimed_at": "2026-03-20T22:27:12Z",
+      "status": "active"
+    }
+  ],
+  "queue": [
+    {
+      "id": "task-42608e3d",
+      "agent": "coder",
+      "description": "Enrich recently written vault notes that have <2 wikilinks. For each: add cross-references, verify frontmatter, ensure t",
+      "priority": 4,
+      "created_at": "2026-03-20T19:05:44Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-49fc07df",
+      "agent": "coder",
+      "description": "For each action item identified: create a dispatch task or vault note capturing the implementation plan. Link back to so",
+      "priority": 3,
+      "created_at": "2026-03-20T19:05:45Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-735db0a6",
+      "agent": "coder",
+      "description": "Enrich recently written vault notes that have <2 wikilinks. For each: add cross-references, verify frontmatter, ensure t",
+      "priority": 4,
+      "created_at": "2026-03-20T18:28:46Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-846e48cf",
+      "agent": "coder",
+      "description": "For each action item identified: create a dispatch task or vault note capturing the implementation plan. Link back to so",
+      "priority": 3,
+      "created_at": "2026-03-20T19:11:43Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-89a326f8",
+      "agent": "coder",
+      "description": "Find vault notes with no wikilinks (grep -rL '\\[\\[' vault/). For the top 5 by importance/recency, add 2-3 relevant wikil",
+      "priority": 4,
+      "created_at": "2026-03-20T19:11:42Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-a88190c9",
+      "agent": "coder",
+      "description": "Enrich recently written vault notes that have <2 wikilinks. For each: add cross-references, verify frontmatter, ensure t",
+      "priority": 4,
+      "created_at": "2026-03-20T19:16:36Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-ca2731ea",
+      "agent": "coder",
+      "description": "Enrich recently written vault notes that have <2 wikilinks. For each: add cross-references, verify frontmatter, ensure t",
+      "priority": 4,
+      "created_at": "2026-03-20T19:11:42Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-e292dea0",
+      "agent": "coder",
+      "description": "Find vault notes with no wikilinks (grep -rL '\\[\\[' vault/). For the top 5 by importance/recency, add 2-3 relevant wikil",
+      "priority": 4,
+      "created_at": "2026-03-20T19:05:44Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-f4849fa0",
+      "agent": "coder",
+      "description": "Find vault notes with no wikilinks (grep -rL '\\[\\[' vault/). For the top 5 by importance/recency, add 2-3 relevant wikil",
+      "priority": 4,
+      "created_at": "2026-03-20T19:16:36Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-5eb76dd9",
+      "agent": "researcher",
+      "description": "Read these vault research notes and extract concrete, implementable next actions from each: Agent Knowledge/researcher/2",
+      "priority": 3,
+      "created_at": "2026-03-20T19:16:37Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-d0b13f0b",
+      "agent": "researcher",
+      "description": "Read these vault research notes and extract concrete, implementable next actions from each: Agent Knowledge/researcher/2",
+      "priority": 3,
+      "created_at": "2026-03-20T19:11:43Z",
+      "status": "queued"
+    },
+    {
+      "id": "task-ff430b3f",
+      "agent": "researcher",
+      "description": "Read these vault research notes and extract concrete, implementable next actions from each: Agent Knowledge/researcher/2",
+      "priority": 3,
+      "created_at": "2026-03-20T19:05:45Z",
+      "status": "queued"
+    }
+  ],
+  "done": [
+    {
+      "id": "bridge-mvp-stack-upgrade",
+      "agent": "coder",
+      "description": "Install shadcn/ui + Zustand + Recharts into frontend-layer and upgrade Conversat",
+      "done_at": "2026-03-20T18:48:01Z",
+      "status": "done"
+    },
+    {
+      "id": "proposal-prop-1774031326-1698a6fd",
+      "agent": "utility",
+      "description": "Weekly synthesis: what did the system learn?",
+      "done_at": "2026-03-20T18:42:03Z",
+      "status": "done"
+    },
+    {
+      "id": "task-e66d5b3f",
+      "agent": "researcher",
+      "description": "Analyze corrections.md and feedback.md for recurring patterns. Group by category",
+      "done_at": "2026-03-20T18:42:03Z",
+      "status": "done"
+    },
+    {
+      "id": "task-c8542e6a",
+      "agent": "coder",
+      "description": "Based on pattern analysis, propose 1-3 specific changes to SOUL.md or agent prom",
+      "done_at": "2026-03-20T18:42:02Z",
+      "status": "done"
+    },
+    {
+      "id": "task-a146cfa7",
+      "agent": "coder",
+      "description": "Implement /api/agents endpoint on bridge server (Projects/agent-os-bridge/server",
+      "done_at": "2026-03-20T18:42:01Z",
+      "status": "done"
+    },
+    {
+      "id": "task-f4103744",
+      "agent": "coder",
+      "description": "Implement /api/queue and /api/proposals endpoints on bridge server (Projects/age",
+      "done_at": "2026-03-20T18:36:02Z",
+      "status": "done"
+    },
+    {
+      "id": "task-07cf58b8",
+      "agent": "coder",
+      "description": "Wire everything together for unified Agent OS product at Projects/agent-os-demo-",
+      "done_at": "2026-03-20T18:36:01Z",
+      "status": "done"
+    },
+    {
+      "id": "task-11b91882",
+      "agent": "coder",
+      "description": "Implement Proposal Engine v2 based on spec at dispatch/specs/proposal-engine-v2-",
+      "done_at": "2026-03-20T18:36:01Z",
+      "status": "done"
+    },
+    {
+      "id": "task-19d2d0c9",
+      "agent": "coder",
+      "description": "Implement /api/feed endpoint on bridge server (server.js at Projects/agent-os-br",
+      "done_at": "2026-03-20T18:36:01Z",
+      "status": "done"
+    },
+    {
+      "id": "task-75abbaaf",
+      "agent": "coder",
+      "description": "Build Workbench tab in frontend at Projects/agent-os-demo-pages/. Add 'Workbench",
+      "done_at": "2026-03-20T18:36:01Z",
+      "status": "done"
+    },
+    {
+      "id": "task-1467181f",
+      "agent": "coder",
+      "description": "Build feed detail slide-out panel in the frontend at Projects/agent-os-demo-page",
+      "done_at": "2026-03-20T18:30:02Z",
+      "status": "done"
+    },
+    {
+      "id": "task-35de59aa",
+      "agent": "coder",
+      "description": "Design Proposal Engine v2 spec. The current proposal-engine.sh generates small m",
+      "done_at": "2026-03-20T18:30:02Z",
+      "status": "done"
+    }
+  ],
+  "failed": [],
+  "counts": {
+    "active": 6,
+    "queued": 12,
+    "done": 12,
+    "failed": 0
+  }
+}

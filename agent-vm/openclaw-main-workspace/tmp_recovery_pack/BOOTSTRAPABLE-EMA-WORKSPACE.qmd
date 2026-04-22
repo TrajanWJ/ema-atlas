@@ -1,0 +1,26 @@
+---
+title: "Bootstrapable EMA Workspace"
+type: workspace-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - shell-hq
+  - knowledge
+format: gfm
+---
+
+# Bootstrapable EMA Workspace
+
+## Main idea
+EMA should be bootstrapable from a working combination of:
+- OpenClaw
+- Discord
+- vault/QMD
+- filesystem truth
+- chronicle/review/recall habits
+
+## Why
+That gives a path from living system -> refined system -> native EMA app, instead of forcing a full rewrite before usefulness.

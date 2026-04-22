@@ -1,0 +1,14 @@
+{
+  "id": "prop-1774029769-64d6c460",
+  "type": "dispatch",
+  "title": "Enrich vault note: Reports/knowledge-quality-followup-2026-03-20.md",
+  "body": "Recently written vault note has <2 wikilinks. Add cross-references, ensure frontmatter is complete, verify accuracy.\\nFile: Reports/knowledge-quality-followup-2026-03-20.md",
+  "options": [],
+  "source": "vault-gaps",
+  "priority": "P4",
+  "created_at": "2026-03-20T18:02:49Z",
+  "status": "approved",
+  "discord_message_id": null,
+  "resolved_at": "2026-03-20T18:07:42Z",
+  "resolved_option": "approve"
+}

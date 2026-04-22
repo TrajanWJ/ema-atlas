@@ -1,0 +1,32 @@
+---
+title: "Chronicle Writeback Rules"
+type: writeback-guide
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - agent-work
+  - knowledge
+format: gfm
+---
+
+# Chronicle Writeback Rules
+
+## Write back when
+- a meaningful session ends
+- a bug or failure teaches a durable lesson
+- a repair or configuration change matters later
+- a workstream materially advances
+- a decision or contradiction needs future recall
+
+## Do not write back everything
+Chronicle should preserve meaningful operational history, not every trivial exchange.
+
+## Good chronicle entries include
+- date/time
+- what changed
+- why it mattered
+- what remains open
+- links to related canon/ops/project pages

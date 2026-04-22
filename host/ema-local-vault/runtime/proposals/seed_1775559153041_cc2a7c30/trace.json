@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "active_tasks": 0,
+    "seed": true,
+    "project": false,
+    "recent_proposals": 5
+  },
+  "project_id": null,
+  "seed_id": "seed_1775559153041_cc2a7c30",
+  "seed_name": "intent:calendar-q2-2026---june-build-agent-workspace-collaboration-",
+  "compiled_at": "2026-04-11T20:49:31.569504Z",
+  "composer_version": 1
+}

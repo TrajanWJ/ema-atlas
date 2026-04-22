@@ -1,0 +1,29 @@
+---
+title: "Track G Ultimate Wiki Seed"
+type: track-seed
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - knowledge
+format: gfm
+---
+
+# Track G Ultimate Wiki Seed
+
+## Mission
+Build the new ultimate wiki by reconciling:
+- old vault power
+- OpenClaw live system knowledge
+- current workspace docs
+- best EMA concepts worth preserving
+
+## First milestones
+- source-of-truth reconciliation
+- write paths defined
+- query habits defined
+- old vault migration pass begins
+- OpenClaw ingest pass begins
+- strong hubs/indexes established

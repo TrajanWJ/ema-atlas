@@ -1,0 +1,26 @@
+**Status: DONE**
+
+**Disk cleanup results: 89% → 87% (9.6G → 12G free, ~2.6G reclaimed)**
+
+| Action | Freed |
+|--------|-------|
+| Docker dangling image | 1.1 GB |
+| Docker old images prune | 1.0 GB |
+| npx cache | ~1.7 GB |
+| npm cache clean | ~1.3 GB |
+| Cargo registry src | 680 MB |
+| Trash emptied | 621 MB |
+| uv cache | 111 MB |
+| codebase-memory cache | 85 MB |
+| node-gyp cache | 65 MB |
+| Docker system prune | 64 MB |
+
+**Not cleaned (investigated but not actionable):**
+- Dispatch archive: only 180K total, not worth cleaning
+- pnpm store (2.6G): all packages actively referenced by projects
+- `data/agent-state/browser`: directory doesn't exist in workspace
+- Browser cache: no Chrome/Chromium/Brave cache found; Firefox snap cache was negligible
+- `/var/log`: only 80MB total, journalctl vacuumed
+
+**Files created/modified:**
+- `/tmp/task-6d8249c7-checkpoint.md` — task progress checkpoint

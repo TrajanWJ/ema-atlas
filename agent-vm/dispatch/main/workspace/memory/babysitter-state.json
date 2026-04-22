@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-04-22T07:05:01Z",
+  "status": "OK",
+  "prev_status": "OK",
+  "state_changed": false,
+  "source": "ema_api",
+  "error": null,
+  "sessions_valid": true,
+  "channel_count": 0,
+  "stalled_count": 0,
+  "stalled_channels": [],
+  "all_ema_zero": true,
+  "active_sessions": 0,
+  "completed_sessions": 0,
+  "zero_session_since": "None",
+  "session_note": "0 active sessions during business hours"
+}

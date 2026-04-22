@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "active_tasks": 0,
+    "seed": true,
+    "project": false,
+    "recent_proposals": 5
+  },
+  "project_id": null,
+  "seed_id": "seed_1775541430480_aefbf47b",
+  "seed_name": "intent:task-1-openclaw-adapter-http-ssh-tests-create-openclawex-ada",
+  "compiled_at": "2026-04-11T20:49:32.838100Z",
+  "composer_version": 1
+}

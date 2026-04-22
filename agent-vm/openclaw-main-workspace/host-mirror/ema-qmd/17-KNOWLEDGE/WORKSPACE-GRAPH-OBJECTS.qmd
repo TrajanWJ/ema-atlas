@@ -1,0 +1,39 @@
+---
+title: "Workspace Graph Objects"
+type: object-model
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - cross-pollination-mined
+tracks:
+  - knowledge
+  - code-vapp
+  - host-ops
+format: gfm
+---
+
+# Workspace Graph Objects
+
+## Major object families
+- workspace
+- region
+- workstream
+- session
+- machine
+- service
+- peer
+- repo-binding
+- worktree-binding
+- terminal-session
+- provider-session
+- artifact
+- review
+- memory-object
+- planning-node
+- research-item
+- capture-item
+
+## Rule
+These objects should be addressable from both CLI and GUI.

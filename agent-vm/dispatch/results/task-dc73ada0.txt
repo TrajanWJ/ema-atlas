@@ -1,0 +1,26 @@
+**DONE**
+
+Disk reduced from **88% → 83%** (76GB → 71GB used, 16GB free now). Reclaimed ~5GB:
+
+| Target | Reclaimed |
+|--------|-----------|
+| Docker prune (unused images) | ~1.1 GB |
+| npm `_npx` cache | ~2.2 GB |
+| Firefox snap browser cache | ~251 MB |
+| Docker dangling layers | ~89 MB |
+| uv cache | ~130 MB |
+| Dispatch archives (failed + cleared) | ~800 KB |
+| Home logs (truncated) | ~3.7 MB |
+
+**Not found / not applicable:**
+- `data/agent-state/browser` — directory doesn't exist in dispatch workspace
+- No browser cache dirs (Chrome/Chromium/Brave not installed, only Firefox snap)
+
+**Files modified/cleaned:**
+- `/home/trajan/.npm/_npx` — removed
+- `/home/trajan/.npm/_logs` — removed
+- `/home/trajan/snap/firefox/common/.cache/` — cleared
+- `/home/trajan/dispatch/archive/` — cleared
+- `/home/trajan/dispatch/failed/archive/` — cleared
+- `/home/trajan/logs/*.log` — large files truncated
+- `/tmp/task-dc73ada0-checkpoint.md` — final checkpoint

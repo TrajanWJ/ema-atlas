@@ -1,0 +1,42 @@
+---
+type: session-summary
+wiki_id: sessions/2026-03-19-interaction-topic
+imported_from: vault/Session Summaries/de099a4f-0f64-499e-88a4-24f2159e9da5.md
+imported_at: '2026-04-04T00:23:57.196Z'
+tags: []
+summary: ''
+---
+# Session 2026-03-19
+
+**Session ID:** `de099a4f-0f64-499e-88a4-24f2159e9da5`
+
+## Topic
+
+Launch it without Claude code on the host
+
+## Key Messages
+
+1. Launch it without Claude code on the host
+2. Launch it without Claude code on the host
+3. Good first draft but agent interaction doesn’t work, long term multiple channel, forums, desk space, discord replacement, tasks etc layered is not clean.   Let’s just use obsidian styling throughout with modern apple
+4. Good first draft but agent interaction doesn’t work, long term multiple channel, forums, desk space, discord replacement, tasks etc layered is not clean.   Let’s just use obsidian styling throughout with modern apple
+5. It needs project management, agent and user executive management system, growing UI etc.
+6. It needs project management, agent and user executive management system, growing UI etc.
+7. Do QA and design psychology round. We need these pages built out atleast to get it to the point of emulating all discord features and cli features
+8. Do QA and design psychology round. We need these pages built out atleast to get it to the point of emulating all discord features and cli features
+9. Do QA and design psychology round. We need these pages built out atleast to get it to the point of emulating all discord features and cli features
+10. Look through every single ai alternative and everything in the vault for inspiration and research
+11. Look through every single ai alternative and everything in the vault for inspiration and research
+12. I also want a different way of interacting and using the vault
+13. I also want a different way of interacting and using the vault
+14. The top left button doesn’t work right now
+15. The top left button doesn’t work right now
+16. Replied message (untrusted, for context): ```json {   "sender_label": "doctor.trajan",   "body": "Come up with 3 completely innovative and unique seperaye new designs for the system, the 5 page bottom bar on mobile and the top left menu bar included and used, should leverage full ability of system w…
+17. Replied message (untrusted, for context): ```json {   "sender_label": "doctor.trajan",   "body": "Come up with 3 completely innovative and unique seperaye new designs for the system, the 5 page bottom bar on mobile and the top left menu bar included and used, should leverage full ability of system w…
+18. The feed and queue and the elements of all designs are cool let’s get all implemented
+19. The feed and queue and the elements of all designs are cool let’s get all implemented
+20. Yes and full discord like interface layer for all channels sessions agents etc
+*(+ 42 more messages)*
+
+---
+*Indexed from: de099a4f-0f64-499e-88a4-24f2159e9da5.jsonl*

@@ -1,0 +1,13 @@
+DONE
+
+**Results:**
+- **24 failed tasks analyzed and cleared** (failed/ is now empty)
+- **7 DB records** updated from `failed` → `cancelled` with supersession notes
+- **24 task files** archived to `archive/cleared-20260416/`
+
+**Key finding:** The researcher agent is degrading — 68% of all failures (17/24) are researcher tasks. vault-improve success rate dropped from 27% (04-14) to 17% (04-15). This is the highest-priority issue to investigate.
+
+**Files created/modified:**
+- `/home/trajan/dispatch/utility/workspace/failed-task-analysis-2026-04-16.md` — full analysis
+- `/home/trajan/dispatch/archive/cleared-20260416/` — 24 archived task files
+- `/tmp/task-aa2f30b3-checkpoint.md` — checkpoint file

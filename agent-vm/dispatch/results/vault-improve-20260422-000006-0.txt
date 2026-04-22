@@ -1,0 +1,12 @@
+DONE
+
+**Files modified:**
+- `vault/System/Intelligence Notes/claudemd-file-bloat-is-the-dominant-token-driver-9.md` — Complete rewrite
+
+**What was done:**
+- Added proper YAML frontmatter (title, type, created, updated, confidence, source, summary, tags)
+- Expanded from ~22 lines to ~120 lines of substantive content (~4.5KB)
+- Added 5 wikilinks to related notes (56% conversational spend, 60% context threshold, token consumption bug, cache bugs)
+- Sourced from Anthropic official docs, community guides, and original extraction
+- Covers: core finding, compounding math, concrete numbers table, three mitigation strategies, current status, interaction with other optimizations
+- QMD index updated

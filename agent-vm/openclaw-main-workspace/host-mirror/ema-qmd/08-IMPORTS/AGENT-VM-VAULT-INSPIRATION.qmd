@@ -1,0 +1,99 @@
+---
+title: "Deprecated Agent VM Vault Inspiration"
+type: import-analysis
+plane: planning
+status: active
+freshness: historical
+provenance:
+  - legacy-reference
+  - repo-read
+tracks:
+  - knowledge
+  - agent-work
+  - productivity
+related:
+  - ../05-WIKI/QMD-GRAPH-SYSTEM.qmd
+  - ../05-WIKI/QMD-METADATA-CONVENTION.qmd
+  - ../05-WIKI/CONNECTED-GRAPH-BEST-PRACTICES.md
+format: gfm
+---
+
+# Deprecated Agent VM Vault Inspiration
+
+## Why it matters
+The old vault is significant prior art for EMA because it already encoded a practical agent-readable knowledge system with:
+- frontmatter discipline
+- wikilink density
+- QMD search conventions
+- ontology/graph extraction ambitions
+- inbox/write protocols
+- quality scoring
+- memory activation/metabolism
+- self-describing structure
+
+## Strongest steals
+
+### 1. Frontmatter enforcement as hygiene, not aspiration
+The old vault explicitly enforced fields like:
+- title
+- created
+- updated
+- type
+- status
+- source
+- tags
+- summary
+
+That is exactly the kind of minimum schema EMA’s QMD graph wants.
+
+### 2. Wikilink densification and links-per-file metrics
+The old vault measured:
+- wikilink coverage
+- average links per file
+- orphan reduction
+
+That is very useful for the EMA deliverable. The graph should be measurable, not just vaguely connected.
+
+### 3. Inbox/default landing zone for agent writes
+The old vault had a clear write protocol:
+- inbox first
+- classify later
+- auto-promote/auto-sort over time
+
+EMA should adopt this pattern for graph capture instead of pretending every write lands perfectly in its final home.
+
+### 4. Vault metabolism / activation model
+The old vault already had an ACT-R-inspired memory metabolism system:
+- retrieval logging
+- activation scores
+- promotion/demotion behavior
+- activation-weighted search
+
+That is highly relevant for EMA memory, recall, and graph ranking.
+
+### 5. Quality baseline / scorecard
+The old vault had a measured quality baseline using metrics like:
+- frontmatter completeness
+- wikilinks
+- summary presence
+- source validity
+- note length
+
+EMA should absolutely have something similar for the deliverable folder.
+
+### 6. Explicit source-of-truth behavior
+The old vault said the vault was the single source of truth and expected direct filesystem write/read, not app dependency. That is the right spirit for EMA’s QMD deliverable too.
+
+## Best adaptations for EMA
+- use QMD frontmatter consistently
+- measure graph quality over time
+- introduce inbox/capture -> classify -> promote pipeline
+- add activation-weighted query behavior later
+- preserve provenance and freshness on every important page
+- keep direct filesystem truth as baseline, richer UI later
+
+## Best next docs to add
+- QMD graph quality score rubric
+- inbox / capture / promotion pipeline
+- activation-weighted graph querying notes
+- graph health log

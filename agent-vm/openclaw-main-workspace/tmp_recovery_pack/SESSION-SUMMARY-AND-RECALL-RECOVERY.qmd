@@ -1,0 +1,27 @@
+---
+title: "Session Summary and Recall Recovery"
+type: recovery-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+tracks:
+  - agent-work
+  - knowledge
+format: gfm
+---
+
+# Session Summary and Recall Recovery
+
+## Recover from old system
+- session summaries
+- learned patterns / gotchas
+- project memory files
+- write-to-disk continuity
+
+## Reconcile into EMA
+- session output becomes chronicle material
+- important outcomes become review and recall objects
+- durable lessons become canon or memory objects
+- project continuity becomes workstream continuity

@@ -1,0 +1,34 @@
+---
+title: Babysitter Repair Log Recovery Map
+lane: babysitter-repair-log
+channel_id: "1489841292627152916"
+kind: recovery-ingest
+updated: 2026-04-17
+---
+
+# Recovery map
+
+## Core thesis
+Old EMA watchdog authority is still mutating recovery state underneath live OpenClaw, producing config drift, session drift, and contradictory lane narratives.
+
+## Five recovery lanes
+- recovery-chronology
+- recovery-config-runtime
+- recovery-session-lineage
+- recovery-lost-threads
+- recovery-rebuild-plan
+
+## Durable checks
+- Is `gateway-watchdog.sh` still in active crontab/config?
+- Are `channels.discord.streaming` and `channels.telegram.streaming` scalar, not object-shaped?
+- Does `orchestrator-implementation` have a bound session key?
+- Can one scheduled lane continuation survive a watchdog cycle?
+- Are new brain/recovery lanes still justified after stabilization?
+
+## Evidence roots
+- /home/trajan/bin/gateway-watchdog.sh
+- /home/trajan/config/crons.conf
+- /home/trajan/.openclaw/openclaw.json
+- /home/trajan/.openclaw/agents/main/sessions/sessions.json
+- /home/trajan/.openclaw/agents/main/workspace/scripts/discord_lane_continue.sh
+- /home/trajan/.openclaw/agents/main/workspace/scripts/babysitter_signal_check.sh

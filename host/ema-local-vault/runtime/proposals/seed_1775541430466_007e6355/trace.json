@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "active_tasks": 0,
+    "seed": true,
+    "project": false,
+    "recent_proposals": 5
+  },
+  "project_id": null,
+  "seed_id": "seed_1775541430466_007e6355",
+  "seed_name": "intent:task-2-provider-registry-wiring-add-openclaw-to-adaptermodul",
+  "compiled_at": "2026-04-11T20:49:32.790085Z",
+  "composer_version": 1
+}

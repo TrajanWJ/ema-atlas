@@ -1,0 +1,23 @@
+{
+  "id": "bridge-mvp-stack-upgrade",
+  "description": "Install shadcn/ui + Zustand + Recharts into frontend-layer and upgrade Conversations tab into the Bridge view",
+  "agent": "coder",
+  "priority": 2,
+  "status": "done",
+  "created": "2026-03-20T16:00:00Z",
+  "timeout_minutes": 30,
+  "context": "Project: /home/trajan/projects/frontend-layer (Next.js 16 + React 19 + Tailwind 4).\n\nDecisions made:\n- Stack: shadcn/ui + Zustand + Recharts (Option D from brainstorm)\n- Priority: Bridge View (Option B) — install stack as part of building Bridge, not separate migration\n- Approach: Evolve existing Observer app, don't start fresh\n\nPhase 1 — Stack Installation:\n- pnpm add zustand recharts\n- npx shadcn@latest init (dark theme, match existing CSS vars in globals.css)\n- Add shadcn components as needed: command, dialog, tabs, sheet, popover, toast\n\nPhase 2 — Zustand Stores:\n- WebSocket store (connection state, messages, agent events — extract from useWebSocket.ts)\n- Agent store (roster, status, activity)\n- UI store (active tab, sidebar state, modals)\n\nPhase 3 — Bridge View (upgrade existing Conversations.tsx):\n- Persistent input bar (always docked at bottom, multi-line with shift+enter)\n- Quick-route agent selector bar (emoji buttons above input: 🔬💻💾📋😈)\n- Route indicator label ('→ Concierge' etc.)\n- Streaming output with expandable cards (one-liner summary, click to expand full thread)\n- Command/confirm loop (structured echo on dispatch: task ID, agent, priority, vault path)\n- Agent identity rendering (name, avatar emoji, accent color per message)\n\nReference docs:\n- Vision: /home/trajan/vault/Architecture/Future-Frontend-Layer.md\n- UX Spec: /home/trajan/vault/Architecture/Future-Frontend-UX-Spec.md\n- Design tokens in UX spec section 'Design Tokens'\n- Existing WebSocket: src/lib/useWebSocket.ts\n- Existing types: src/lib/types.ts\n- Gateway protocol: /usr/lib/node_modules/openclaw/docs/gateway/protocol.md\n\nSuccess criteria: Bridge tab renders live agent output with streaming, user can type messages and route to specific agents via quick-route bar, expandable cards work, Zustand manages all state.",
+  "success_criteria": "1) shadcn/ui initialized with dark theme matching existing CSS vars. 2) Zustand stores for WS, agents, UI replace scattered useState/useCallback. 3) Conversations tab renamed to Bridge with persistent input bar, quick-route selector, and expandable output cards. 4) pnpm build succeeds. 5) Live agent messages render with identity (emoji + color).",
+  "tags": [
+    "frontend",
+    "bridge-mvp",
+    "stack-upgrade",
+    "high-priority"
+  ],
+  "source": "manual-dispatch",
+  "claimed_at": "2026-03-20T18:36:03Z",
+  "locked_by": "coder",
+  "pid": 139842,
+  "done_at": "2026-03-20T18:48:01Z",
+  "result_file": "/home/trajan/dispatch/results/bridge-mvp-stack-upgrade.txt"
+}

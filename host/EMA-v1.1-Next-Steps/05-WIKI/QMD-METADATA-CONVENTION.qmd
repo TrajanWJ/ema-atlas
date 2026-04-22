@@ -1,0 +1,47 @@
+---
+title: "QMD Metadata Convention"
+format: gfm
+---
+
+# QMD Metadata Convention
+
+## Recommended frontmatter
+```yaml
+---
+title: "Code vApp Object Model"
+type: object-model
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - repo-read
+  - planning-synthesis
+tracks:
+  - code-vapp
+objects:
+  - code-workstream
+  - code-session
+  - repo-binding
+related:
+  - ../05-WIKI/OBJECT-REGISTRY.qmd
+  - ./CODE-VAPP-CLI-GUI-MIRROR.qmd
+---
+```
+
+## Recommended fields
+- `title`
+- `type`
+- `plane`
+- `status`
+- `freshness`
+- `provenance`
+- `tracks`
+- `objects`
+- `related`
+
+## Why
+If these become consistent, the folder becomes much easier to:
+- browse
+- render
+- query
+- transform into a richer graph surface later

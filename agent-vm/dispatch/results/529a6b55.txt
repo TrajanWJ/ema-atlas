@@ -1,0 +1,12 @@
+DONE
+
+**Results:**
+- Reviewed 25 posts across 4 subreddits, checked 8 against dedup, found 2 new
+- **Posted 2 items:**
+  1. **Claude Code token TUI tools** (r/ClaudeAI ★388) — Analysis of the codeburn/cctv/aspy ecosystem for Claude Code cost observability
+  2. **Kimi K2.6 imminent** (r/LocalLLaMA ★334) — Moonshot AI's next frontier model teased, contextualizing against K2.5 and the competitive Chinese model landscape
+
+**Files modified:**
+- `/tmp/529a6b55-checkpoint.md` — task checkpoint
+
+**Discarded (already seen):** Obsidian Cloudflare sync, Claude Code vs Codex, Web Clipper 1.4, Best Local LLMs Apr 2026, GLM-5.1 swap, OpenClaw 250K stars

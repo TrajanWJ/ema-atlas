@@ -1,0 +1,87 @@
+---
+title: "Deep Research Sweep — System Enhancement & Competitors"
+created: 2026-03-19
+updated: 2026-03-19
+type: research
+status: active
+confidence: 0.85
+source: scout-deep-sweep
+tags: [research, competitors, memory, openclaw, enhancement]
+---
+
+# Deep Research Sweep — 2026-03-19
+
+## Direct Competitors to Trajan's System
+
+### Memory Layer
+| Project | Stars | What It Does | vs Our smrti |
+|---|---|---|---|
+| graphiti (getzep) | 23,951 | Real-time knowledge graphs for agents | smrti's upstream concept. 23k stars vs 1. Way more community support. |
+| Letta (MemGPT) | 21,653 | Stateful agents with self-improving memory | Full platform. Self-improvement built in. |
+| MemOS | 7,445 | Memory OS for LLM/agents. Has OpenClaw plugin! | 72% lower token usage. Multi-agent memory sharing. Cloud + local. |
+| OpenViking | 15,896 | Context database with filesystem paradigm | L0/L1/L2 tiered loading. Auto session management. |
+| MegaMemory | 64 | Knowledge graph for coding agents | Semantic search + web explorer |
+| Ori-Mnemos | 37 | ACT-R cognitive decay model | Scientifically grounded forgetting |
+| knowall-ai/neo4j | 65 | Neo4j-based agent memory MCP | Graph DB at scale |
+| mnemon | 29 | LLM-supervised persistent memory | Cross-session knowledge |
+
+### Personal AI OS Competitors
+| Project | Stars | What It Does | vs Our System |
+|---|---|---|---|
+| OwnPilot | 299 | Privacy-first personal AI with autonomous agents | Similar vision, TypeScript |
+| LiAgent OS | 4 | Local-first AI agent OS | Same concept, earlier stage |
+| SYNAPSE | (reddit) | Self-evolving multi-agent with source modification | Self-modifying code, brain portability |
+
+### OpenClaw Ecosystem (Enhancement Opportunities)
+| Project | Stars | What It Does | Should We Use It? |
+|---|---|---|---|
+| MemOS OpenClaw Plugin | 7,445 | Memory plugin for OpenClaw | YES - 72% token savings, multi-agent sharing |
+| ClawX | 4,932 | Desktop GUI for OpenClaw | YES - visual interface instead of CLI |
+| last30days-skill | 4,367 | Research across Reddit/X/YouTube/HN/Polymarket | YES - exactly what research feed needs |
+| clawmetry | 169 | Real-time observability dashboard | YES - agent monitoring/debugging |
+| openclaw-foundry | 294 | Self-writing meta-extension | STUDY - self-evolution patterns |
+| self-evolve | 75 | Self-evolution extension | STUDY - continuous improvement |
+| send-to-openclaw | 70 | Chrome extension for page capture | YES - research ingestion |
+| openclaw-deck | 13 | Cost tracking dashboard | YES - budget enforcement |
+| Parlant | 17,826 | Conversational control layer | STUDY - guideline enforcement patterns |
+
+## Key Problems Identified & Solutions
+
+### 1. Memory Fragmentation (smrti graph healing)
+**Problem:** Entities from different episodes not properly linked
+**Solution from ecosystem:** 
+- MemOS offers multi-agent memory sharing via same user_id
+- OpenViking's filesystem paradigm eliminates fragmentation by design
+- Ori-Mnemos uses ACT-R cognitive decay (scientific forgetting model)
+
+### 2. Context Window Pollution
+**Problem:** Agents loading irrelevant context
+**Reddit insight (r/openclaw):** "Attentional gating" — need mechanism to suppress irrelevant memories, not just retrieve relevant ones. "Given what you're about to do, what should you NOT think about right now?"
+**Solution:** OpenViking's L0/L1/L2 tiered context loading. Only load what's needed at each tier.
+
+### 3. Agent Output Validation (Silent Failures)
+**Reddit insight (r/ClaudeAI):** "The default failure mode in multi-agent systems is silence." Downstream agents process garbage confidently.
+**Solution:** Metadata envelopes on every agent output. Each agent declares: did I finish? How many sources hit vs expected? Next agent checks before processing.
+
+### 4. Research Feed Quality
+**Problem:** Research picks too homogeneous, low quality
+**Solution:** last30days-skill — researches across 10 sources (Reddit, X, YouTube, HN, Polymarket, Bluesky, TikTok, Instagram), quality-ranked scoring, convergence detection
+
+### 5. Research Loop Visibility  
+**Problem:** Research loops complete but produce no visible output
+**Solution:** Every research completion must produce: desk post + Discord update + vault entry
+
+### 6. Cost/Token Optimization
+**Problem:** High token usage across 27 agents
+**Solution:** MemOS claims 72% lower token usage, 35% memory token savings
+
+## Actionable Next Steps (Priority Order)
+
+1. **Install MemOS OpenClaw Plugin** — immediate token savings + multi-agent memory sharing
+2. **Study last30days-skill** — reimplement the multi-source research pattern
+3. **Install clawmetry** — real-time agent observability
+4. **Study OpenViking's tiered context loading** — implement L0/L1/L2 for our context management
+5. **Implement metadata envelopes** — agent output validation between handoffs
+6. **Study attentional gating** — build "what NOT to recall" alongside "what to recall"
+7. **Study openclaw-foundry** — self-writing extension patterns
+8. **Evaluate ClawX** — desktop GUI for management

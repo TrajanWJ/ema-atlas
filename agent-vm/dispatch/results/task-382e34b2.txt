@@ -1,0 +1,25 @@
+**DONE**
+
+Disk reduced from **96% (4G free) to 82% (16G free)** — freed ~12G.
+
+### Cleanup summary:
+| Target | Freed |
+|--------|-------|
+| Agent research repos (.openclaw cloned repos) | ~5.1G |
+| Dispatch archive (archive/openclaw/config) | ~3.6G |
+| uv cache | ~1.7G |
+| npm cache | ~1.5G |
+| qmd cache | ~878M |
+| System logs (rotated + truncated) | ~50M |
+| Browser cache (Chrome) | ~40M |
+| Docker prune | minimal (5 active containers) |
+| Journal vacuum | ~50M |
+
+### Not cleaned (require judgment):
+- `.openclaw/agents/` — 4.5G of qmd indexes across ~30 agents. Likely needed by openclaw.
+- `.npm-global/` — 3G of globally installed packages (not cache)
+- `.bun/install/global/` — 2.3G of global bun packages
+- `.local/share/pnpm/` — 2.6G pnpm store (pruned, all referenced)
+
+### Files modified:
+- `/tmp/task-382e34b2-checkpoint.md` — task progress checkpoint

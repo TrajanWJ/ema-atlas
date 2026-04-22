@@ -1,0 +1,28 @@
+## DONE
+
+**Disk: 89% → 87% (9.9G → 12G free, ~2.1GB recovered)**
+
+### What was cleaned
+| Target | Freed |
+|--------|-------|
+| Docker images (prune) | ~1.1 GB |
+| Docker system (dangling) | ~89 MB |
+| node-gyp cache | ~65 MB |
+| uv cache | cleaned |
+| npm cache | cleaned |
+| Old snap revisions | ~removed cups |
+| Journal (vacuumed to 7d) | trimmed |
+| Old rotated logs (>7d) | removed |
+| /tmp old files | removed |
+
+### Items with no/minimal cleanup needed
+- **dispatch/archive**: only 288K — nothing worth pruning
+- **data/agent-state/browser**: path doesn't exist
+- **Browser cache**: no Chrome/Firefox/Brave cache dirs found (likely a server/VM without a browser)
+
+### Opportunities flagged (not in scope, need your approval)
+- `~/cherry-studio/node_modules/` — **2.7 GB** (if you're not actively developing this, `trash ~/cherry-studio/node_modules` would reclaim it; re-run `npm install` to restore)
+- `~/archive/openclaw/` — **3.8 GB** (could compress or move to external storage)
+
+### Files modified
+- `/tmp/task-49ee5872-checkpoint.md` — task checkpoint

@@ -1,0 +1,29 @@
+{
+  "id": "prop-1774033545-280d18c9",
+  "type": "dispatch",
+  "title": "Weekly synthesis: what did the system learn?",
+  "body": "Weekly review and synthesis of agent system learnings.",
+  "options": [],
+  "source": "self-improvement",
+  "priority": "P3",
+  "created_at": "2026-03-20T19:05:45Z",
+  "status": "approved",
+  "discord_message_id": null,
+  "resolved_at": "2026-03-20T19:07:07Z",
+  "resolved_option": "approve",
+  "is_multi_task": false,
+  "tasks": [
+    {
+      "agent": "researcher",
+      "description": "Review this week's dispatch outcomes, vault writes, feed errors. Synthesize: what shipped, what failed, patterns, what to change. Write to vault/Daily Notes/Weekly-2026-03-20.md",
+      "priority": 3,
+      "timeout": 20,
+      "depends_on_prev": false
+    }
+  ],
+  "safety_class": "human",
+  "triaged": true,
+  "triage_verdict": "escalate",
+  "triage_reason": "Ambiguous — needs human review",
+  "triaged_at": "2026-03-20T19:05:47Z"
+}

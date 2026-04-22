@@ -1,0 +1,159 @@
+---
+title: "Current EMA UI Structure Inventory"
+type: ui-inventory
+plane: reality
+status: active
+freshness: recent
+provenance:
+  - repo-read
+tracks:
+  - shell-hq
+  - code-vapp
+  - host-ops
+  - knowledge
+  - agent-work
+format: gfm
+---
+
+# Current EMA UI Structure Inventory
+
+## Live codebase roots
+- `apps/electron/` — desktop shell / preload / runtime bridge / windows state
+- `apps/renderer/` — primary frontend/UI app
+
+## Renderer top-level structure
+- `src/App.tsx`
+- `src/main.tsx`
+- `src/components/`
+- `src/config/`
+- `src/lib/`
+- `src/stores/`
+- `src/styles/`
+- `src/types/`
+- `src/vapps/`
+
+## Layout / shell primitives already present
+Under `src/components/layout/`:
+- `Shell.tsx`
+- `Launchpad.tsx`
+- `Sidebar.tsx`
+- `Dock.tsx`
+- `CommandBar.tsx`
+- `QuickCapture.tsx`
+- `StandaloneAppShell.tsx`
+- window chrome / resize / header actions
+
+This suggests the app already has the beginnings of a native shell/launchpad/windowed multi-app model.
+
+## Major current UI families visible in renderer
+
+### Shell / workspace / system surfaces
+- `hq/`
+- `desk/`
+- `dashboard/`
+- `life-dashboard/`
+- `layout/`
+- `briefing/`
+- `jarvis/`
+- `orb/`
+
+### Agent / orchestration surfaces
+- `agent-chat/`
+- `agent-bridge/`
+- `agent-fleet/`
+- `agent-graph/`
+- `agent-stream/`
+- `agent-system/`
+- `agents/`
+- `orchestration/`
+- `dispatch-board/`
+- `babysitter/`
+- `operator-chat/`
+- `mcp/`
+- `claude-bridge/`
+- `cli-manager/`
+
+### Planning / intent / proposal surfaces
+- `blueprint-planner/`
+- `intent/`
+- `intents/`
+- `proposals/`
+- `decision-log/`
+- `pipeline/`
+- `pattern-lab/`
+- `prompt-workshop/`
+- `metamind/`
+
+### Knowledge / graph / memory surfaces
+- `knowledge-graph/`
+- `project-graph/`
+- `context/`
+- `memory/`
+- `notes/`
+- `drafts/`
+- `canvas/`
+- `file-vault/`
+- `ingestor/`
+- `harvesters/`
+
+### Runtime / execution / audit surfaces
+- `executions/`
+- `audit-trail/`
+- `gaps/`
+- `quality/`
+- `governance/`
+- `persistence/`
+- `pipes/`
+- `evolution/`
+
+### Channels / messaging / org surfaces
+- `channels/`
+- `message-hub/`
+- `org/`
+- `integrations/`
+
+### Productivity / personal operating surfaces
+- `agenda/`
+- `brain-dump/`
+- `focus/`
+- `goals/`
+- `journal/`
+- `habits/`
+- `responsibilities/`
+- `routine-builder/` (present in tree)
+- `finance-tracker/`
+- `invoice-billing/`
+- `contacts-crm/`
+- `campaigns/`
+- `meeting-room/`
+
+### Code / repo / sync-ish surfaces
+- `git-sync/`
+- `code-health/`
+- likely related pieces under agent/orchestration/context families
+
+## Main structural reality
+The renderer currently looks like a **large app garden of many semi-separate vApps/apps**, with a shell/layout layer over them.
+
+## Key interpretation
+This is useful because it shows:
+- there is already a native UI shell direction
+- there is already a vApp/app-window model
+- the problem is not lack of surfaces, but lack of reconciliation / conceptual coherence
+
+## Main UI revision question
+How should these many app families collapse into a cleaner EMA-native structure?
+Likely candidates:
+- Shell / HQ
+- Workstreams / Agent Work
+- Knowledge Graph / Canon / Recall
+- Code Region
+- Host Ops / Runtime Reality
+- Chronicle / Review / Gaps
+- Capture / Inbox / Daily Steering
+
+## Related
+- [EMA as Native UI App](../03-IDENTITY/EMA-AS-NATIVE-UI-APP.qmd)
+- [VAPP Reconciliation Table](../04-CANON/VAPP-RECONCILIATION-TABLE.md)
+- [Renderer Reconciliation Questions](../11-GAPS/RENDERER-RECONCILIATION-QUESTIONS.md)
+- [Shared Workspace Capabilities](../03-IDENTITY/SHARED-WORKSPACE-CAPABILITIES.qmd)

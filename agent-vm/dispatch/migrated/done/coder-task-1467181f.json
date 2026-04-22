@@ -1,0 +1,23 @@
+{
+  "id": "task-1467181f",
+  "created_at": "2026-03-20T18:20:20Z",
+  "source": "agent-os-unification-sprint",
+  "priority": 1,
+  "agent": "coder",
+  "description": "Build feed detail slide-out panel in the frontend at Projects/agent-os-demo-pages/. When a feed item is clicked, a right-side panel (55% width) slides out showing: (1) DELEGATION TREE — Goal→Mission→Plan→Pipeline→Task hierarchy with each level clickable, showing inline progress %. Use /api/feed/:id enriched response. (2) DELEGATED BY — chain showing which agent delegated to which. (3) AGENT STATUS — current state, tasks today. (4) WHAT IT DID — full description with topic tags. (5) ARTIFACTS — files produced, clickable. (6) TASK TIMELINE — chronological events for this task with 'you are here' marker. (7) VAULT CONNECTIONS — linked notes from obsidian vault. (8) SIBLING TASKS — other tasks in same mission with status. (9) WHAT'S NEXT — unblocked downstream tasks. (10) QUICK NAV — buttons linking to Mission View, Pipeline View, Vault, Agent Profile. Panel must work on both agent-os-demo-pages AND be portable to frontend-layer later. Use /api/feed, /api/agents, /api/queue endpoints.",
+  "success_criteria": "",
+  "timeout_min": 60,
+  "depends_on": [
+    "task-19d2d0c9"
+  ],
+  "on_complete": {},
+  "attempts": 0,
+  "max_attempts": 2,
+  "cleanup_source": "stale-task-cleanup.sh (zombie recovery)",
+  "status": "done",
+  "claimed_at": "2026-03-20T18:24:02Z",
+  "locked_by": "coder",
+  "pid": 105681,
+  "done_at": "2026-03-20T18:30:02Z",
+  "result_file": "/home/trajan/dispatch/results/task-1467181f.txt"
+}

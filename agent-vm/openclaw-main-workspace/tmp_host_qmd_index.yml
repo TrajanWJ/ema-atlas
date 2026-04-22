@@ -1,0 +1,21 @@
+global_context: "Trajan's cross-machine knowledge base and project docs"
+
+collections:
+  vault:
+    path: /home/trajan/vault
+    pattern: "**/*.{md,qmd}"
+    context:
+      "/": "Primary host vault — notes, research, architecture, workflows, and operational docs"
+    includeByDefault: true
+  ema-docs:
+    path: /home/trajan/Projects/ema
+    pattern: "**/*.{md,qmd}"
+    context:
+      "/": "Active host EMA monorepo docs, architecture notes, AGENTS/CLAUDE guidance, and implementation specs"
+    includeByDefault: true
+  ema-next-steps:
+    path: /home/trajan/Desktop/EMA-v1.1-Next-Steps
+    pattern: "**/*.{md,qmd}"
+    context:
+      "/": "Host-side EMA planning and QMD design pack with graph, research, and workspace-identity docs"
+    includeByDefault: true

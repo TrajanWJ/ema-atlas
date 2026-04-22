@@ -1,0 +1,19 @@
+{
+  "track": "EMA v1.1 Track E",
+  "mode": "self-paced",
+  "timeboxWeeks": 12,
+  "cadence": {
+    "planningReview": "weekly",
+    "demoReview": "end-of-sprint",
+    "canonReview": "biweekly",
+    "graphCoverageReview": "biweekly"
+  },
+  "phases": [
+    {"id": "phase-0", "name": "Canon and ontology foundation", "weeks": [1,2]},
+    {"id": "phase-1", "name": "Projection and blueprint substrate", "weeks": [3,4]},
+    {"id": "phase-2", "name": "Feed, wiki, and contradiction surfaces", "weeks": [5,6]},
+    {"id": "phase-3", "name": "Research import and cross-pollination", "weeks": [7,8]},
+    {"id": "phase-4", "name": "Meta-EMA ingestion and full graph coverage", "weeks": [9,10]},
+    {"id": "phase-5", "name": "Hardening, demos, and operatorization", "weeks": [11,12]}
+  ]
+}

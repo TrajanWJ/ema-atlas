@@ -1,0 +1,22 @@
+{
+  "id": "task-4c4bb2c7",
+  "created_at": "2026-04-17T03:00:01Z",
+  "source": "signal",
+  "priority": 3,
+  "agent": "utility",
+  "description": "Vault staleness: 114 notes not updated in 30+ days. Pick the 5 most important and verify/update.",
+  "success_criteria": "",
+  "timeout_min": 15,
+  "depends_on": [],
+  "on_complete": {},
+  "attempts": 0,
+  "max_attempts": 2,
+  "status": "partial",
+  "claimed_at": "2026-04-17T03:00:02Z",
+  "locked_by": "utility",
+  "pid": 421192,
+  "failure_reason": "stale-task-cleanup: timeout after 30min (partial checkpoint saved)",
+  "failed_at": "2026-04-17T03:30:02.455993+00:00",
+  "partial_result_file": "/home/trajan/dispatch/results/task-4c4bb2c7-partial.txt",
+  "cleanup_source": "stale-task-cleanup.sh"
+}

@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "active_tasks": 0,
+    "seed": true,
+    "project": false,
+    "recent_proposals": 5
+  },
+  "project_id": null,
+  "seed_id": "seed_1775545173283_ac3c0c34",
+  "seed_name": "intent:add-filesystem-dep-and-rewrite-vaultwatcher-to-use-inotify-r",
+  "compiled_at": "2026-04-11T20:49:32.508586Z",
+  "composer_version": 1
+}

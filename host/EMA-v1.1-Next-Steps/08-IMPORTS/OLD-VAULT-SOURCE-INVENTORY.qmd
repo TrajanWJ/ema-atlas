@@ -1,0 +1,39 @@
+---
+title: "Old Vault Source Inventory"
+type: source-inventory
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+tracks:
+  - knowledge
+format: gfm
+---
+
+# Old Vault Source Inventory
+
+## Major source families worth mining
+- system docs
+- architecture notes
+- operations and maintenance logs
+- skill and agent notes
+- projects/workstreams
+- research/reference material
+- session summaries and memory files
+- QMD/query/metabolism docs
+
+## Known especially valuable patterns
+- vault health / maintenance logs
+- session continuity
+- graph/link density practices
+- ontology-sync ambitions
+- inbox/capture/promote flows
+- filesystem-first durability
+
+## Migration intent
+Use this inventory as the staging page for selecting which old-vault material gets:
+- preserved
+- translated
+- merged
+- archived as lineage

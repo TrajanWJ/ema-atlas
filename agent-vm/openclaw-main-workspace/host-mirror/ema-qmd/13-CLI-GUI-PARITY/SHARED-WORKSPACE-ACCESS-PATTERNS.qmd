@@ -1,0 +1,27 @@
+---
+title: "Shared Workspace Access Patterns"
+type: access-model
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - shell-hq
+  - host-ops
+  - code-vapp
+format: gfm
+---
+
+# Shared Workspace Access Patterns
+
+## Access modes
+- local GUI
+- local CLI
+- remote CLI over SSH
+- remote attach to active workspace/session
+- multi-user shared review/planning presence
+- agent-native execution against same workspace truth
+
+## Principle
+Different access paths should converge on the same objects, sessions, chronicle, bindings, and approvals.

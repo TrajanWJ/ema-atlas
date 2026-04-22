@@ -1,0 +1,27 @@
+{
+  "id": "vault-improve-20260416-040007-2",
+  "description": "Vault improvement: Backfill/improve 'sum_8b5b215bad858a8f' (thin-file (344B)). Current content is insufficient \u2014 research the topic and write substantive content.",
+  "agent": "researcher",
+  "priority": 3,
+  "status": "done",
+  "created": "2026-04-16T04:00:07Z",
+  "timeout_minutes": 10,
+  "context": "File: LCM Summaries/sum_8b5b215bad858a8f.md\\nReason: thin-file (344B)\\nCurrent preview: # LCM Summary sum_8b5b215bad858a8f  Created: 2026-03-20 10:42:30 Kind: leaf Depth: 0 Conversation: 659 Tokens: 34 Descendants: 0 Earliest: 2026-03-20T09:44:15.000Z Latest: 2026-03-20T09:44:15.000Z  ##\\n\\nResearch this topic and produce a well-written vault note with: proper frontmatter, substantive content (500+ words), wikilinks to related notes, and sources where applicable.\\n\\nIMPORTANT: Do NOT post to #research-feed unless there is a genuinely novel finding worth Trajan's attention. Vault improvement tasks are internal \u2014 write to vault only.",
+  "success_criteria": "The file at vault/LCM Summaries/sum_8b5b215bad858a8f.md should have: 1) Valid frontmatter with confidence/source/summary, 2) Substantive content covering the topic, 3) At least 2 wikilinks, 4) 500+ bytes minimum",
+  "vault_refs": [
+    "LCM Summaries/sum_8b5b215bad858a8f.md"
+  ],
+  "tags": [
+    "research-loop",
+    "vault-improvement",
+    "thin-file (344B)"
+  ],
+  "source": "vault-research-loop",
+  "post_to_feed": false,
+  "claimed_at": "2026-04-16T04:01:04Z",
+  "locked_by": "researcher",
+  "pid": 377702,
+  "done_at": "2026-04-16T04:03:05.005135+00:00",
+  "result_file": "/home/trajan/dispatch/results/vault-improve-20260416-040007-2.txt",
+  "cleanup_source": "stale-task-cleanup.sh (zombie recovery)"
+}

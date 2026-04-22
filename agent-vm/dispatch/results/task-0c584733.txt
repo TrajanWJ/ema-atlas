@@ -1,0 +1,25 @@
+## Status: DONE
+
+**Disk: 87% → 84%** (75GB → 73GB used, ~3GB freed)
+
+### Cleanup Summary
+
+| Area | Action | Space Freed |
+|------|--------|-------------|
+| Docker images | Pruned 3 dangling + 1 unused python image | ~2.4GB |
+| Docker system | Pruned unused networks/containers | minor |
+| /tmp logs | Truncated claudeforge.log, openclaw log | ~3MB |
+| /var/log | Removed rotated .gz and .1 files | ~20MB |
+| journalctl | Vacuumed to 50MB cap | variable |
+| ~/.cache/node-gyp | Removed | ~65MB |
+| ~/.cache/uv | Cleaned via `uv cache clean` | ~178MB |
+| Browser cache | None found (no browser installed) | 0 |
+| data/agent-state/browser | Directory doesn't exist | 0 |
+| dispatch/archive | Only 176KB — left as-is | 0 |
+
+### Notes
+- The remaining ~878MB in `~/.cache/` is mostly `qmd` (722MB) and `codebase-memory-mcp` (85MB) — both are active working caches that would need to be rebuilt if removed.
+- Docker still has 5 active containers using all 5 volumes — no safe volumes to prune.
+
+### Files Modified
+- `/tmp/task-0c584733-checkpoint.md` — task checkpoint

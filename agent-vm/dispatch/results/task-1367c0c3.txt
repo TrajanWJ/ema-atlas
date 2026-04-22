@@ -1,0 +1,16 @@
+[rate-limit-handler] Retry 1/3 — waiting 30s...
+## Status: DONE
+
+This task was already completed by a prior execution of the same task-id (`task-1367c0c3`). The full analysis exists at:
+
+**Files created/verified:**
+- `/home/trajan/dispatch/utility/workspace/failed-task-analysis-2026-04-22.md` — full analysis (pre-existing)
+- `/tmp/task-1367c0c3-checkpoint.md` — checkpoint confirming completion
+
+**Summary of prior analysis findings:**
+- **198 failed tasks** across 5 days (04-17 to 04-21), all cleared
+- Top failure categories: vault-improve (85, 43%), utility-task (42, 21%), ops-task (37, 19%), reddit-intel (28, 14%)
+- **Root cause**: Researcher agent degradation (60% of failures), disk pressure feedback loop (86%→95% usage), no dedup guard on recurring signals
+- **Key recommendations**: P0 investigate researcher agent, P1 add recurring task dedup, P1 fix disk cleanup scheduling
+
+**Current state**: `failed/` is empty, DB shows 0 failed tasks.

@@ -1,0 +1,18 @@
+## DONE
+
+### Files Modified
+
+| File | Key Changes |
+|---|---|
+| `~/vault/Trajan/Active Projects Summary.md` | Added **place.org** as #1 project (was missing entirely). Recategorized projects into active/stable/slower tiers based on actual git commit dates. |
+| `~/vault/Trajan/Projects.md` | Added place.org as Primary Focus section. Updated statuses with real last-commit dates. Marked ExecuDeck as stalled (last commit 2026-02-19). |
+| `~/vault/Trajan/Priorities.md` | Added proper frontmatter (had none). Marked stale items with ❓ for user verification. Noted dispatch system is running again. |
+| `~/vault/Trajan/Profile.md` | Added current primary project (place.org). Updated verification timestamp. |
+| `~/vault/Trajan/Host Machine Profile.md` | Fixed Node version (v22→v20.20.1). Updated disk usage (20%→35%, +124GB). Updated place.org to v0.4 status. |
+
+### Findings Worth Noting
+- **place.org** is clearly the primary project now (committed 2026-04-13) but was completely absent from both project tracking notes
+- **Host disk grew 124GB in 3 weeks** (165GB→289GB) — worth monitoring
+- **ExecuDeck** hasn't had a commit since Feb 19 — may be abandoned or deprioritized
+- **Priorities.md** had items from March that may no longer be relevant — flagged for Trajan to confirm
+- **Monthly Goals** is still an empty template — never populated

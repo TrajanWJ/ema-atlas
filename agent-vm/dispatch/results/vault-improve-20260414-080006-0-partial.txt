@@ -1,0 +1,14 @@
+# Checkpoint: vault-improve-20260414-080006-0
+Updated: 2026-04-14T08:01
+## Completed
+- Read existing file (121 lines, good content but no frontmatter, some duplicates)
+- Added proper frontmatter (title, type, created, confidence, source, tags, summary)
+- Deduplicated entries (ChromaFs, self-distillation, subscription threads appeared twice)
+- Added 10+ wikilinks throughout (Claude Code, MCP, RAG, agent security, LLM training, etc.)
+- Cleaned up formatting with consistent structure
+- Ran qmd update successfully
+- qmd embed running
+## Remaining
+- None
+## Current Status
+DONE - File improved with frontmatter, deduplication, and wikilinks

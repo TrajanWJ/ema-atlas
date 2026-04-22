@@ -1,0 +1,43 @@
+---
+title: "OpenClaw to EMA Bootstrap"
+type: bootstrap-plan
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - shell-hq
+  - knowledge
+  - agent-work
+format: gfm
+---
+
+# OpenClaw to EMA Bootstrap
+
+## Goal
+Bring the current OpenClaw setup to an EMA-shaped operating point using the vault, QMD habits, and old-system mechanisms.
+
+## Bootstrap principle
+Do not wait for the final EMA native UI before becoming useful.
+Bootstrap EMA through OpenClaw + vault/QMD + Discord + durable workspace files.
+
+## Minimum bootstrap stack
+- OpenClaw as agent runtime and messaging surface
+- Discord as command/control surface
+- vault/QMD as durable knowledge/query substrate
+- workspace files as living EMA scaffold
+- chronicle/review/recall write paths
+- maintenance/freshness loops
+
+## Bootstrap sequence
+1. declare source-of-truth split clearly
+2. connect OpenClaw workspace to vault/QMD substrate intentionally
+3. define write paths for summaries, chronicle, capture, and memory
+4. define query habits across workspace + vault
+5. recover old maintenance loops in EMA language
+6. define how EMA native UI later sits on top of the same substrate
+
+## Main outcome
+An EMA-like system that is already operational and bootstrapable before the full app is complete.

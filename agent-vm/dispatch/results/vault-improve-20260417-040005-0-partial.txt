@@ -1,0 +1,13 @@
+# Checkpoint: vault-improve-20260417-040005-0
+Updated: 2026-04-17T04:01:30Z
+## Completed
+- Read existing note (stub with no frontmatter, 17 lines)
+- Researched actual filesystem state (snap dirs, cache sizes, profile contents)
+- Found related vault notes (uv-cache, docker-prune)
+- Checked crontab for existing cleanup automation
+- Wrote comprehensive note with frontmatter, ~3KB content, 3 wikilinks, sources
+- Ran qmd update/embed for vault indexing
+## Remaining
+- None
+## Current Status
+DONE - note fully rewritten with proper frontmatter and substantive content

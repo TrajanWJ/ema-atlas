@@ -1,0 +1,189 @@
+{
+  "generated_at": "2026-04-04T18:06:16.589248+00:00",
+  "top_topics": [
+    {
+      "topic": "EMA execution",
+      "score": 5711.259,
+      "examples": [
+        {
+          "title": "2026 04 04 # Daily Memory — 2026-04-04 ## EMA Sprint — Session Summary ### What shipped tonight (commits landed on main) | 693b05e | Test s…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:04:34.786811+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SIGNAL FIRST NEXT ROUND BRIEF # EMA Babysitter Signal-First Next Round Brief ## Objective Reduce noise from the engine and i…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:00:50.268932+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SURFACE GOVERNOR IMPLEMENTATION BRIEF # EMA Babysitter Surface Governor — Implementation Brief ## Goal - semantic lanes for …",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T17:57:10.709077+00:00"
+        }
+      ]
+    },
+    {
+      "topic": "Dispatch & bridge",
+      "score": 3835.998,
+      "examples": [
+        {
+          "title": "2026 04 04 # Daily Memory — 2026-04-04 ## EMA Sprint — Session Summary ### What shipped tonight (commits landed on main) | 693b05e | Test s…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:04:34.786811+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SIGNAL FIRST NEXT ROUND BRIEF # EMA Babysitter Signal-First Next Round Brief ## Objective Reduce noise from the engine and i…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:00:50.268932+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SURFACE GOVERNOR IMPLEMENTATION BRIEF # EMA Babysitter Surface Governor — Implementation Brief ## Goal - semantic lanes for …",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T17:57:10.709077+00:00"
+        }
+      ]
+    },
+    {
+      "topic": "MCP / integrations",
+      "score": 2584.943,
+      "examples": [
+        {
+          "title": "2026 04 04 # Daily Memory — 2026-04-04 ## EMA Sprint — Session Summary ### What shipped tonight (commits landed on main) | 693b05e | Test s…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:04:34.786811+00:00"
+        },
+        {
+          "title": "Babysitter Stream Master Guide # Plan: Babysitter + Stream-of-Consciousness + Tick Spec Master Guide ## Overview This document consolidates…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T17:55:48.992722+00:00"
+        },
+        {
+          "title": "PROPOSAL USER INPUT AND DESK SPEC # Proposal User Input + Desk Surface Spec **Status:** READY FOR IMPLEMENTATION ## What This Solves 1.",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T03:26:38.907735+00:00"
+        }
+      ]
+    },
+    {
+      "topic": "Discord / channel ops",
+      "score": 2472.871,
+      "examples": [
+        {
+          "title": "2026 04 04 # Daily Memory — 2026-04-04 ## EMA Sprint — Session Summary ### What shipped tonight (commits landed on main) | 693b05e | Test s…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:04:34.786811+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SIGNAL FIRST NEXT ROUND BRIEF # EMA Babysitter Signal-First Next Round Brief ## Objective Reduce noise from the engine and i…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:00:50.268932+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SURFACE GOVERNOR IMPLEMENTATION BRIEF # EMA Babysitter Surface Governor — Implementation Brief ## Goal - semantic lanes for …",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T17:57:10.709077+00:00"
+        }
+      ]
+    },
+    {
+      "topic": "Wiki memory layer",
+      "score": 1856.185,
+      "examples": [
+        {
+          "title": "2026 04 04 # Daily Memory — 2026-04-04 ## EMA Sprint — Session Summary ### What shipped tonight (commits landed on main) | 693b05e | Test s…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:04:34.786811+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SURFACE GOVERNOR IMPLEMENTATION BRIEF # EMA Babysitter Surface Governor — Implementation Brief ## Goal - semantic lanes for …",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T17:57:10.709077+00:00"
+        },
+        {
+          "title": "agent performance # Agent Performance Log ## Fitness Scoring Framework - **success_rate** — Completed tasks / Total tasks (0.0–1.0).",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T17:46:07.657977+00:00"
+        }
+      ]
+    },
+    {
+      "topic": "Babysitter reliability",
+      "score": 1400.391,
+      "examples": [
+        {
+          "title": "2026 04 04 # Daily Memory — 2026-04-04 ## EMA Sprint — Session Summary ### What shipped tonight (commits landed on main) | 693b05e | Test s…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:04:34.786811+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SIGNAL FIRST NEXT ROUND BRIEF # EMA Babysitter Signal-First Next Round Brief ## Objective Reduce noise from the engine and i…",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T18:00:50.268932+00:00"
+        },
+        {
+          "title": "EMA BABYSITTER SURFACE GOVERNOR IMPLEMENTATION BRIEF # EMA Babysitter Surface Governor — Implementation Brief ## Goal - semantic lanes for …",
+          "source_kind": "local_markdown_resource",
+          "timestamp": "2026-04-04T17:57:10.709077+00:00"
+        }
+      ]
+    }
+  ],
+  "priority_records": [
+    {
+      "title": "SEED STARVATION HARDENING 2026 04 04 # Seed Starvation Hardening — 2026-04-04 ## What failed - active: true - schedule: null - run_count: 0…",
+      "timestamp": "2026-04-04T17:43:20.033739+00:00",
+      "source_kind": "local_markdown_resource",
+      "domain": "code",
+      "agent": "concierge"
+    },
+    {
+      "title": "EMA REPO REALITY CHECK 2026 04 04 # EMA Repo Reality Check — 2026-04-04 ## Bottom line The live repo at /home/trajan/Projects/ema is **much…",
+      "timestamp": "2026-04-04T17:33:33.007942+00:00",
+      "source_kind": "local_markdown_resource",
+      "domain": "code",
+      "agent": "coder"
+    },
+    {
+      "title": "Explore the OpenClaw project at /home/trajan.",
+      "timestamp": "2026-04-04T06:37:54.653Z",
+      "source_kind": "claude_project",
+      "domain": "ops",
+      "agent": "ops"
+    },
+    {
+      "title": "Start openclaw now, test it with cli, make sure he is responding and alive in discord",
+      "timestamp": "2026-04-04T06:27:42.472Z",
+      "source_kind": "claude_project",
+      "domain": "code",
+      "agent": "coder"
+    },
+    {
+      "title": "learnings ### 2026-04-04 | ema-brain-backend-sessions-20260404 | ❌ FAILED - **Lesson:** Task failed with exit code 0.",
+      "timestamp": "2026-04-04T03:37:01.804424+00:00",
+      "source_kind": "local_markdown_resource",
+      "domain": "code",
+      "agent": "coder"
+    },
+    {
+      "title": "PROPOSAL USER INPUT AND DESK SPEC # Proposal User Input + Desk Surface Spec **Status:** READY FOR IMPLEMENTATION ## What This Solves 1.",
+      "timestamp": "2026-04-04T03:26:38.907735+00:00",
+      "source_kind": "local_markdown_resource",
+      "domain": "code",
+      "agent": "coder"
+    },
+    {
+      "title": "CODER EMA FIXES RESULT # EMA Critical Fixes — Result Report ## FIX 1: Bridge Activation — ai_backend: :bridge **Status:** ✅ ALREADY DONE — …",
+      "timestamp": "2026-04-04T03:15:45.524730+00:00",
+      "source_kind": "local_markdown_resource",
+      "domain": "code",
+      "agent": "coder"
+    },
+    {
+      "title": "W7 B3 BRIDGE ASYNC RESULT # W7-B3 Bridge Async Dispatch — Result **Status: DONE_WITH_CONCERNS** ## Summary ## What Was Done ### 1.",
+      "timestamp": "2026-04-04T02:48:58.520611+00:00",
+      "source_kind": "local_markdown_resource",
+      "domain": "code",
+      "agent": "coder"
+    }
+  ]
+}

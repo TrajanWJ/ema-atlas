@@ -1,0 +1,16 @@
+DONE
+
+**Posted 3 items from today's Reddit intel feed:**
+
+1. **Claude Code removed from Pro plan** (r/ClaudeAI ★1193) — Anthropic silently removed Claude Code from $20 Pro, now Max-only ($100+). Massive community backlash, no official announcement. Multiple corroborating posts across r/ClaudeAI and r/ClaudeCode.
+
+2. **Open WebUI Desktop released** (r/LocalLLaMA ★260) — Native desktop app (AGPL-3.0) for self-hosted AI with spotlight chat overlay, local llama.cpp inference, zero telemetry. Svelte/Electron stack.
+
+3. **TaskForge v2.6 ships calendar integration** (r/ObsidianMD ★331) — Native iOS/macOS/Android Obsidian task manager now overlays device calendar events, supports time blocking with natural language, and home screen widgets.
+
+**Skipped:**
+- Kimi K2.6, cryptominer post — already seen
+- Mythos/Bloomberg — 403 paywall, couldn't fetch source
+- Obsidian student vault (★1345) — wholesome but not technically novel
+- Claude Code pricing duplicates (★728, ★260, ★201) — same story as #1
+- Meme posts, basic questions, opinion threads — low signal

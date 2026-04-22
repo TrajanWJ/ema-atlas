@@ -1,0 +1,22 @@
+**DONE**
+
+## Summary
+
+21 failed tasks analyzed and cleared. Two patterns found:
+
+1. **Recurring signal tasks (9)** — vault-staleness, disk-cleanup, and failed-task-analysis tasks that intermittently fail but have successful later runs. All superseded.
+
+2. **Vault-improve research tasks (12)** — 73% failure rate on 04-14 (11/15). Likely continued API auth instability from 04-13. The vault-research-loop will re-queue targets.
+
+**Actions taken:**
+- Archived all 21 failed tasks to `archive/cleared-20260415/`
+- Updated 9 DB records to `cancelled`
+- `failed/` directory is now empty, DB shows 0 failed tasks
+
+**Recommendation:** Monitor researcher agent success rate on 04-15. If vault-improve failures continue, investigate API auth stability.
+
+## Files created/modified
+- `/home/trajan/dispatch/utility/workspace/failed-task-analysis-2026-04-15.md` (created — analysis report)
+- `/home/trajan/dispatch/archive/cleared-20260415/` (created — 21 archived task files)
+- `/home/trajan/dispatch/dispatch.db` (modified — 9 tasks updated failed→cancelled)
+- `/tmp/task-ed9af122-checkpoint.md` (created — checkpoint)

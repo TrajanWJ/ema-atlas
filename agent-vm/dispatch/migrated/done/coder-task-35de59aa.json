@@ -1,0 +1,21 @@
+{
+  "id": "task-35de59aa",
+  "created_at": "2026-03-20T18:20:42Z",
+  "source": "agent-os-unification-sprint",
+  "priority": 1,
+  "agent": "coder",
+  "description": "Design Proposal Engine v2 spec. The current proposal-engine.sh generates small maintenance tasks (orphan notes, disk pressure). Replace with a system that generates genuinely ambitious, multi-task work packages and dispatches them autonomously. IDEA SOURCES: (1) Audit gap analysis — maintain a living gap list from architecture audits, work through remediation items. (2) Goal alignment — pull from goals/missions, identify stalled/blocked work, propose unblocking. (3) Pattern recognition — analyze feed.jsonl history, failure patterns, recurring manual work, propose automation. (4) Codebase analysis — scan projects for TODO comments, dead code, missing tests, incomplete features, tech debt. (5) Self-improvement — Agent OS improving itself: missing API endpoints, broken integrations, unimplemented specs from shared-agent-config/. (6) Vault integration — scan vault for research notes that should become implementations, stale knowledge that needs updating, notes referencing unbuilt features. PROPOSAL FORMAT: Each proposal must include title, scope (number of tasks, estimated sessions), source (which idea source generated it), task breakdown, success criteria, and impact assessment. AUTONOMY: Non-destructive proposals auto-approve and auto-dispatch. Destructive/high-risk proposals queue for human review. Write spec to dispatch/specs/proposal-engine-v2-spec.md",
+  "success_criteria": "",
+  "timeout_min": 45,
+  "depends_on": [],
+  "on_complete": {},
+  "attempts": 0,
+  "max_attempts": 2,
+  "cleanup_source": "stale-task-cleanup.sh (zombie recovery)",
+  "status": "done",
+  "claimed_at": "2026-03-20T18:24:03Z",
+  "locked_by": "coder",
+  "pid": 106427,
+  "done_at": "2026-03-20T18:30:02Z",
+  "result_file": "/home/trajan/dispatch/results/task-35de59aa.txt"
+}

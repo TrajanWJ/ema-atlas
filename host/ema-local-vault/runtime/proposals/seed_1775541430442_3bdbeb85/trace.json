@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "active_tasks": 0,
+    "seed": true,
+    "project": true,
+    "recent_proposals": 5
+  },
+  "project_id": "proj_1775262165726_b0e3eb21",
+  "seed_id": "seed_1775541430442_3bdbeb85",
+  "seed_name": "intent:wiki-engine",
+  "compiled_at": "2026-04-11T20:49:32.716672Z",
+  "composer_version": 1
+}

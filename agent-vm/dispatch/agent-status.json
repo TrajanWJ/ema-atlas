@@ -1,0 +1,24 @@
+{
+  "updated_at": "2026-03-20T22:27:19Z",
+  "agents": {
+    "coder": {
+      "status": "active",
+      "task_id": "task-36bed2a5",
+      "task": "For each action item identified: create a dispatch task or vault note capturing ",
+      "since": "2026-03-20T22:27:14Z"
+    },
+    "researcher": {
+      "status": "active",
+      "task_id": "pipeline-research-20260320-204801",
+      "task": "Research loop: Investigate best practices for 'performance_optimization' in AI a",
+      "since": "2026-03-20T22:27:08Z"
+    },
+    "utility": {
+      "status": "active",
+      "task_id": "proposal-prop-1774033545-280d18c9",
+      "task": "Weekly synthesis: what did the system learn?",
+      "since": "2026-03-20T22:27:03Z"
+    }
+  },
+  "active_count": 3
+}

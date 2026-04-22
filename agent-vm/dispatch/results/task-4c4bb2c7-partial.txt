@@ -1,0 +1,16 @@
+# Checkpoint: task-4c4bb2c7
+Updated: 2026-04-17T00:08:00
+## Completed
+- Scanned vault for stale notes (80+ with created dates before 2026-03-18)
+- Selected 5 most important stale notes based on reference value and drift
+- Verified current system state (crontab, settings, MCP servers, plugins, ports)
+- Updated Note 1: My Stack Decisions — plugins, MCP servers, hooks, skills/agents/commands counts, architecture diagram
+- Updated Note 2: Networking — port map (19 ports verified), Docker networks, archived OpenClaw sections
+- Updated Note 3: User Profile — tool counts, services, dispatch engine, hooks, Ori Mnemos
+- Updated Note 4: Auto-Knowledge Architecture — pipeline rewritten to match current crontab, broken wikilinks cleaned
+- Updated Note 5: Design Decisions — broken wikilinks cleaned (removed orphans like [[3]], [[-]], [[and]])
+- QMD reindex triggered
+## Remaining
+- None
+## Current Status
+DONE

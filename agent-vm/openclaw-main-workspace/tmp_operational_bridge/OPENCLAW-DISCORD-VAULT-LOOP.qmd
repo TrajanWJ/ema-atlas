@@ -1,0 +1,27 @@
+---
+title: "OpenClaw Discord Vault Loop"
+type: loop-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - shell-hq
+  - knowledge
+  - agent-work
+format: gfm
+---
+
+# OpenClaw Discord Vault Loop
+
+## Loop
+1. human issues command/question in Discord
+2. OpenClaw investigates/acts using runtime + workspace + vault/wiki context
+3. result is returned conversationally
+4. important result is written back into durable pages
+5. future queries can retrieve it from the wiki/substrate
+
+## Why it matters
+This loop is how the system becomes cumulatively intelligent instead of stateless.

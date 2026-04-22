@@ -1,0 +1,29 @@
+---
+title: "Ultimate Wiki Index and Hubs"
+type: navigation-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - knowledge
+format: gfm
+---
+
+# Ultimate Wiki Index and Hubs
+
+## Core hubs
+- identity / worldview hub
+- system truth hub
+- OpenClaw operations hub
+- agent/workspace hub
+- projects/workstreams hub
+- chronicle/review hub
+- imports/lineage hub
+
+## Rule
+Every major area needs a durable hub page that prevents important pages from becoming orphaned.
+
+## Bootstrap recommendation
+Start with a small number of strong hubs and grow outward.

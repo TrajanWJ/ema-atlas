@@ -1,0 +1,32 @@
+---
+title: "Shared Workspace Capabilities"
+type: capability-map
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - shell-hq
+  - host-ops
+  - knowledge
+  - agent-work
+  - code-vapp
+format: gfm
+---
+
+# Shared Workspace Capabilities
+
+## Core capability families
+- graph knowledge and object pages
+- live workstreams and executions
+- chronicle / review / recall
+- code sessions and terminals
+- host / repo / runtime bindings
+- capture / inbox / promotion
+- multi-user presence and attach
+- approvals, recovery, and supervision
+
+## Rule
+These are not separate apps. They are regions/capabilities of one shared workspace.

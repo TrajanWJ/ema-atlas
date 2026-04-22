@@ -1,0 +1,65 @@
+---
+title: "EMA as Native UI App"
+type: product-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - repo-read
+tracks:
+  - shell-hq
+  - agent-work
+  - code-vapp
+format: gfm
+---
+
+# EMA as Native UI App
+
+## Important framing
+EMA should be thought of partly like what happened when systems such as superpowers or GSD stopped being merely prompt/process overlays and started becoming more native products with their own UI/app shape.
+
+## Main point
+EMA is not just:
+- a prompt system
+- a workflow convention
+- a CLI harness
+- a note/graph substrate
+
+It likely wants a **native app/UI form** that embodies its core concept directly.
+
+## Why this matters
+If EMA remains only a collection of:
+- markdown structures
+- prompts
+- CLI flows
+- hidden agent conventions
+
+then it will stay indirect and harder to inhabit.
+
+A native app/UI can make its real conceptual primitives first-class and legible.
+
+## What the native EMA UI should expose
+Not generic tabs, but EMA-native things like:
+- planes
+- objects across planes
+- drift / gaps / reconciliation
+- chronicle / review / recall
+- active executions and bindings
+- code / host / agent realities as part of the same system
+
+## Best analogy
+superpowers / GSD becoming more native is useful inspiration, but EMA should go further:
+- not just native UI around agent workflows
+- native UI around the full EMA conceptual model
+
+## Implication for the new folder
+The deliverable should keep asking:
+- what is the EMA-native UI expression of this concept?
+- what becomes visible only once EMA has its own app shell?
+- what should stop being implicit once EMA is first-class product, not scaffolding?
+
+## Related
+- [EMA Shared Workspace Identity](../03-IDENTITY/EMA-SHARED-WORKSPACE-IDENTITY.qmd)
+- [Code vApp as Workspace Region](../06-IMPLEMENTATION/code-vapp/CODE-VAPP-AS-WORKSPACE-REGION.qmd)
+- [Track C — Agent Work Seed](../07-TRACKS/TRACK-C-AGENT-WORK-SEED.md)

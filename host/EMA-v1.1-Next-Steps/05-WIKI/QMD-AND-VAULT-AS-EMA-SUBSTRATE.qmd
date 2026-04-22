@@ -1,0 +1,34 @@
+---
+title: "QMD and Vault as EMA Substrate"
+type: substrate-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - knowledge
+format: gfm
+---
+
+# QMD and Vault as EMA Substrate
+
+## Main point
+The old vault/QMD system should not be treated as an obsolete side-system.
+It should be treated as a major substrate for EMA.
+
+## What it provides
+- direct filesystem truth
+- durable documents/pages
+- frontmatter metadata
+- queryability
+- link graph
+- promotion surface for memory and canon
+- practical bootstrap path without waiting for full native UI
+
+## EMA-native framing
+- vault -> shared document/graph substrate
+- note -> page/artifact/object page
+- QMD search -> workspace query layer
+- vault maintenance -> substrate health/maintenance

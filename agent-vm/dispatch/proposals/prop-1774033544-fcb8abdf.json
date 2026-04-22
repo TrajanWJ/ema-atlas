@@ -1,0 +1,26 @@
+{
+  "id": "prop-1774033544-fcb8abdf",
+  "type": "dispatch",
+  "title": "Enrich recently written vault notes",
+  "body": "These new notes need wikilinks and enrichment:\\n  - Daily\\n  - Notes/briefing-2026-03-20.md\\n  - Reports/knowledge-quality-followup-2026-03-20.md\\n  - System/Intelligence\\n  - Notes/autonomy-rules-table-structured-classification-of-.md\\n  - System/Intelligence\\n  - Notes/context-enrichment-layer-buildtaskindexbuildpipeli.md\\n",
+  "options": [],
+  "source": "vault-integration",
+  "priority": "P4",
+  "created_at": "2026-03-20T19:05:44Z",
+  "status": "approved",
+  "discord_message_id": null,
+  "resolved_at": "2026-03-20T19:05:44Z",
+  "resolved_option": "auto-dispatch",
+  "is_multi_task": false,
+  "tasks": [
+    {
+      "agent": "coder",
+      "description": "Enrich recently written vault notes that have <2 wikilinks. For each: add cross-references, verify frontmatter, ensure tagged correctly.",
+      "priority": 4,
+      "timeout": 15,
+      "depends_on_prev": false
+    }
+  ],
+  "safety_class": "auto",
+  "triaged": false
+}

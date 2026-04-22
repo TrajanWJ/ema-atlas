@@ -1,0 +1,27 @@
+**DONE**
+
+**Disk: 87% → 83% (freed ~4GB, from 12G → 16G free)**
+
+### What was cleaned:
+| Target | Freed |
+|--------|-------|
+| Docker images (dangling + unused >7d) | ~1.67GB |
+| npm _npx cache | ~1.1GB |
+| npm cache | ~130MB |
+| uv cache | ~130MB |
+| Old rotated logs | minor |
+| Old /tmp files | minor |
+| Chrome cache dirs | minor |
+| pnpm store prune | metadata only |
+
+### Skipped (actively in use):
+- `~/.cache/qmd/` (809M) — vault search index + embedding models
+- `~/.local/share/pipx/` (1.5G) — installed CLI tools
+- `~/.local/share/pnpm/` (2.6G) — package store for active projects
+- `~/.claude/projects/` (510M) — session histories
+- `dispatch/archive` and `data/agent-state/browser` — don't exist
+
+### Files modified:
+- `/tmp/task-3d95d42b-checkpoint.md` — task checkpoint
+
+To get further below 80%, the biggest remaining targets would be the pnpm store (2.6G) or pipx venvs (1.5G), but those contain actively-used tools.

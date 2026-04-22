@@ -1,0 +1,47 @@
+{
+  "active_tasks": [],
+  "seed": {
+    "id": "seed_1775551141508_dd78e249",
+    "name": "intent:stolen-patterns-implementation",
+    "project_id": "proj_1775262165726_b0e3eb21",
+    "prompt_template": "You are analyzing an intent from EMA's intent schematic.\n\nIntent: Stolen Patterns Implementation\nLevel: 3 (feature)\nKind: task\nDescription: Implement top patterns from cross-pollination: task dependencies + filter_ready, vault lint (7 checks), loop detection for agents, agent gotchas system, preflight checker, execution state machine, blast radius BFS, coverage indicators, agent safety rules.\n\nGenerate a concrete, actionable proposal to advance this intent.\nConsider: what is the smallest next step that would make measurable progress?\nBe specific about files to change, tests to write, or research to conduct."
+  },
+  "project": {
+    "id": "proj_1775262165726_b0e3eb21",
+    "name": "EMA",
+    "path": null,
+    "slug": "ema"
+  },
+  "recent_proposals": [
+    {
+      "id": "prop_1775933204820_fd578cf4",
+      "status": "queued",
+      "title": "Decision: Matrix** (50%) — `prop_1775803604760_1f32858e`** (50%) — `prop_1775818004768_e47",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775933204821_cdb8537d",
+      "status": "queued",
+      "title": "Decision: rule for Claude Code delegation — corrections.md shows two consecutive routing c",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775933204822_e89a0c8f",
+      "status": "queued",
+      "title": "Decision: memory** (50%) — `prop_1775803604758_963cfc39`** (50%) — `prop_1775818004770_830",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775918804808_ff8a1d71",
+      "status": "queued",
+      "title": "Decision: memory** (50%) — `prop_1775803604758_963cfc39`** (50%) — `prop_1775818004770_830",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775918804811_7e5d3536",
+      "status": "queued",
+      "title": "Decision: rule for Claude Code delegation — corrections.md shows two consecutive routing c",
+      "confidence": 0.5
+    }
+  ]
+}

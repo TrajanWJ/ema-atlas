@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "capabilities": {
+    "test-skill": {
+      "allowed": [
+        "read",
+        "write",
+        "vault_read"
+      ],
+      "declaredAt": "2026-03-24T21:22:10Z"
+    }
+  },
+  "policy": "warn"
+}

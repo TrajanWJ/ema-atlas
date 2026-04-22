@@ -1,0 +1,43 @@
+{
+    "id": "pipeline-knowledge_quality-20260320-072401",
+    "focus": "knowledge_quality",
+    "started": "2026-03-20T07:24:03Z",
+    "current_stage": "implement",
+    "assessment_file": "/home/trajan/dispatch/results/pipeline-knowledge_quality-20260320-072401-assessment.md",
+    "stages": {
+        "assess": {
+            "started": "2026-03-20T07:24:03Z",
+            "status": "complete"
+        },
+        "research": {
+            "started": "2026-03-20T17:47:27Z",
+            "status": "complete"
+        },
+        "implement": {
+            "started": null,
+            "status": "pending"
+        },
+        "verify": {
+            "started": null,
+            "status": "pending"
+        },
+        "self_feed": {
+            "started": null,
+            "status": "pending"
+        }
+    },
+    "results": {
+        "research": {
+            "sourceless_files_fixed": 2,
+            "todo_tbd_files": 21,
+            "todo_categories": {
+                "expected_placeholders": 4,
+                "historical_logs": 8,
+                "incidental_mentions": 5,
+                "system_artifacts": 4,
+                "open_arch_question": 1
+            },
+            "report": "/home/trajan/vault/Reports/knowledge-quality-followup-2026-03-20.md"
+        }
+    }
+}

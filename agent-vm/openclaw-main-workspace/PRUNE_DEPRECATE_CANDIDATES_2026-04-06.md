@@ -1,0 +1,80 @@
+# Prune / Deprecate Candidates — 2026-04-06
+
+## Primary candidates
+
+- `cron.host-oauth-sync` — status=compatibility · decision=review · risk=high
+  - Conditional canonical only if host→VM credential borrowing remains intentional.
+- `cron.integrity-scan-fix` — status=active · decision=review · risk=high
+- `cron.integrity-scan.log` — status=active · decision=review · risk=high
+- `cron.oauth-auto-approve` — status=dangerous-convenience · decision=demote · risk=critical
+  - Browser-coupled auth automation; should not be normal-path dependency.
+- `cron.oauth-auto-approve.log` — status=active · decision=review · risk=high
+- `cron.proactive-task-generator` — status=heuristic · decision=keep · risk=medium
+  - Opportunity/suggestion feeder; non-authoritative.
+- `cron.vault-autocommit.log` — status=active · decision=review · risk=high
+
+## Overlap clusters to review before deprecation
+
+- `auth/mutator` (3)
+  - `cron.host-oauth-sync` — status=compatibility · decision=review
+  - `cron.oauth-auto-approve` — status=dangerous-convenience · decision=demote
+  - `service.oauth-credentials-watcher` — status=canonical · decision=keep
+- `dispatch/executor` (5)
+  - `cron.desk-dispatch.log` — status=active · decision=review
+  - `cron.dispatch-engine` — status=active · decision=review
+  - `cron.dispatch-engine.log` — status=active · decision=review
+  - `cron.dispatch-schedule.log` — status=active · decision=review
+  - `cron.proposal-cron.log` — status=active · decision=review
+- `dispatch/feeder` (3)
+  - `cron.dispatch-schedule-loader` — status=canonical · decision=keep
+  - `cron.proactive-task-generator` — status=heuristic · decision=keep
+  - `cron.signal-to-queue` — status=canonical · decision=keep
+- `health/detector` (6)
+  - `cron.dispatch-heartbeat.log` — status=active · decision=review
+  - `cron.gateway-watchdog.log` — status=active · decision=review
+  - `cron.null` — status=active · decision=review
+  - `cron.session-watchdog` — status=canonical · decision=keep
+  - `cron.system-watchdog` — status=canonical · decision=keep
+  - `cron.watchdog.log` — status=active · decision=review
+- `knowledge/ingestor` (6)
+  - `cron.ontology-sync-extract` — status=active · decision=review
+  - `cron.ontology-sync.log` — status=active · decision=review
+  - `cron.qmd` — status=active · decision=review
+  - `cron.session-tree-expiry.log` — status=active · decision=review
+  - `cron.transcript-scanner` — status=active · decision=review
+  - `cron.transcript-scanner.log` — status=active · decision=review
+- `knowledge/mutator` (3)
+  - `cron.qmd-update-embed` — status=active · decision=review
+  - `cron.vault-autocommit.log` — status=active · decision=review
+  - `hook.claude.vault-post-write` — status=active · decision=review
+- `maintenance/executor` (11)
+  - `cron.agent-learning-sync.log` — status=active · decision=review
+  - `cron.auto-resume.log` — status=active · decision=review
+  - `cron.cron-restore.log` — status=active · decision=review
+  - `cron.evolution-loop.log` — status=active · decision=review
+  - `cron.host-oauth-sync.log` — status=active · decision=review
+  - `cron.links-pipeline.log` — status=active · decision=review
+  - `cron.memory-pressure.log` — status=active · decision=review
+  - `cron.morning-briefing-v2` — status=active · decision=review
+  - `cron.overnight-digest.log` — status=active · decision=review
+  - `cron.proactive-task-generator.log` — status=active · decision=review
+  - `cron.signal-to-queue.log` — status=active · decision=review
+- `maintenance/janitor` (6)
+  - `cron.cron-backup.txt` — status=active · decision=review
+  - `cron.session-janitor` — status=active · decision=review
+  - `cron.session-janitor.log` — status=active · decision=review
+  - `cron.stale-task-cleanup` — status=active · decision=review
+  - `cron.stale-task-cleanup.log` — status=active · decision=review
+  - `cron.vault-janitor.log` — status=active · decision=review
+- `research/ingestor` (5)
+  - `cron.competitive-scan.log` — status=active · decision=review
+  - `cron.github-trending.log` — status=active · decision=review
+  - `cron.reddit-intel.log` — status=active · decision=review
+  - `cron.research-pipeline.log` — status=active · decision=review
+  - `cron.vault-research-loop.log` — status=active · decision=review
+- `runtime/executor` (5)
+  - `hook.claude.on-clear` — status=active · decision=keep
+  - `hook.claude.on-startup` — status=active · decision=review
+  - `service.claudeforge` — status=active · decision=review
+  - `service.opentabs` — status=active · decision=review
+  - `service.session-migration` — status=active · decision=review

@@ -1,0 +1,27 @@
+{
+  "id": "vault-improve-20260414-080006-0",
+  "description": "Vault improvement: Backfill/improve 'GithubInteresting-2026-04-04' (missing-frontmatter). Current content is insufficient — research the topic and write substantive content.",
+  "agent": "researcher",
+  "priority": 3,
+  "status": "partial",
+  "created": "2026-04-14T08:00:06Z",
+  "timeout_minutes": 10,
+  "context": "File: Research/GithubInteresting-2026-04-04.md\\nReason: missing-frontmatter\\nCurrent preview: # GitHub Interesting — 2026-04-04  *Posted to #github-interesting at 05:03 UTC*  ## 🎬 Netflix/void-model **What:** Netflix's first public ML model — video inpainting that removes objects AND al\\n\\nResearch this topic and produce a well-written vault note with: proper frontmatter, substantive content (500+ words), wikilinks to related notes, and sources where applicable.\\n\\nIMPORTANT: Do NOT post to #research-feed unless there is a genuinely novel finding worth Trajan's attention. Vault improvement tasks are internal — write to vault only.",
+  "success_criteria": "The file at vault/Research/GithubInteresting-2026-04-04.md should have: 1) Valid frontmatter with confidence/source/summary, 2) Substantive content covering the topic, 3) At least 2 wikilinks, 4) 500+ bytes minimum",
+  "vault_refs": [
+    "Research/GithubInteresting-2026-04-04.md"
+  ],
+  "tags": [
+    "research-loop",
+    "vault-improvement",
+    "missing-frontmatter"
+  ],
+  "source": "vault-research-loop",
+  "post_to_feed": false,
+  "claimed_at": "2026-04-14T08:01:03Z",
+  "locked_by": "researcher",
+  "pid": 2139772,
+  "failure_reason": "timeout after 10min (partial checkpoint saved)",
+  "failed_at": "2026-04-14T08:11:03Z",
+  "partial_result_file": "/home/trajan/dispatch/results/vault-improve-20260414-080006-0-partial.txt"
+}

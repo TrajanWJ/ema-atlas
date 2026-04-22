@@ -1,0 +1,33 @@
+{
+  "id": "prop-1774034196-b002f7a9",
+  "type": "dispatch",
+  "title": "Implement 5 unactioned research notes",
+  "body": "Found 5 research/actionable vault notes with no dispatch proposal:\\n  - Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-vault_structure.md\\n  - Agents/Performance/right-hand.md\\n  - Agents/Performance/scout.md\\n  - Agents/Performance/universal-orchestrator.md\\n  - Agents/Roster Health Report.md\\n\\nFirst note: vault/Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-vault_structure.md",
+  "options": [],
+  "source": "vault-integration",
+  "priority": "P3",
+  "created_at": "2026-03-20T19:16:36Z",
+  "status": "approved",
+  "discord_message_id": null,
+  "resolved_at": "2026-03-20T19:16:37Z",
+  "resolved_option": "auto-dispatch",
+  "is_multi_task": false,
+  "tasks": [
+    {
+      "agent": "researcher",
+      "description": "Read these vault research notes and extract concrete, implementable next actions from each: Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-vault_structure.md, Agents/Performance/right-hand.md, Agents/Performance/scout.md, Agents/Performance/universal-orchestrator.md, Agents/Roster Health Report.md, . Summarise findings as a numbered action list.",
+      "priority": 3,
+      "timeout": 20,
+      "depends_on_prev": false
+    },
+    {
+      "agent": "coder",
+      "description": "For each action item identified: create a dispatch task or vault note capturing the implementation plan. Link back to source note with wikilinks.",
+      "priority": 3,
+      "timeout": 15,
+      "depends_on_prev": true
+    }
+  ],
+  "safety_class": "auto",
+  "triaged": false
+}

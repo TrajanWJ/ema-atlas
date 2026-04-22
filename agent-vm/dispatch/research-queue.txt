@@ -1,0 +1,9 @@
+# autoresearch-queue — one topic per line
+# Format: topic | vault_check_query | priority (high/med/low)
+# Scout screens against vault first; only researches if novel
+
+# Example entries (remove/replace with real topics):
+# Bayesian skill routing for agent selection | bayesian routing agents | high
+# ACT-R cognitive decay models for memory | cognitive decay memory forgetting | med
+# Attentional gating in multi-agent context | attentional gating context | med
+Agent memory tiered context loading patterns | tiered context memory | med

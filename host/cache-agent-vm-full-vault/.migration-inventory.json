@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-04-04",
+  "root_md_files": [
+    "Welcome.md",
+    "index.md",
+    "README.md",
+    "Wiki.md"
+  ],
+  "folder_counts": {
+    "LCM Summaries": 1253,
+    ".archive": 421,
+    "Research": 371,
+    "System": 199,
+    "Agents": 132,
+    "Session Summaries": 108,
+    "Architecture": 76,
+    "Trajan": 62,
+    "Reference": 61,
+    "Projects": 56,
+    "Skills": 50,
+    "Operations": 31,
+    "Claude-Code-Bot": 26,
+    "Daily Notes": 26,
+    "Agent Knowledge": 20,
+    "Codebases": 17,
+    "Templates": 17,
+    "Claude-Code-Sessions": 10,
+    "Inbox": 7,
+    "Security": 7,
+    "_hubs": 6,
+    "Claude-Code-Memory": 5,
+    "Agent-Learnings": 4,
+    "Resources": 4,
+    "Tools": 3,
+    "Reports": 2,
+    "Courses": 1,
+    "Decisions": 1,
+    "EMA": 1,
+    "Learnings & Gotchas": 1,
+    "Media": 1,
+    "Ops": 1,
+    ".git": 0,
+    ".graph-memory": 0,
+    "_deprecated": 0,
+    "ontology": 0
+  },
+  "totals": {
+    "all_md_files_in_folders": 2980,
+    "root_md_files": 4,
+    "total_all": 2984,
+    "migrateable_files": 1298,
+    "excluded": {
+      "LCM Summaries": 1253,
+      "Inbox": 7,
+      "_deprecated": 0,
+      "Claude-Code-Memory": 5,
+      ".archive": 421
+    }
+  },
+  "migration_notes": {
+    "high_priority": [
+      "Research",
+      "System",
+      "Agents",
+      "Projects",
+      "Architecture",
+      "Decisions",
+      "Trajan"
+    ],
+    "medium_priority": [
+      "Reference",
+      "Skills",
+      "Operations",
+      "Codebases",
+      "Daily Notes"
+    ],
+    "low_priority_selective": [
+      "Session Summaries",
+      "Claude-Code-Sessions",
+      "Agent Knowledge",
+      "Agent-Learnings"
+    ],
+    "skip": [
+      "LCM Summaries",
+      "Claude-Code-Memory",
+      "_deprecated",
+      ".archive",
+      "Inbox"
+    ]
+  }
+}

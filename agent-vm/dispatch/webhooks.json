@@ -1,0 +1,44 @@
+{
+  "researcher": {
+    "id": "1484015005593637058",
+    "url": "https://discord.com/api/webhooks/1484015005593637058/iTAp88lshAuTP7AFKJbrpXwIx412jDgfNp9SEEj0gQJleLm1PIrGJMtHWCDYzoxcQH6I",
+    "channel_id": "1482258431997116531",
+    "channel_name": "\ud83d\udd2c-research-feed",
+    "name": "Researcher \ud83d\udd2c"
+  },
+  "coder": {
+    "id": "1484015011075588258",
+    "url": "https://discord.com/api/webhooks/1484015011075588258/0fXDa5faCFVtovvnjph41BCRHAskBRgGdYLejTrRLsOCcwJWV5INSi5et3gxV1Avx6CH",
+    "channel_id": "1484014829156175893",
+    "channel_name": "\ud83d\udcbb-code-output",
+    "name": "Coder \ud83d\udcbb"
+  },
+  "devils-advocate": {
+    "id": "1484015014905122968",
+    "url": "https://discord.com/api/webhooks/1484015014905122968/FOOWTqC3H4wGjMvgSkyV1yoKhkj6dZf6NNH9INVPmIqpHWr7m7ttGKCbkRGCdP9dKq5G",
+    "channel_id": "1484014830280249395",
+    "channel_name": "\ud83d\ude08-devils-corner",
+    "name": "Devil's Advocate \ud83d\ude08"
+  },
+  "vault-keeper": {
+    "id": "1484015018801496197",
+    "url": "https://discord.com/api/webhooks/1484015018801496197/Wis88Lfyx78LTYVrWvfz_1Ak22CarnK7vKsFDRJyqrwFXvQL_79nWL4g4gsgkK7HUY7f",
+    "channel_id": "1483018390015709315",
+    "channel_name": "\ud83d\udce6-vault-feed",
+    "name": "Vault Keeper \ud83d\udce6"
+  },
+  "security": {
+    "id": "1484015022874300437",
+    "url": "https://discord.com/api/webhooks/1484015022874300437/-rRsS-Sbiiir0UQ44pzNBrYrz3oWFq4Lyd7026CneXmD4xfWSgVjg6VA8gibX9Hzj-30",
+    "channel_id": "1484014833790877716",
+    "channel_name": "\ud83d\udd12-security",
+    "name": "Security \ud83d\udd12"
+  },
+  "ingestor": {
+    "id": "1484015026946703393",
+    "url": "https://discord.com/api/webhooks/1484015026946703393/IX2mH0wSB0mkh5Y551kAIfM7kbGDC_9J0HlIKqY_xjBGL1DmK72WNVTELFNfML6-y-5w",
+    "channel_id": "1482295358963974187",
+    "channel_name": "\ud83d\udce1-ingestor-feed",
+    "name": "Ingestor \ud83d\udce1"
+  }
+}

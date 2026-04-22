@@ -1,0 +1,27 @@
+**DONE**
+
+## Summary
+
+27 failed tasks analyzed and cleared. All from 2026-04-16, all superseded by later runs.
+
+**5 failure patterns identified:**
+
+| Pattern | Count | Agent | Trend |
+|---|---|---|---|
+| Vault staleness | 6 | utility | Worsening (0% success, was 25%) |
+| Disk cleanup | 4 | ops | Stable (mid-day failures only) |
+| Vault-improve | 12 | researcher | 4-day degradation |
+| Reddit intel | 4 | researcher | Consistent failures |
+| GitHub trending | 1 | researcher | Failed |
+
+**Key finding:** Researcher agent accounts for 63% of failures (17/27) with a 4-day worsening trend. This is the highest-impact issue to investigate.
+
+**Actions taken:**
+- Moved 27 files → `failed/archive/cleared-20260417/`
+- Updated 10 DB rows: `failed` → `cancelled`
+- `failed/` directory is clean
+
+**Files created/modified:**
+- `/home/trajan/dispatch/utility/workspace/failed-task-analysis-2026-04-17.md` (created)
+- `/tmp/task-eedb596f-checkpoint.md` (created)
+- `dispatch.db` — 10 task rows updated

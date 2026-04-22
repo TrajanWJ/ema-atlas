@@ -1,0 +1,29 @@
+---
+title: "2026-04-14 Ultimate Wiki Inbox Capture"
+type: inbox
+plane: capture
+status: active
+freshness: recent
+provenance:
+  - live-session
+tracks:
+  - knowledge
+  - shell-hq
+format: gfm
+---
+
+# 2026-04-14 Ultimate Wiki Inbox Capture
+
+## Captured fragments from this session cluster
+- desire for one new ultimate wiki, not parallel systems
+- recover old Discord/OpenClaw/QMD/vault power
+- keep all important knowledge from everywhere
+- make the system bootstrapable through current OpenClaw
+- shift focus away from EMA app ideation and into current OpenClaw reality
+- make this current session a first true writeback example
+
+## Needs later classification
+- detailed old-vault directory mapping
+- current OpenClaw config truth pages
+- security cleanup notes and decisions
+- actual hub hierarchy for the new wiki root

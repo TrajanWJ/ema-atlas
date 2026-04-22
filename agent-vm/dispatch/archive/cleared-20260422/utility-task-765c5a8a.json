@@ -1,0 +1,20 @@
+{
+  "id": "task-765c5a8a",
+  "created_at": "2026-04-20T12:00:01Z",
+  "source": "signal",
+  "priority": 3,
+  "agent": "utility",
+  "description": "Vault staleness: 221 notes not updated in 30+ days. Pick the 5 most important and verify/update.",
+  "success_criteria": "",
+  "timeout_min": 15,
+  "depends_on": [],
+  "on_complete": {},
+  "attempts": 0,
+  "max_attempts": 2,
+  "status": "failed",
+  "claimed_at": "2026-04-20T12:00:04Z",
+  "locked_by": "utility",
+  "pid": 4131573,
+  "failed_at": "2026-04-20T12:03:02Z",
+  "failure_reason": "exit code 1"
+}

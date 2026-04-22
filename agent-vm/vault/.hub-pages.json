@@ -1,0 +1,156 @@
+{
+  "generated_at": "2026-04-04",
+  "total_hub_pages": 30,
+  "hub_pages": [
+    {
+      "path": "_hubs/hub-agent-system.md",
+      "title": "Hub \u2014 Agent System",
+      "category": "hub"
+    },
+    {
+      "path": "_hubs/hub-business.md",
+      "title": "Hub \u2014 Business",
+      "category": "hub"
+    },
+    {
+      "path": "_hubs/hub-integrations.md",
+      "title": "Hub \u2014 Integrations",
+      "category": "hub"
+    },
+    {
+      "path": "_hubs/hub-knowledge-management.md",
+      "title": "Hub \u2014 Knowledge Management",
+      "category": "hub"
+    },
+    {
+      "path": "_hubs/hub-projects.md",
+      "title": "Hub \u2014 Projects",
+      "category": "hub"
+    },
+    {
+      "path": "_hubs/hub-security.md",
+      "title": "Hub \u2014 Security",
+      "category": "hub"
+    },
+    {
+      "path": "README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Trajan/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Codebases/README.md",
+      "title": "Codebases",
+      "category": "readme"
+    },
+    {
+      "path": "Projects/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "System/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Architecture/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Research/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Reference/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Agents/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Skills/README.md",
+      "title": "Skills Directory",
+      "category": "readme"
+    },
+    {
+      "path": "Operations/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Projects/Business/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Projects/System Buildout/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "System/Channel Context/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Reference/prompt-engineering/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Reference/Prompt Engineering/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Agents/Performance/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Agents/Evolution/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Agents/Modules/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "Agents/Templates/README.md",
+      "title": "README",
+      "category": "readme"
+    },
+    {
+      "path": "index.md",
+      "title": "The Wiki",
+      "category": "index"
+    },
+    {
+      "path": "Courses/index.md",
+      "title": "Codebase Courses",
+      "category": "index"
+    },
+    {
+      "path": "Wiki.md",
+      "title": "The Wiki",
+      "category": "root-nav"
+    },
+    {
+      "path": "Welcome.md",
+      "title": "Welcome",
+      "category": "root-nav"
+    }
+  ]
+}

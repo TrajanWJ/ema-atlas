@@ -1,0 +1,14 @@
+{
+  "id": "prop-1774029769-ccf2226d",
+  "type": "dispatch",
+  "title": "Enrich vault note: AI",
+  "body": "Recently written vault note has <2 wikilinks. Add cross-references, ensure frontmatter is complete, verify accuracy.\\nFile: AI",
+  "options": [],
+  "source": "vault-gaps",
+  "priority": "P4",
+  "created_at": "2026-03-20T18:02:49Z",
+  "status": "approved",
+  "discord_message_id": null,
+  "resolved_at": "2026-03-20T18:07:28Z",
+  "resolved_option": "approve"
+}

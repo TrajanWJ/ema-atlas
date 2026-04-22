@@ -1,0 +1,39 @@
+---
+title: "EMA QMD Graph System"
+format: gfm
+---
+
+# EMA QMD Graph System
+
+## Purpose
+Make the Desktop deliverable usable as a **queryable, navigable, self-describing graph** using QMD, since that is the format you already know.
+
+## Why QMD here
+QMD gives EMA a practical middle ground:
+- readable as plain text
+- linkable like a wiki
+- structured enough for metadata/frontmatter
+- renderable into a nicer docs surface later
+- compatible with indexes, listings, and graph-oriented conventions
+
+## Core rule
+The graph should not live only in a future app.
+It should already exist in the file layer through:
+- frontmatter
+- canonical object names
+- stable relative links
+- repeated edge vocabulary
+- hub/index pages
+- query pages and listings
+
+## What each important page should contain
+- frontmatter metadata
+- summary
+- related links
+- provenance/freshness cues
+- object/track/plane identity
+
+## Related
+- [QMD metadata convention](./QMD-METADATA-CONVENTION.qmd)
+- [QMD query patterns](./QMD-QUERY-PATTERNS.qmd)
+- [Navigating the EMA graph](./NAVIGATING-THE-EMA-GRAPH.qmd)

@@ -1,0 +1,13 @@
+{
+  "track": "EMA v1.1 Track E",
+  "status": "draft",
+  "epics": [
+    {"id": "TE-EPIC-01", "name": "Canon governance and ontology", "phase": "phase-0"},
+    {"id": "TE-EPIC-02", "name": "Typed object graph and storage", "phase": "phase-0"},
+    {"id": "TE-EPIC-03", "name": "Blueprint and projection substrate", "phase": "phase-1"},
+    {"id": "TE-EPIC-04", "name": "Feeds, wiki, and contradiction UX", "phase": "phase-2"},
+    {"id": "TE-EPIC-05", "name": "Research import and cross-pollination", "phase": "phase-3"},
+    {"id": "TE-EPIC-06", "name": "Meta-EMA knowledge ingestion", "phase": "phase-4"},
+    {"id": "TE-EPIC-07", "name": "Hardening, evaluation, and rollout", "phase": "phase-5"}
+  ]
+}

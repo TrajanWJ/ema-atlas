@@ -1,0 +1,37 @@
+---
+title: "QMD Query and Maintenance for Ultimate Wiki"
+type: maintenance-guide
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - knowledge
+format: gfm
+---
+
+# QMD Query and Maintenance for Ultimate Wiki
+
+## Query expectations
+The Ultimate Wiki should support:
+- lexical lookup
+- metadata filtering
+- link/backlink exploration
+- graph-oriented traversal
+- session/chronicle recall
+- source-family-aware retrieval
+
+## Maintenance expectations
+- frontmatter discipline
+- link density
+- summary presence
+- provenance/freshness tracking
+- orphan reduction
+- inbox/capture triage
+- archive and demotion paths
+
+## Why
+The old vault was powerful partly because it had metabolism.
+The new wiki should too.

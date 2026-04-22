@@ -1,0 +1,22 @@
+---
+title: "Self-Describing Deliverable"
+format: gfm
+---
+
+# Self-Describing Deliverable
+
+## Purpose
+This folder should explain itself.
+
+A new human or agent should be able to infer:
+- what EMA is
+- what is canon vs planning vs reality vs gap
+- how to navigate the work
+- which tracks exist
+- which imports influenced the design
+- how code vApp / host ops / graph knowledge fit together
+
+## Use this with
+- [Artifact index](./INDEX.qmd)
+- [EMA QMD graph system](../05-WIKI/QMD-GRAPH-SYSTEM.qmd)
+- [Navigating the EMA graph](../05-WIKI/NAVIGATING-THE-EMA-GRAPH.qmd)

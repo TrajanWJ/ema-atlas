@@ -1,0 +1,66 @@
+{
+  "id": "plan-system-improvements",
+  "name": "System Improvements",
+  "description": "Infrastructure, performance, and reliability improvements for the agent VM and bridge.",
+  "status": "active",
+  "created_at": "2026-03-20T07:47:00Z",
+  "updated_at": "2026-03-20T07:47:00Z",
+  "columns": [
+    { "id": "ideas", "name": "Ideas", "color": "#cba6f7" },
+    { "id": "planned", "name": "Planned", "color": "#89b4fa" },
+    { "id": "active", "name": "Active", "color": "#f9e2af" },
+    { "id": "shipped", "name": "Shipped", "color": "#a6e3a1" }
+  ],
+  "relatedPlans": ["plan-agent-os-frontend"],
+  "tasks": [
+    {
+      "id": "task-ws-gateway",
+      "title": "Discord Gateway WebSocket",
+      "description": "Replace REST polling with real-time Discord Gateway events for instant message delivery.",
+      "column": "planned",
+      "agent": null,
+      "priority": "P3",
+      "labels": ["bridge", "performance"],
+      "blockedBy": [{ "planId": "plan-agent-os-frontend", "taskId": "task-bidi-sync", "taskTitle": "Bidirectional Discord sync" }],
+      "comments": [],
+      "created_at": "2026-03-20T07:47:00Z",
+      "updated_at": "2026-03-20T07:47:00Z"
+    },
+    {
+      "id": "task-bridge-health",
+      "title": "Bridge health dashboard",
+      "description": "Expose /api/health with uptime, memory, WS client count, request rates.",
+      "column": "active",
+      "agent": "ops",
+      "priority": "P2",
+      "labels": ["bridge", "monitoring"],
+      "comments": [],
+      "created_at": "2026-03-20T07:47:00Z",
+      "updated_at": "2026-03-20T07:47:00Z"
+    },
+    {
+      "id": "task-vault-perf",
+      "title": "Vault search performance",
+      "description": "Index vault notes for sub-100ms search via QMD cache layer.",
+      "column": "ideas",
+      "agent": null,
+      "priority": "P3",
+      "labels": ["vault", "performance"],
+      "comments": [],
+      "created_at": "2026-03-20T07:47:00Z",
+      "updated_at": "2026-03-20T07:47:00Z"
+    },
+    {
+      "id": "task-agent-metrics",
+      "title": "Agent performance metrics",
+      "description": "Track success rates, latency, token usage per agent per task type.",
+      "column": "ideas",
+      "agent": null,
+      "priority": "P3",
+      "labels": ["agents", "analytics"],
+      "comments": [],
+      "created_at": "2026-03-20T07:47:00Z",
+      "updated_at": "2026-03-20T07:47:00Z"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+---
+type: session-summary
+wiki_id: sessions/2026-03-23-task-topic
+imported_from: vault/Session Summaries/b1a2a7ce-86a5-4bc2-b078-73a38a9aec87.md
+imported_at: '2026-04-04T00:23:57.191Z'
+tags: []
+summary: ''
+---
+# Session 2026-03-23
+
+**Session ID:** `b1a2a7ce-86a5-4bc2-b078-73a38a9aec87`
+
+## Topic
+
+[Mon 2026-03-23 00:37 UTC]   [Subagent Task]: Evaluate GitHub Agentic Workflows (gh-aw) for our system.  1. Install the gh extension: `gh extension install github/gh-aw`  2. Read the docs at https://g
+
+## Key Messages
+
+1. [Mon 2026-03-23 00:37 UTC]   [Subagent Task]: Evaluate GitHub Agentic Workflows (gh-aw) for our system.  1. Install the gh extension: `gh extension install github/gh-aw`  2. Read the docs at https://github.github.com/gh-aw/  3. Study how workflows are defined as markdown 4. Test creating a simple ag…
+
+---
+*Indexed from: b1a2a7ce-86a5-4bc2-b078-73a38a9aec87.jsonl*

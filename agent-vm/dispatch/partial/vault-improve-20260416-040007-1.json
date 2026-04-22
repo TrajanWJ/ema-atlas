@@ -1,0 +1,28 @@
+{
+  "id": "vault-improve-20260416-040007-1",
+  "description": "Vault improvement: Backfill/improve 'System Obsidian' (missing-frontmatter). Current content is insufficient \u2014 research the topic and write substantive content.",
+  "agent": "researcher",
+  "priority": 3,
+  "status": "partial",
+  "created": "2026-04-16T04:00:07Z",
+  "timeout_minutes": 10,
+  "context": "File: System/System Obsidian.md\\nReason: missing-frontmatter\\nCurrent preview: # System Obsidian  > Obsidian app configuration \u2014 installed plugins, MCP bridge, skills. > Last verified: 2026-04-01  ---  ## Vault  | Field | Value | |---|---| | **Location** | `~/vault/` | | **Vau\\n\\nResearch this topic and produce a well-written vault note with: proper frontmatter, substantive content (500+ words), wikilinks to related notes, and sources where applicable.\\n\\nIMPORTANT: Do NOT post to #research-feed unless there is a genuinely novel finding worth Trajan's attention. Vault improvement tasks are internal \u2014 write to vault only.",
+  "success_criteria": "The file at vault/System/System Obsidian.md should have: 1) Valid frontmatter with confidence/source/summary, 2) Substantive content covering the topic, 3) At least 2 wikilinks, 4) 500+ bytes minimum",
+  "vault_refs": [
+    "System/System Obsidian.md"
+  ],
+  "tags": [
+    "research-loop",
+    "vault-improvement",
+    "missing-frontmatter"
+  ],
+  "source": "vault-research-loop",
+  "post_to_feed": false,
+  "claimed_at": "2026-04-16T04:01:03Z",
+  "locked_by": "researcher",
+  "pid": 377557,
+  "failure_reason": "stale-task-cleanup: timeout after 10min (partial checkpoint saved)",
+  "failed_at": "2026-04-16T04:11:04.198639+00:00",
+  "partial_result_file": "/home/trajan/dispatch/results/vault-improve-20260416-040007-1-partial.txt",
+  "cleanup_source": "stale-task-cleanup.sh"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "vault-improve-20260417-200004-1",
+  "description": "Vault improvement: Backfill/improve 'placeorg-is-the-primary-active-project-last-commit' (missing-frontmatter). Current content is insufficient — research the topic and write substantive content.",
+  "agent": "researcher",
+  "priority": 3,
+  "status": "failed",
+  "created": "2026-04-17T20:00:04Z",
+  "timeout_minutes": 10,
+  "context": "File: System/Intelligence Notes/placeorg-is-the-primary-active-project-last-commit.md\\nReason: missing-frontmatter\\nCurrent preview: # place.org is the primary active project (last commit 2026-04-13) but was completely absent from all project tracking notes — vault project docs were stale/incomplete  - **Category:** best-practice\\n\\nResearch this topic and produce a well-written vault note with: proper frontmatter, substantive content (500+ words), wikilinks to related notes, and sources where applicable.\\n\\nIMPORTANT: Do NOT post to #research-feed unless there is a genuinely novel finding worth Trajan's attention. Vault improvement tasks are internal — write to vault only.",
+  "success_criteria": "The file at vault/System/Intelligence Notes/placeorg-is-the-primary-active-project-last-commit.md should have: 1) Valid frontmatter with confidence/source/summary, 2) Substantive content covering the topic, 3) At least 2 wikilinks, 4) 500+ bytes minimum",
+  "vault_refs": [
+    "System/Intelligence Notes/placeorg-is-the-primary-active-project-last-commit.md"
+  ],
+  "tags": [
+    "research-loop",
+    "vault-improvement",
+    "missing-frontmatter"
+  ],
+  "source": "vault-research-loop",
+  "post_to_feed": false,
+  "claimed_at": "2026-04-17T20:01:03Z",
+  "locked_by": "researcher",
+  "pid": 1137063,
+  "failed_at": "2026-04-17T20:02:01Z",
+  "failure_reason": "exit code 1"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "task-75abbaaf",
+  "created_at": "2026-03-20T18:20:20Z",
+  "source": "agent-os-unification-sprint",
+  "priority": 1,
+  "agent": "coder",
+  "description": "Build Workbench tab in frontend at Projects/agent-os-demo-pages/. Add 'Workbench' as a top-level nav tab. Layout: LEFT COLUMN (30%) shows: Active Agents (cards with name, duration, current stage, task description, parent mission), Queued Tasks (priority-sorted with P-labels), Pending Proposals (title, scope estimate, source). RIGHT COLUMN (70%) shows selected agent detail: delegation breadcrumb, LIVE OUTPUT panel (streaming log of what agent is doing, auto-scrolling), files changed with diff stats, pipeline progress bar, HANDOFFS & INBOX section (outgoing handoffs, incoming messages from other agents folded in), recent feed events from this agent. Poll /api/agents every 5s for live status, /api/queue every 10s. Every item must be cross-linked — click mission name goes to Missions, click vault link goes to Vault, click pipeline shows stages. Include status bar showing 'N agents active, M tasks queued, K proposals pending'.",
+  "success_criteria": "",
+  "timeout_min": 60,
+  "depends_on": [
+    "task-a146cfa7"
+  ],
+  "on_complete": {},
+  "attempts": 0,
+  "max_attempts": 2,
+  "cleanup_source": "stale-task-cleanup.sh (zombie recovery)",
+  "status": "done",
+  "claimed_at": "2026-03-20T18:24:04Z",
+  "locked_by": "coder",
+  "pid": 106768,
+  "done_at": "2026-03-20T18:36:01Z",
+  "result_file": "/home/trajan/dispatch/results/task-75abbaaf.txt"
+}

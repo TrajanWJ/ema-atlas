@@ -1,0 +1,34 @@
+# LCM Summary sum_17f2d83c2e642faf
+
+Created: 2026-03-18 21:47:20
+Kind: leaf
+Depth: 0
+Conversation: 435
+Tokens: 273
+Descendants: 0
+Earliest: 2026-03-18T21:47:19.000Z
+Latest: 2026-03-18T21:47:19.000Z
+
+## Content
+
+[2026-03-18 21:47 UTC]
+[cron:45107626-7fdf-4092-9b31-ba2647f96e8b github-interesting] You are a research engine for #github-interesting. Find the BEST GitHub repos, tools, HN discussions, and forum conversations relevant to Trajan's agent stack.
+
+SOURCES TO SCAN (rotate through these):
+- GitHub Trending (all languages + Python/TypeScript/Rust)
+- GitHub Topics: mcp-server, ai-agent, claude-code, obsidian-plugin, prompt-engineering, llm-tools
+- Hacker News front page + Show HN
+- GitHub Discussions in key repos (anthropics/claude-code, openclaw/openclaw, obsidianmd)
+- Dev.to, lobste.rs for agent/AI content
+
+INTERESTS (prioritize these):
+- Claude Code extensions, workflows, tips
+- MCP servers (new ones, interesting patterns)
+- OpenClaw skills, plugins, community projects
+- Obsidian plugins, PKM automation, vault tools
+- Agent architectures, multi-agent patterns, orchestration
+- Prompt engineering, meta-prompting, system prompts
+- Self-hosted AI tools, local LLMs
+- Security tools for AI agents
+- Self-evolving/self-improvi
+[LCM fallback summary; truncated for context management]

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "weekly-vault-hygiene",
+    "description": "Vault hygiene: prune orphan notes, fix broken wikilinks, update stale high-importance files",
+    "agent": "utility",
+    "priority": 3,
+    "hour": 4,
+    "day_of_week": 1
+  },
+  {
+    "id": "weekly-synthesis",
+    "description": "Weekly synthesis: summarize this week's sessions, decisions, and learnings into vault/Daily Notes/Weekly-YYYY-MM-DD.md",
+    "agent": "utility",
+    "priority": 3,
+    "hour": 3,
+    "day_of_week": 7
+  },
+  {
+    "id": "daily-vault-frontmatter",
+    "description": "Enforce vault frontmatter standards: check last 20 modified notes for missing summary, confidence, source, domain fields",
+    "agent": "utility",
+    "priority": 4,
+    "hour": 4,
+    "day_of_week": -1
+  }
+]

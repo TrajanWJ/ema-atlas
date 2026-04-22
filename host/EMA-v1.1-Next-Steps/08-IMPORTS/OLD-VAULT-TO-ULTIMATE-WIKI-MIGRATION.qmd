@@ -1,0 +1,45 @@
+---
+title: "Old Vault to Ultimate Wiki Migration"
+type: migration-plan
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - knowledge
+format: gfm
+---
+
+# Old Vault to Ultimate Wiki Migration
+
+## Main rule
+Do not copy the old vault wholesale.
+Mine it, classify it, translate it, and re-home it.
+
+## Migration buckets
+### Keep nearly as-is
+- durable research/reference docs
+- system architecture notes still true
+- useful agent-learning notes
+- session-summary formats worth preserving
+
+### Translate into new language
+- vault -> wiki/workspace substrate
+- note -> page/object page/artifact
+- MOC -> hub/index/entrypoint
+- memory file -> chronicle/recall/memory object
+
+### Distill / merge
+- duplicated system docs
+- overlapping project notes
+- stale setup files
+- parallel README/index notes
+
+### Archive as lineage
+- historically useful but no longer active structures
+- dead conventions that still explain system evolution
+
+## Outcome
+A cleaner, stronger system that keeps the old vault's power without dragging all of its shape forward unchanged.

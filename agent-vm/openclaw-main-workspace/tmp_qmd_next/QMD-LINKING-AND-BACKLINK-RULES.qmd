@@ -1,0 +1,29 @@
+---
+title: "QMD Linking and Backlink Rules"
+format: gfm
+---
+
+# QMD Linking and Backlink Rules
+
+## Rule
+Every important QMD page should:
+- link outward to related pages
+- be linked back from at least one hub/index page
+- use stable relative links
+- repeat canonical object names in body/frontmatter
+
+## Recommended sections
+- Summary
+- Purpose
+- Current truth
+- Gaps / tensions
+- Related
+- Backlinks expected from
+
+## Backlink sources
+- artifact index
+- object registry
+- track pages
+- implementation pages
+- imports/comparison pages
+- decision pages

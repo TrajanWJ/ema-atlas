@@ -1,0 +1,122 @@
+[
+  {
+    "note": "reference/agent-memory-model-hermes.md",
+    "activation": 3.0939,
+    "retrievals": 3,
+    "last_retrieved": "2026-03-20T08:35:33Z",
+    "zone": "reference",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "research/agent-memory-architectures.md",
+    "activation": 3.0939,
+    "retrievals": 3,
+    "last_retrieved": "2026-03-20T08:35:33Z",
+    "zone": "research",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "research/memoria-agent-memory.md",
+    "activation": 3.0939,
+    "retrievals": 3,
+    "last_retrieved": "2026-03-20T08:35:33Z",
+    "zone": "research",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "skills/memory-hygiene.md",
+    "activation": 3.0939,
+    "retrievals": 3,
+    "last_retrieved": "2026-03-20T08:35:33Z",
+    "zone": "skills",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "system/memory-architecture.md",
+    "activation": 2.6946,
+    "retrievals": 3,
+    "last_retrieved": "2026-03-20T08:35:33Z",
+    "zone": "system",
+    "decay_rate": 0.4
+  },
+  {
+    "note": "reference/openclaw-claude-code-plugin.md",
+    "activation": 1.9758,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:21Z",
+    "zone": "reference",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "research/memos-integration-analysis.md",
+    "activation": 1.9758,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:21Z",
+    "zone": "research",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "research/openclaw-ecosystem.md",
+    "activation": 1.9758,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:21Z",
+    "zone": "research",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "research/opentabs-browser-api.md",
+    "activation": 1.9758,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:21Z",
+    "zone": "research",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "hubs/hub-agent-system.md",
+    "activation": 1.9686,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:20Z",
+    "zone": "hubs",
+    "decay_rate": 0.5
+  },
+  {
+    "note": "architecture/claude-code-channels.md",
+    "activation": 1.1855,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:21Z",
+    "zone": "architecture",
+    "decay_rate": 0.3
+  },
+  {
+    "note": "architecture/agent-architecture-overview.md",
+    "activation": 1.1812,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:20Z",
+    "zone": "architecture",
+    "decay_rate": 0.3
+  },
+  {
+    "note": "architecture/auto-knowledge-architecture.md",
+    "activation": 1.1812,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:20Z",
+    "zone": "architecture",
+    "decay_rate": 0.3
+  },
+  {
+    "note": "architecture/discord-server-architecture-v4.md",
+    "activation": 1.1812,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:20Z",
+    "zone": "architecture",
+    "decay_rate": 0.3
+  },
+  {
+    "note": "architecture/index.md",
+    "activation": 1.1812,
+    "retrievals": 1,
+    "last_retrieved": "2026-03-20T08:35:20Z",
+    "zone": "architecture",
+    "decay_rate": 0.3
+  }
+]

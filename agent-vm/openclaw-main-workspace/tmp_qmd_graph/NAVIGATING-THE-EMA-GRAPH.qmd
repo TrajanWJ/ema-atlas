@@ -1,0 +1,27 @@
+---
+title: "Navigating the EMA Graph"
+format: gfm
+---
+
+# Navigating the EMA Graph
+
+## Start here
+- [Artifact index](../02-ARTIFACTS/INDEX.qmd)
+- [Self-describing deliverable](../02-ARTIFACTS/SELF-DESCRIBING-DELIVERABLE.qmd)
+- [Source-of-truth hierarchy](../04-CANON/SOURCE-OF-TRUTH-HIERARCHY.qmd)
+
+## Then choose a route
+### If you want the overall system
+- [vApp final vision checklist](../01-PLANS/VAPP-FINAL-VISION-CHECKLIST.qmd)
+- [Object registry](./OBJECT-REGISTRY.qmd)
+- [Connected graph best practices](./CONNECTED-GRAPH-BEST-PRACTICES.qmd)
+
+### If you want code-vApp direction
+- [Code vApp object model](../06-IMPLEMENTATION/code-vapp/CODE-VAPP-OBJECT-MODEL.qmd)
+- [Code vApp CLI↔GUI mirror](../06-IMPLEMENTATION/code-vapp/CODE-VAPP-CLI-GUI-MIRROR.qmd)
+- [Repo graph integration](../06-IMPLEMENTATION/code-vapp/CODE-VAPP-REPO-GRAPH-INTEGRATION.qmd)
+
+### If you want graph/memory imports
+- [Graph knowledge comparison](../08-IMPORTS/external-sources/GRAPH-KNOWLEDGE-COMPARISON.qmd)
+- [Memory systems comparison](../08-IMPORTS/external-sources/MEMORY-SYSTEMS-COMPARISON.qmd)
+- [Graph knowledge and memory architecture](../08-IMPORTS/external-sources/GRAPH-KNOWLEDGE-AND-MEMORY-ARCHITECTURE.qmd)

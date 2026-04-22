@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "description": "Agent roster + rolling performance fields for self-improvement and dispatch heuristics.",
+  "agents": [
+    {"id": "main", "name": "Right Hand", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "researcher", "name": "Researcher", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "coder", "name": "Coder", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "codex", "name": "Codex", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "ops", "name": "Ops", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "security", "name": "Security", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "vault-keeper", "name": "Vault Keeper", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "browser-automation", "name": "Scout", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "prompt-engineer", "name": "Prompt Engineer", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "concierge", "name": "Concierge", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "devils-advocate", "name": "Devil's Advocate", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0},
+    {"id": "strategist", "name": "Strategist", "fitness": null, "success_rate": null, "avg_runtime_sec": null, "failure_modes": [], "tasks_completed": 0, "tasks_total": 0}
+  ]
+}

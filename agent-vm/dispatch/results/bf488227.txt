@@ -1,0 +1,13 @@
+DONE
+
+**3 posts published from 25 candidates:**
+
+1. **Kimi K2.6 as Opus replacement** (r/LocalLLaMA, ★950) — First local model credibly positioned at 85% Opus task parity. Version stability becoming the real selling point over proprietary models.
+
+2. **Claude caught a cryptominer** (r/ClaudeAI, ★187) — Claude Code autonomously detected and remediated a 2-year-old cryptominer in a Docker container during unrelated homepage work. Interesting emergent security capability + agent autonomy concern.
+
+3. **Radical candor CLAUDE.md directive** (r/ClaudeCode, ★147) — Community finding anti-sycophancy instructions effective but prone to overcorrection (argumentative on settled decisions). Custom output styles suggested as more reliable mechanism than CLAUDE.md.
+
+**Discarded:** Amazon/Anthropic investment (news), Opus version controversy (memes), vault screenshots (low signal), TaskForge (video-only).
+
+**Files modified:** `/tmp/bf488227-checkpoint.md`

@@ -1,0 +1,22 @@
+**DONE**
+
+Disk usage reduced from **89% (9.9G free) → 85% (14G free)**, reclaiming ~4GB.
+
+### Cleanup summary
+
+| Target | Action | Space reclaimed |
+|--------|--------|----------------|
+| Docker images | Pruned dangling/unused (python, build layers) | ~1.1 GB |
+| Docker system | `docker system prune -f` | ~89 MB |
+| Journal logs | Vacuumed to 50M limit | ~70 MB |
+| Rotated logs | Removed .gz/.old from /var/log | ~few MB |
+| uv cache | Removed Python package cache | ~111 MB |
+| Browser caches | Cleaned all browser caches from ~/.cache | minimal (none found) |
+| /tmp | Removed node-compile-cache, jiti, old checkpoints | ~40 MB |
+| Dispatch archive | Removed 2 old cleared-* dirs (kept latest) | ~176 KB |
+| Trash | Emptied 2.4G accumulated trash | ~2.4 GB |
+
+### Files modified
+- `/tmp/task-92bc2f74-checkpoint.md` — task checkpoint (created)
+
+Note: The `data/agent-state/browser` directory was empty/nonexistent. The qmd cache (785M at `~/.cache/qmd`) was intentionally kept — it's actively used for vault search indexing and expensive to rebuild.

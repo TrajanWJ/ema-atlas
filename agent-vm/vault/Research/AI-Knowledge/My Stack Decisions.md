@@ -1,0 +1,187 @@
+# My Stack Decisions
+
+> Chosen tools and architecture decisions, dated for reference.
+>
+> **Legend:** ==INSTALLED== means verified on disk. **CHOSEN** means decided but not yet installed.
+
+---
+
+## Last verified: 2026-04-13
+
+### Obsidian Plugins (installed to `.obsidian/plugins/`)
+
+| Tool | Status | Why |
+|---|---|---|
+| [[Claudian]] v1.3.68 | ==INSTALLED== | Claude Code inside Obsidian sidebar |
+| [[obsidian-claude-code-mcp]] v1.1.8 | ==INSTALLED== | MCP bridge exposing vault to Claude Code CLI (port 22360) |
+
+### Obsidian CLI
+
+| Tool | Status | Why |
+|---|---|---|
+| Obsidian CLI (built-in v2.1.2+) | ==INSTALLED== | 100+ commands, `obsidian --no-sandbox` on this system |
+
+### Claude Code Plugins (from `~/.claude/settings.json`)
+
+| Tool | Status | Scope | Why |
+|---|---|---|---|
+| Superpowers v5.0.1 | ==INSTALLED== | Global | 14 dev workflow skills (TDD, debugging, planning, etc.) |
+| Context7 | ==INSTALLED== | Global | Up-to-date API docs for coding agents |
+| Frontend Dev | ==INSTALLED== | Global (custom at `~/.claude/plugins/frontend-dev/`) | 8 agents, Playwright visual testing |
+| Frontend Design | ==INSTALLED== | Local (Truks project only) | Production-grade UI design |
+
+### MCP Servers (from `~/.claude/mcp.json`)
+
+| Server | Status | Why |
+|---|---|---|
+| ema | ==INSTALLED== | Agent memory/context |
+| qmd | ==INSTALLED== | Hybrid BM25 + vector search, cron reindex every 30m |
+| filesystem | ==INSTALLED== | Local filesystem access |
+| vault-filesystem | ==INSTALLED== | Vault-specific filesystem access |
+| sequential-thinking | ==INSTALLED== | Step-by-step reasoning |
+| memory | ==INSTALLED== | Persistent memory server |
+| context7 | ==INSTALLED== | Up-to-date API docs |
+| git | ==INSTALLED== | Git operations via MCP |
+| fetch | ==INSTALLED== | HTTP fetch operations |
+| playwright | ==INSTALLED== | Browser automation |
+| codebase-memory-mcp | ==INSTALLED== | Code graph analysis (replaces CodeGraphContext) |
+
+### Cloud MCP Servers (platform-provided)
+
+| Server | Notes |
+|---|---|
+| Context7 (cloud) | API docs (duplicate of plugin) |
+| Figma | Design-to-code |
+| Gmail | Email access |
+| Vercel | Deployment management |
+
+### Safety & Quality Hooks
+
+| Tool | Status | Type | Why |
+|---|---|---|---|
+| [[Dippy]] | ==INSTALLED== | PreToolUse (Bash) | Auto-approve safe commands, block destructive. At `~/Dippy/` |
+| [[Lasso claude-hooks]] | ==INSTALLED== | PostToolUse (Read, WebFetch, Bash, Grep, Task) | Prompt injection scanner, 50+ patterns. At `~/.claude/hooks/prompt-injection-defender/` |
+
+### Vault-Level Skills (46 skills in `.claude/skills/`)
+
+| Category | Skills |
+|---|---|
+| **Obsidian** (5) | obsidian-cli, obsidian-markdown, obsidian-bases, json-canvas, defuddle |
+| **PKM Workflow** (13) | daily, weekly, monthly, review, project, goal-tracking, adopt, onboard, push, search, check-links, upgrade, obsidian-vault-ops |
+| **Dev Patterns** (7) | api-design, backend-patterns, postgres-patterns, database-migrations, deployment-patterns, blueprint, agentic-engineering |
+| **Security** (2) | security-scan, security-review |
+| **Productivity** (3) | search-first, strategic-compact, content-engine |
+| **Agent Ops** (1) | autonomous-loops |
+| **Memory** (3) | sync-claude-sessions, recall, qmd |
+| **Codebase Analysis** (4) | codebase-memory-exploring, codebase-memory-quality, codebase-memory-reference, codebase-memory-tracing |
+| **Planning** (4) | planner, plan-harder, parallel-task, llm-council |
+| **Research** (1) | read-github |
+| **Context** (1) | context7 |
+
+### Vault-Level Agents (15 agents in `.claude/agents/`)
+
+| Category | Agents |
+|---|---|
+| **PKM** (4) | goal-aligner, inbox-processor, note-organizer, weekly-reviewer |
+| **Dev** (7) | architect, database-reviewer, security-reviewer, doc-updater, build-error-resolver, refactor-cleaner, orchestrator |
+| **Research** (1) | researcher |
+| **Ops** (3) | cron-ops, system-ops, knowledge-engineer |
+
+### Vault-Level Commands (9 in `.claude/commands/`)
+
+| Command | Purpose |
+|---|---|
+| /orchestrate | Sequential agent workflow dispatcher with handoffs |
+| /quality-gate | On-demand formatter/lint/type/test pipeline |
+| /checkpoint | Git-backed workflow checkpoints |
+| /sessions | List/load/alias session files |
+| /resume-session | Load recent session with structured briefing |
+| /save-session | Capture full session state to file |
+| /learn | Extract reusable patterns as skills |
+| /vault-save | Save conversation context to vault |
+| /vault-search | Search vault via antfly-search and qmd |
+
+### Vault Structure (PKM cascade)
+
+| Layer | Folder | Skill |
+|---|---|---|
+| Vision | `Goals/0. Three Year Goals.md` | /goal-tracking |
+| Annual | `Goals/1. Yearly Goals.md` | /goal-tracking |
+| Monthly | `Goals/2. Monthly Goals.md` | /monthly |
+| Weekly | `Goals/3. Weekly Review.md` | /weekly |
+| Daily | `Daily Notes/YYYY-MM-DD.md` | /daily |
+| Projects | `Trajan's Projects/` | /project |
+
+### Memory System (vault-native, replaces claude-mem)
+
+| Component | What it does |
+|---|---|
+| Session Log/ | Session summaries persisted to vault |
+| QMD semantic search | Context injection from past sessions |
+| recall skill | Load context from previous sessions |
+| sync-claude-sessions skill | Export conversations to Obsidian markdown |
+| Claude Code auto-memory | File-based memory at `~/.claude/projects/` |
+
+---
+
+## Evaluating (Docker Self-Hosting)
+
+| Tool | Status | Why |
+|---|---|---|
+| [[builderz-labs Mission Control]] v2.0.0 | ==INSTALLED== | Agent orchestration dashboard — running in JarvisAI VM (:3000), hardened Docker, zero external deps, Claude Code session auto-discovery |
+| [[OpenClaw]] | ==INSTALLED== | AI assistant across 20+ platforms — running in JarvisAI VM, isolated in KVM. ClawHavoc supply chain attack history mitigated by VM isolation |
+| **IronClaw** (NEAR AI) | **WATCHING** | Rust + WASM sandbox — best security model among AI assistants. Worth evaluating when more mature |
+
+See [[Research - Self-Hosted AI Agent Platforms 2026]] for full comparison.
+
+## Rejected / Deferred
+
+| Tool | Status | Reason |
+|---|---|---|
+| claude-mem | **REJECTED** | Replaced by vault-native memory (QMD + recall + session logs) |
+| [[CloudCLI]] | **REPLACED** | Replaced by Mission Control in JarvisAI VM |
+| n8n | **REJECTED** | Too much overhead |
+| LibreChat | **DEFERRED** | Phase 2 |
+| CopilotKit | **DEFERRED** | Phase 2 |
+
+---
+
+## Architecture (verified 2026-04-13)
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                     TRAJAN'S AI STACK                             │
+│                                                                   │
+│  Obsidian Vault ──── Claudian v1.3.68 (sidebar chat)             │
+│       │               Obsidian CLI (100+ commands)                │
+│       │                                                           │
+│       ├── obsidian-claude-code-mcp v1.1.8 (port 22360)           │
+│       ├── 46 vault skills (PKM + dev + security + memory + analysis) │
+│       ├── 15 vault agents (PKM + dev + ops + research)           │
+│       ├── 9 vault commands (orchestrate, checkpoint, vault-*, etc.) │
+│       ├── Goals cascade (3-year → daily)                          │
+│       └── Rules + hooks (markdown-standards, auto-commit, etc.)   │
+│                                                                   │
+│  Claude Code CLI ─── Superpowers v5.0.1 (14 skills)              │
+│       │               Context7 (API docs)                         │
+│       │               Frontend Dev (8 agents)                     │
+│       │               Frontend Design (Truks only)                │
+│       │                                                           │
+│       ├── MCP Servers (11):                                       │
+│       │    qmd, context7, codebase-memory-mcp, memory, ema        │
+│       │    filesystem, vault-filesystem, git, fetch, playwright    │
+│       │    sequential-thinking                                     │
+│       │                                                           │
+│       ├── Safety Hooks:                                           │
+│       │    Dippy (PreToolUse — auto-approve safe Bash)            │
+│       │    Lasso (PostToolUse — prompt injection scanner)          │
+│       │                                                           │
+│       └── Memory:                                                 │
+│            ~/.claude/projects/ (auto-memory)                      │
+│            Session Log/ + QMD + recall (vault-native)             │
+│                                                                   │
+│  Cloud MCPs ──── Context7 │ Figma │ Gmail │ Vercel               │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+#decisions #my-stack

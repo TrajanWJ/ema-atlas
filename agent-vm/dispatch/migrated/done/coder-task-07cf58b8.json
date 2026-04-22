@@ -1,0 +1,25 @@
+{
+  "id": "task-07cf58b8",
+  "created_at": "2026-03-20T18:20:58Z",
+  "source": "agent-os-unification-sprint",
+  "priority": 1,
+  "agent": "coder",
+  "description": "Wire everything together for unified Agent OS product at Projects/agent-os-demo-pages/. (1) INBOX INTEGRATION: Fold dispatch/inter-agent/inbox/ into the feed — inbox messages appear as feed events with type 'inbox'. Activate the inter-agent polling loop (state/reaction-dispatch-state.json currently shows last_poll:never). Every inbox message gets a feed event. (2) SHARED STATE: Populate dispatch/active-tasks.json and dispatch/agent-status.json on every task lifecycle event (create/start/done/fail). Update dispatch-engine.sh to write these files. (3) CROSS-LINKING: Every view (Feed, Workbench, Missions, Vault, Talk, Pulse) must link to every other where relevant — feed items link to workbench agent, workbench links to mission, mission links to vault notes, vault notes link back to tasks that reference them. (4) UNIFIED NAV: Consistent top-level tabs across all pages: Feed, Workbench, Missions, Vault, Talk, Pulse. Status bar always shows active agent count, queue depth, pending proposals. (5) HANDOFF VISIBILITY: handoff create/claim/complete events emit to feed. Handoffs visible in workbench agent detail. (6) CRON ACTIVATION: Add actual crontab entries for the 3 scheduled tasks in dispatch/schedule.json plus proposal-engine-v2.sh on 30-min interval.",
+  "success_criteria": "",
+  "timeout_min": 90,
+  "depends_on": [
+    "task-1467181f",
+    "task-75abbaaf",
+    "task-11b91882"
+  ],
+  "on_complete": {},
+  "attempts": 0,
+  "max_attempts": 2,
+  "cleanup_source": "stale-task-cleanup.sh (zombie recovery)",
+  "status": "done",
+  "claimed_at": "2026-03-20T18:24:00Z",
+  "locked_by": "coder",
+  "pid": 104852,
+  "done_at": "2026-03-20T18:36:01Z",
+  "result_file": "/home/trajan/dispatch/results/task-07cf58b8.txt"
+}

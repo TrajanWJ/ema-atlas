@@ -1,0 +1,145 @@
+# LCM Summary sum_3ca30db95cabbb61
+
+Created: 2026-03-16 20:42:42
+Kind: leaf
+Depth: 0
+Conversation: 165
+Tokens: 1215
+Descendants: 0
+Earliest: 2026-03-16T20:42:40.000Z
+Latest: 2026-03-16T20:42:41.000Z
+
+## Content
+
+[2026-03-16 20:42 UTC]
+[cron:45107626-7fdf-4092-9b31-ba2647f96e8b github-interesting] You are a research engine for #github-interesting. Find the BEST GitHub repos, tools, HN discussions, and forum conversations relevant to Trajan's agent stack.
+
+SOURCES TO SCAN (rotate through these):
+- GitHub Trending (all languages + Python/TypeScript/Rust)
+- GitHub Topics: mcp-server, ai-agent, claude-code, obsidian-plugin, prompt-engineering, llm-tools
+- Hacker News front page + Show HN
+- GitHub Discussions in key repos (anthropics/claude-code, openclaw/openclaw, obsidianmd)
+- Dev.to, lobste.rs for agent/AI content
+
+INTERESTS (prioritize these):
+- Claude Code extensions, workflows, tips
+- MCP servers (new ones, interesting patterns)
+- OpenClaw skills, plugins, community projects
+- Obsidian plugins, PKM automation, vault tools
+- Agent architectures, multi-agent patterns, orchestration
+- Prompt engineering, meta-prompting, system prompts
+- Self-hosted AI tools, local LLMs
+- Security tools for AI agents
+- Self-evolving/self-improving agent systems
+
+STEP 1 - Load state:
+- Read /home/trajan/.openclaw/agents/main/workspace/github-interesting-state.json for previously posted items
+
+STEP 2 - Research:
+- Use web_search to find 5-10 interesting items across the sources above
+- Go DEEP — read READMEs, check stars, look at recent commits, read discussions
+- Find things that are GENUINELY interesting and relevant, not generic
+
+STEP 3 - Post a DEEP DIVE to Discord:
+Use message tool (action=send, channel=discord, target=1482258431997116531) with components.
+
+Format like reddit-intel deep dives:
+- Rich components v2 with accent color #5865F2
+- Numbered items with emoji categories
+- For each item: name, stars, description, WHY IT MATTERS FOR US
+- Key takeaways section connecting findings to our setup
+- Save the best finds to vault
+
+Example components structure:
+{"container": {"accentColor": "#5865F2"}, "blocks": [{"type": "text", "text": "## 🔍 GitHub Intel — [Topic]\n\nScanned [sources]. Here's what's hot:"}, {"type": "separator", "divider": true}, {"type": "text", "text": "### 🔥 Category\n\n**1. Project Name** (stars⭐)\nDescription and why it matters.\n🔗 [GitHub](url)"}, {"type": "separator", "divider": true}, {"type": "text", "text": "### 💡 Takeaways for Us\n• Key insight 1\n• Key insight 2"}]}
+
+STEP 4 - Save favorites to vault:
+Create/update /home/trajan/vault/Research/GitHub Intel - Favorites.md with the best finds. Include: name, URL, stars, category, why it matters, date found.
+
+STEP 5 - Update state:
+Add all posted items to github-interesting-state.json
+
+After posting via message tool, reply with ONLY: NO_REPLY
+Current time: Monday, March 16th, 2026 — 8:38 PM (UTC) / 2026-03-16 20:38 UTC
+
+Return your summary as plain text; it will be delivered automatically. If the task explicitly calls for messaging a specific external recipient, note who/where it should go instead of sending it yourself.
+
+[2026-03-16 20:42 UTC]
+
+
+[2026-03-16 20:42 UTC]
+{
+  "posted": [
+    {
+      "name": "AgentClick",
+      "url": "https://github.com/agentlayer-io/AgentClick",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "krometrail",
+      "url": "https://github.com/nklisch/krometrail",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "promptcmd",
+      "url": "https://github.com/tgalal/promptcmd",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "aelitium",
+      "url": "https://aelitium.com",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "multimodal-tools",
+      "url": "https://github.com/mixpeek/multimodal-tools",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "apache-iggy",
+      "url": "https://github.com/apache/iggy",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "KARIMO",
+      "url": "https://github.com/opensesh/KARIMO",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "superpowers-optimized",
+      "url": "https://github.com/REPOZY/superpowers-optimized",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "claude-skills-vault",
+      "url": "https://github.com/georgekhananaev/claude-skills-vault",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "claude-code-pulse",
+      "url": "https://github.com/brianruggieri/claude-code-pulse",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "claude-code-docs",
+      "url": "https://github.com/costiash/claude-code-docs",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "scaffold-zigrivers",
+      "url": "https://github.com/zigrivers/scaffold",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "llm-teams-distributed-systems",
+      "url": "https://arxiv.org/abs/2603.12229",
+      "date": "2026-03-16"
+    },
+    {
+      "name": "googleworkspace-cli",
+      "url": "https://github.com/googleworkspace/cli",
+      "date": "2026-03-16"
+    },
+    {
+ 
+[LCM fallback summary; truncated for context management]

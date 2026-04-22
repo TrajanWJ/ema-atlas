@@ -1,0 +1,15 @@
+{
+    "id": "pipeline-vault_structure-20260320-064801",
+    "focus": "vault_structure",
+    "started": "2026-03-20T06:48:09Z",
+    "current_stage": "research",
+    "assessment_file": "/home/trajan/dispatch/results/pipeline-vault_structure-20260320-064801-assessment.md",
+    "stages": {
+        "assess": {"started": "2026-03-20T06:48:09Z", "status": "complete"},
+        "research": {"started": null, "status": "pending"},
+        "implement": {"started": null, "status": "pending"},
+        "verify": {"started": null, "status": "pending"},
+        "self_feed": {"started": null, "status": "pending"}
+    },
+    "results": {}
+}

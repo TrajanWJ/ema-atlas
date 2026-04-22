@@ -1,0 +1,26 @@
+{
+  "id": "prop-1774033544-21288c83",
+  "type": "dispatch",
+  "title": "Link 109 orphan vault notes",
+  "body": "Found 109 notes with no wikilinks. Sample: Discord-as-IDE-Landscape,ido4-governance,competitive-landscape,\\nEnrich with cross-references.",
+  "options": [],
+  "source": "vault-integration",
+  "priority": "P4",
+  "created_at": "2026-03-20T19:05:44Z",
+  "status": "approved",
+  "discord_message_id": null,
+  "resolved_at": "2026-03-20T19:05:44Z",
+  "resolved_option": "auto-dispatch",
+  "is_multi_task": false,
+  "tasks": [
+    {
+      "agent": "coder",
+      "description": "Find vault notes with no wikilinks (grep -rL '\\[\\[' vault/). For the top 5 by importance/recency, add 2-3 relevant wikilinks each. Batch-update in a single pass.",
+      "priority": 4,
+      "timeout": 15,
+      "depends_on_prev": false
+    }
+  ],
+  "safety_class": "auto",
+  "triaged": false
+}

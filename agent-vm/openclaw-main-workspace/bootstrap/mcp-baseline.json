@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "ema": {
+      "command": "node",
+      "args": ["/home/trajan/bin/ema-mcp-server.js"],
+      "env": {
+        "EMA_URL": "http://192.168.122.1:4488/api"
+      }
+    },
+    "qmd": {
+      "command": "/usr/bin/qmd",
+      "args": ["mcp"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/trajan/Projects", "/home/trajan/vault"]
+    },
+    "vault-filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/trajan/vault"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git"]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+    "codebase-memory-mcp": {
+      "command": "/home/trajan/.local/bin/codebase-memory-mcp"
+    }
+  }
+}

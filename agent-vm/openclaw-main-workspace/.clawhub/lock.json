@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "skills": {
+    "automation-workflows": {
+      "version": "0.1.0",
+      "installedAt": 1776065308589
+    },
+    "memory-tiering": {
+      "version": "1.0.0",
+      "installedAt": 1776065310509
+    },
+    "in-depth-research": {
+      "version": "1.0.0",
+      "installedAt": 1776065333596
+    },
+    "porteden-email": {
+      "version": "1.0.4",
+      "installedAt": 1776065338191
+    },
+    "openclaw-power-ops": {
+      "version": "1.0.0",
+      "installedAt": 1776065602926
+    },
+    "openclaw-ops-guardrails": {
+      "version": "0.1.1",
+      "installedAt": 1776065604095
+    },
+    "browser-automation": {
+      "version": "1.0.1",
+      "installedAt": 1776065605330
+    },
+    "afrexai-email-to-calendar": {
+      "version": "1.0.0",
+      "installedAt": 1776065606615
+    },
+    "openclaw-github-assistant": {
+      "version": "2.0.1",
+      "installedAt": 1776065608180
+    },
+    "proactive-agent-lite": {
+      "version": "1.0.0",
+      "installedAt": 1776067620721
+    },
+    "cron-mastery": {
+      "version": "1.0.3",
+      "installedAt": 1776067621999
+    }
+  }
+}

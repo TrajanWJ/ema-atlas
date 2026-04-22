@@ -1,0 +1,15 @@
+{
+    "id": "pipeline-vault_formatting-20260320-080001",
+    "focus": "vault_formatting",
+    "started": "2026-03-20T08:00:11Z",
+    "current_stage": "research",
+    "assessment_file": "/home/trajan/dispatch/results/pipeline-vault_formatting-20260320-080001-assessment.md",
+    "stages": {
+        "assess": {"started": "2026-03-20T08:00:11Z", "status": "complete"},
+        "research": {"started": null, "status": "pending"},
+        "implement": {"started": null, "status": "pending"},
+        "verify": {"started": null, "status": "pending"},
+        "self_feed": {"started": null, "status": "pending"}
+    },
+    "results": {}
+}

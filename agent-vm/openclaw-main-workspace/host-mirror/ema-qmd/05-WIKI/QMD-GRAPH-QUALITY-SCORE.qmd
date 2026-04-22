@@ -1,0 +1,22 @@
+---
+title: "QMD Graph Quality Score"
+format: gfm
+---
+
+# QMD Graph Quality Score
+
+## Purpose
+Borrowing from the old vault, EMA should measure graph quality rather than hand-wave it.
+
+## Candidate metrics
+- frontmatter completeness
+- outgoing related links present
+- inbound hub links present
+- summary present
+- provenance present
+- freshness present
+- object/track metadata present
+- orphan page count
+
+## Why
+A connected graph should be inspectable and improvable over time.

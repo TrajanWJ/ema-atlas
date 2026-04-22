@@ -1,0 +1,13 @@
+**Status: DONE**
+
+**Files modified:**
+- `vault/System/Overnight Digest 2026-04-13.md` — the only file changed
+
+**What was done:**
+1. Added proper YAML frontmatter with title, type, created date, tags, and summary
+2. Added introductory paragraph with 2 wikilinks (`[[Vault Operations|vault]]`, `[[Cron Jobs|overnight digest cron]]`)
+3. Reformatted vault activity as a structured table with summary analysis and pattern notes (added `[[Session Capture|session transcript]]` wikilink)
+4. Enhanced system health with a table format and status commentary (added `[[System Health Log]]` wikilink)
+5. Added context to Skills and New Learnings sections
+
+Total: 4 wikilinks, proper frontmatter, ~1,800 bytes of content. The `qmd update` failed due to lock contention — non-blocking, will sync on next scheduled run.

@@ -1,0 +1,700 @@
+{
+  "generated_at": "2026-04-04T18:06:16.589248+00:00",
+  "state_dir": "/home/trajan/wiki/spaces/default/system/intent-state",
+  "sources": [
+    {
+      "kind": "wiki_intent",
+      "path": "/home/trajan/wiki/spaces/default/intents",
+      "mode": "direct markdown intent pages",
+      "count": 4
+    },
+    {
+      "kind": "vault_registry",
+      "path": "/home/trajan/vault/System/intent-registry.json",
+      "mode": "legacy session intent registry",
+      "count": 1
+    },
+    {
+      "kind": "claude_project",
+      "path": "/home/trajan/.claude/projects",
+      "mode": "Claude Code project jsonl user turns",
+      "count": 484,
+      "limit": 600
+    },
+    {
+      "kind": "openclaw_session",
+      "path": "/home/trajan/.openclaw/agents",
+      "mode": "OpenClaw agent session jsonl user turns (includes Discord mirrored prompts)",
+      "count": 305,
+      "limit": 1200
+    },
+    {
+      "kind": "codex_history",
+      "path": "/home/trajan/.codex/history.jsonl",
+      "mode": "Codex CLI history lines",
+      "count": 8,
+      "limit": 400
+    },
+    {
+      "kind": "codex_session",
+      "path": "/home/trajan/.openclaw/agents/codex/sessions",
+      "mode": "OpenClaw codex session jsonl user turns",
+      "count": 13,
+      "limit": 600
+    },
+    {
+      "kind": "local_markdown_resource",
+      "path": "workspace + vault + wiki markdown resources",
+      "mode": "local architecture, roadmap, integration, and system markdown docs matched by curated path/keyword filters",
+      "count": 285,
+      "limit": 500
+    },
+    {
+      "kind": "discord_live",
+      "path": "message tool / Discord API",
+      "mode": "not invoked by this local script; current pass relies on OpenClaw mirrored Discord prompts and existing channel artifacts",
+      "count": 0,
+      "next_step": "add chunked message.read backfill runner or export channel history into raw data directory"
+    }
+  ],
+  "current_wiki_intents": [
+    {
+      "path": "/home/trajan/wiki/spaces/default/intents/wiki-agent-memory-intent.md",
+      "title": "Wiki as Agent Memory Layer Intent",
+      "status": "active",
+      "priority": "medium",
+      "project": "Wiki",
+      "summary": "Every agent session creates a wiki page. Agent's next session starts with recent session pages as context. Wiki replaces scattered Agent Knowledge/ files.",
+      "updated": "2026-04-04"
+    },
+    {
+      "path": "/home/trajan/wiki/spaces/default/intents/wiki-ema-integration-intent.md",
+      "title": "Wiki ↔ EMA Integration Intent",
+      "status": "active",
+      "priority": "high",
+      "project": "Wiki",
+      "summary": "Embed wiki as EMA app #14, wire Projects/Agents/Dashboard to wiki API, prompt interface in command palette.",
+      "updated": "2026-04-04"
+    },
+    {
+      "path": "/home/trajan/wiki/spaces/default/intents/wiki-superman-intent.md",
+      "title": "Wiki ↔ Superman Integration Intent",
+      "status": "active",
+      "priority": "high",
+      "project": "Wiki",
+      "summary": "Wiki intent pages become Superman's context source. Agent dispatch reads wiki intents. On completion, wiki intent auto-updates.",
+      "updated": "2026-04-04"
+    },
+    {
+      "path": "/home/trajan/wiki/spaces/default/intents/wiki-system-intent.md",
+      "title": "Wiki — Core System Intent",
+      "status": "active",
+      "priority": "high",
+      "project": "Wiki",
+      "summary": "Unified knowledge system replacing vault. API-first, agent-accessible, EMA-integrated. Wikipedia-style web mirror + prompt interface.",
+      "updated": "2026-04-04"
+    }
+  ],
+  "local_resource_docs": [
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/AGENT-OS-EMA-INTEGRATION.md",
+      "title": "AGENT-OS-EMA-INTEGRATION",
+      "updated": "2026-04-03T23:10:12.803379+00:00",
+      "size_bytes": 22695
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/AGENT_DISPATCH_PLAYBOOK.md",
+      "title": "AGENT_DISPATCH_PLAYBOOK",
+      "updated": "2026-04-04T17:34:11.187356+00:00",
+      "size_bytes": 8570
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/CODER-EMA-FIXES-RESULT.md",
+      "title": "CODER-EMA-FIXES-RESULT",
+      "updated": "2026-04-04T03:15:45.524730+00:00",
+      "size_bytes": 2908
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/CUSTOM-TOOLING-ROADMAP.md",
+      "title": "CUSTOM-TOOLING-ROADMAP",
+      "updated": "2026-04-03T22:39:50.299759+00:00",
+      "size_bytes": 17757
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-AGENT-OS-CROSS-POLLINATION-2026-04-04.md",
+      "title": "EMA-AGENT-OS-CROSS-POLLINATION-2026-04-04",
+      "updated": "2026-04-04T00:21:14.721214+00:00",
+      "size_bytes": 26476
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-BABYSITTER-SIGNAL-FIRST-NEXT-ROUND-BRIEF.md",
+      "title": "EMA-BABYSITTER-SIGNAL-FIRST-NEXT-ROUND-BRIEF",
+      "updated": "2026-04-04T18:00:50.268932+00:00",
+      "size_bytes": 5165
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-BABYSITTER-SURFACE-GOVERNOR-IMPLEMENTATION-BRIEF.md",
+      "title": "EMA-BABYSITTER-SURFACE-GOVERNOR-IMPLEMENTATION-BRIEF",
+      "updated": "2026-04-04T17:57:10.709077+00:00",
+      "size_bytes": 1876
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-CLI-SPECIFICATION.md",
+      "title": "EMA-CLI-SPECIFICATION",
+      "updated": "2026-04-03T22:36:40.943669+00:00",
+      "size_bytes": 21417
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-CONTRADICTIONS-2026-04-04.md",
+      "title": "EMA-CONTRADICTIONS-2026-04-04",
+      "updated": "2026-04-04T00:40:26.722428+00:00",
+      "size_bytes": 14999
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-INTENT-FARMING-AND-FRONTEND-DESIGN.md",
+      "title": "EMA-INTENT-FARMING-AND-FRONTEND-DESIGN",
+      "updated": "2026-04-04T01:48:39.653108+00:00",
+      "size_bytes": 10589
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-P2P-SSH-DISTRIBUTED-AI-DESIGN.md",
+      "title": "EMA-P2P-SSH-DISTRIBUTED-AI-DESIGN",
+      "updated": "2026-04-04T01:07:00.853694+00:00",
+      "size_bytes": 19988
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-REPO-REALITY-CHECK-2026-04-04.md",
+      "title": "EMA-REPO-REALITY-CHECK-2026-04-04",
+      "updated": "2026-04-04T17:33:33.007942+00:00",
+      "size_bytes": 7831
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA-SYSTEM-DISCOVERY-AND-CLARIFICATION.md",
+      "title": "EMA-SYSTEM-DISCOVERY-AND-CLARIFICATION",
+      "updated": "2026-04-03T21:39:24.532340+00:00",
+      "size_bytes": 20069
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA_HEARTBEAT.md",
+      "title": "EMA_HEARTBEAT",
+      "updated": "2026-04-03T10:37:32.637153+00:00",
+      "size_bytes": 770
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/EMA_PASSOVER_PROMPT.md",
+      "title": "EMA_PASSOVER_PROMPT",
+      "updated": "2026-04-03T21:13:12.913181+00:00",
+      "size_bytes": 4814
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/MEMORY.md",
+      "title": "MEMORY",
+      "updated": "2026-04-04T01:14:48.286187+00:00",
+      "size_bytes": 2726
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/OPENCLAW-EMA-SYSTEM-MARRIAGE-DESIGN.md",
+      "title": "OPENCLAW-EMA-SYSTEM-MARRIAGE-DESIGN",
+      "updated": "2026-04-03T22:21:23.978256+00:00",
+      "size_bytes": 13227
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/PROPOSAL-USER-INPUT-AND-DESK-SPEC.md",
+      "title": "PROPOSAL-USER-INPUT-AND-DESK-SPEC",
+      "updated": "2026-04-04T03:26:38.907735+00:00",
+      "size_bytes": 20336
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/REMOTE-DISPATCH-INTEGRATION.md",
+      "title": "REMOTE-DISPATCH-INTEGRATION",
+      "updated": "2026-04-04T01:12:24.926814+00:00",
+      "size_bytes": 13817
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ROADMAP_SYNTHESIS.md",
+      "title": "ROADMAP_SYNTHESIS",
+      "updated": "2026-04-03T21:59:00.382841+00:00",
+      "size_bytes": 11726
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/SEED-STARVATION-HARDENING-2026-04-04.md",
+      "title": "SEED-STARVATION-HARDENING-2026-04-04",
+      "updated": "2026-04-04T17:43:20.033739+00:00",
+      "size_bytes": 2944
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/UNIFIED-CLI-ARCHITECTURE.md",
+      "title": "UNIFIED-CLI-ARCHITECTURE",
+      "updated": "2026-04-03T22:38:05.397828+00:00",
+      "size_bytes": 15781
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/W7-B3-BRIDGE-ASYNC-RESULT.md",
+      "title": "W7-B3-BRIDGE-ASYNC-RESULT",
+      "updated": "2026-04-04T02:48:58.520611+00:00",
+      "size_bytes": 5796
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/W7-W3-CONTEXT-ENDPOINT-RESULT.md",
+      "title": "W7-W3-CONTEXT-ENDPOINT-RESULT",
+      "updated": "2026-04-04T03:07:54.637305+00:00",
+      "size_bytes": 3040
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/W8-TRACK3-CANONICAL-ARCHITECTURE.md",
+      "title": "W8-TRACK3-CANONICAL-ARCHITECTURE",
+      "updated": "2026-04-04T04:56:53.912944+00:00",
+      "size_bytes": 8982
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/W8-W10-ARCHITECTURE-SYNTHESIS.md",
+      "title": "W8-W10-ARCHITECTURE-SYNTHESIS",
+      "updated": "2026-04-04T02:59:06.731386+00:00",
+      "size_bytes": 57466
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/WEEK-7-EXECUTION-ROADMAP.md",
+      "title": "WEEK-7-EXECUTION-ROADMAP",
+      "updated": "2026-04-03T23:00:29.038470+00:00",
+      "size_bytes": 27848
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/discord-slack-integration.md",
+      "title": "discord-slack-integration",
+      "updated": "2026-04-03T21:59:21.243650+00:00",
+      "size_bytes": 59968
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-mcp-system-architecture.md",
+      "title": "ema-mcp-system-architecture",
+      "updated": "2026-04-03T11:21:53.580695+00:00",
+      "size_bytes": 36546
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-meta-dev/phase1-meta-prompts/CLARIFICATION-QUESTIONS.md",
+      "title": "CLARIFICATION-QUESTIONS",
+      "updated": "2026-04-03T21:55:44.666213+00:00",
+      "size_bytes": 6386
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-meta-dev/phase1-meta-prompts/DESIGN-VALIDATION-QUESTIONS.md",
+      "title": "DESIGN-VALIDATION-QUESTIONS",
+      "updated": "2026-04-03T21:56:18.350532+00:00",
+      "size_bytes": 5922
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-meta-dev/phase1-meta-prompts/IMPLEMENTATION-CHECKPOINTS.md",
+      "title": "IMPLEMENTATION-CHECKPOINTS",
+      "updated": "2026-04-03T21:56:56.064005+00:00",
+      "size_bytes": 7397
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-meta-dev/phase1-meta-prompts/META-PROMPT-PLAYBOOK.md",
+      "title": "META-PROMPT-PLAYBOOK",
+      "updated": "2026-04-03T21:55:07.057738+00:00",
+      "size_bytes": 14823
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-meta-dev/phase1-meta-prompts/VERIFICATION-FRAMEWORK.md",
+      "title": "VERIFICATION-FRAMEWORK",
+      "updated": "2026-04-03T21:57:38.443657+00:00",
+      "size_bytes": 7543
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-meta-dev/phase2-practices/ARCHITECTURE-PATTERNS.md",
+      "title": "ARCHITECTURE-PATTERNS",
+      "updated": "2026-04-03T21:59:28.973950+00:00",
+      "size_bytes": 8600
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/ema-meta-dev/phase2-practices/DEVELOPMENT-PRACTICES.md",
+      "title": "DEVELOPMENT-PRACTICES",
+      "updated": "2026-04-03T21:58:45.284255+00:00",
+      "size_bytes": 11900
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/github-integration.md",
+      "title": "github-integration",
+      "updated": "2026-04-03T22:00:50.570107+00:00",
+      "size_bytes": 85137
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/integration-framework.md",
+      "title": "integration-framework",
+      "updated": "2026-04-03T21:58:53.572577+00:00",
+      "size_bytes": 54173
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/2026-03-14.md",
+      "title": "2026-03-14",
+      "updated": "2026-03-16T04:53:04.960642+00:00",
+      "size_bytes": 955
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/2026-03-15.md",
+      "title": "2026-03-15",
+      "updated": "2026-03-15T06:00:10.243874+00:00",
+      "size_bytes": 736
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/2026-03-16.md",
+      "title": "2026-03-16",
+      "updated": "2026-03-16T19:49:11.865510+00:00",
+      "size_bytes": 9103
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/2026-03-17.md",
+      "title": "2026-03-17",
+      "updated": "2026-03-20T18:32:50.792226+00:00",
+      "size_bytes": 3267
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/2026-04-03.md",
+      "title": "2026-04-03",
+      "updated": "2026-04-03T23:02:48.766753+00:00",
+      "size_bytes": 8164
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/2026-04-04.md",
+      "title": "2026-04-04",
+      "updated": "2026-04-04T18:04:34.786811+00:00",
+      "size_bytes": 17869
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/agent-performance.md",
+      "title": "agent-performance",
+      "updated": "2026-04-04T17:46:07.657977+00:00",
+      "size_bytes": 6687
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/coder/learnings.md",
+      "title": "learnings",
+      "updated": "2026-04-04T03:37:01.804424+00:00",
+      "size_bytes": 144
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/gap-analysis-2026-03-16.md",
+      "title": "gap-analysis-2026-03-16",
+      "updated": "2026-03-16T09:21:11.297643+00:00",
+      "size_bytes": 2976
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/ops-overnight-report.md",
+      "title": "ops-overnight-report",
+      "updated": "2026-03-16T08:15:36.006287+00:00",
+      "size_bytes": 6139
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/memory/researcher/learnings.md",
+      "title": "learnings",
+      "updated": "2026-04-04T04:12:02.025456+00:00",
+      "size_bytes": 554
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/protocols/delegation-system.md",
+      "title": "delegation-system",
+      "updated": "2026-03-16T07:36:54.366743+00:00",
+      "size_bytes": 3904
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/protocols/system-operations.md",
+      "title": "system-operations",
+      "updated": "2026-03-16T08:01:55.686279+00:00",
+      "size_bytes": 1907
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scratch/core-loop/01-loop-architect.md",
+      "title": "01-loop-architect",
+      "updated": "2026-04-03T21:53:27.815962+00:00",
+      "size_bytes": 11264
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scratch/core-loop/02-backend-engineer.md",
+      "title": "02-backend-engineer",
+      "updated": "2026-04-03T21:54:37.814600+00:00",
+      "size_bytes": 17260
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scratch/core-loop/03-frontend-state-manager.md",
+      "title": "03-frontend-state-manager",
+      "updated": "2026-04-03T21:55:47.883339+00:00",
+      "size_bytes": 16040
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scratch/core-loop/04-api-specifier.md",
+      "title": "04-api-specifier",
+      "updated": "2026-04-03T21:56:37.590284+00:00",
+      "size_bytes": 9907
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scratch/core-loop/05-deployment-monitoring.md",
+      "title": "05-deployment-monitoring",
+      "updated": "2026-04-03T21:57:45.687939+00:00",
+      "size_bytes": 13395
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/scratch/core-loop/CORE-LOOP-IMPLEMENTATION-GUIDE.md",
+      "title": "CORE-LOOP-IMPLEMENTATION-GUIDE",
+      "updated": "2026-04-03T21:59:28.844945+00:00",
+      "size_bytes": 22548
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/superman-architecture.md",
+      "title": "superman-architecture",
+      "updated": "2026-04-03T21:59:54.916955+00:00",
+      "size_bytes": 61477
+    },
+    {
+      "path": "/home/trajan/.openclaw/agents/main/workspace/wiki-knowledge-compiler-plan.md",
+      "title": "wiki-knowledge-compiler-plan",
+      "updated": "2026-04-04T04:50:04.902518+00:00",
+      "size_bytes": 13545
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/BRIDGE-ASYNC-PATTERN.md",
+      "title": "Bridge Async Contract",
+      "updated": "2026-04-03",
+      "size_bytes": 23698
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/HONCHO-DECISION.md",
+      "title": "Honcho Decision Framework",
+      "updated": "2026-04-03",
+      "size_bytes": 11466
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/MCP-GATEWAY-ARCH.md",
+      "title": "MCP Gateway Architecture",
+      "updated": "2026-04-03",
+      "size_bytes": 21776
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/SUPERMAN-CONTEXT-FORMAT-SPEC.md",
+      "title": "Superman Context Format Specification",
+      "updated": "2026-04-03",
+      "size_bytes": 13205
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/discord-slack-integration.md",
+      "title": "discord-slack-integration",
+      "updated": "2026-04-03T22:13:04.913252+00:00",
+      "size_bytes": 59968
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/github-integration.md",
+      "title": "github-integration",
+      "updated": "2026-04-03T22:13:09.810439+00:00",
+      "size_bytes": 85137
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/honcho-scope-advisor.md",
+      "title": "honcho-scope-advisor",
+      "updated": "2026-04-03T22:13:04.936253+00:00",
+      "size_bytes": 76038
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/integration-framework.md",
+      "title": "integration-framework",
+      "updated": "2026-04-03T22:13:09.812439+00:00",
+      "size_bytes": 54173
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/monitoring-observability.md",
+      "title": "monitoring-observability",
+      "updated": "2026-04-03T22:13:04.963254+00:00",
+      "size_bytes": 81951
+    },
+    {
+      "path": "/home/trajan/vault/Architecture/Intelligence-Integrations/superman-architecture.md",
+      "title": "superman-architecture",
+      "updated": "2026-04-03T22:13:04.967254+00:00",
+      "size_bytes": 61477
+    },
+    {
+      "path": "/home/trajan/vault/Projects/EMA/BLOCKERS-RANKED.md",
+      "title": "BLOCKERS-RANKED",
+      "updated": "2026-04-03T22:43:11.456315+00:00",
+      "size_bytes": 14063
+    },
+    {
+      "path": "/home/trajan/vault/Projects/EMA/EMA-16-WEEK-ROADMAP.md",
+      "title": "EMA 16-Week Roadmap — Cross-Pollination Edition",
+      "updated": "2026-04-04",
+      "size_bytes": 30900
+    },
+    {
+      "path": "/home/trajan/vault/Projects/EMA/EMA-SELF-BUILDING-BOOTSTRAP.md",
+      "title": "EMA Self-Building Bootstrap Strategy",
+      "updated": "2026-04-03T21:50Z",
+      "size_bytes": 18848
+    },
+    {
+      "path": "/home/trajan/vault/Projects/EMA/WEEK-7-UNIFIED-PLAN.md",
+      "title": "EMA Week 7 — Unified Master Plan",
+      "updated": "2026-04-03",
+      "size_bytes": 20247
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "title": "5-day-analysis-2026-03-18",
+      "updated": "2026-03-18",
+      "size_bytes": 12614
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/README.md",
+      "title": "README",
+      "updated": "2026-03-16",
+      "size_bytes": 2632
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/aspiration-gap-report.md",
+      "title": "Aspiration Gap Report",
+      "updated": "2026-03-18",
+      "size_bytes": 19537
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/aspiration-sprint-2026-03-18.md",
+      "title": "Aspiration Sprint 2026-03-18",
+      "updated": "2026-03-18",
+      "size_bytes": 2959
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/backlog.md",
+      "title": "backlog",
+      "updated": "2026-03-16",
+      "size_bytes": 3329
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/dashboard-concepts.md",
+      "title": "dashboard-concepts",
+      "updated": "2026-03-17",
+      "size_bytes": 33392
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/dashboard-critique.md",
+      "title": "dashboard-critique",
+      "updated": "2026-03-17",
+      "size_bytes": 9912
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/dashboard-design-critique-v2.md",
+      "title": "dashboard-design-critique-v2",
+      "updated": "2026-03-17",
+      "size_bytes": 22883
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/dashboard-designs-v2.md",
+      "title": "dashboard-designs-v2",
+      "updated": "2026-03-17",
+      "size_bytes": 37449
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/dashboard-testing-plan.md",
+      "title": "dashboard-testing-plan",
+      "updated": "2026-03-17",
+      "size_bytes": 2273
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/desk-pitches-2026-03-16.md",
+      "title": "desk-pitches-2026-03-16",
+      "updated": "2026-03-16",
+      "size_bytes": 8322
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/loose-ends.md",
+      "title": "loose-ends",
+      "updated": "2026-03-16",
+      "size_bytes": 6479
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/overnight-proposals-2026-03-18.md",
+      "title": "Overnight Autonomous Proposals — 2026-03-18",
+      "updated": "2026-03-18",
+      "size_bytes": 2667
+    },
+    {
+      "path": "/home/trajan/vault/Projects/System Buildout/reliability-first-reorg-v1.md",
+      "title": "reliability-first-reorg-v1",
+      "updated": "2026-03-18",
+      "size_bytes": 15246
+    },
+    {
+      "path": "/home/trajan/vault/Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "title": "Architecture Synthesis 2026-03-25",
+      "updated": "2026-04-01T04:57:43.365198+00:00",
+      "size_bytes": 7254
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Agents/monty-EMA-integration.md",
+      "title": "Monty — Secure Python Interpreter Cross-Pollination for EMA",
+      "updated": "2026-04-04",
+      "size_bytes": 8920
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/AI Knowledge Hub.md",
+      "title": "AI Knowledge Hub",
+      "updated": "2026-03-29T18:41:58.240104+00:00",
+      "size_bytes": 3887
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Archive/CloudCLI.md",
+      "title": "CloudCLI",
+      "updated": "2026-03-12T03:00:08.261582+00:00",
+      "size_bytes": 2352
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/Claude Code Configuration.md",
+      "title": "Claude Code Configuration",
+      "updated": "2026-03-12T02:57:51.889622+00:00",
+      "size_bytes": 8478
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/Claude Code Plugins MOC.md",
+      "title": "Claude Code Plugins MOC",
+      "updated": "2026-03-12T02:56:30.209644+00:00",
+      "size_bytes": 2346
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/Claude Task Master.md",
+      "title": "Claude Task Master",
+      "updated": "2026-03-12T02:55:52.628271+00:00",
+      "size_bytes": 2957
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/Dippy.md",
+      "title": "Dippy",
+      "updated": "2026-03-12T02:56:32.358722+00:00",
+      "size_bytes": 2503
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/Lasso claude-hooks.md",
+      "title": "Lasso claude-hooks",
+      "updated": "2026-03-12T01:57:41.034641+00:00",
+      "size_bytes": 1562
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/QMD.md",
+      "title": "QMD",
+      "updated": "2026-03-12T02:54:35.185438+00:00",
+      "size_bytes": 4168
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/Superpowers (Obra).md",
+      "title": "Superpowers (Obra)",
+      "updated": "2026-03-12T02:56:47.273267+00:00",
+      "size_bytes": 2581
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/claude-mem.md",
+      "title": "claude-mem",
+      "updated": "2026-03-12T02:55:00.964382+00:00",
+      "size_bytes": 3695
+    },
+    {
+      "path": "/home/trajan/vault/Research/AI-Knowledge/Claude Code Plugins/everything-claude-code.md",
+      "title": "everything-claude-code",
+      "updated": "2026-03-12T02:55:32.694543+00:00",
+      "size_bytes": 4799
+    }
+  ]
+}

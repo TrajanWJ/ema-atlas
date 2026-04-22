@@ -1,0 +1,30 @@
+---
+title: "Discord as EMA Surface"
+type: surface-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - shell-hq
+  - agent-work
+format: gfm
+---
+
+# Discord as EMA Surface
+
+## Main point
+Discord should remain a first-class EMA interaction surface.
+
+## Why
+The old system proved Discord can carry:
+- direct commands
+- ambient ops
+- fast human/agent interaction
+- distributed work coordination
+- swarm-style decomposition
+
+## EMA role
+Discord is not the whole product, but it is a real control, command, and conversational surface for EMA.

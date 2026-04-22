@@ -1,0 +1,7 @@
+# Checkpoint: vault-improve-20260416-040007-1
+Started: 2026-04-16T04:01:03Z
+Agent: researcher
+Task: Vault improvement: Backfill/improve 'System Obsidian' (missing-frontmatter). Current content is insufficient — research the topic and write substantive content.
+
+## Progress
+(Agent has not yet written progress)

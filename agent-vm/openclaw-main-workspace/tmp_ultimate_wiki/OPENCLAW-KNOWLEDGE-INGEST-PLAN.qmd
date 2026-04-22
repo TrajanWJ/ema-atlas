@@ -1,0 +1,35 @@
+---
+title: "OpenClaw Knowledge Ingest Plan"
+type: ingest-plan
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - shell-hq
+  - knowledge
+  - agent-work
+format: gfm
+---
+
+# OpenClaw Knowledge Ingest Plan
+
+## Goal
+Pull important current OpenClaw knowledge into the Ultimate Wiki so the system is not split between live runtime and forgotten config lore.
+
+## Ingest targets
+- gateway and service configuration facts
+- channel and surface setup
+- agent roster and purpose
+- workspace conventions and startup behavior
+- heartbeat / cron / messaging patterns
+- known issues, pairing paths, and recovery notes
+- host/node/device connectivity knowledge
+
+## Method
+- read current reality
+- summarize into durable pages
+- link to source-of-truth files/commands
+- mark freshness and provenance
+- separate canon vs chronicle vs troubleshooting

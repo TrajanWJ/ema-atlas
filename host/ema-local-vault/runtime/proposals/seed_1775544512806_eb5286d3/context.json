@@ -1,0 +1,42 @@
+{
+  "active_tasks": [],
+  "seed": {
+    "id": "seed_1775544512806_eb5286d3",
+    "name": "intent:batch-1-critical-factual-corrections-7-pages-fix-indexmd-age",
+    "project_id": null,
+    "prompt_template": "You are analyzing an intent from EMA's intent schematic.\n\nIntent: Batch 1: Critical factual corrections (7 pages): Fix _index.md, Agent-Network, Infrastructure, OpenClaw, Dispatch-Engine, EMA-Overview, Babysitter-System with correct counts and offline status\nLevel: 5 (execution)\nKind: fix\nDescription: \n\nGenerate a concrete, actionable proposal to advance this intent.\nConsider: what is the smallest next step that would make measurable progress?\nBe specific about files to change, tests to write, or research to conduct."
+  },
+  "project": null,
+  "recent_proposals": [
+    {
+      "id": "prop_1775933204820_fd578cf4",
+      "status": "queued",
+      "title": "Decision: Matrix** (50%) — `prop_1775803604760_1f32858e`** (50%) — `prop_1775818004768_e47",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775933204821_cdb8537d",
+      "status": "queued",
+      "title": "Decision: rule for Claude Code delegation — corrections.md shows two consecutive routing c",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775933204822_e89a0c8f",
+      "status": "queued",
+      "title": "Decision: memory** (50%) — `prop_1775803604758_963cfc39`** (50%) — `prop_1775818004770_830",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775918804808_ff8a1d71",
+      "status": "queued",
+      "title": "Decision: memory** (50%) — `prop_1775803604758_963cfc39`** (50%) — `prop_1775818004770_830",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775918804811_7e5d3536",
+      "status": "queued",
+      "title": "Decision: rule for Claude Code delegation — corrections.md shows two consecutive routing c",
+      "confidence": 0.5
+    }
+  ]
+}

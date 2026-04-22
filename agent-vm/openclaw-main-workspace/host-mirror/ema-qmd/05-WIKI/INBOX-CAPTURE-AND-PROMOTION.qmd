@@ -1,0 +1,19 @@
+---
+title: "Inbox Capture and Promotion"
+format: gfm
+---
+
+# Inbox Capture and Promotion
+
+## Borrow from old vault
+The old vault used an inbox-first write protocol and later classification/promotion.
+
+## EMA version
+New fragments should be allowed to land in an inbox/capture layer, then be:
+1. classified
+2. linked
+3. promoted into durable object pages or track docs
+4. harvested into chronicle/review/memory if warranted
+
+## Why
+This keeps the graph from requiring perfect placement at the moment of capture.

@@ -1,0 +1,23 @@
+{
+  "id": "task-11b91882",
+  "created_at": "2026-03-20T18:20:42Z",
+  "source": "agent-os-unification-sprint",
+  "priority": 1,
+  "agent": "coder",
+  "description": "Implement Proposal Engine v2 based on spec at dispatch/specs/proposal-engine-v2-spec.md. Replace bin/proposal-engine.sh with new version. Must: (1) Scan all 6 idea sources (audit gaps, goal alignment, pattern recognition, codebase analysis, self-improvement, vault integration). (2) Generate multi-task proposals with full task breakdowns. (3) Auto-approve and auto-dispatch non-destructive proposals via dispatch.sh add with proper dependency chains. (4) Queue destructive/high-risk proposals for human review. (5) Track proposal outcomes in dispatch/proposal-state.json (proposed→dispatched→completed with success/fail). (6) Emit feed events for each proposal generated, approved, dispatched. (7) Close the feedback loop: completed proposals inform future proposal generation. (8) Cap at 3 active large proposals to prevent overload. Write to bin/proposal-engine-v2.sh.",
+  "success_criteria": "",
+  "timeout_min": 60,
+  "depends_on": [
+    "task-35de59aa"
+  ],
+  "on_complete": {},
+  "attempts": 0,
+  "max_attempts": 2,
+  "cleanup_source": "stale-task-cleanup.sh (zombie recovery)",
+  "status": "done",
+  "claimed_at": "2026-03-20T18:24:01Z",
+  "locked_by": "coder",
+  "pid": 105234,
+  "done_at": "2026-03-20T18:36:01Z",
+  "result_file": "/home/trajan/dispatch/results/task-11b91882.txt"
+}

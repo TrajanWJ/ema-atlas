@@ -1,0 +1,47 @@
+---
+title: "Code vApp Repo Graph Integration"
+type: implementation-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - repo-read
+  - planning-synthesis
+tracks:
+  - code-vapp
+objects:
+  - code-workstream
+  - code-session
+  - repo-binding
+  - worktree-binding
+related:
+  - ../../08-IMPORTS/external-sources/GITNEXUS-DEEPER-NOTES.qmd
+  - ../../08-IMPORTS/external-sources/GRAPHIFY-DEEPER-NOTES.qmd
+  - ./CODE-VAPP-OBJECT-MODEL.qmd
+format: gfm
+---
+
+# Code vApp Repo Graph Integration
+
+## Purpose
+Define how repo graph intelligence should plug into the EMA code vApp.
+
+## Core idea
+The repo graph is not a separate toy explorer.
+It should be part of the same code-workstream truth as:
+- code sessions
+- workstream context
+- diffs/checkpoints/review
+- machine/repo/worktree bindings
+
+## Best imports
+- GitNexus for repo intelligence and bridge mode
+- Graphify for graph extraction over mixed artifacts
+
+## Result
+A code vApp that understands:
+- the live code session
+- the repo structure
+- related docs and plans
+- review blast radius
+- where the current work sits in the larger EMA graph

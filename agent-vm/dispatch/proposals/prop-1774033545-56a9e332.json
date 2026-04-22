@@ -1,0 +1,33 @@
+{
+  "id": "prop-1774033545-56a9e332",
+  "type": "dispatch",
+  "title": "Implement 5 unactioned research notes",
+  "body": "Found 5 research/actionable vault notes with no dispatch proposal:\\n  - Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-agent_architect.md\\n  - Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-agent_routing-i.md\\n  - Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-content_gaps-in.md\\n  - Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-context_managem.md\\n  - Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-discord_integra.md\\n\\nFirst note: vault/Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-agent_architect.md",
+  "options": [],
+  "source": "vault-integration",
+  "priority": "P3",
+  "created_at": "2026-03-20T19:05:45Z",
+  "status": "approved",
+  "discord_message_id": null,
+  "resolved_at": "2026-03-20T19:05:45Z",
+  "resolved_option": "auto-dispatch",
+  "is_multi_task": false,
+  "tasks": [
+    {
+      "agent": "researcher",
+      "description": "Read these vault research notes and extract concrete, implementable next actions from each: Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-agent_architect.md, Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-agent_routing-i.md, Agent Knowledge/researcher/2026-03-18-research-loop-investigate-best-practices-for-content_gap. Summarise findings as a numbered action list.",
+      "priority": 3,
+      "timeout": 20,
+      "depends_on_prev": false
+    },
+    {
+      "agent": "coder",
+      "description": "For each action item identified: create a dispatch task or vault note capturing the implementation plan. Link back to source note with wikilinks.",
+      "priority": 3,
+      "timeout": 15,
+      "depends_on_prev": true
+    }
+  ],
+  "safety_class": "auto",
+  "triaged": false
+}

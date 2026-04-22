@@ -1,0 +1,5494 @@
+{
+  "generated_at": "2026-04-04",
+  "total_wikilinks": 6788,
+  "valid_links": 5691,
+  "broken_links_count": 1097,
+  "unique_broken_targets": 544,
+  "broken_links": [
+    {
+      "source": "index.md",
+      "link": "Codebases/README\\",
+      "target_basename": "readme\\"
+    },
+    {
+      "source": "index.md",
+      "link": "Projects/README\\",
+      "target_basename": "readme\\"
+    },
+    {
+      "source": "index.md",
+      "link": "Research/README\\",
+      "target_basename": "readme\\"
+    },
+    {
+      "source": "index.md",
+      "link": "Architecture",
+      "target_basename": "architecture"
+    },
+    {
+      "source": "index.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "index.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "index.md",
+      "link": "Trajan",
+      "target_basename": "trajan"
+    },
+    {
+      "source": "index.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "index.md",
+      "link": "Reference",
+      "target_basename": "reference"
+    },
+    {
+      "source": "index.md",
+      "link": "Daily Notes",
+      "target_basename": "daily notes"
+    },
+    {
+      "source": "index.md",
+      "link": "Templates",
+      "target_basename": "templates"
+    },
+    {
+      "source": "index.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "index.md",
+      "link": "Templates/",
+      "target_basename": ""
+    },
+    {
+      "source": "README.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Codebases/README\\",
+      "target_basename": "readme\\"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Projects/README\\",
+      "target_basename": "readme\\"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Research/README\\",
+      "target_basename": "readme\\"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Architecture",
+      "target_basename": "architecture"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Trajan",
+      "target_basename": "trajan"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Reference",
+      "target_basename": "reference"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Daily Notes",
+      "target_basename": "daily notes"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Templates",
+      "target_basename": "templates"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Wiki.md",
+      "link": "Templates/",
+      "target_basename": ""
+    },
+    {
+      "source": "Session Summaries/49270f79-4dd7-4a68-9401-fdbcf335215c.md",
+      "link": "link",
+      "target_basename": "link"
+    },
+    {
+      "source": "Session Summaries/49270f79-4dd7-4a68-9401-fdbcf335215c.md",
+      "link": "link",
+      "target_basename": "link"
+    },
+    {
+      "source": "Trajan/Schedule & Routines.md",
+      "link": "schedule-routines",
+      "target_basename": "schedule-routines"
+    },
+    {
+      "source": "Trajan/Schedule & Routines.md",
+      "link": "research-round-3-deprecation-and-advancement-analysis",
+      "target_basename": "research-round-3-deprecation-and-advancement-analysis"
+    },
+    {
+      "source": "Trajan/_index.md",
+      "link": "harvest-2026-03-16-0740",
+      "target_basename": "harvest-2026-03-16-0740"
+    },
+    {
+      "source": "Trajan/Intent Analysis - March 2026.md",
+      "link": "intent-analysis-march-2026",
+      "target_basename": "intent-analysis-march-2026"
+    },
+    {
+      "source": "Trajan/Communication Patterns.md",
+      "link": "voltagent-openclaw-skills-5400-community-extensions",
+      "target_basename": "voltagent-openclaw-skills-5400-community-extensions"
+    },
+    {
+      "source": "Trajan/Communication Patterns.md",
+      "link": "reddit-intel-deep-sweep-2026-03-18",
+      "target_basename": "reddit-intel-deep-sweep-2026-03-18"
+    },
+    {
+      "source": "Trajan/Profile.md",
+      "link": "user-profile",
+      "target_basename": "user-profile"
+    },
+    {
+      "source": "Trajan/Active Projects Summary.md",
+      "link": "three-tier-memory-architecture",
+      "target_basename": "three-tier-memory-architecture"
+    },
+    {
+      "source": "Trajan/History.md",
+      "link": "2026-03-16-0844-claude-code-perfect",
+      "target_basename": "2026-03-16-0844-claude-code-perfect"
+    },
+    {
+      "source": "Trajan/Who Is Trajan.md",
+      "link": "Goals",
+      "target_basename": "goals"
+    },
+    {
+      "source": "Trajan/Skills & Expertise.md",
+      "link": "qa-prompt-library-comprehensive-testing-templates",
+      "target_basename": "qa-prompt-library-comprehensive-testing-templates"
+    },
+    {
+      "source": "Trajan/Skills & Expertise.md",
+      "link": "agency-agents-adapted-templates",
+      "target_basename": "agency-agents-adapted-templates"
+    },
+    {
+      "source": "Trajan/Aspirational Agent System.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Trajan/Aspirational Integrations.md",
+      "link": "goals-aspirations",
+      "target_basename": "goals-aspirations"
+    },
+    {
+      "source": "Security/axios-npm-supply-chain-attack-2026-03-31.md",
+      "link": "Security/",
+      "target_basename": ""
+    },
+    {
+      "source": "Security/axios-npm-supply-chain-attack-2026-03-31.md",
+      "link": "vault/Operations/",
+      "target_basename": ""
+    },
+    {
+      "source": "Security/axios-npm-supply-chain-attack-2026-03-31.md",
+      "link": "Research/GithubInteresting-2026-03-31.md",
+      "target_basename": "githubinteresting-2026-03-31.md"
+    },
+    {
+      "source": "Security/Gateway Exposure Audit.md",
+      "link": "vm-audit-2026-03-16",
+      "target_basename": "vm-audit-2026-03-16"
+    },
+    {
+      "source": "Tools/flyto-core.md",
+      "link": "MCP Ecosystem",
+      "target_basename": "mcp ecosystem"
+    },
+    {
+      "source": "Tools/Claude Code Design Stack.md",
+      "link": "Claude Code",
+      "target_basename": "claude code"
+    },
+    {
+      "source": "Tools/Claude Code Design Stack.md",
+      "link": "Agent Architecture",
+      "target_basename": "agent architecture"
+    },
+    {
+      "source": "Tools/ui-annotator-mcp.md",
+      "link": "MCP Ecosystem",
+      "target_basename": "mcp ecosystem"
+    },
+    {
+      "source": "Codebases/README.md",
+      "link": "Architecture",
+      "target_basename": "architecture"
+    },
+    {
+      "source": "Codebases/README.md",
+      "link": "Pomodoro",
+      "target_basename": "pomodoro"
+    },
+    {
+      "source": "Codebases/README.md",
+      "link": "YouTube Automations",
+      "target_basename": "youtube automations"
+    },
+    {
+      "source": "Codebases/ProSlync.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "LetMeScale Bible",
+      "target_basename": "letmescale bible"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "00 Design System Overview",
+      "target_basename": "00 design system overview"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "07 Variant Architecture",
+      "target_basename": "07 variant architecture"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-03-03 Cinematic Redesign Plan",
+      "target_basename": "2026-03-03 cinematic redesign plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-03-03 Cinematic Redesign Design",
+      "target_basename": "2026-03-03 cinematic redesign design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-03-02 Hero Rework",
+      "target_basename": "2026-03-02 hero rework"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "00 Project Overview",
+      "target_basename": "00 project overview"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Master Testimonials Research",
+      "target_basename": "master testimonials research"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "00 Design System Overview",
+      "target_basename": "00 design system overview"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "01 Color System",
+      "target_basename": "01 color system"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "02 Glass Morphism",
+      "target_basename": "02 glass morphism"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "03 Typography",
+      "target_basename": "03 typography"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "04 Components",
+      "target_basename": "04 components"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "05 Section Specs",
+      "target_basename": "05 section specs"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "06 Animations",
+      "target_basename": "06 animations"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "07 Variant Architecture",
+      "target_basename": "07 variant architecture"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-03-03 Cinematic Redesign Plan",
+      "target_basename": "2026-03-03 cinematic redesign plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-03-03 Cinematic Redesign Design",
+      "target_basename": "2026-03-03 cinematic redesign design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-03-02 Hero Rework",
+      "target_basename": "2026-03-02 hero rework"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-27 Visual Polish Plan",
+      "target_basename": "2026-02-27 visual polish plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-27 Visual Polish Design",
+      "target_basename": "2026-02-27 visual polish design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-27 V2 Landing Page Plan",
+      "target_basename": "2026-02-27 v2 landing page plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-20 Landing Page Design",
+      "target_basename": "2026-02-20 landing page design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-20 LetMeScale Implementation Plan",
+      "target_basename": "2026-02-20 letmescale implementation plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-20 LetMeScale Platform Design",
+      "target_basename": "2026-02-20 letmescale platform design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-21 Sections Brainstorming",
+      "target_basename": "2026-02-21 sections brainstorming"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-21 Testimonials Cascade Design",
+      "target_basename": "2026-02-21 testimonials cascade design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-21 Testimonials Cascade Plan",
+      "target_basename": "2026-02-21 testimonials cascade plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Brand Amplification Design",
+      "target_basename": "2026-02-25 brand amplification design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Brand Amplification Plan",
+      "target_basename": "2026-02-25 brand amplification plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Landing Page Rebuild Design",
+      "target_basename": "2026-02-25 landing page rebuild design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Landing Page Rebuild",
+      "target_basename": "2026-02-25 landing page rebuild"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Testimonials DE Design",
+      "target_basename": "2026-02-25 testimonials de design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Testimonials DE Plan",
+      "target_basename": "2026-02-25 testimonials de plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Testimonials Stack Design",
+      "target_basename": "2026-02-25 testimonials stack design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-25 Testimonials Stack Plan",
+      "target_basename": "2026-02-25 testimonials stack plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-26 Testimonials V2 Proof Design",
+      "target_basename": "2026-02-26 testimonials v2 proof design"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "2026-02-26 Testimonials V2 Proof Plan",
+      "target_basename": "2026-02-26 testimonials v2 proof plan"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "LetMeScale Bible",
+      "target_basename": "letmescale bible"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "LetMeScale Business Overview",
+      "target_basename": "letmescale business overview"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Master Testimonials Research",
+      "target_basename": "master testimonials research"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Trell Analysis",
+      "target_basename": "trell analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Daniel Analysis",
+      "target_basename": "daniel analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Mark Shapiro Analysis",
+      "target_basename": "mark shapiro analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Chetha Analysis",
+      "target_basename": "chetha analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Farid Analysis",
+      "target_basename": "farid analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Josh Snow Analysis",
+      "target_basename": "josh snow analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Clipping Accounts Analysis",
+      "target_basename": "clipping accounts analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Clipping Stars Analysis",
+      "target_basename": "clipping stars analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Puppets Master Analysis",
+      "target_basename": "puppets master analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Theroi Media Analysis",
+      "target_basename": "theroi media analysis"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "00 Project Overview",
+      "target_basename": "00 project overview"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "01 Design System",
+      "target_basename": "01 design system"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "02 Client Case Studies",
+      "target_basename": "02 client case studies"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "03 Section Architecture",
+      "target_basename": "03 section architecture"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "05 Copy and Messaging",
+      "target_basename": "05 copy and messaging"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "07 Tools and Patterns",
+      "target_basename": "07 tools and patterns"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "08 Ideas and Directions",
+      "target_basename": "08 ideas and directions"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "09 Quick Start",
+      "target_basename": "09 quick start"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "10 Implementation Spec",
+      "target_basename": "10 implementation spec"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "V2 Business Overview",
+      "target_basename": "v2 business overview"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "Vercel Deploy",
+      "target_basename": "vercel deploy"
+    },
+    {
+      "source": "Projects/LetMeScale.md",
+      "link": "What We Do - Original A",
+      "target_basename": "what we do - original a"
+    },
+    {
+      "source": "Projects/QuickNotes.md",
+      "link": "wikilink",
+      "target_basename": "wikilink"
+    },
+    {
+      "source": "Projects/QuickNotes.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Projects/EMA Master Knowledge Base.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Projects/EMA 8-Week Implementation Sprint.md",
+      "link": "wikilink",
+      "target_basename": "wikilink"
+    },
+    {
+      "source": "Projects/ClaudeForge.md",
+      "link": "Agent OS Demo",
+      "target_basename": "agent os demo"
+    },
+    {
+      "source": "Projects/ClaudeForge.md",
+      "link": "Dashboard Designs v2",
+      "target_basename": "dashboard designs v2"
+    },
+    {
+      "source": "Projects/EMA-Superman-HQ-NextSteps-2026-04-03.md",
+      "link": "EMA-Claude-Bridge-Design",
+      "target_basename": "ema-claude-bridge-design"
+    },
+    {
+      "source": "Daily Notes/2026-03-19.md",
+      "link": "2026-03-20",
+      "target_basename": "2026-03-20"
+    },
+    {
+      "source": "Daily Notes/2026-03-19.md",
+      "link": "Trajan",
+      "target_basename": "trajan"
+    },
+    {
+      "source": "Daily Notes/2026-03-18.md",
+      "link": "Evolution Report 2026-03-18",
+      "target_basename": "evolution report 2026-03-18"
+    },
+    {
+      "source": "System/Claude Code Programmatic API.md",
+      "link": "agentic-dev-env-OS",
+      "target_basename": "agentic-dev-env-os"
+    },
+    {
+      "source": "System/Dispatch Architecture Review.md",
+      "link": "$exit_code -eq 127",
+      "target_basename": "$exit_code -eq 127"
+    },
+    {
+      "source": "System/Dispatch Architecture Review.md",
+      "link": "Agent Architecture",
+      "target_basename": "agent architecture"
+    },
+    {
+      "source": "System/Dispatch Architecture Review.md",
+      "link": "agent-cards.json",
+      "target_basename": "agent-cards.json"
+    },
+    {
+      "source": "System/EMA-Unified-Spec-With-Integrations.md",
+      "link": "project name",
+      "target_basename": "project name"
+    },
+    {
+      "source": "System/EMA-Unified-Spec-With-Integrations.md",
+      "link": "task:id",
+      "target_basename": "task:id"
+    },
+    {
+      "source": "System/EMA-Unified-Spec-With-Integrations.md",
+      "link": "Page",
+      "target_basename": "page"
+    },
+    {
+      "source": "System/EMA-Unified-Spec-With-Integrations.md",
+      "link": "canvas:name",
+      "target_basename": "canvas:name"
+    },
+    {
+      "source": "System/Usage Patterns.md",
+      "link": "auto-knowledge-architecture",
+      "target_basename": "auto-knowledge-architecture"
+    },
+    {
+      "source": "System/dispatch-audit-2026-03-19.md",
+      "link": "-x \"$HOME/bin/dispatch-chain.sh\"",
+      "target_basename": "dispatch-chain.sh\""
+    },
+    {
+      "source": "System/dispatch-audit-2026-03-19.md",
+      "link": "wikilink",
+      "target_basename": "wikilink"
+    },
+    {
+      "source": "System/dispatch-audit-2026-03-19.md",
+      "link": "Agent Performance Tracking",
+      "target_basename": "agent performance tracking"
+    },
+    {
+      "source": "System/dispatch-audit-2026-03-19.md",
+      "link": "Dispatch System Design",
+      "target_basename": "dispatch system design"
+    },
+    {
+      "source": "System/Orphan Fix Report.md",
+      "link": "wikilink",
+      "target_basename": "wikilink"
+    },
+    {
+      "source": "System/Orphan Fix Report.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "System/Code Patterns.md",
+      "link": "#^python",
+      "target_basename": "#^python"
+    },
+    {
+      "source": "System/Code Patterns.md",
+      "link": "#^bash",
+      "target_basename": "#^bash"
+    },
+    {
+      "source": "System/Code Patterns.md",
+      "link": "#^typescript",
+      "target_basename": "#^typescript"
+    },
+    {
+      "source": "System/Code Patterns.md",
+      "link": "#^sql",
+      "target_basename": "#^sql"
+    },
+    {
+      "source": "System/Code Patterns.md",
+      "link": "#^json",
+      "target_basename": "#^json"
+    },
+    {
+      "source": "System/Wiki-Navigation.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "System/System Overview.md",
+      "link": "Anti-Staleness",
+      "target_basename": "anti-staleness"
+    },
+    {
+      "source": "System/Overnight Digest 2026-03-16.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "System/Memory-Architecture.md",
+      "link": "mem.sh",
+      "target_basename": "mem.sh"
+    },
+    {
+      "source": "System/Memory-Architecture.md",
+      "link": "Session Management",
+      "target_basename": "session management"
+    },
+    {
+      "source": "System/Executive System.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "System/Executive System.md",
+      "link": "AGENTS",
+      "target_basename": "agents"
+    },
+    {
+      "source": "System/vault-reference-snippet.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "System/Staleness Report.md",
+      "link": "intent-analysis-march-2026",
+      "target_basename": "intent-analysis-march-2026"
+    },
+    {
+      "source": "System/Quality Report.md",
+      "link": "superpowers-architecture-stolen-patterns",
+      "target_basename": "superpowers-architecture-stolen-patterns"
+    },
+    {
+      "source": "System/Quality Report.md",
+      "link": "agent-tester-multi-model-soul-md-testing",
+      "target_basename": "agent-tester-multi-model-soul-md-testing"
+    },
+    {
+      "source": "System/Architecture Critique 2026-03-19.md",
+      "link": "Anthropic",
+      "target_basename": "anthropic"
+    },
+    {
+      "source": "System/Architecture Critique 2026-03-19.md",
+      "link": "Self-Evolution Protocol",
+      "target_basename": "self-evolution protocol"
+    },
+    {
+      "source": "System/CTA-Session-Tree.md",
+      "link": "Session Architecture",
+      "target_basename": "session architecture"
+    },
+    {
+      "source": "System/System Obsidian.md",
+      "link": "Installation Playbook",
+      "target_basename": "installation playbook"
+    },
+    {
+      "source": "_hubs/hub-agent-system.md",
+      "link": "Agents/Sessions/2026-03-16_0648_\ud83e\uddea Delegation Test \u2014",
+      "target_basename": "2026-03-16_0648_\ud83e\uddea delegation test \u2014"
+    },
+    {
+      "source": "Decisions/Web-Content-Extraction-Stack.md",
+      "link": "deep-scraper skill",
+      "target_basename": "deep-scraper skill"
+    },
+    {
+      "source": "Decisions/Web-Content-Extraction-Stack.md",
+      "link": "Vault-Keeper Agent",
+      "target_basename": "vault-keeper agent"
+    },
+    {
+      "source": "Architecture/Integrations Roadmap.md",
+      "link": "goals-aspirations",
+      "target_basename": "goals-aspirations"
+    },
+    {
+      "source": "Architecture/EMA Full Integration Roadmap.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Architecture/Design Decisions.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Architecture/Design Decisions.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Architecture/Design Decisions.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Architecture/Design Decisions.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Architecture/Design Decisions.md",
+      "link": "Advancement",
+      "target_basename": "advancement"
+    },
+    {
+      "source": "Architecture/Design Decisions.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Architecture/Claude Agent SDK Migration.md",
+      "link": "Agent Team Orchestration",
+      "target_basename": "agent team orchestration"
+    },
+    {
+      "source": "Architecture/Agent-Queue-System.md",
+      "link": "Dispatch Protocol",
+      "target_basename": "dispatch protocol"
+    },
+    {
+      "source": "Architecture/agents-md-audit-2026-03-19.md",
+      "link": "SOUL.md Protocol",
+      "target_basename": "soul.md protocol"
+    },
+    {
+      "source": "Architecture/agents-md-audit-2026-03-19.md",
+      "link": "Self-Evolution Protocol",
+      "target_basename": "self-evolution protocol"
+    },
+    {
+      "source": "Architecture/Agent Architecture Overview.md",
+      "link": "2.0",
+      "target_basename": "2.0"
+    },
+    {
+      "source": "Architecture/Agent Architecture Overview.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Architecture/Agent Architecture Overview.md",
+      "link": "ByteDance",
+      "target_basename": "bytedance"
+    },
+    {
+      "source": "Architecture/dispatch-nag-protocol.md",
+      "link": "swift-claude-code-teardown#Todo Nag Injection",
+      "target_basename": "swift-claude-code-teardown#todo nag injection"
+    },
+    {
+      "source": "Architecture/Discord Server Architecture v4.md",
+      "link": "reddit-intel-deep-sweep-2026-03-18",
+      "target_basename": "reddit-intel-deep-sweep-2026-03-18"
+    },
+    {
+      "source": "Architecture/Future-Frontend-UX-Spec.md",
+      "link": "...",
+      "target_basename": "..."
+    },
+    {
+      "source": "Architecture/Future-Frontend-UX-Spec.md",
+      "link": "target",
+      "target_basename": "target"
+    },
+    {
+      "source": "Architecture/agent-handoff-envelope.md",
+      "link": "HEARTBEAT",
+      "target_basename": "heartbeat"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "NousResearch",
+      "target_basename": "nousresearch"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "1",
+      "target_basename": "1"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "Self-Organizing",
+      "target_basename": "self-organizing"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "Systems",
+      "target_basename": "systems"
+    },
+    {
+      "source": "Architecture/Auto-Knowledge Architecture.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Architecture/autoresearch-pattern.md",
+      "link": "StackMemory",
+      "target_basename": "stackmemory"
+    },
+    {
+      "source": "Architecture/intercept-mcp-guardrails.md",
+      "link": "oh-my-harness",
+      "target_basename": "oh-my-harness"
+    },
+    {
+      "source": "Architecture/auto-prompt-optimization.md",
+      "link": "AdalFlow Concepts",
+      "target_basename": "adalflow concepts"
+    },
+    {
+      "source": "Architecture/auto-prompt-optimization.md",
+      "link": "SciTeX Concepts",
+      "target_basename": "scitex concepts"
+    },
+    {
+      "source": "Architecture/auto-prompt-optimization.md",
+      "link": "Scientific Method for Agents",
+      "target_basename": "scientific method for agents"
+    },
+    {
+      "source": "Architecture/v5.1-Red-Team-Report.md",
+      "link": "$QUEUE_SIZE -gt 10 && $LOCK_AGE -gt 180",
+      "target_basename": "$queue_size -gt 10 && $lock_age -gt 180"
+    },
+    {
+      "source": "Architecture/v5.1-Red-Team-Report.md",
+      "link": "$FREE_MB -lt 500",
+      "target_basename": "$free_mb -lt 500"
+    },
+    {
+      "source": "Architecture/v5.1-Red-Team-Report.md",
+      "link": "$QUEUE -gt 10 && $LOCK_AGE -gt 300",
+      "target_basename": "$queue -gt 10 && $lock_age -gt 300"
+    },
+    {
+      "source": "Architecture/Queue Architecture v2.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Architecture/consensus-loop-pattern.md",
+      "link": "GouvernAI risk-tier model",
+      "target_basename": "gouvernai risk-tier model"
+    },
+    {
+      "source": "Architecture/strawpot-orchestration.md",
+      "link": "Multi-Agent Orchestration",
+      "target_basename": "multi-agent orchestration"
+    },
+    {
+      "source": "Architecture/Independent AI System Design.md",
+      "link": "-z \"$last_activity\"",
+      "target_basename": "-z \"$last_activity\""
+    },
+    {
+      "source": "Architecture/Independent AI System Design.md",
+      "link": "$age -gt $STALE_THRESHOLD",
+      "target_basename": "$age -gt $stale_threshold"
+    },
+    {
+      "source": "Architecture/Independent AI System Design.md",
+      "link": "$HOUR -ge 22",
+      "target_basename": "$hour -ge 22"
+    },
+    {
+      "source": "Architecture/Independent AI System Design.md",
+      "link": "$(( NOW - LAST_HEARTBEAT )) -gt 7200",
+      "target_basename": "$(( now - last_heartbeat )) -gt 7200"
+    },
+    {
+      "source": "Architecture/Independent AI System Design.md",
+      "link": "$HOUR -ge 22",
+      "target_basename": "$hour -ge 22"
+    },
+    {
+      "source": "Architecture/Independent AI System Design.md",
+      "link": "\"$NIGHT_MODE\" == \"true\"",
+      "target_basename": "\"$night_mode\" == \"true\""
+    },
+    {
+      "source": "Architecture/scientific-method-for-agents.md",
+      "link": "SciTeX Concepts",
+      "target_basename": "scitex concepts"
+    },
+    {
+      "source": "Architecture/scientific-method-for-agents.md",
+      "link": "Auto-Prompt Optimization",
+      "target_basename": "auto-prompt optimization"
+    },
+    {
+      "source": "Architecture/scientific-method-for-agents.md",
+      "link": "AdalFlow Concepts",
+      "target_basename": "adalflow concepts"
+    },
+    {
+      "source": "Architecture/Claude Code Bot Architecture.md",
+      "link": "\"\n---\n# Claude Code Bot Architecture\n\n**Status:** #active\n**Created:** 2026-03-16\n**Version:** v2 (agentic, context-aware, live-streaming)\n\n## Overview\n\nStandalone Discord bot that runs Claude Code with full system access and streams output to Discord in real time. Separate identity from Right Hand ([[OpenClaw",
+      "target_basename": "\"\n---\n# claude code bot architecture\n\n**status:** #active\n**created:** 2026-03-16\n**version:** v2 (agentic, context-aware, live-streaming)\n\n## overview\n\nstandalone discord bot that runs claude code with full system access and streams output to discord in real time. separate identity from right hand ([[openclaw"
+    },
+    {
+      "source": "Architecture/background-results-contract.md",
+      "link": "swift-claude-code-teardown#Background Task Injection",
+      "target_basename": "swift-claude-code-teardown#background task injection"
+    },
+    {
+      "source": "Architecture/claude-code-channels.md",
+      "link": "MCP Ecosystem",
+      "target_basename": "mcp ecosystem"
+    },
+    {
+      "source": "Architecture/Discord UX Philosophy.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Inbox/2026-03-31 Agent Dispatch Empty Task Content Bug.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Inbox/2026-03-31 Agent Dispatch Empty Task Content Bug.md",
+      "link": "memory/agent-performance.md",
+      "target_basename": "agent-performance.md"
+    },
+    {
+      "source": "Inbox/2026-03-31 Agent Dispatch Empty Task Content Bug.md",
+      "link": "TASKS.md",
+      "target_basename": "tasks.md"
+    },
+    {
+      "source": "Inbox/2026-03-29 Git with Coding Agents.md",
+      "link": "TOOLS.md",
+      "target_basename": "tools.md"
+    },
+    {
+      "source": "Inbox/2026-03-29 Git with Coding Agents.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Inbox/2026-03-29 Git with Coding Agents.md",
+      "link": "vault/Trajan/Preferences.md",
+      "target_basename": "preferences.md"
+    },
+    {
+      "source": "Inbox/2026-03-30 Discord User Account Automation Risk.md",
+      "link": "TOOLS.md",
+      "target_basename": "tools.md"
+    },
+    {
+      "source": "Inbox/2026-03-30 Discord User Account Automation Risk.md",
+      "link": "SOUL.md",
+      "target_basename": "soul.md"
+    },
+    {
+      "source": "Inbox/2026-04-01 agents-observe Claude Code Observability.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Inbox/2026-04-01 agents-observe Claude Code Observability.md",
+      "link": "vault/Inbox/2026-03-31 Agent Dispatch Empty Task Content Bug.md",
+      "target_basename": "2026-03-31 agent dispatch empty task content bug.md"
+    },
+    {
+      "source": "Inbox/2026-03-30 Agent Dispatch Scoring Heuristics.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Inbox/2026-03-30 Agent Dispatch Scoring Heuristics.md",
+      "link": "memory/agent-performance.md",
+      "target_basename": "agent-performance.md"
+    },
+    {
+      "source": "Inbox/2026-03-30 Agent Dispatch Scoring Heuristics.md",
+      "link": "memory/workflow-patterns.json",
+      "target_basename": "workflow-patterns.json"
+    },
+    {
+      "source": "Inbox/2026-03-30 Agent Dispatch Scoring Heuristics.md",
+      "link": "vault/Research/Self-Critique and Auto-Evolution Design.md",
+      "target_basename": "self-critique and auto-evolution design.md"
+    },
+    {
+      "source": "Agent Knowledge/Agent Knowledge.md",
+      "link": "Agent Knowledge/coder\\",
+      "target_basename": "coder\\"
+    },
+    {
+      "source": "Agent Knowledge/Agent Knowledge.md",
+      "link": "Agent Knowledge/researcher\\",
+      "target_basename": "researcher\\"
+    },
+    {
+      "source": "Agent Knowledge/Agent Knowledge.md",
+      "link": "Agent Knowledge/devils-advocate\\",
+      "target_basename": "devils-advocate\\"
+    },
+    {
+      "source": "Agent Knowledge/Agent Knowledge.md",
+      "link": "Agent Knowledge/ops\\",
+      "target_basename": "ops\\"
+    },
+    {
+      "source": "Agent Knowledge/Agent Knowledge.md",
+      "link": "Agent Knowledge/security\\",
+      "target_basename": "security\\"
+    },
+    {
+      "source": "Research/Web Intel - Deep Sweep 2026-03-18.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Web Intel - Deep Sweep 2026-03-18.md",
+      "link": "Agent",
+      "target_basename": "agent"
+    },
+    {
+      "source": "Research/Web Intel - Deep Sweep 2026-03-18.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Research/Code Review Skills Landscape.md",
+      "link": "ai-landscape-2026-03-17",
+      "target_basename": "ai-landscape-2026-03-17"
+    },
+    {
+      "source": "Research/Code Review Skills Landscape.md",
+      "link": "ai-landscape-2026-03-16",
+      "target_basename": "ai-landscape-2026-03-16"
+    },
+    {
+      "source": "Research/karpathy-digest-2026-03-19.md",
+      "link": "Agent Architecture",
+      "target_basename": "agent architecture"
+    },
+    {
+      "source": "Research/Multi-Agent-247-Lessons-2026.md",
+      "link": "AGENTS.md",
+      "target_basename": "agents.md"
+    },
+    {
+      "source": "Research/AI Landscape 2026-03-16.md",
+      "link": "Recursive",
+      "target_basename": "recursive"
+    },
+    {
+      "source": "Research/AI Landscape 2026-03-16.md",
+      "link": "Knowledge",
+      "target_basename": "knowledge"
+    },
+    {
+      "source": "Research/AI Landscape 2026-03-16.md",
+      "link": "Mining",
+      "target_basename": "mining"
+    },
+    {
+      "source": "Research/AI Landscape 2026-03-16.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/AI Landscape 2026-03-16.md",
+      "link": "3-Layer",
+      "target_basename": "3-layer"
+    },
+    {
+      "source": "Research/AI Landscape 2026-03-16.md",
+      "link": "Architecture",
+      "target_basename": "architecture"
+    },
+    {
+      "source": "Research/Reddit Intel - OpenClaw Focus.md",
+      "link": "reddit-intel-curated-favorites-2026-03-16",
+      "target_basename": "reddit-intel-curated-favorites-2026-03-16"
+    },
+    {
+      "source": "Research/Reddit Intel - OpenClaw Focus.md",
+      "link": "Reddit",
+      "target_basename": "reddit"
+    },
+    {
+      "source": "Research/Reddit Intel - OpenClaw Focus.md",
+      "link": "Intel",
+      "target_basename": "intel"
+    },
+    {
+      "source": "Research/Reddit Intel - OpenClaw Focus.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Reddit Intel - OpenClaw Focus.md",
+      "link": "Curated",
+      "target_basename": "curated"
+    },
+    {
+      "source": "Research/Reddit Intel - OpenClaw Focus.md",
+      "link": "Favorites",
+      "target_basename": "favorites"
+    },
+    {
+      "source": "Research/Reddit Intel - OpenClaw Focus.md",
+      "link": "(2026-03-16)",
+      "target_basename": "(2026-03-16)"
+    },
+    {
+      "source": "Research/kali-mcp.md",
+      "link": "Tool Integration March 2026",
+      "target_basename": "tool integration march 2026"
+    },
+    {
+      "source": "Research/harbor-llm-stack.md",
+      "link": "Vane Search",
+      "target_basename": "vane search"
+    },
+    {
+      "source": "Research/harbor-llm-stack.md",
+      "link": "Tool Integration March 2026",
+      "target_basename": "tool integration march 2026"
+    },
+    {
+      "source": "Research/dispatch-failure-analysis-20260329.md",
+      "link": "dispatch",
+      "target_basename": "dispatch"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v1.md",
+      "link": "STORM Stanford Research",
+      "target_basename": "storm stanford research"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v1.md",
+      "link": "OmniThink",
+      "target_basename": "omnithink"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v1.md",
+      "link": "GPT Researcher",
+      "target_basename": "gpt researcher"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v1.md",
+      "link": "AI Scientist v2",
+      "target_basename": "ai scientist v2"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v1.md",
+      "link": "Research Feed",
+      "target_basename": "research feed"
+    },
+    {
+      "source": "Research/Ollama MCP Bridge Installation.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Research/_index.md",
+      "link": "DeerFlow 2.0 - ByteDance",
+      "target_basename": "deerflow 2.0 - bytedance"
+    },
+    {
+      "source": "Research/_index.md",
+      "link": "Hermes Agent - NousResearch",
+      "target_basename": "hermes agent - nousresearch"
+    },
+    {
+      "source": "Research/_index.md",
+      "link": "OpenViking - Context Database for Agents",
+      "target_basename": "openviking - context database for agents"
+    },
+    {
+      "source": "Research/_index.md",
+      "link": "OpenViking-Context-Database",
+      "target_basename": "openviking-context-database"
+    },
+    {
+      "source": "Research/_index.md",
+      "link": "DeerFlow 2.0",
+      "target_basename": "deerflow 2.0"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "style-guide",
+      "target_basename": "style-guide"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "architecture",
+      "target_basename": "architecture"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "design-pattern/strategy",
+      "target_basename": "strategy"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "external-service/payment-api",
+      "target_basename": "payment-api"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "note-name",
+      "target_basename": "note-name"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "link",
+      "target_basename": "link"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "Stripe",
+      "target_basename": "stripe"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "card-authorization",
+      "target_basename": "card-authorization"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "webhook-events",
+      "target_basename": "webhook-events"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "payment",
+      "target_basename": "payment"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "retry-logic",
+      "target_basename": "retry-logic"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "exponential-backoff",
+      "target_basename": "exponential-backoff"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "link",
+      "target_basename": "link"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "design-pattern/observer",
+      "target_basename": "observer"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "infrastructure/redis",
+      "target_basename": "redis"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "team/backend",
+      "target_basename": "backend"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "runbook/payment-runbook",
+      "target_basename": "payment-runbook"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "X",
+      "target_basename": "x"
+    },
+    {
+      "source": "Research/Wiki-Graph-Memory-Systems.md",
+      "link": "X",
+      "target_basename": "x"
+    },
+    {
+      "source": "Research/Integrations - March 2026.md",
+      "link": "gh-aw",
+      "target_basename": "gh-aw"
+    },
+    {
+      "source": "Research/Integrations - March 2026.md",
+      "link": "integrations-march-2026",
+      "target_basename": "integrations-march-2026"
+    },
+    {
+      "source": "Research/Mirror System - Our Rebuild.md",
+      "link": "Three-Tier Memory Architecture#6. What We Should Adopt",
+      "target_basename": "three-tier memory architecture#6. what we should adopt"
+    },
+    {
+      "source": "Research/Mirror System - Our Rebuild.md",
+      "link": "Mirror",
+      "target_basename": "mirror"
+    },
+    {
+      "source": "Research/Mirror System - Our Rebuild.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Research/Mirror System - Our Rebuild.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Mirror System - Our Rebuild.md",
+      "link": "Comparison",
+      "target_basename": "comparison"
+    },
+    {
+      "source": "Research/Mirror System - Our Rebuild.md",
+      "link": "Review",
+      "target_basename": "review"
+    },
+    {
+      "source": "Research/agent-architecture-sota-2026-03-19.md",
+      "link": "Multi-Agent Orchestration",
+      "target_basename": "multi-agent orchestration"
+    },
+    {
+      "source": "Research/agent-architecture-sota-2026-03-19.md",
+      "link": "MCP Ecosystem",
+      "target_basename": "mcp ecosystem"
+    },
+    {
+      "source": "Research/agent-architecture-sota-2026-03-19.md",
+      "link": "Agent Performance Tracking",
+      "target_basename": "agent performance tracking"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v2.md",
+      "link": "STORM Stanford",
+      "target_basename": "storm stanford"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v2.md",
+      "link": "OmniThink",
+      "target_basename": "omnithink"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v2.md",
+      "link": "GPT Researcher",
+      "target_basename": "gpt researcher"
+    },
+    {
+      "source": "Research/Recursive-Research-System-Spec-v2.md",
+      "link": "AI Scientist v2",
+      "target_basename": "ai scientist v2"
+    },
+    {
+      "source": "Research/OpenClaw Discord Setup.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Research/OpenClaw Discord Setup.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/OpenClaw Discord Setup.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Research/OpenClaw Discord Setup.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Research/OpenClaw Discord Setup.md",
+      "link": "Advancement",
+      "target_basename": "advancement"
+    },
+    {
+      "source": "Research/OpenClaw Discord Setup.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Research/Slash Commands Design.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Research/competitive-scan-2026-03-27.md",
+      "link": "AI Agent Landscape",
+      "target_basename": "ai agent landscape"
+    },
+    {
+      "source": "Research/competitive-scan-2026-03-27.md",
+      "link": "Anthropic Claude",
+      "target_basename": "anthropic claude"
+    },
+    {
+      "source": "Research/competitive-scan-2026-03-27.md",
+      "link": "OpenAI Strategy",
+      "target_basename": "openai strategy"
+    },
+    {
+      "source": "Research/LCM Context Compression.md",
+      "link": "context-gateway-evaluation",
+      "target_basename": "context-gateway-evaluation"
+    },
+    {
+      "source": "Research/LCM Context Compression.md",
+      "link": "openviking-context-database-for-agents",
+      "target_basename": "openviking-context-database-for-agents"
+    },
+    {
+      "source": "Research/LCM Context Compression.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/LCM Context Compression.md",
+      "link": "Context",
+      "target_basename": "context"
+    },
+    {
+      "source": "Research/LCM Context Compression.md",
+      "link": "Database",
+      "target_basename": "database"
+    },
+    {
+      "source": "Research/LCM Context Compression.md",
+      "link": "for",
+      "target_basename": "for"
+    },
+    {
+      "source": "Research/LCM Context Compression.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Research/Agent Memory Architectures.md",
+      "link": "Multi-Agent",
+      "target_basename": "multi-agent"
+    },
+    {
+      "source": "Research/Agent Memory Architectures.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Agent Memory Architectures.md",
+      "link": "3-Layer",
+      "target_basename": "3-layer"
+    },
+    {
+      "source": "Research/Agent Memory Architectures.md",
+      "link": "Architecture",
+      "target_basename": "architecture"
+    },
+    {
+      "source": "Research/GitHub Agentic Workflows Evaluation.md",
+      "link": "Intelligent Delegation",
+      "target_basename": "intelligent delegation"
+    },
+    {
+      "source": "Research/CassieEvans-Site-Analysis.md",
+      "link": "SVG Animation Techniques",
+      "target_basename": "svg animation techniques"
+    },
+    {
+      "source": "Research/CassieEvans-Site-Analysis.md",
+      "link": "Interactive Web Design",
+      "target_basename": "interactive web design"
+    },
+    {
+      "source": "Research/JoshWComeau-Site-Analysis.md",
+      "link": "CSS Animation Techniques",
+      "target_basename": "css animation techniques"
+    },
+    {
+      "source": "Research/JoshWComeau-Site-Analysis.md",
+      "link": "Interactive Web Design",
+      "target_basename": "interactive web design"
+    },
+    {
+      "source": "Research/mcp-security-trinityguard.md",
+      "link": "MCP Ecosystem",
+      "target_basename": "mcp ecosystem"
+    },
+    {
+      "source": "Research/adalflow-concepts.md",
+      "link": "Auto-Prompt Optimization",
+      "target_basename": "auto-prompt optimization"
+    },
+    {
+      "source": "Research/adalflow-concepts.md",
+      "link": "SciTeX Concepts",
+      "target_basename": "scitex concepts"
+    },
+    {
+      "source": "Research/adalflow-concepts.md",
+      "link": "Scientific Method for Agents",
+      "target_basename": "scientific method for agents"
+    },
+    {
+      "source": "Research/QMD Semantic Search.md",
+      "link": "openviking-context-database-for-agents",
+      "target_basename": "openviking-context-database-for-agents"
+    },
+    {
+      "source": "Research/QMD Semantic Search.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/QMD Semantic Search.md",
+      "link": "Context",
+      "target_basename": "context"
+    },
+    {
+      "source": "Research/QMD Semantic Search.md",
+      "link": "Database",
+      "target_basename": "database"
+    },
+    {
+      "source": "Research/QMD Semantic Search.md",
+      "link": "for",
+      "target_basename": "for"
+    },
+    {
+      "source": "Research/QMD Semantic Search.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Research/QMD Semantic Search.md",
+      "link": "OpenViking-Context-Database",
+      "target_basename": "openviking-context-database"
+    },
+    {
+      "source": "Research/Research Round 2 - Metaprompting Deep Dive.md",
+      "link": "memory:MEMORY_ID",
+      "target_basename": "memory:memory_id"
+    },
+    {
+      "source": "Research/Opik Agent Tracing Evaluation.md",
+      "link": "Agent Dispatch Architecture",
+      "target_basename": "agent dispatch architecture"
+    },
+    {
+      "source": "Research/Promptcmd Installation.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Research/Self-Evaluation and Self-Critique Techniques for AI Agents.md",
+      "link": "rating",
+      "target_basename": "rating"
+    },
+    {
+      "source": "Research/Self-Evaluation and Self-Critique Techniques for AI Agents.md",
+      "link": "5",
+      "target_basename": "5"
+    },
+    {
+      "source": "Research/Self-Evaluation and Self-Critique Techniques for AI Agents.md",
+      "link": "A",
+      "target_basename": "a"
+    },
+    {
+      "source": "Research/Self-Evaluation and Self-Critique Techniques for AI Agents.md",
+      "link": "B",
+      "target_basename": "b"
+    },
+    {
+      "source": "Research/Self-Evaluation and Self-Critique Techniques for AI Agents.md",
+      "link": "C",
+      "target_basename": "c"
+    },
+    {
+      "source": "Research/Self-Evaluation and Self-Critique Techniques for AI Agents.md",
+      "link": "4",
+      "target_basename": "4"
+    },
+    {
+      "source": "Research/Agent Evaluation Frameworks.md",
+      "link": "Self-Evaluation",
+      "target_basename": "self-evaluation"
+    },
+    {
+      "source": "Research/Agent Evaluation Frameworks.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Research/Agent Evaluation Frameworks.md",
+      "link": "Self-Critique",
+      "target_basename": "self-critique"
+    },
+    {
+      "source": "Research/Agent Evaluation Frameworks.md",
+      "link": "Techniques",
+      "target_basename": "techniques"
+    },
+    {
+      "source": "Research/Agent Evaluation Frameworks.md",
+      "link": "for",
+      "target_basename": "for"
+    },
+    {
+      "source": "Research/Agent Evaluation Frameworks.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Research/Agent Evaluation Frameworks.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Research/Immutable Safety Baseline - Coder Position.md",
+      "link": "immutable-safety-baseline-coder-position",
+      "target_basename": "immutable-safety-baseline-coder-position"
+    },
+    {
+      "source": "Research/Tool Discovery Sprint - 2026-03-16.md",
+      "link": "Agent Stack",
+      "target_basename": "agent stack"
+    },
+    {
+      "source": "Research/Tool Discovery Sprint - 2026-03-16.md",
+      "link": "Claude Agent SDK",
+      "target_basename": "claude agent sdk"
+    },
+    {
+      "source": "Research/scitex-concepts.md",
+      "link": "Auto-Prompt Optimization",
+      "target_basename": "auto-prompt optimization"
+    },
+    {
+      "source": "Research/scitex-concepts.md",
+      "link": "Scientific Method for Agents",
+      "target_basename": "scientific method for agents"
+    },
+    {
+      "source": "Research/Wiki-Engine-Audit-EMA.md",
+      "link": "...",
+      "target_basename": "..."
+    },
+    {
+      "source": "Research/Wiki-Engine-Audit-EMA.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Research/Wiki-Engine-Audit-EMA.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "GitHub",
+      "target_basename": "github"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "Intel",
+      "target_basename": "intel"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "Advancement",
+      "target_basename": "advancement"
+    },
+    {
+      "source": "Research/OpenClaw Ecosystem.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Research/ClawHub Relevant Skills Audit.md",
+      "link": "voltagent-openclaw-skills-5400-community-extensions",
+      "target_basename": "voltagent-openclaw-skills-5400-community-extensions"
+    },
+    {
+      "source": "Research/ClawHub Relevant Skills Audit.md",
+      "link": "2026-03-16-0648-1f9ea-delegation-test",
+      "target_basename": "2026-03-16-0648-1f9ea-delegation-test"
+    },
+    {
+      "source": "Research/ClawHub Relevant Skills Audit.md",
+      "link": "2026-03-16_0648_\ud83e\uddea",
+      "target_basename": "2026-03-16_0648_\ud83e\uddea"
+    },
+    {
+      "source": "Research/ClawHub Relevant Skills Audit.md",
+      "link": "Delegation",
+      "target_basename": "delegation"
+    },
+    {
+      "source": "Research/ClawHub Relevant Skills Audit.md",
+      "link": "Test",
+      "target_basename": "test"
+    },
+    {
+      "source": "Research/ClawHub Relevant Skills Audit.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Research/Multimodal Tools Installation.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Research/Self-Organizing Agent Architectures.md",
+      "link": "Multi-Agent",
+      "target_basename": "multi-agent"
+    },
+    {
+      "source": "Research/Self-Organizing Agent Architectures.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Arkana MCP Installation.md",
+      "link": "mcp-tool-search-installation",
+      "target_basename": "mcp-tool-search-installation"
+    },
+    {
+      "source": "Research/OpenClaw Research.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Research/OpenClaw Research.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/OpenClaw Research.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Research/OpenClaw Research.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Research/OpenClaw Research.md",
+      "link": "Advancement",
+      "target_basename": "advancement"
+    },
+    {
+      "source": "Research/OpenClaw Research.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Research/Depth-Research-2026-03-27.md",
+      "link": "Multi-Agent Code Generation",
+      "target_basename": "multi-agent code generation"
+    },
+    {
+      "source": "Research/GithubInteresting-2026-03-26.md",
+      "link": "Claude Code",
+      "target_basename": "claude code"
+    },
+    {
+      "source": "Research/GithubInteresting-2026-03-26.md",
+      "link": "agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Research/GithubInteresting-2026-03-26.md",
+      "link": "local LLM",
+      "target_basename": "local llm"
+    },
+    {
+      "source": "Research/GithubInteresting-2026-03-26.md",
+      "link": "privacy",
+      "target_basename": "privacy"
+    },
+    {
+      "source": "Research/GithubInteresting-2026-03-26.md",
+      "link": "GitHub",
+      "target_basename": "github"
+    },
+    {
+      "source": "Research/GithubInteresting-2026-03-26.md",
+      "link": "Linux",
+      "target_basename": "linux"
+    },
+    {
+      "source": "Research/GithubInteresting-2026-03-26.md",
+      "link": "open source",
+      "target_basename": "open source"
+    },
+    {
+      "source": "Research/Rune Discipline Engineering Study.md",
+      "link": "Agent Architecture",
+      "target_basename": "agent architecture"
+    },
+    {
+      "source": "Research/Rune Discipline Engineering Study.md",
+      "link": "Dispatch Protocol",
+      "target_basename": "dispatch protocol"
+    },
+    {
+      "source": "Research/Rune Discipline Engineering Study.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Research/Superman-IDE-vs-Current-System.md",
+      "link": "codebase-memory-mcp",
+      "target_basename": "codebase-memory-mcp"
+    },
+    {
+      "source": "Research/Superman-IDE-vs-Current-System.md",
+      "link": "Serena",
+      "target_basename": "serena"
+    },
+    {
+      "source": "Research/Self-Critique and Auto-Evolution Design.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Self-Critique and Auto-Evolution Design.md",
+      "link": "NousResearch",
+      "target_basename": "nousresearch"
+    },
+    {
+      "source": "Research/DeerFlow Architecture Study.md",
+      "link": "DeerFlow 2.0",
+      "target_basename": "deerflow 2.0"
+    },
+    {
+      "source": "Research/DeerFlow Architecture Study.md",
+      "link": "DeerFlow 2.0",
+      "target_basename": "deerflow 2.0"
+    },
+    {
+      "source": "Research/Lightpanda Installation.md",
+      "link": "tool-verification-2026-03-16",
+      "target_basename": "tool-verification-2026-03-16"
+    },
+    {
+      "source": "Research/Lightpanda Installation.md",
+      "link": "mcp-tool-search-installation",
+      "target_basename": "mcp-tool-search-installation"
+    },
+    {
+      "source": "Research/Security and Research MCPs Installation.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Research/OpenClaw Extensions Deep Dive.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Research/OpenClaw Extensions Deep Dive.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/OpenClaw Extensions Deep Dive.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Research/OpenClaw Extensions Deep Dive.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "Multi-Agent",
+      "target_basename": "multi-agent"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "Self-Evaluation",
+      "target_basename": "self-evaluation"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "Self-Critique",
+      "target_basename": "self-critique"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "Techniques",
+      "target_basename": "techniques"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "for",
+      "target_basename": "for"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Research/Metaprompting and Dynamic Agent Architecture.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Research/ruflo-dissection.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Research/ruflo-dissection.md",
+      "link": "Workflow Patterns",
+      "target_basename": "workflow patterns"
+    },
+    {
+      "source": "Research/CLAUDE.md Compliance - Enforcement Patterns.md",
+      "link": "\"$TOOL_NAME\" == \"write_file\"",
+      "target_basename": "\"$tool_name\" == \"write_file\""
+    },
+    {
+      "source": "Research/CLAUDE.md Compliance - Enforcement Patterns.md",
+      "link": "claude-md-compliance-enforcement-patterns",
+      "target_basename": "claude-md-compliance-enforcement-patterns"
+    },
+    {
+      "source": "Research/CLAUDE.md Compliance - Enforcement Patterns.md",
+      "link": "reddit-intel-deep-sweep-2026-03-18",
+      "target_basename": "reddit-intel-deep-sweep-2026-03-18"
+    },
+    {
+      "source": "Research/OpenViking Evaluation.md",
+      "link": "OpenViking-Context-Database",
+      "target_basename": "openviking-context-database"
+    },
+    {
+      "source": "Research/Synthesis-2026-03-27.md",
+      "link": "Multi-Agent Systems",
+      "target_basename": "multi-agent systems"
+    },
+    {
+      "source": "Research/Synthesis-2026-03-27.md",
+      "link": "LLM Reasoning",
+      "target_basename": "llm reasoning"
+    },
+    {
+      "source": "Research/Synthesis-2026-03-27.md",
+      "link": "Agent Safety",
+      "target_basename": "agent safety"
+    },
+    {
+      "source": "Research/Harness Engineering Discipline.md",
+      "link": "Citadel",
+      "target_basename": "citadel"
+    },
+    {
+      "source": "Research/Harness Engineering Discipline.md",
+      "link": "oh-my-agent",
+      "target_basename": "oh-my-agent"
+    },
+    {
+      "source": "Research/Harness Engineering Discipline.md",
+      "link": "Harness Evolver",
+      "target_basename": "harness evolver"
+    },
+    {
+      "source": "Research/Harness Engineering Discipline.md",
+      "link": "RalphCTL",
+      "target_basename": "ralphctl"
+    },
+    {
+      "source": "Research/Harness Engineering Discipline.md",
+      "link": "c9r Orchestrator",
+      "target_basename": "c9r orchestrator"
+    },
+    {
+      "source": "Research/Harness Engineering Discipline.md",
+      "link": "CCFlow",
+      "target_basename": "ccflow"
+    },
+    {
+      "source": "Research/Harness Engineering Discipline.md",
+      "link": "Claude Code Server",
+      "target_basename": "claude code server"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Figma",
+      "target_basename": "figma"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Webflow",
+      "target_basename": "webflow"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Three.js",
+      "target_basename": "three.js"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "React Three Fiber",
+      "target_basename": "react three fiber"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Lenis",
+      "target_basename": "lenis"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Barba.js",
+      "target_basename": "barba.js"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Webflow",
+      "target_basename": "webflow"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Three.js",
+      "target_basename": "three.js"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "React Three Fiber",
+      "target_basename": "react three fiber"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Lenis",
+      "target_basename": "lenis"
+    },
+    {
+      "source": "Research/Web Development Stack - High-End Sites.md",
+      "link": "Barba.js",
+      "target_basename": "barba.js"
+    },
+    {
+      "source": "Research/MemOS-Integration-Analysis.md",
+      "link": "HEARTBEAT",
+      "target_basename": "heartbeat"
+    },
+    {
+      "source": "Research/System-Genome-Prior-Art.md",
+      "link": "wikilink",
+      "target_basename": "wikilink"
+    },
+    {
+      "source": "Research/Reddit Intel - Deep Sweep 2026-03-18.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Reddit Intel - Deep Sweep 2026-03-18.md",
+      "link": "Agent",
+      "target_basename": "agent"
+    },
+    {
+      "source": "Research/Reddit Intel - Deep Sweep 2026-03-18.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Research/LangChain-Deep-Agents.md",
+      "link": "OpenViking-Context-Database",
+      "target_basename": "openviking-context-database"
+    },
+    {
+      "source": "Research/DeerFlow 2.0 Evaluation.md",
+      "link": "DeerFlow 2.0",
+      "target_basename": "deerflow 2.0"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Decisions/2026-03-15-tauri-over-electron",
+      "target_basename": "2026-03-15-tauri-over-electron"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "intents/ema-honcho-week7",
+      "target_basename": "ema-honcho-week7"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "intents/ema-dispatch-board",
+      "target_basename": "ema-dispatch-board"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "intents/ema-frontend-must-use-tauri",
+      "target_basename": "ema-frontend-must-use-tauri"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "intents/ema-trajan-is-the-user",
+      "target_basename": "ema-trajan-is-the-user"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Research/Superman-Runtime",
+      "target_basename": "superman-runtime"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Sessions/2026-04-03-researcher-superman-runtime",
+      "target_basename": "2026-04-03-researcher-superman-runtime"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Sessions/2026-04-03-coder-dispatch-board",
+      "target_basename": "2026-04-03-coder-dispatch-board"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Decisions/2026-04-03-honcho-docker-first",
+      "target_basename": "2026-04-03-honcho-docker-first"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Agents/coder/learnings/dispatch-routing-pattern",
+      "target_basename": "dispatch-routing-pattern"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Research/Superman-Runtime-Architecture.md",
+      "target_basename": "superman-runtime-architecture.md"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Agents/coder/performance",
+      "target_basename": "performance"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Page Name",
+      "target_basename": "page name"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Related Research Page",
+      "target_basename": "related research page"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "relevant page",
+      "target_basename": "relevant page"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Page Name",
+      "target_basename": "page name"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Folder/Page Name",
+      "target_basename": "page name"
+    },
+    {
+      "source": "Research/Wiki-Structure-Schema-Design-2026-04-03.md",
+      "link": "Page Name",
+      "target_basename": "page name"
+    },
+    {
+      "source": "Research/Memoria-Agent-Memory.md",
+      "link": "mem0 Agent Memory",
+      "target_basename": "mem0 agent memory"
+    },
+    {
+      "source": "Research/Memoria-Agent-Memory.md",
+      "link": "MCP Protocol",
+      "target_basename": "mcp protocol"
+    },
+    {
+      "source": "Research/Memoria-Agent-Memory.md",
+      "link": "MatrixOne Database",
+      "target_basename": "matrixone database"
+    },
+    {
+      "source": "Research/ori-mnemos-cognitive-memory.md",
+      "link": "link",
+      "target_basename": "link"
+    },
+    {
+      "source": "Research/ori-mnemos-cognitive-memory.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Research/Krometrail MCP Installation.md",
+      "link": "mcp-tool-search-installation",
+      "target_basename": "mcp-tool-search-installation"
+    },
+    {
+      "source": "Research/Krometrail MCP Installation.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "self-evaluation-and-self-critique-techniques-for-ai-agents",
+      "target_basename": "self-evaluation-and-self-critique-techniques-for-ai-agents"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "reddit-intel-deep-sweep-2026-03-18",
+      "target_basename": "reddit-intel-deep-sweep-2026-03-18"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "Multi-Agent",
+      "target_basename": "multi-agent"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "Self-Evaluation",
+      "target_basename": "self-evaluation"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "Self-Critique",
+      "target_basename": "self-critique"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "Techniques",
+      "target_basename": "techniques"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "for",
+      "target_basename": "for"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Research/Multi-Agent Architecture Evaluation.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Research/BretVictor-Worrydream-Takeaways.md",
+      "link": "Edward Tufte",
+      "target_basename": "edward tufte"
+    },
+    {
+      "source": "Research/BretVictor-Worrydream-Takeaways.md",
+      "link": "Alan Kay",
+      "target_basename": "alan kay"
+    },
+    {
+      "source": "Research/BretVictor-Worrydream-Takeaways.md",
+      "link": "Seymour Papert",
+      "target_basename": "seymour papert"
+    },
+    {
+      "source": "Research/BretVictor-Worrydream-Takeaways.md",
+      "link": "Dynamicland",
+      "target_basename": "dynamicland"
+    },
+    {
+      "source": "Research/Tego Security Index Evaluation.md",
+      "link": "ClawHub",
+      "target_basename": "clawhub"
+    },
+    {
+      "source": "Research/Tego Security Index Evaluation.md",
+      "link": "Security Audit Toolkit",
+      "target_basename": "security audit toolkit"
+    },
+    {
+      "source": "Reference/Deer-Flow-Implementation-Patterns.md",
+      "link": "Deer-Flow Research",
+      "target_basename": "deer-flow research"
+    },
+    {
+      "source": "Reference/Deer-Flow-Implementation-Patterns.md",
+      "link": "Deer-Flow Research",
+      "target_basename": "deer-flow research"
+    },
+    {
+      "source": "Reference/OpenClaw Extensions.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Reference/GSD-2 Meta-Prompting Context Engineering.md",
+      "link": "Agent-Skills-for-Context-Engineering",
+      "target_basename": "agent-skills-for-context-engineering"
+    },
+    {
+      "source": "Reference/GSD-2 Meta-Prompting Context Engineering.md",
+      "link": "mvanhorn/last30days-skill",
+      "target_basename": "last30days-skill"
+    },
+    {
+      "source": "Reference/Claude-Code-Hidden-Features-2026-March.md",
+      "link": "System/Intelligence Notes/--bare-flag-in-claude-code-cli-provides-10x-sdk-st.md",
+      "target_basename": "--bare-flag-in-claude-code-cli-provides-10x-sdk-st.md"
+    },
+    {
+      "source": "Reference/Claude-Code-Hidden-Features-2026-March.md",
+      "link": "System/Intelligence Notes/claude-code-cache-bugs-causing-10-20x-api-cost-inf.md",
+      "target_basename": "claude-code-cache-bugs-causing-10-20x-api-cost-inf.md"
+    },
+    {
+      "source": "Reference/TCRTE.md",
+      "link": "GitHub",
+      "target_basename": "github"
+    },
+    {
+      "source": "Reference/TCRTE.md",
+      "link": "Intel",
+      "target_basename": "intel"
+    },
+    {
+      "source": "Reference/TCRTE.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/TCRTE.md",
+      "link": "Favorites",
+      "target_basename": "favorites"
+    },
+    {
+      "source": "Reference/Claude Code Mastery.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Reference/Claude Code Mastery.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Reference/Claude Code Mastery.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Reference/Claude-Code-Quick-Wins.md",
+      "link": "Claude Code",
+      "target_basename": "claude code"
+    },
+    {
+      "source": "Reference/Claude-Code-Power-Patterns.md",
+      "link": "Claude Code",
+      "target_basename": "claude code"
+    },
+    {
+      "source": "Reference/Claude-Code-Power-Patterns.md",
+      "link": "$ITERATION -lt $MAX_ITERATIONS",
+      "target_basename": "$iteration -lt $max_iterations"
+    },
+    {
+      "source": "Reference/Few-Shot.md",
+      "link": "GitHub",
+      "target_basename": "github"
+    },
+    {
+      "source": "Reference/Few-Shot.md",
+      "link": "Intel",
+      "target_basename": "intel"
+    },
+    {
+      "source": "Reference/Few-Shot.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/Few-Shot.md",
+      "link": "Favorites",
+      "target_basename": "favorites"
+    },
+    {
+      "source": "Ops/Dispatch-Failure-Analysis-20260401.md",
+      "link": "Dispatch Engine",
+      "target_basename": "dispatch engine"
+    },
+    {
+      "source": "Ops/Dispatch-Failure-Analysis-20260401.md",
+      "link": "Agent Health",
+      "target_basename": "agent health"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "mirror-system-our-rebuild",
+      "target_basename": "mirror-system-our-rebuild"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "three-tier-memory-architecture",
+      "target_basename": "three-tier-memory-architecture"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "2026-03-17-the-output-directory",
+      "target_basename": "2026-03-17-the-output-directory"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "Mirror",
+      "target_basename": "mirror"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "Comparison",
+      "target_basename": "comparison"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "Review",
+      "target_basename": "review"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "Mirror",
+      "target_basename": "mirror"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "Our",
+      "target_basename": "our"
+    },
+    {
+      "source": "Templates/Session Capture.md",
+      "link": "Rebuild",
+      "target_basename": "rebuild"
+    },
+    {
+      "source": "Templates/edge-convention.md",
+      "link": "Target Note",
+      "target_basename": "target note"
+    },
+    {
+      "source": "Templates/edge-convention.md",
+      "link": "Old Note",
+      "target_basename": "old note"
+    },
+    {
+      "source": "Templates/edge-convention.md",
+      "link": "Dependency Note",
+      "target_basename": "dependency note"
+    },
+    {
+      "source": "Templates/Project Template.md",
+      "link": "Project Name",
+      "target_basename": "project name"
+    },
+    {
+      "source": "Templates/Project Template.md",
+      "link": "Project Name",
+      "target_basename": "project name"
+    },
+    {
+      "source": "Templates/Project Template.md",
+      "link": "Projects/",
+      "target_basename": ""
+    },
+    {
+      "source": "Templates/Weekly Review Template.md",
+      "link": "{{date-7:YYYY-MM-DD}} Weekly Review",
+      "target_basename": "{{date-7:yyyy-mm-dd}} weekly review"
+    },
+    {
+      "source": "Templates/Weekly Review Template.md",
+      "link": "{{date+7:YYYY-MM-DD}} Weekly Review",
+      "target_basename": "{{date+7:yyyy-mm-dd}} weekly review"
+    },
+    {
+      "source": "Templates/Daily Template.md",
+      "link": "{{date-1:YYYY-MM-DD}}",
+      "target_basename": "{{date-1:yyyy-mm-dd}}"
+    },
+    {
+      "source": "Templates/Daily Template.md",
+      "link": "{{date+1:YYYY-MM-DD}}",
+      "target_basename": "{{date+1:yyyy-mm-dd}}"
+    },
+    {
+      "source": "Agents/Claude Code Bot.md",
+      "link": "2026-03-16_0624_desk",
+      "target_basename": "2026-03-16_0624_desk"
+    },
+    {
+      "source": "Agents/Claude Code Bot.md",
+      "link": "Daily",
+      "target_basename": "daily"
+    },
+    {
+      "source": "Agents/Claude Code Bot.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Agents/Claude Code Bot.md",
+      "link": "Log",
+      "target_basename": "log"
+    },
+    {
+      "source": "Agents/Claude Code Bot.md",
+      "link": "v3",
+      "target_basename": "v3"
+    },
+    {
+      "source": "Agents/project_system_buildout_mar16.md",
+      "link": "2026-03-16_0701_\ud83d\udcca",
+      "target_basename": "2026-03-16_0701_\ud83d\udcca"
+    },
+    {
+      "source": "Agents/project_system_buildout_mar16.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Agents/project_system_buildout_mar16.md",
+      "link": "Buildout",
+      "target_basename": "buildout"
+    },
+    {
+      "source": "Agents/project_system_buildout_mar16.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0648_\ud83e\uddea Delegation Test \u2014",
+      "target_basename": "2026-03-16_0648_\ud83e\uddea delegation test \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0831_\ud83d\udd27 Cron Persistence \u2014",
+      "target_basename": "2026-03-16_0831_\ud83d\udd27 cron persistence \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0835_\ud83d\udd27 Cron Persistence \u2014",
+      "target_basename": "2026-03-16_0835_\ud83d\udd27 cron persistence \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0624_desk",
+      "target_basename": "2026-03-16_0624_desk"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0625_desk",
+      "target_basename": "2026-03-16_0625_desk"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0626_\ud83d\udcda Vault Maintenance",
+      "target_basename": "2026-03-16_0626_\ud83d\udcda vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0701_\ud83d\udcca System Buildout \u2014",
+      "target_basename": "2026-03-16_0701_\ud83d\udcca system buildout \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0723_system-buildout-mar1",
+      "target_basename": "2026-03-16_0723_system-buildout-mar1"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0727_overview",
+      "target_basename": "2026-03-16_0727_overview"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0823_\ud83d\udd04 Cross-Agent Handof",
+      "target_basename": "2026-03-16_0823_\ud83d\udd04 cross-agent handof"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0824_\ud83d\udd04 Cross-Agent Handof",
+      "target_basename": "2026-03-16_0824_\ud83d\udd04 cross-agent handof"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0824_\ud83d\udd0c Agent-to-Discord D",
+      "target_basename": "2026-03-16_0824_\ud83d\udd0c agent-to-discord d"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0827_\ud83c\udf05 Morning Pitches \u2014",
+      "target_basename": "2026-03-16_0827_\ud83c\udf05 morning pitches \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0827_\ud83d\udccb Vault Maintenance",
+      "target_basename": "2026-03-16_0827_\ud83d\udccb vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0829_\ud83d\udccb Vault Maintenance",
+      "target_basename": "2026-03-16_0829_\ud83d\udccb vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0830_\ud83d\udccb Vault Maintenance",
+      "target_basename": "2026-03-16_0830_\ud83d\udccb vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0831_\ud83d\udccb Vault Maintenance",
+      "target_basename": "2026-03-16_0831_\ud83d\udccb vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0832_\ud83d\udccb Vault Maintenance",
+      "target_basename": "2026-03-16_0832_\ud83d\udccb vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0832_\ud83d\udd27 Cron Persistence \u2014",
+      "target_basename": "2026-03-16_0832_\ud83d\udd27 cron persistence \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0833_\ud83d\udccb Vault Maintenance",
+      "target_basename": "2026-03-16_0833_\ud83d\udccb vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0833_\ud83d\udd27 Cron Persistence \u2014",
+      "target_basename": "2026-03-16_0833_\ud83d\udd27 cron persistence \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0833_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0833_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0834_\ud83d\udccb Vault Maintenance",
+      "target_basename": "2026-03-16_0834_\ud83d\udccb vault maintenance"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0834_\ud83d\udd27 Cron Persistence \u2014",
+      "target_basename": "2026-03-16_0834_\ud83d\udd27 cron persistence \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0834_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0834_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0835_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0835_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0836_\ud83d\udd27 Cron Persistence \u2014",
+      "target_basename": "2026-03-16_0836_\ud83d\udd27 cron persistence \u2014"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0841_concierge",
+      "target_basename": "2026-03-16_0841_concierge"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0842_Claude Code: nudeg m",
+      "target_basename": "2026-03-16_0842_claude code: nudeg m"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0843_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0843_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0844_concierge",
+      "target_basename": "2026-03-16_0844_concierge"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0845_Claude Code: Perfect",
+      "target_basename": "2026-03-16_0845_claude code: perfect"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0845_concierge",
+      "target_basename": "2026-03-16_0845_concierge"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0849_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0849_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0850_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0850_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0853_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0853_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/_index.md",
+      "link": "2026-03-16_0854_\ud83d\udee1\ufe0f Secrets in Plaint",
+      "target_basename": "2026-03-16_0854_\ud83d\udee1\ufe0f secrets in plaint"
+    },
+    {
+      "source": "Agents/project_obsidian_vault.md",
+      "link": "2026-03-16_0701_\ud83d\udcca",
+      "target_basename": "2026-03-16_0701_\ud83d\udcca"
+    },
+    {
+      "source": "Agents/project_obsidian_vault.md",
+      "link": "System",
+      "target_basename": "system"
+    },
+    {
+      "source": "Agents/project_obsidian_vault.md",
+      "link": "Buildout",
+      "target_basename": "buildout"
+    },
+    {
+      "source": "Agents/project_obsidian_vault.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Agents/Skill Proposals.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "12-Factor",
+      "target_basename": "12-factor"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "Agents",
+      "target_basename": "agents"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "2026-03-16_0830_\ud83d\udd27",
+      "target_basename": "2026-03-16_0830_\ud83d\udd27"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "Cron",
+      "target_basename": "cron"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "Persistence",
+      "target_basename": "persistence"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "2026-03-16_0830_\ud83d\udee1\ufe0f",
+      "target_basename": "2026-03-16_0830_\ud83d\udee1\ufe0f"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "Secrets",
+      "target_basename": "secrets"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "in",
+      "target_basename": "in"
+    },
+    {
+      "source": "Agents/OpenClaw.md",
+      "link": "Plaint",
+      "target_basename": "plaint"
+    },
+    {
+      "source": "Agents/mistakes.md",
+      "link": "project-obsidian-vault",
+      "target_basename": "project-obsidian-vault"
+    },
+    {
+      "source": "Agents/tools.md",
+      "link": "mcp-tool-search-installation",
+      "target_basename": "mcp-tool-search-installation"
+    },
+    {
+      "source": "Agents/reference_oauth_guardian.md",
+      "link": "Secrets",
+      "target_basename": "secrets"
+    },
+    {
+      "source": "Skills/slash-commands.md",
+      "link": "GitHub",
+      "target_basename": "github"
+    },
+    {
+      "source": "Skills/slash-commands.md",
+      "link": "Intel",
+      "target_basename": "intel"
+    },
+    {
+      "source": "Skills/slash-commands.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Skills/video-transcript-downloader.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Skills/video-transcript-downloader.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Skills/video-transcript-downloader.md",
+      "link": "Agent",
+      "target_basename": "agent"
+    },
+    {
+      "source": "Skills/video-transcript-downloader.md",
+      "link": "Ecosystem",
+      "target_basename": "ecosystem"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "2026-03-16-0648-1f9ea-delegation-test",
+      "target_basename": "2026-03-16-0648-1f9ea-delegation-test"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "2026-03-16_0626_\ud83d\udcda",
+      "target_basename": "2026-03-16_0626_\ud83d\udcda"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "Vault",
+      "target_basename": "vault"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "Maintenance",
+      "target_basename": "maintenance"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "2026-03-16_0630_\ud83d\udd2c",
+      "target_basename": "2026-03-16_0630_\ud83d\udd2c"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "ClawHub",
+      "target_basename": "clawhub"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "Mining",
+      "target_basename": "mining"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "+",
+      "target_basename": "+"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "S",
+      "target_basename": "s"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "2026-03-16_0648_\ud83e\uddea",
+      "target_basename": "2026-03-16_0648_\ud83e\uddea"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "Delegation",
+      "target_basename": "delegation"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "Test",
+      "target_basename": "test"
+    },
+    {
+      "source": "Skills/soulcraft.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Skills/Agency Agents.md",
+      "link": "agency-agents-adapted-templates",
+      "target_basename": "agency-agents-adapted-templates"
+    },
+    {
+      "source": "Skills/Agency Agents.md",
+      "link": "wonderland-methodology-human-ai-partnership",
+      "target_basename": "wonderland-methodology-human-ai-partnership"
+    },
+    {
+      "source": "Skills/evolution-loop.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Skills/evolution-loop.md",
+      "link": "Favorites",
+      "target_basename": "favorites"
+    },
+    {
+      "source": "Skills/config-guardian.md",
+      "link": "2026-03-16_0648_\ud83e\uddea",
+      "target_basename": "2026-03-16_0648_\ud83e\uddea"
+    },
+    {
+      "source": "Skills/config-guardian.md",
+      "link": "Delegation",
+      "target_basename": "delegation"
+    },
+    {
+      "source": "Skills/config-guardian.md",
+      "link": "Test",
+      "target_basename": "test"
+    },
+    {
+      "source": "Skills/config-guardian.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Skills/agent-tester.md",
+      "link": "2026-03-16_0630_\ud83d\udd2c",
+      "target_basename": "2026-03-16_0630_\ud83d\udd2c"
+    },
+    {
+      "source": "Skills/agent-tester.md",
+      "link": "ClawHub",
+      "target_basename": "clawhub"
+    },
+    {
+      "source": "Skills/agent-tester.md",
+      "link": "Mining",
+      "target_basename": "mining"
+    },
+    {
+      "source": "Skills/agent-tester.md",
+      "link": "+",
+      "target_basename": "+"
+    },
+    {
+      "source": "Skills/agent-tester.md",
+      "link": "Anti-Pattern",
+      "target_basename": "anti-pattern"
+    },
+    {
+      "source": "Skills/auto-knowledge.md",
+      "link": "2026-03-16_0626_\ud83d\udcda",
+      "target_basename": "2026-03-16_0626_\ud83d\udcda"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "agency-agents",
+      "target_basename": "agency-agents"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "agent-factory-v2",
+      "target_basename": "agent-factory-v2"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "antfly",
+      "target_basename": "antfly"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "cli-anything",
+      "target_basename": "cli-anything"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "commit-standards",
+      "target_basename": "commit-standards"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "context-budgeting",
+      "target_basename": "context-budgeting"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "guardrails",
+      "target_basename": "guardrails"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "last30days",
+      "target_basename": "last30days"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "nuke",
+      "target_basename": "nuke"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "pr-review",
+      "target_basename": "pr-review"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "project-workflow-scheduler",
+      "target_basename": "project-workflow-scheduler"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "supermemory",
+      "target_basename": "supermemory"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "task-queue-sr",
+      "target_basename": "task-queue-sr"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "typed-memory",
+      "target_basename": "typed-memory"
+    },
+    {
+      "source": "Skills/README.md",
+      "link": "visual-validation-loop",
+      "target_basename": "visual-validation-loop"
+    },
+    {
+      "source": "Skills/self-improving-agent.md",
+      "link": "2026-03-16_0630_\ud83d\udd2c",
+      "target_basename": "2026-03-16_0630_\ud83d\udd2c"
+    },
+    {
+      "source": "Skills/self-improving-agent.md",
+      "link": "ClawHub",
+      "target_basename": "clawhub"
+    },
+    {
+      "source": "Skills/self-improving-agent.md",
+      "link": "Mining",
+      "target_basename": "mining"
+    },
+    {
+      "source": "Skills/self-improving-agent.md",
+      "link": "+",
+      "target_basename": "+"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "2026-03-16_0626_\ud83d\udcda",
+      "target_basename": "2026-03-16_0626_\ud83d\udcda"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "Vault",
+      "target_basename": "vault"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "Maintenance",
+      "target_basename": "maintenance"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Skills/elite-longterm-memory.md",
+      "link": "2026-03-17",
+      "target_basename": "2026-03-17"
+    },
+    {
+      "source": "Skills/knowledge-graph.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Skills/knowledge-graph.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Skills/knowledge-graph.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Skills/knowledge-graph.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Skills/knowledge-graph.md",
+      "link": "2026-03-17",
+      "target_basename": "2026-03-17"
+    },
+    {
+      "source": "Skills/discord-voice.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Skills/discord-voice.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Skills/discord-voice.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Skills/discord-voice.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Skills/discord-voice.md",
+      "link": "Advancement",
+      "target_basename": "advancement"
+    },
+    {
+      "source": "Skills/discord-voice.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Skills/LAP.md",
+      "link": "goals-aspirations",
+      "target_basename": "goals-aspirations"
+    },
+    {
+      "source": "Skills/agent-factory.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Skills/memory-hygiene.md",
+      "link": "2026-03-16_0626_\ud83d\udcda",
+      "target_basename": "2026-03-16_0626_\ud83d\udcda"
+    },
+    {
+      "source": "Skills/memory-hygiene.md",
+      "link": "Vault",
+      "target_basename": "vault"
+    },
+    {
+      "source": "Skills/memory-hygiene.md",
+      "link": "Maintenance",
+      "target_basename": "maintenance"
+    },
+    {
+      "source": "Skills/memory-hygiene.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Skills/memory-hygiene.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Skills/memory-hygiene.md",
+      "link": "2026-03-17",
+      "target_basename": "2026-03-17"
+    },
+    {
+      "source": "Skills/deep-research-pro.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Skills/deep-research-pro.md",
+      "link": "1",
+      "target_basename": "1"
+    },
+    {
+      "source": "Skills/deep-research-pro.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Skills/deep-research-pro.md",
+      "link": "Self-Organizing",
+      "target_basename": "self-organizing"
+    },
+    {
+      "source": "Skills/deep-research-pro.md",
+      "link": "Systems",
+      "target_basename": "systems"
+    },
+    {
+      "source": "Skills/deep-research-pro.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "2026-03-17",
+      "target_basename": "2026-03-17"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "5400+",
+      "target_basename": "5400+"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "Community",
+      "target_basename": "community"
+    },
+    {
+      "source": "Skills/agent-team-orchestration.md",
+      "link": "Extensions",
+      "target_basename": "extensions"
+    },
+    {
+      "source": "Agent-Learnings/openclaw-env-stale-apikey-auth-conflict.md",
+      "link": "oauth-guardian",
+      "target_basename": "oauth-guardian"
+    },
+    {
+      "source": "Agent-Learnings/openclaw-env-stale-apikey-auth-conflict.md",
+      "link": "dispatch-engine",
+      "target_basename": "dispatch-engine"
+    },
+    {
+      "source": "Agent-Learnings/auto-knowledge-gated-broken.md",
+      "link": "Agent-Learnings/patterns.md",
+      "target_basename": "patterns.md"
+    },
+    {
+      "source": "Agent-Learnings/auto-knowledge-gated-broken.md",
+      "link": "Inbox/2026-04-01 agents-observe Claude Code Observability.md",
+      "target_basename": "2026-04-01 agents-observe claude code observability.md"
+    },
+    {
+      "source": "Resources/Design Inspiration - Motion and Mobile.md",
+      "link": "Screenlane",
+      "target_basename": "screenlane"
+    },
+    {
+      "source": "Resources/Design Inspiration - Motion and Mobile.md",
+      "link": "Page Flows",
+      "target_basename": "page flows"
+    },
+    {
+      "source": "Resources/Design Inspiration - Motion and Mobile.md",
+      "link": "UI Sources",
+      "target_basename": "ui sources"
+    },
+    {
+      "source": "Resources/Design Inspiration - Motion and Mobile.md",
+      "link": "Lookup Design",
+      "target_basename": "lookup design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Motion and Mobile.md",
+      "link": "Dribbble",
+      "target_basename": "dribbble"
+    },
+    {
+      "source": "Resources/Design Inspiration - Motion and Mobile.md",
+      "link": "Behance",
+      "target_basename": "behance"
+    },
+    {
+      "source": "Resources/Design Inspiration.md",
+      "link": "Design Inspiration - UI Components",
+      "target_basename": "design inspiration - ui components"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Awwwards",
+      "target_basename": "awwwards"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Siteinspire",
+      "target_basename": "siteinspire"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Godly",
+      "target_basename": "godly"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Mobbin",
+      "target_basename": "mobbin"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Lapa.Ninja",
+      "target_basename": "lapa.ninja"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "UIStore.Design",
+      "target_basename": "uistore.design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Bookmarks.Design",
+      "target_basename": "bookmarks.design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Godly",
+      "target_basename": "godly"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Awwwards",
+      "target_basename": "awwwards"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Land-book",
+      "target_basename": "land-book"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Framer",
+      "target_basename": "framer"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Mobbin",
+      "target_basename": "mobbin"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Shadcn Blocks",
+      "target_basename": "shadcn blocks"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "SaaS Landing Page",
+      "target_basename": "saas landing page"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "SaaSFrame",
+      "target_basename": "saasframe"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Page Collective",
+      "target_basename": "page collective"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "footer.design",
+      "target_basename": "footer.design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Mobbin",
+      "target_basename": "mobbin"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "footer.design",
+      "target_basename": "footer.design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "cta.gallery",
+      "target_basename": "cta.gallery"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "hero.gallery",
+      "target_basename": "hero.gallery"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "footer.design",
+      "target_basename": "footer.design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Webestica",
+      "target_basename": "webestica"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Iconstica",
+      "target_basename": "iconstica"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "navbar.gallery",
+      "target_basename": "navbar.gallery"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "footer.design",
+      "target_basename": "footer.design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "hero.gallery",
+      "target_basename": "hero.gallery"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Awwwards",
+      "target_basename": "awwwards"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Godly",
+      "target_basename": "godly"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Mobbin",
+      "target_basename": "mobbin"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Dribbble",
+      "target_basename": "dribbble"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Land-book",
+      "target_basename": "land-book"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "Lapa.Ninja",
+      "target_basename": "lapa.ninja"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "footer.design",
+      "target_basename": "footer.design"
+    },
+    {
+      "source": "Resources/Design Inspiration - Web Design Galleries.md",
+      "link": "SaaSFrame",
+      "target_basename": "saasframe"
+    },
+    {
+      "source": "Operations/Estimation Calibration.md",
+      "link": "Agent Performance Dashboard",
+      "target_basename": "agent performance dashboard"
+    },
+    {
+      "source": "Operations/Project Pulse 2026-03-19.md",
+      "link": "Tool Integration \u2014 March 2026",
+      "target_basename": "tool integration \u2014 march 2026"
+    },
+    {
+      "source": "Operations/Project Pulse 2026-03-19.md",
+      "link": "Overnight Autonomous Proposals \u2014 2026-03-18",
+      "target_basename": "overnight autonomous proposals \u2014 2026-03-18"
+    },
+    {
+      "source": "Operations/Project Pulse 2026-03-19.md",
+      "link": "Aspiration Sprint 2026-03-18",
+      "target_basename": "aspiration sprint 2026-03-18"
+    },
+    {
+      "source": "Operations/Project Pulse 2026-03-19.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Operations/Weekly-Report-2026-03-19.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Operations/Weekly-Report-2026-03-19.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Operations/vane-search.md",
+      "link": "Harbor LLM Stack",
+      "target_basename": "harbor llm stack"
+    },
+    {
+      "source": "Operations/vane-search.md",
+      "link": "Tool Integration March 2026",
+      "target_basename": "tool integration march 2026"
+    },
+    {
+      "source": "Operations/Overnight Summary 2026-03-14.md",
+      "link": "DeerFlow 2.0",
+      "target_basename": "deerflow 2.0"
+    },
+    {
+      "source": "Operations/Overnight Summary 2026-03-14.md",
+      "link": "DeerFlow 2.0",
+      "target_basename": "deerflow 2.0"
+    },
+    {
+      "source": "Operations/Setup Log.md",
+      "link": "project-obsidian-vault",
+      "target_basename": "project-obsidian-vault"
+    },
+    {
+      "source": "Operations/Setup Log.md",
+      "link": "Self-Hosted",
+      "target_basename": "self-hosted"
+    },
+    {
+      "source": "Operations/Setup Log.md",
+      "link": "2026",
+      "target_basename": "2026"
+    },
+    {
+      "source": "Operations/Daily Operations Log 2026-03-16.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Operations/Cron Health 2026-03-19.md",
+      "link": "Cron Orchestra",
+      "target_basename": "cron orchestra"
+    },
+    {
+      "source": "Operations/Cron Health 2026-03-19.md",
+      "link": "System Operations",
+      "target_basename": "system operations"
+    },
+    {
+      "source": "Operations/OpenClaw Config.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Operations/OpenClaw Config.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Operations/OpenClaw Config.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Operations/OpenClaw Config.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Operations/OpenClaw Config.md",
+      "link": "Advancement",
+      "target_basename": "advancement"
+    },
+    {
+      "source": "Operations/OpenClaw Config.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Operations/Usage Optimization Review.md",
+      "link": "3",
+      "target_basename": "3"
+    },
+    {
+      "source": "Operations/Usage Optimization Review.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Operations/Usage Optimization Review.md",
+      "link": "Deprecation",
+      "target_basename": "deprecation"
+    },
+    {
+      "source": "Operations/Usage Optimization Review.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Operations/Usage Optimization Review.md",
+      "link": "Advancement",
+      "target_basename": "advancement"
+    },
+    {
+      "source": "Operations/Usage Optimization Review.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Trajan/Goals/3. Weekly Review.md",
+      "link": "3. Weekly Review - [PREVIOUS WEEK",
+      "target_basename": "3. weekly review - [previous week"
+    },
+    {
+      "source": "Trajan/Goals/3. Weekly Review.md",
+      "link": "3. Weekly Review - [NEXT WEEK",
+      "target_basename": "3. weekly review - [next week"
+    },
+    {
+      "source": "Trajan/Goals/2. Monthly Goals.md",
+      "link": "2. Monthly Goals - [PREVIOUS MONTH",
+      "target_basename": "2. monthly goals - [previous month"
+    },
+    {
+      "source": "Trajan/Goals/2. Monthly Goals.md",
+      "link": "2. Monthly Goals - [NEXT MONTH",
+      "target_basename": "2. monthly goals - [next month"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-19-0200.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-16-1000.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-16-1200.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-1000.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-1200.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-0800.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-1600.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-19-0400.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-19-0400.md",
+      "link": "link",
+      "target_basename": "link"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-19-0000.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-2200.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-1800.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-16-1400.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-2000.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Trajan/message-harvests/harvest-2026-03-18-1400.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-sprint-2026-03-18.md",
+      "link": "dispatch-engine",
+      "target_basename": "dispatch-engine"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "March",
+      "target_basename": "march"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "2026",
+      "target_basename": "2026"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "Intent",
+      "target_basename": "intent"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "March",
+      "target_basename": "march"
+    },
+    {
+      "source": "Projects/System Buildout/5-day-analysis-2026-03-18.md",
+      "link": "2026",
+      "target_basename": "2026"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Auto",
+      "target_basename": "auto"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Delegator",
+      "target_basename": "delegator"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Layer",
+      "target_basename": "layer"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "goals-aspirations",
+      "target_basename": "goals-aspirations"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Auto",
+      "target_basename": "auto"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Delegator",
+      "target_basename": "delegator"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Layer",
+      "target_basename": "layer"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Auto",
+      "target_basename": "auto"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Delegator",
+      "target_basename": "delegator"
+    },
+    {
+      "source": "Projects/System Buildout/aspiration-gap-report.md",
+      "link": "Layer",
+      "target_basename": "layer"
+    },
+    {
+      "source": "Projects/System Buildout/desk-pitches-2026-03-16.md",
+      "link": "2026-03-16_0827_\ud83c\udf05",
+      "target_basename": "2026-03-16_0827_\ud83c\udf05"
+    },
+    {
+      "source": "Projects/System Buildout/desk-pitches-2026-03-16.md",
+      "link": "Morning",
+      "target_basename": "morning"
+    },
+    {
+      "source": "Projects/System Buildout/desk-pitches-2026-03-16.md",
+      "link": "Pitches",
+      "target_basename": "pitches"
+    },
+    {
+      "source": "Projects/System Buildout/desk-pitches-2026-03-16.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "link": "SESSION-NOTES.md",
+      "target_basename": "session-notes.md"
+    },
+    {
+      "source": "Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "link": "vault/Research/Agent-OS-Speculative-UI-Deep-Dive.md",
+      "target_basename": "agent-os-speculative-ui-deep-dive.md"
+    },
+    {
+      "source": "Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "link": "vault/Research/Agent-OS-UX-Competitive-Deep-Dive.md",
+      "target_basename": "agent-os-ux-competitive-deep-dive.md"
+    },
+    {
+      "source": "Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "link": "vault/Research/Agent-OS-Business-Software-Paradigms.md",
+      "target_basename": "agent-os-business-software-paradigms.md"
+    },
+    {
+      "source": "Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "link": "vault/System/Aspirational System Design.md",
+      "target_basename": "aspirational system design.md"
+    },
+    {
+      "source": "Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "link": "vault/Projects/Future Frontend Layer.md",
+      "target_basename": "future frontend layer.md"
+    },
+    {
+      "source": "Projects/agentic-dev-env-OS/Architecture Synthesis 2026-03-25.md",
+      "link": "vault/Projects/place.org-openclaw-vision.md",
+      "target_basename": "place.org-openclaw-vision.md"
+    },
+    {
+      "source": "Projects/EMA/EMA-16-WEEK-ROADMAP.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Projects/EMA/EMA-16-WEEK-ROADMAP.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Projects/EMA/EMA-16-WEEK-ROADMAP.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "System/Intelligence Notes/kairos-always-on-background-agent-cross-session-memory-distillation.md",
+      "link": "Three-Man-Team Agent Pipeline",
+      "target_basename": "three-man-team agent pipeline"
+    },
+    {
+      "source": "System/Intelligence Notes/kairos-always-on-background-agent-cross-session-memory-distillation.md",
+      "link": "Two-Agent Harness for Long-Running Claude Code",
+      "target_basename": "two-agent harness for long-running claude code"
+    },
+    {
+      "source": "System/Intelligence Notes/kairos-always-on-background-agent-cross-session-memory-distillation.md",
+      "link": "SSGM Memory Governance",
+      "target_basename": "ssgm memory governance"
+    },
+    {
+      "source": "System/Channel Context/README.md",
+      "link": "Discord Architecture",
+      "target_basename": "discord architecture"
+    },
+    {
+      "source": "System/Channel Context/system-buildout-mar16.md",
+      "link": "2026-03-16_0723_system-buildout-mar1",
+      "target_basename": "2026-03-16_0723_system-buildout-mar1"
+    },
+    {
+      "source": "System/Channel Context/projects.md",
+      "link": "project-system-buildout-mar16",
+      "target_basename": "project-system-buildout-mar16"
+    },
+    {
+      "source": "System/Channel Context/ops.md",
+      "link": "research-round-3-deprecation-and-advancement-analysis",
+      "target_basename": "research-round-3-deprecation-and-advancement-analysis"
+    },
+    {
+      "source": "System/Channel Context/ops.md",
+      "link": "2026-03-16-1806-trajans-office",
+      "target_basename": "2026-03-16-1806-trajans-office"
+    },
+    {
+      "source": "System/Channel Context/ops.md",
+      "link": "ai-landscape-2026-03-16",
+      "target_basename": "ai-landscape-2026-03-16"
+    },
+    {
+      "source": "System/Channel Context/research.md",
+      "link": "DeerFlow 2.0",
+      "target_basename": "deerflow 2.0"
+    },
+    {
+      "source": "System/Channel Context/chat.md",
+      "link": "multi-agent-coordination-patterns",
+      "target_basename": "multi-agent-coordination-patterns"
+    },
+    {
+      "source": "System/Channel Context/concierge.md",
+      "link": "2026-03-16-0841-concierge",
+      "target_basename": "2026-03-16-0841-concierge"
+    },
+    {
+      "source": "System/Evolution Reports/2026-03-18.md",
+      "link": "Agent Performance Log",
+      "target_basename": "agent performance log"
+    },
+    {
+      "source": "System/Evolution Reports/2026-03-22.md",
+      "link": "Agent Performance Log",
+      "target_basename": "agent performance log"
+    },
+    {
+      "source": "System/Evolution Reports/2026-03-29.md",
+      "link": "Agent Performance Log",
+      "target_basename": "agent performance log"
+    },
+    {
+      "source": "Architecture/Intelligence-Integrations/superman-architecture.md",
+      "link": "id",
+      "target_basename": "id"
+    },
+    {
+      "source": "Research/Tools/Chrome DevTools MCP.md",
+      "link": "tool-verification-2026-03-16",
+      "target_basename": "tool-verification-2026-03-16"
+    },
+    {
+      "source": "Research/Tools/Chrome DevTools MCP.md",
+      "link": "mcp-tool-search-installation",
+      "target_basename": "mcp-tool-search-installation"
+    },
+    {
+      "source": "Research/Tools/Chrome DevTools MCP.md",
+      "link": "GitHub",
+      "target_basename": "github"
+    },
+    {
+      "source": "Research/Tools/Chrome DevTools MCP.md",
+      "link": "Intel",
+      "target_basename": "intel"
+    },
+    {
+      "source": "Research/Tools/Chrome DevTools MCP.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Tools/Chrome DevTools MCP.md",
+      "link": "Favorites",
+      "target_basename": "favorites"
+    },
+    {
+      "source": "Research/Tools/OpenViking.md",
+      "link": "openviking-context-database-for-agents",
+      "target_basename": "openviking-context-database-for-agents"
+    },
+    {
+      "source": "Research/Tools/OpenViking.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Tools/OpenViking.md",
+      "link": "Context",
+      "target_basename": "context"
+    },
+    {
+      "source": "Research/Tools/OpenViking.md",
+      "link": "Database",
+      "target_basename": "database"
+    },
+    {
+      "source": "Research/Tools/OpenViking.md",
+      "link": "for",
+      "target_basename": "for"
+    },
+    {
+      "source": "Research/Tools/OpenViking.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Tools/Laminar.md",
+      "link": "vm-audit-2026-03-16",
+      "target_basename": "vm-audit-2026-03-16"
+    },
+    {
+      "source": "Research/Tools/Laminar.md",
+      "link": "security-audit-2026-03-16",
+      "target_basename": "security-audit-2026-03-16"
+    },
+    {
+      "source": "Research/Tools/Engram.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Tools/Engram.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Tools/Lightpanda Browser.md",
+      "link": "reddit-deep-dive-agent-ecosystem",
+      "target_basename": "reddit-deep-dive-agent-ecosystem"
+    },
+    {
+      "source": "Research/Tools/Capsule.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Research/Tools/Capsule.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Research/Tools/Capsule.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Tools/MarkItDown.md",
+      "link": "tool-verification-2026-03-16",
+      "target_basename": "tool-verification-2026-03-16"
+    },
+    {
+      "source": "Research/Tools/MarkItDown.md",
+      "link": "mcp-tool-search-installation",
+      "target_basename": "mcp-tool-search-installation"
+    },
+    {
+      "source": "Research/Tools/Hermes Agent.md",
+      "link": "GitHub",
+      "target_basename": "github"
+    },
+    {
+      "source": "Research/Tools/Hermes Agent.md",
+      "link": "Intel",
+      "target_basename": "intel"
+    },
+    {
+      "source": "Research/Tools/Hermes Agent.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Tools/Hermes Agent.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Tools/Awesome-Claude-Code.md",
+      "link": "Claude Code",
+      "target_basename": "claude code"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "reddit-deep-dive-agent-ecosystem",
+      "target_basename": "reddit-deep-dive-agent-ecosystem"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "Reddit",
+      "target_basename": "reddit"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "Agent",
+      "target_basename": "agent"
+    },
+    {
+      "source": "Research/Tools/Snyk Agent Scan.md",
+      "link": "Ecosystem",
+      "target_basename": "ecosystem"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "reddit-deep-dive-agent-ecosystem",
+      "target_basename": "reddit-deep-dive-agent-ecosystem"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "overnight-summary-2026-03-14",
+      "target_basename": "overnight-summary-2026-03-14"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "Reddit",
+      "target_basename": "reddit"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "Agent",
+      "target_basename": "agent"
+    },
+    {
+      "source": "Research/Tools/BrowserWing.md",
+      "link": "Ecosystem",
+      "target_basename": "ecosystem"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Reddit",
+      "target_basename": "reddit"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Agent",
+      "target_basename": "agent"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Ecosystem",
+      "target_basename": "ecosystem"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Self-Organizing",
+      "target_basename": "self-organizing"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Agent",
+      "target_basename": "agent"
+    },
+    {
+      "source": "Research/Tools/Context Gateway.md",
+      "link": "Architectures",
+      "target_basename": "architectures"
+    },
+    {
+      "source": "Research/Tools/Promptfoo.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Research/Tools/Promptfoo.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Research/Tools/Promptfoo.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/ArXiv/2026-03-27-arxiv-digest.md",
+      "link": "RAG",
+      "target_basename": "rag"
+    },
+    {
+      "source": "Research/ArXiv/2026-03-27-arxiv-digest.md",
+      "link": "LLM Agent Architecture",
+      "target_basename": "llm agent architecture"
+    },
+    {
+      "source": "Research/ArXiv/2026-03-27-arxiv-digest.md",
+      "link": "Memory Systems",
+      "target_basename": "memory systems"
+    },
+    {
+      "source": "Research/ArXiv/2026-03-27-arxiv-digest.md",
+      "link": "Code Generation",
+      "target_basename": "code generation"
+    },
+    {
+      "source": "Research/ArXiv/2026-03-26-arxiv-digest.md",
+      "link": "Multi-Agent Systems",
+      "target_basename": "multi-agent systems"
+    },
+    {
+      "source": "Research/ArXiv/2026-03-26-arxiv-digest.md",
+      "link": "LLM Reasoning",
+      "target_basename": "llm reasoning"
+    },
+    {
+      "source": "Research/ArXiv/2026-03-26-arxiv-digest.md",
+      "link": "Agent Safety",
+      "target_basename": "agent safety"
+    },
+    {
+      "source": "Research/Design/neuwebstudio-tiktok-web-design-channel.md",
+      "link": "Figma",
+      "target_basename": "figma"
+    },
+    {
+      "source": "Research/Design/neuwebstudio-tiktok-web-design-channel.md",
+      "link": "Webflow",
+      "target_basename": "webflow"
+    },
+    {
+      "source": "Research/Design/neuwebstudio-tiktok-web-design-channel.md",
+      "link": "Web Animation",
+      "target_basename": "web animation"
+    },
+    {
+      "source": "Research/agent-prompting/APEX-Hybrid-Analysis.md",
+      "link": "GSD-2 Architecture",
+      "target_basename": "gsd-2 architecture"
+    },
+    {
+      "source": "Research/agent-prompting/APEX-Hybrid-Analysis.md",
+      "link": "Agent Learnings Patterns",
+      "target_basename": "agent learnings patterns"
+    },
+    {
+      "source": "Research/agent-prompting/APEX-Hybrid-Analysis.md",
+      "link": "OpenClaw Skills System",
+      "target_basename": "openclaw skills system"
+    },
+    {
+      "source": "Research/GitHub-Trending/2026-03-26-trending.md",
+      "link": "anthropics-claude-code",
+      "target_basename": "anthropics-claude-code"
+    },
+    {
+      "source": "Research/GitHub-Trending/2026-03-26-trending.md",
+      "link": "Letta",
+      "target_basename": "letta"
+    },
+    {
+      "source": "Research/AI-Agents/Claude-Code-Harness-Long-Running-Agents.md",
+      "link": "Claude-Code-Best-Practices",
+      "target_basename": "claude-code-best-practices"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflow - Goal Cascade",
+      "target_basename": "workflow - goal cascade"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Note A",
+      "target_basename": "note a"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Note B",
+      "target_basename": "note b"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Project C",
+      "target_basename": "project c"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflow - Knowledge Growth",
+      "target_basename": "workflow - knowledge growth"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "{{date-1:YYYY-MM-DD}}",
+      "target_basename": "{{date-1:yyyy-mm-dd}}"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "{{date+1:YYYY-MM-DD}}",
+      "target_basename": "{{date+1:yyyy-mm-dd}}"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Weekly Review - Week {{date:w}}",
+      "target_basename": "weekly review - week {{date:w}}"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflows MOC",
+      "target_basename": "workflows moc"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflow - Knowledge Growth",
+      "target_basename": "workflow - knowledge growth"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflow - Knowledge Growth",
+      "target_basename": "workflow - knowledge growth"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflow - Goal Cascade",
+      "target_basename": "workflow - goal cascade"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflow - Knowledge Growth",
+      "target_basename": "workflow - knowledge growth"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Obsidian PKM Patterns 2026.md",
+      "link": "Workflow - Session Memory",
+      "target_basename": "workflow - session memory"
+    },
+    {
+      "source": "Research/AI-Knowledge/Research - Zen Browser Features and Configuration 2026.md",
+      "link": "Zen Workspaces",
+      "target_basename": "zen workspaces"
+    },
+    {
+      "source": "Research/AI-Knowledge/Obsidian-Claude Connectivity.md",
+      "link": "Installation Playbook",
+      "target_basename": "installation playbook"
+    },
+    {
+      "source": "Research/AI-Knowledge/Obsidian-Claude Connectivity.md",
+      "link": "Installation Playbook",
+      "target_basename": "installation playbook"
+    },
+    {
+      "source": "Research/Videos/CodingJesus-AI-Delusional-2026-03-26.md",
+      "link": "getcracked.io",
+      "target_basename": "getcracked.io"
+    },
+    {
+      "source": "Research/Videos/CodingJesus-AI-Delusional-2026-03-26.md",
+      "link": "AI Hype vs Reality",
+      "target_basename": "ai hype vs reality"
+    },
+    {
+      "source": "Research/Tools/Archive/Rampart.md",
+      "link": "Overnight",
+      "target_basename": "overnight"
+    },
+    {
+      "source": "Research/Tools/Archive/Rampart.md",
+      "link": "Summary",
+      "target_basename": "summary"
+    },
+    {
+      "source": "Research/Tools/Archive/Rampart.md",
+      "link": "2026-03-14",
+      "target_basename": "2026-03-14"
+    },
+    {
+      "source": "Research/AI-Knowledge/Claude Code Plugins/Claude Task Master.md",
+      "link": "CCPM",
+      "target_basename": "ccpm"
+    },
+    {
+      "source": "Research/AI-Knowledge/Claude Code Plugins/Claude Task Master.md",
+      "link": "MeisnerDan Mission Control",
+      "target_basename": "meisnerdan mission control"
+    },
+    {
+      "source": "Research/AI-Knowledge/Claude Code Plugins/claude-mem.md",
+      "link": "Claudesidian MCP (Nexus)",
+      "target_basename": "claudesidian mcp (nexus)"
+    },
+    {
+      "source": "Research/AI-Knowledge/Archive/CloudCLI.md",
+      "link": "CUI",
+      "target_basename": "cui"
+    },
+    {
+      "source": "Research/AI-Knowledge/Obsidian Integration/obsidian-claude-code-mcp.md",
+      "link": "Claudesidian MCP (Nexus)",
+      "target_basename": "claudesidian mcp (nexus)"
+    },
+    {
+      "source": "Research/AI-Knowledge/Obsidian Integration/Claudian.md",
+      "link": "Claudesidian MCP (Nexus)",
+      "target_basename": "claudesidian mcp (nexus)"
+    },
+    {
+      "source": "Research/AI-Knowledge/Obsidian Integration/Claudian.md",
+      "link": "Agent Client",
+      "target_basename": "agent client"
+    },
+    {
+      "source": "Research/AI-Knowledge/Obsidian Integration/obsidian-skills (kepano).md",
+      "link": "Note",
+      "target_basename": "note"
+    },
+    {
+      "source": "Research/AI-Knowledge/Obsidian Integration/obsidian-skills (kepano).md",
+      "link": "Note",
+      "target_basename": "note"
+    },
+    {
+      "source": "Reference/Learnings/Learnings & Gotchas.md",
+      "link": "Session Log",
+      "target_basename": "session log"
+    },
+    {
+      "source": "Reference/metaprompting/Advanced Prompt Engineering Frameworks.md",
+      "link": "langgpt-structured-prompt-framework",
+      "target_basename": "langgpt-structured-prompt-framework"
+    },
+    {
+      "source": "Reference/metaprompting/Metaprompting Patterns.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/metaprompting/Metaprompting Patterns.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Reference/metaprompting/Metaprompting Patterns.md",
+      "link": "2",
+      "target_basename": "2"
+    },
+    {
+      "source": "Reference/metaprompting/Metaprompting Patterns.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/metaprompting/Metaprompting Patterns.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/metaprompting/Metaprompting Patterns.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Reference/metaprompting/Metaprompting Patterns.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Reference/agents/Agent Templates Index.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Reference/agents/Agent Templates Index.md",
+      "link": "1",
+      "target_basename": "1"
+    },
+    {
+      "source": "Reference/agents/Agent Templates Index.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/agents/Agent Templates Index.md",
+      "link": "Self-Organizing",
+      "target_basename": "self-organizing"
+    },
+    {
+      "source": "Reference/agents/Agent Templates Index.md",
+      "link": "Systems",
+      "target_basename": "systems"
+    },
+    {
+      "source": "Reference/agents/Agent Templates Index.md",
+      "link": "Analysis",
+      "target_basename": "analysis"
+    },
+    {
+      "source": "Reference/agents/Multi-Agent Orchestration Frameworks.md",
+      "link": "reddit-intel-deep-sweep-2026-03-18",
+      "target_basename": "reddit-intel-deep-sweep-2026-03-18"
+    },
+    {
+      "source": "Reference/prompts/EliFuzz Coding Agent System Prompts.md",
+      "link": "research-round-2-metaprompting-deep-dive",
+      "target_basename": "research-round-2-metaprompting-deep-dive"
+    },
+    {
+      "source": "Reference/prompts/LangGPT System Prompts Collection.md",
+      "link": "research-round-2-metaprompting-deep-dive",
+      "target_basename": "research-round-2-metaprompting-deep-dive"
+    },
+    {
+      "source": "Reference/prompts/QA Prompt Library - Comprehensive Testing Templates.md",
+      "link": "qa-prompt-library-comprehensive-testing-templates",
+      "target_basename": "qa-prompt-library-comprehensive-testing-templates"
+    },
+    {
+      "source": "Reference/prompts/QA Prompt Library - Comprehensive Testing Templates.md",
+      "link": "qa-prompts-playwright",
+      "target_basename": "qa-prompts-playwright"
+    },
+    {
+      "source": "Reference/prompts/System Prompt Patterns.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/prompts/System Prompt Patterns.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Reference/prompts/System Prompt Patterns.md",
+      "link": "2",
+      "target_basename": "2"
+    },
+    {
+      "source": "Reference/prompts/System Prompt Patterns.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/prompts/System Prompt Patterns.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/prompts/System Prompt Patterns.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Reference/prompts/System Prompt Patterns.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Reference/configurations/OpenClaw Advanced Config Patterns.md",
+      "link": "research-round-3-deprecation-and-advancement-analysis",
+      "target_basename": "research-round-3-deprecation-and-advancement-analysis"
+    },
+    {
+      "source": "Reference/configurations/OpenClaw Advanced Config Patterns.md",
+      "link": "multi-agent-orchestration-frameworks",
+      "target_basename": "multi-agent-orchestration-frameworks"
+    },
+    {
+      "source": "Reference/tools/Installed External Tools.md",
+      "link": "security-audit-2026-03-16",
+      "target_basename": "security-audit-2026-03-16"
+    },
+    {
+      "source": "Reference/Prompt Engineering/EliFuzz Awesome System Prompts.md",
+      "link": "research-round-2-metaprompting-deep-dive",
+      "target_basename": "research-round-2-metaprompting-deep-dive"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Awesome AI System Prompts.md",
+      "link": "memory:MEMORY_ID",
+      "target_basename": "memory:memory_id"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Awesome AI System Prompts.md",
+      "link": "2",
+      "target_basename": "2"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Awesome AI System Prompts.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Awesome AI System Prompts.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Awesome AI System Prompts.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Awesome AI System Prompts.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Brex Prompt Engineering Guide.md",
+      "link": "research-round-2-metaprompting-deep-dive",
+      "target_basename": "research-round-2-metaprompting-deep-dive"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Brex Prompt Engineering Guide.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Brex Prompt Engineering Guide.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Reference/Prompt Engineering/LangGPT - Structured Prompt Framework.md",
+      "link": "langgpt-structured-prompt-framework",
+      "target_basename": "langgpt-structured-prompt-framework"
+    },
+    {
+      "source": "Reference/Prompt Engineering/LangGPT - Structured Prompt Framework.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Prompt Library Sources.md",
+      "link": "qa-prompt-library-comprehensive-testing-templates",
+      "target_basename": "qa-prompt-library-comprehensive-testing-templates"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Prompt Library Sources.md",
+      "link": "2",
+      "target_basename": "2"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Prompt Library Sources.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Prompt Library Sources.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Prompt Library Sources.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Reference/Prompt Engineering/Prompt Library Sources.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Reference/Prompt Engineering/12-Factor Agents.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/Prompt Engineering/12-Factor Agents.md",
+      "link": "and",
+      "target_basename": "and"
+    },
+    {
+      "source": "Reference/Prompt Engineering/12-Factor Agents.md",
+      "link": "2",
+      "target_basename": "2"
+    },
+    {
+      "source": "Reference/Prompt Engineering/12-Factor Agents.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Reference/Prompt Engineering/12-Factor Agents.md",
+      "link": "Metaprompting",
+      "target_basename": "metaprompting"
+    },
+    {
+      "source": "Reference/Prompt Engineering/12-Factor Agents.md",
+      "link": "Deep",
+      "target_basename": "deep"
+    },
+    {
+      "source": "Reference/Prompt Engineering/12-Factor Agents.md",
+      "link": "Dive",
+      "target_basename": "dive"
+    },
+    {
+      "source": "Agents/Performance/universal-orchestrator.md",
+      "link": "AI",
+      "target_basename": "ai"
+    },
+    {
+      "source": "Agents/Performance/universal-orchestrator.md",
+      "link": "Landscape",
+      "target_basename": "landscape"
+    },
+    {
+      "source": "Agents/Performance/universal-orchestrator.md",
+      "link": "2026-03-17",
+      "target_basename": "2026-03-17"
+    },
+    {
+      "source": "Agents/Performance/README.md",
+      "link": "Agents/Performance/auto-generated",
+      "target_basename": "auto-generated"
+    },
+    {
+      "source": "Agents/Performance/README.md",
+      "link": "Agents/Performance/test-agent",
+      "target_basename": "test-agent"
+    },
+    {
+      "source": "Agents/Performance/README.md",
+      "link": "Agents/Performance/test-researcher",
+      "target_basename": "test-researcher"
+    },
+    {
+      "source": "Agents/Performance/strategist.md",
+      "link": "ai-landscape-2026-03-17",
+      "target_basename": "ai-landscape-2026-03-17"
+    },
+    {
+      "source": "Agents/Performance/concierge.md",
+      "link": "2026-03-16-0841-concierge",
+      "target_basename": "2026-03-16-0841-concierge"
+    },
+    {
+      "source": "Agents/Evolution/security.md",
+      "link": "qa-prompts-security-testing",
+      "target_basename": "qa-prompts-security-testing"
+    },
+    {
+      "source": "Agents/Evolution/security.md",
+      "link": "self-evolution-security-audit",
+      "target_basename": "self-evolution-security-audit"
+    },
+    {
+      "source": "Agents/Evolution/vault-keeper.md",
+      "link": "research-round-3-deprecation-and-advancement-analysis",
+      "target_basename": "research-round-3-deprecation-and-advancement-analysis"
+    },
+    {
+      "source": "Agents/Evolution/README.md",
+      "link": "Agents/Evolution/test-agent",
+      "target_basename": "test-agent"
+    },
+    {
+      "source": "Agents/Evolution/README.md",
+      "link": "Agents/Evolution/test-researcher",
+      "target_basename": "test-researcher"
+    },
+    {
+      "source": "Agents/Evolution/ops.md",
+      "link": "research-round-3-deprecation-and-advancement-analysis",
+      "target_basename": "research-round-3-deprecation-and-advancement-analysis"
+    },
+    {
+      "source": "Agents/Evolution/ops.md",
+      "link": "2026-03-16-1806-trajans-office",
+      "target_basename": "2026-03-16-1806-trajans-office"
+    },
+    {
+      "source": "Agents/Evolution/ops.md",
+      "link": "ai-landscape-2026-03-16",
+      "target_basename": "ai-landscape-2026-03-16"
+    },
+    {
+      "source": "Agents/Evolution/strategist.md",
+      "link": "ai-landscape-2026-03-17",
+      "target_basename": "ai-landscape-2026-03-17"
+    },
+    {
+      "source": "Agents/Evolution/concierge.md",
+      "link": "2026-03-16-0841-concierge",
+      "target_basename": "2026-03-16-0841-concierge"
+    },
+    {
+      "source": "Agents/Evolution/coder.md",
+      "link": "immutable-safety-baseline-coder-position",
+      "target_basename": "immutable-safety-baseline-coder-position"
+    },
+    {
+      "source": "Agents/Modules/vault-interaction.md",
+      "link": "wikilink",
+      "target_basename": "wikilink"
+    },
+    {
+      "source": "Agents/Modules/vault-management.md",
+      "link": "wikilink",
+      "target_basename": "wikilink"
+    },
+    {
+      "source": "Agents/Modules/discord-output.md",
+      "link": "-",
+      "target_basename": "-"
+    },
+    {
+      "source": "Agents/Templates/archived-souls-2026-03-16.md",
+      "link": "2026-03-16_0648_\ud83e\uddea",
+      "target_basename": "2026-03-16_0648_\ud83e\uddea"
+    },
+    {
+      "source": "Agents/Templates/archived-souls-2026-03-16.md",
+      "link": "Delegation",
+      "target_basename": "delegation"
+    },
+    {
+      "source": "Agents/Templates/archived-souls-2026-03-16.md",
+      "link": "Test",
+      "target_basename": "test"
+    },
+    {
+      "source": "Agents/Templates/archived-souls-2026-03-16.md",
+      "link": "\u2014",
+      "target_basename": "\u2014"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Role - Planner",
+      "target_basename": "role - planner"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Role - Architect",
+      "target_basename": "role - architect"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Role - Implementer",
+      "target_basename": "role - implementer"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Role - Reviewer",
+      "target_basename": "role - reviewer"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Workflow - Session Memory",
+      "target_basename": "workflow - session memory"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Role - Reviewer",
+      "target_basename": "role - reviewer"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Workflow - Goal Cascade",
+      "target_basename": "workflow - goal cascade"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Role - Project Manager",
+      "target_basename": "role - project manager"
+    },
+    {
+      "source": "Agents/Host-Context/Research - Agentic Development Patterns 2026.md",
+      "link": "Role - Architect",
+      "target_basename": "role - architect"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Architect",
+      "target_basename": "role - architect"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Planner",
+      "target_basename": "role - planner"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Reviewer",
+      "target_basename": "role - reviewer"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Code Review Prompt",
+      "target_basename": "code review prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Agent Delegation Prompt",
+      "target_basename": "agent delegation prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Project Manager",
+      "target_basename": "role - project manager"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Implementer",
+      "target_basename": "role - implementer"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Context Synthesis Prompt",
+      "target_basename": "context synthesis prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Task Breakdown Prompt",
+      "target_basename": "task breakdown prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Agent Delegation Prompt",
+      "target_basename": "agent delegation prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Architect",
+      "target_basename": "role - architect"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Researcher",
+      "target_basename": "role - researcher"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Chain of Thought Template",
+      "target_basename": "chain of thought template"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Role - Reviewer",
+      "target_basename": "role - reviewer"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Debugging Prompt",
+      "target_basename": "debugging prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Code Review Prompt",
+      "target_basename": "code review prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Codebase Exploration Prompt",
+      "target_basename": "codebase exploration prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Sprint Planning Prompt",
+      "target_basename": "sprint planning prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Risk Analysis Prompt",
+      "target_basename": "risk analysis prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Release Readiness Prompt",
+      "target_basename": "release readiness prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Meta-Prompt Generator",
+      "target_basename": "meta-prompt generator"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Chain of Thought Template",
+      "target_basename": "chain of thought template"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Agent Delegation Prompt",
+      "target_basename": "agent delegation prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Release Readiness Prompt",
+      "target_basename": "release readiness prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Codebase Exploration Prompt",
+      "target_basename": "codebase exploration prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "PRD Generation Prompt",
+      "target_basename": "prd generation prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Implementation Planning Prompt",
+      "target_basename": "implementation planning prompt"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Decision Record Template",
+      "target_basename": "decision record template"
+    },
+    {
+      "source": "Agents/Host-Context/Prompt Library Sources.md",
+      "link": "Code Review Prompt",
+      "target_basename": "code review prompt"
+    },
+    {
+      "source": "Agents/Evolution/researcher/2026-03-16.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Agents/Evolution/coder/2026-03-16.md",
+      "link": "github-intel-favorites",
+      "target_basename": "github-intel-favorites"
+    },
+    {
+      "source": "Agents/Templates/documentation-writer/SOUL.md",
+      "link": "agent-tester-multi-model-soul-md-testing",
+      "target_basename": "agent-tester-multi-model-soul-md-testing"
+    },
+    {
+      "source": "Agents/Templates/ops/SOUL.md",
+      "link": "agent-tester-multi-model-soul-md-testing",
+      "target_basename": "agent-tester-multi-model-soul-md-testing"
+    },
+    {
+      "source": "Agents/Templates/test-researcher/SOUL.md",
+      "link": "agent-tester-multi-model-soul-md-testing",
+      "target_basename": "agent-tester-multi-model-soul-md-testing"
+    },
+    {
+      "source": "Agents/Templates/researcher/capabilities.md",
+      "link": "wikilinks",
+      "target_basename": "wikilinks"
+    },
+    {
+      "source": "Agents/Templates/researcher/SOUL.md",
+      "link": "agent-tester-multi-model-soul-md-testing",
+      "target_basename": "agent-tester-multi-model-soul-md-testing"
+    },
+    {
+      "source": "Agents/Templates/coder/SOUL.md",
+      "link": "agent-tester-multi-model-soul-md-testing",
+      "target_basename": "agent-tester-multi-model-soul-md-testing"
+    },
+    {
+      "source": "Agents/Templates/code-reviewer/SOUL.md",
+      "link": "agent-tester-multi-model-soul-md-testing",
+      "target_basename": "agent-tester-multi-model-soul-md-testing"
+    },
+    {
+      "source": "Operations/Post-Mortems/compare-ops-vs-coder-20260319.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Operations/Post-Mortems/compare-ops-vs-coder-20260319.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Operations/Post-Mortems/20260318-025720-86669597.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Operations/Post-Mortems/20260318-025720-86669597.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Operations/Post-Mortems/compare-researcher-vs-coder-20260319.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Operations/Post-Mortems/compare-researcher-vs-coder-20260319.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Operations/Post-Mortems/compare-researcher-vs-vault-keeper-20260319.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Operations/Post-Mortems/compare-researcher-vs-vault-keeper-20260319.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    },
+    {
+      "source": "Operations/Post-Mortems/20260318042802.-dym9km.md",
+      "link": "Agent Performance",
+      "target_basename": "agent performance"
+    },
+    {
+      "source": "Operations/Post-Mortems/20260318042802.-dym9km.md",
+      "link": "Operations",
+      "target_basename": "operations"
+    }
+  ]
+}

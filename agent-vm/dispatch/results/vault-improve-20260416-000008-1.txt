@@ -1,0 +1,13 @@
+**Status: DONE**
+
+**Files modified:**
+- `~/vault/System/System Vault Structure.md`
+
+**Changes made:**
+1. **Added YAML frontmatter** with title, type (reference), created/updated dates, confidence (high), source, summary, and tags
+2. **Updated vault stats** — file count from 2,922→3,090, size from 258 MB→1.5 GB (verified from filesystem)
+3. **Added missing directories** to the tree: `EMA/`, `Learnings & Gotchas/`, `.archive/`
+4. **Added section descriptions** for EMA/ and Learnings & Gotchas/
+5. **Added "How to Navigate This Vault" section** with practical guidance on searching, session context, and cross-referencing
+6. **Added 5+ wikilinks**: `[[System QMD Search]]`, `[[System Daily Notes]]`, `[[Welcome]]`, `[[ontology]]`, `[[System Session Management]]` (in addition to existing `[[Research - Self-Evolving Vault Patterns]]` and `[[System Claude Code]]`)
+7. **Ran `qmd update`** to re-index

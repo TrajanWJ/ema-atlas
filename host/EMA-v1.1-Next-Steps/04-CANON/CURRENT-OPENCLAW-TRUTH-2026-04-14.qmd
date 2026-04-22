@@ -1,0 +1,33 @@
+---
+title: "Current OpenClaw Truth 2026-04-14"
+type: ops-truth
+plane: reality
+status: active
+freshness: recent
+provenance:
+  - host-inspected
+  - live-session
+tracks:
+  - shell-hq
+  - agent-work
+format: gfm
+---
+
+# Current OpenClaw Truth 2026-04-14
+
+## Verified in this session
+- OpenClaw gateway runtime is running
+- Discord and Telegram channels are enabled and connected
+- memory/vector subsystem is ready
+- multiple active sessions are present
+- the current system is operational but has significant security/config debt
+
+## Major issues noted
+- wildcard Control UI origins
+- device auth disabled for Control UI
+- open group policies with risky tool exposure
+- auth/probe path inconsistency around gateway token/device identity
+- gateway service state is slightly messy (running while unit disabled)
+
+## Meaning
+The current OpenClaw system is alive enough to bootstrap the new Ultimate Wiki, but it should be tightened and better documented as it is absorbed.

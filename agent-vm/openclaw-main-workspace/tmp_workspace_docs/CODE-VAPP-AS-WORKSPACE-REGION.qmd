@@ -1,0 +1,26 @@
+---
+title: "Code vApp as Workspace Region"
+type: product-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - repo-read
+tracks:
+  - code-vapp
+  - shell-hq
+format: gfm
+---
+
+# Code vApp as Workspace Region
+
+## Principle
+The code vApp should be a region of the shared workspace, not a separate product.
+
+## That means
+- it shares workstream identity
+- it shares chronicle and review
+- it shares graph knowledge and imports
+- it shares host/repo/runtime bindings
+- it is reachable from CLI and GUI

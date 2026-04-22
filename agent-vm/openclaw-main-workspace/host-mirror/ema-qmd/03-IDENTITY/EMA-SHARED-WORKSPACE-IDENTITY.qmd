@@ -1,0 +1,72 @@
+---
+title: "EMA Shared Workspace Identity"
+type: identity-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+  - cross-pollination-mined
+tracks:
+  - shell-hq
+  - agent-work
+  - host-ops
+  - knowledge
+  - code-vapp
+format: gfm
+---
+
+# EMA Shared Workspace Identity
+
+## Core identity
+EMA should be framed as a **shared workspace for humans and agents**.
+
+Not:
+- a chatbot
+- an Obsidian clone
+- a hidden agent vault
+- a devtool sidecar
+- a dashboard with disconnected tabs
+
+But:
+- one living workspace
+- shared by humans and agents
+- grounded in real host/runtime/repo/session truth
+- accessible through both GUI and CLI
+- equally navigable as graph, timeline, workspace, and control plane
+
+## Access surfaces
+### GUI
+Best for:
+- visibility
+- supervision
+- graph navigation
+- planning
+- review/approval
+- multi-pane workspace context
+- live operational overview
+
+### CLI
+Best for:
+- precise operations
+- scripting
+- agent-native execution
+- remote/headless usage
+- direct session attachment
+- search/query against the same shared truth
+
+## Rule
+GUI and CLI are not separate products.
+They are two access modes over the same workspace.
+
+## Shared workspace contents
+- workstreams
+- intentions/proposals/approvals/executions
+- chronicle/review/recall
+- machines/services/peers
+- repo/worktree/runtime bindings
+- code sessions and terminals
+- notes/plans/research/memory
+- inbox/capture/promotions
+- graph knowledge and live object pages

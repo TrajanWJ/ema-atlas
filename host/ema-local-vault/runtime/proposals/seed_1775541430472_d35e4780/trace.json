@@ -1,0 +1,13 @@
+{
+  "sources": {
+    "active_tasks": 0,
+    "seed": true,
+    "project": false,
+    "recent_proposals": 5
+  },
+  "project_id": null,
+  "seed_id": "seed_1775541430472_d35e4780",
+  "seed_name": "intent:task-4-config-defaults-add-openclawgatewayurl-and-openclawss",
+  "compiled_at": "2026-04-11T20:49:32.829711Z",
+  "composer_version": 1
+}

@@ -1,0 +1,26 @@
+{
+  "id": "vault-improve-20260420-120015-0",
+  "description": "Vault improvement: Backfill/improve 'sum_4fdfb4fe50ac7514' (thin-file (344B)). Current content is insufficient — research the topic and write substantive content.",
+  "agent": "researcher",
+  "priority": 3,
+  "status": "failed",
+  "created": "2026-04-20T12:00:15Z",
+  "timeout_minutes": 10,
+  "context": "File: LCM Summaries/sum_4fdfb4fe50ac7514.md\\nReason: thin-file (344B)\\nCurrent preview: # LCM Summary sum_4fdfb4fe50ac7514  Created: 2026-03-20 08:17:02 Kind: leaf Depth: 0 Conversation: 659 Tokens: 34 Descendants: 0 Earliest: 2026-03-20T07:56:08.000Z Latest: 2026-03-20T07:56:08.000Z  ##\\n\\nResearch this topic and produce a well-written vault note with: proper frontmatter, substantive content (500+ words), wikilinks to related notes, and sources where applicable.\\n\\nIMPORTANT: Do NOT post to #research-feed unless there is a genuinely novel finding worth Trajan's attention. Vault improvement tasks are internal — write to vault only.",
+  "success_criteria": "The file at vault/LCM Summaries/sum_4fdfb4fe50ac7514.md should have: 1) Valid frontmatter with confidence/source/summary, 2) Substantive content covering the topic, 3) At least 2 wikilinks, 4) 500+ bytes minimum",
+  "vault_refs": [
+    "LCM Summaries/sum_4fdfb4fe50ac7514.md"
+  ],
+  "tags": [
+    "research-loop",
+    "vault-improvement",
+    "thin-file (344B)"
+  ],
+  "source": "vault-research-loop",
+  "post_to_feed": false,
+  "claimed_at": "2026-04-20T12:01:06Z",
+  "locked_by": "researcher",
+  "pid": 4141832,
+  "failed_at": "2026-04-20T12:02:01Z",
+  "failure_reason": "exit code 1"
+}

@@ -1,0 +1,47 @@
+{
+  "active_tasks": [],
+  "seed": {
+    "id": "seed_1775541430443_f5502edf",
+    "name": "intent:intent-wiki-schematic",
+    "project_id": "proj_1775262165726_b0e3eb21",
+    "prompt_template": "Intent: Intent Wiki Schematic\nLevel: 3\nKind: feature\nDescription: Intents as navigable wiki pages. The wiki IS the intent schematic.\n\nGenerate a concrete proposal to advance this intent."
+  },
+  "project": {
+    "id": "proj_1775262165726_b0e3eb21",
+    "name": "EMA",
+    "path": null,
+    "slug": "ema"
+  },
+  "recent_proposals": [
+    {
+      "id": "prop_1775933204820_fd578cf4",
+      "status": "queued",
+      "title": "Decision: Matrix** (50%) — `prop_1775803604760_1f32858e`** (50%) — `prop_1775818004768_e47",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775933204821_cdb8537d",
+      "status": "queued",
+      "title": "Decision: rule for Claude Code delegation — corrections.md shows two consecutive routing c",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775933204822_e89a0c8f",
+      "status": "queued",
+      "title": "Decision: memory** (50%) — `prop_1775803604758_963cfc39`** (50%) — `prop_1775818004770_830",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775918804808_ff8a1d71",
+      "status": "queued",
+      "title": "Decision: memory** (50%) — `prop_1775803604758_963cfc39`** (50%) — `prop_1775818004770_830",
+      "confidence": 0.5
+    },
+    {
+      "id": "prop_1775918804811_7e5d3536",
+      "status": "queued",
+      "title": "Decision: rule for Claude Code delegation — corrections.md shows two consecutive routing c",
+      "confidence": 0.5
+    }
+  ]
+}

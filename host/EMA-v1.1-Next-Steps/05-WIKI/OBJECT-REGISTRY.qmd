@@ -1,0 +1,31 @@
+---
+title: "EMA Object Registry"
+format: gfm
+---
+
+# EMA Object Registry
+
+## Core object families
+- intention
+- proposal
+- approval
+- execution
+- trace
+- workstream
+- session
+- artifact
+- review
+- memory
+- machine
+- service
+- planning-node
+- research-item
+- code-workstream
+- code-session
+- repo-binding
+- worktree-binding
+- secret-reference
+
+## Query hint
+This page should become one of the major graph hubs.
+Use it as the canonical place to anchor object names across the deliverable.

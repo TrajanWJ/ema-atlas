@@ -182,42 +182,29 @@ migration shape?
 
 ## Provenance
 
-Cite every external doc, vault note, or branch read while filling this
-in. The matrix is only as good as its grounding.
-
 - [`OPEN_QUESTIONS.md`](../../OPEN_QUESTIONS.md) — Q1 wording, blast
-  radius, "highest-blast-radius open question" framing.
-- [`DESIGN_PRINCIPLES.md`](../../DESIGN_PRINCIPLES.md) — P1, P4, P8,
-  P10 (and the canonical rule); the three architecture mistakes.
-- [`ARCHITECTURE.md`](../../ARCHITECTURE.md) — identity model sketch
-  (Q1, Q3 still open); the `Member` sum constructor variants;
-  identity registry as its own OTP app per
-  [`EMA_V0_0_3_PREP.md`](../../EMA_V0_0_3_PREP.md).
+  radius, "highest-blast-radius open question."
+- [`DESIGN_PRINCIPLES.md`](../../DESIGN_PRINCIPLES.md) — canonical
+  rule; P1, P4, P8, P10; three architecture mistakes.
+- [`ARCHITECTURE.md`](../../ARCHITECTURE.md) — identity sketch
+  ("Q1, Q3 still open"); `Member` sum.
 - [`research/parts/identity-project-space.md`](../../research/parts/identity-project-space.md)
-  — the `Member` Gleam type; the `AgentMember` "Q1-dependent
-  variant" comment; the policy bundle and `personal_ai_resolver`
-  shape.
+  — `AgentMember` "Q1-dependent variant"; `personal_ai_resolver`.
 - [`research/build-steps/02-identity-registry-skeleton.md`](../../research/build-steps/02-identity-registry-skeleton.md)
-  — the coded assumption ("ship the `AgentMember(...)` variant"), the
-  explicit Q1=no fallback ("`AgentMember` is deprecated to a separate
-  `AttachedAgent` table"), and gates #4 and #7.
+  — coded assumption + Q1=no `AttachedAgent` fallback; gates #4, #7.
 - [`research/COLLAB_PLANE_OPTIONS.md`](../../research/COLLAB_PLANE_OPTIONS.md)
-  — "Identity / attribution implications" section; Yjs `clientID`,
-  Automerge `ActorId`, ShareDB `src`, Riak DT / DeltaCrdt envelope
-  story; the warning that "if Q1 lands 'agents not first-class' after
-  EMA has shipped Yjs with `clientID == agent_id`, every historical
-  op needs re-attribution to a human principal."
-- [`GLOSSARY.md`](../../GLOSSARY.md) — controlled vocabulary used
-  here (Personal AI, Org, Space, Project, Member, Driver, Provider,
-  Harness, Auto-Resolve Gate, Distributed AI Delegation, Collaboration
-  object, vApp).
+  — Yjs `clientID`, Automerge `ActorId`, ShareDB `src`; warning that
+  shipping Yjs with `clientID == agent_id` makes Q1=no a forced
+  re-attribution migration.
+- [`GLOSSARY.md`](../../GLOSSARY.md) — Personal AI, Org, Space,
+  Project, Member, Driver, Provider, Harness, Auto-Resolve Gate,
+  Distributed AI Delegation, Collaboration object.
 - [`05-fresh-context-project-app-model.md`](../../05-fresh-context-project-app-model.md)
-  — "Personal AI can access all projects/spaces they are part of";
-  Threads/Server "visible multi-agent conversations/DMs" framing.
+  — "Personal AI can access all projects/spaces"; Threads/Server
+  multi-agent visible conversations.
 - [`research/parts/harness-execution.md`](../../research/parts/harness-execution.md)
-  — the Q1 note: "without first-class agent `MemberId`,
-  `DispatchEnvelope.by` has to fall back to `HumanActor` for
-  agent-initiated runs, which breaks delegation-tree rendering."
+  — Q1 note: `DispatchEnvelope.by` falls back to `HumanActor`
+  without first-class agent identity.
 
 ## Decision
 

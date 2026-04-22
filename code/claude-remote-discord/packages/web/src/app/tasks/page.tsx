@@ -1,0 +1,119 @@
+"use client";
+
+import { Layout } from "@/components/layout/Layout";
+import { useSystemStore } from "@/stores/system-store";
+import {
+  LayoutGrid,
+  Plus,
+  Circle,
+  ArrowUpDown,
+  Clock,
+  Bot,
+} from "lucide-react";
+import type { TaskRecord, TaskStatus } from "@claudeforge/shared";
+
+const COLUMNS: { status: TaskStatus; label: string; color: string }[] = [
+  { status: "backlog", label: "Backlog", color: "text-text-secondary" },
+  { status: "in_progress", label: "In Progress", color: "text-info" },
+  { status: "review", label: "Review", color: "text-warning" },
+  { status: "done", label: "Done", color: "text-success" },
+];
+
+const PRIORITY_COLORS: Record<string, string> = {
+  critical: "bg-error/20 text-error",
+  high: "bg-warning/20 text-warning",
+  normal: "bg-text-muted/20 text-text-secondary",
+  low: "bg-text-muted/10 text-text-muted",
+};
+
+function TaskCard({ task }: { task: TaskRecord }) {
+  const age = Math.floor((Date.now() - task.createdAt) / 60000);
+  const ageStr = age < 60 ? `${age}m` : `${Math.floor(age / 60)}h`;
+
+  return (
+    <div className="bg-surface border border-border rounded-lg p-3 hover:border-primary/25 transition-colors cursor-pointer">
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-sm font-medium text-text-primary line-clamp-2">
+          {task.title}
+        </span>
+        <span
+          className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 ${
+            PRIORITY_COLORS[task.priority]
+          }`}
+        >
+          {task.priority}
+        </span>
+      </div>
+      {task.description && (
+        <p className="text-xs text-text-muted mt-1 line-clamp-2">
+          {task.description}
+        </p>
+      )}
+      <div className="flex items-center gap-2 mt-2 text-xs text-text-muted">
+        {task.agent && (
+          <span className="flex items-center gap-1">
+            <Bot size={10} /> {task.agent}
+          </span>
+        )}
+        <span className="flex items-center gap-1 ml-auto">
+          <Clock size={10} /> {ageStr}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default function TasksPage() {
+  const { tasks } = useSystemStore();
+
+  return (
+    <Layout>
+      <div className="h-full flex flex-col">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <LayoutGrid size={20} strokeWidth={1.5} className="text-primary" />
+            <h1 className="text-lg font-semibold">Tasks</h1>
+          </div>
+          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded transition-colors">
+            <Plus size={14} /> New Task
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-x-auto p-4">
+          <div className="flex gap-4 h-full min-w-max">
+            {COLUMNS.map((col) => {
+              const columnTasks = tasks.filter((t) => t.status === col.status);
+              return (
+                <div
+                  key={col.status}
+                  className="w-72 flex flex-col shrink-0"
+                >
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <span
+                      className={`text-xs font-medium uppercase tracking-wider ${col.color}`}
+                    >
+                      {col.label}
+                    </span>
+                    <span className="text-xs text-text-muted bg-surface-elevated px-2 py-0.5 rounded-full">
+                      {columnTasks.length}
+                    </span>
+                  </div>
+                  <div className="flex-1 space-y-2 overflow-y-auto">
+                    {columnTasks.map((task) => (
+                      <TaskCard key={task.id} task={task} />
+                    ))}
+                    {columnTasks.length === 0 && (
+                      <div className="text-xs text-text-muted text-center py-8 border border-dashed border-border rounded-lg">
+                        No tasks
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}

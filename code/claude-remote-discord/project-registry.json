@@ -1,0 +1,112 @@
+{
+  "letmescale": {
+    "category_id": "1484289632123490428",
+    "main_channel": "1484289635906752717",
+    "path": "~/Desktop/Coding/Projects/letmescale",
+    "discord_name": "letmescale",
+    "sessions": {
+      "latest": "86efc34d-f8c5-40cc-84aa-0955e7de396c",
+      "total": 50,
+      "last_active": "2026-03-13"
+    }
+  },
+  "proslync": {
+    "category_id": "1484289641363542017",
+    "main_channel": "1484289645108924608",
+    "path": "~/Desktop/Coding/Projects/proslync",
+    "discord_name": "proslync",
+    "sessions": {
+      "latest": null,
+      "total": 0,
+      "last_active": null
+    }
+  },
+  "xpressdrop": {
+    "category_id": "1484289649655681207",
+    "main_channel": "1484289652822245398",
+    "path": "~/Desktop/Coding/Projects/xpressdrop",
+    "discord_name": "xpressdrop",
+    "sessions": {
+      "latest": "b899984f-3127-406e-9bcf-1ab1a45ae15b",
+      "total": 35,
+      "last_active": "2026-03-10"
+    }
+  },
+  "dispohub": {
+    "category_id": "1484289657435983874",
+    "main_channel": "1484289660455878750",
+    "path": "~/Desktop/Coding/Projects/dispohub",
+    "discord_name": "dispohub",
+    "sessions": {
+      "latest": "a09a62cd-c1e5-4cf0-ba29-6cdb360be1bc",
+      "total": 3,
+      "last_active": "2026-02-25"
+    }
+  },
+  "execudeck": {
+    "category_id": "1484289665375666317",
+    "main_channel": "1484289668781707506",
+    "path": "~/Desktop/Coding/Projects/execudeck",
+    "discord_name": "execudeck",
+    "sessions": {
+      "latest": "38938c62-a617-41ff-94a7-ce89935cd866",
+      "total": 4,
+      "last_active": "2026-03-12"
+    }
+  },
+  "pomodoro": {
+    "category_id": "1484289673416413184",
+    "main_channel": "1484289676201164943",
+    "path": "~/Desktop/Coding/Projects/pomodoro",
+    "discord_name": "pomodoro",
+    "sessions": {
+      "latest": "1a72e4d4-a0e8-4c7a-8b63-36b7e66ca23c",
+      "total": 1,
+      "last_active": "2026-03-02"
+    }
+  },
+  "blueprint-media": {
+    "category_id": "1484289681230401838",
+    "main_channel": "1484289684535246970",
+    "path": "~/Desktop/Coding/Projects/blueprint-media-full-archive",
+    "discord_name": "blueprint-media-full-archive",
+    "sessions": {
+      "latest": null,
+      "total": 0,
+      "last_active": null
+    }
+  },
+  "truck-stuff": {
+    "category_id": "1484289689870536745",
+    "main_channel": "1484289694299721919",
+    "path": "~/Desktop/Coding/Projects/truck stuff",
+    "discord_name": "truck-stuff",
+    "sessions": {
+      "latest": "e8576a0a-0645-498a-ad61-87ed2c5d3786",
+      "total": 1,
+      "last_active": "2026-02-18"
+    }
+  },
+  "web-design-str": {
+    "category_id": "1484289699072839741",
+    "main_channel": "1484289702528811261",
+    "path": "~/Desktop/Coding/Projects/web design STR",
+    "discord_name": "web-design-str",
+    "sessions": {
+      "latest": "c21e8350-2b4e-4af4-ab40-d2e0d09cc469",
+      "total": 5,
+      "last_active": "2026-02-24"
+    }
+  },
+  "youtube-auto": {
+    "category_id": "1484289707369037834",
+    "main_channel": "1484289710808498186",
+    "path": "~/Desktop/Coding/Projects/YoutubeAutomations",
+    "discord_name": "YoutubeAutomations",
+    "sessions": {
+      "latest": "a2817feb-cf01-4511-916f-42f9d9c4995e",
+      "total": 1,
+      "last_active": "2026-03-12"
+    }
+  }
+}

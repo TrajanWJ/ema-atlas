@@ -1,0 +1,929 @@
+/* Sora - geometric, designed by Fontworks with Japanese sensibility */
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Sora", system-ui, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, monospace;
+
+  /* Tokyo Minimal Palette */
+  --color-void: #0c0c0c;
+  --color-ink: #171717;
+  --color-paper: #fafaf9;
+  --color-stone: #a3a3a3;
+  --color-mist: #e5e5e5;
+  --color-vermillion: #c73e3a;
+  --color-indigo: #3d5a80;
+
+  /* Status colors */
+  --color-sky: #38bdf8;
+  --color-harvest: #f59e0b;
+  --color-jade: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+  --color-void: #fafaf9;
+  --color-ink: #ffffff;
+  --color-paper: #0c0c0c;
+  --color-stone: #6b7280;
+  --color-mist: #e5e7eb;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-void);
+  color: var(--color-paper);
+  margin: 0;
+  min-height: 100vh;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* iOS PWA safe area - push content below status bar / Dynamic Island.
+   Only applies in standalone (installed PWA) mode; env() returns 0 on non-notched devices. */
+@media all and (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    min-height: calc(100vh + env(safe-area-inset-top));
+  }
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Hairline scrollbar - barely visible */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(163, 163, 163, 0.3);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(163, 163, 163, 0.5);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Japanese-inspired status marks */
+.mark {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.mark-pending {
+  background: var(--color-stone);
+}
+
+.mark-running {
+  background: var(--color-paper);
+  animation: breathe 2s ease-in-out infinite;
+}
+
+.mark-completed {
+  background: var(--color-stone);
+  opacity: 0.5;
+}
+
+.mark-review {
+  background: #a855f7;
+}
+
+.mark-failed {
+  background: var(--color-vermillion);
+}
+
+.mark-cancelled {
+  background: var(--color-stone);
+  opacity: 0.3;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Connection indicator - sonar ping style */
+.connection-indicator {
+  position: relative;
+}
+
+.connection-indicator::before,
+.connection-indicator::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0;
+}
+
+.connection-indicator.connected::before {
+  animation: sonar-ping 2.5s ease-out infinite;
+}
+
+.connection-indicator.connected::after {
+  animation: sonar-ping 2.5s ease-out infinite 1.25s;
+}
+
+@keyframes sonar-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-stripe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.card-running {
+  border-left-color: transparent !important;
+  overflow: visible !important;
+}
+
+.card-running .stripe-pulse {
+  animation: pulse-stripe 2s ease-in-out infinite;
+}
+
+/* Recovery state - amber shimmer */
+@keyframes shimmer-stripe {
+  0% {
+    opacity: 0.4;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.02);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scaleY(1);
+  }
+}
+
+.card-recovering {
+  border-left-color: transparent !important;
+  overflow: visible !important;
+}
+
+.card-recovering .stripe-shimmer {
+  animation: shimmer-stripe 1.5s ease-in-out infinite;
+}
+
+/* Subtle hover - just a whisper */
+.hover-whisper {
+  transition: background-color 0.3s ease;
+}
+
+.hover-whisper:hover {
+  background: rgba(250, 250, 249, 0.03);
+}
+
+/* Typography scale - standardized 3-tier: 10px / 12px / 14px */
+.text-title {
+  font-size: 0.875rem; /* 14px - headings, prominent text */
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+.text-body {
+  font-size: 0.75rem !important; /* 12px - body text, descriptions */
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* Input text - same as text-body but allows touch device override for iOS zoom prevention */
+.text-input {
+  font-size: 0.75rem; /* 12px on desktop */
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 0.625rem; /* 10px - labels, metadata, buttons */
+  font-weight: 300;
+  color: var(--color-stone);
+  letter-spacing: 0.03em;
+}
+
+.text-mono {
+  font-family: var(--font-mono);
+  font-size: 0.625rem; /* 10px - align with caption */
+  letter-spacing: -0.01em;
+}
+
+/* Column - vertical rhythm */
+.column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+}
+
+/* Desktop: flexible columns that scale proportionately */
+@media (min-width: 768px) {
+  .column {
+    min-width: 260px;
+    flex: 1 1 0%;
+  }
+}
+
+.column-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(163, 163, 163, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: sticky;
+  top: 0;
+  background: var(--color-void);
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .column-header {
+    padding: 1rem 0.75rem;
+  }
+}
+
+.column-title {
+  font-size: 0.625rem; /* 10px - align with text-caption */
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-stone);
+}
+
+.column-count {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: rgba(163, 163, 163, 0.5);
+  margin-left: auto;
+}
+
+/* Card - paper-like */
+.card {
+  background: var(--color-ink);
+  border: 1px solid rgba(163, 163, 163, 0.08);
+  padding: 0.75rem;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 0.875rem;
+  }
+}
+
+.card:hover {
+  background: rgba(23, 23, 23, 0.8);
+  border-color: rgba(163, 163, 163, 0.15);
+}
+
+/* Vermillion accent for errors/danger */
+.accent-vermillion {
+  color: var(--color-vermillion);
+}
+
+/* Indigo accent for active states */
+.accent-indigo {
+  color: var(--color-indigo);
+}
+
+/* Mobile-first kanban layout */
+.kanban-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Mobile: tabs at top, single column view */
+@media (max-width: 767px) {
+  .kanban-tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(163, 163, 163, 0.1);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .kanban-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Utility class to hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .kanban-tab {
+    flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.625rem; /* 10px - align with text-caption */
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(163, 163, 163, 0.5);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .kanban-tab.active {
+    color: var(--color-paper);
+    border-bottom-color: var(--color-paper);
+  }
+
+  .kanban-columns {
+    display: none;
+  }
+
+  .kanban-column-mobile {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Desktop: horizontal columns */
+@media (min-width: 768px) {
+  .kanban-tabs {
+    display: none;
+  }
+
+  .kanban-columns {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    flex: 1;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .kanban-column-mobile {
+    display: none;
+  }
+
+  .kanban-divider {
+    width: 1px;
+    background: rgba(163, 163, 163, 0.08);
+    flex-shrink: 0;
+  }
+}
+
+/* Dialog responsive */
+.dialog-content {
+  background: var(--color-ink);
+  border: 1px solid rgba(163, 163, 163, 0.1);
+}
+
+@media (max-width: 767px) {
+  .dialog-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+}
+
+/* PWA safe area for fixed-position modals (dialogs & lightbox) */
+@media all and (display-mode: standalone) {
+  @media (max-width: 767px) {
+    .dialog-content {
+      padding-top: env(safe-area-inset-top) !important;
+    }
+
+    /* Radix close [X] button is absolute-positioned, so padding doesn't help — offset it directly */
+    .dialog-content > [data-slot="dialog-close"] {
+      top: calc(1rem + env(safe-area-inset-top)) !important;
+    }
+  }
+
+  .lightbox-overlay {
+    padding-top: calc(env(safe-area-inset-top) + 1rem);
+  }
+
+  .lightbox-close {
+    top: calc(env(safe-area-inset-top) + 1rem);
+  }
+}
+
+/* Header responsive */
+.header-stats {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .header-stats {
+    display: flex;
+  }
+}
+
+/* Light mode overrides */
+.light .column-header {
+  background: var(--color-void);
+}
+
+.light .card {
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.light .card:hover {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.light .hover-whisper:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.light .dialog-content {
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.light .mark-running {
+  background: var(--color-paper);
+}
+
+.light .kanban-divider {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Prevent iOS Safari from zooming on input focus */
+/* iOS zooms when font-size < 16px - apply to all touch devices */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select,
+  [contenteditable="true"],
+  .text-input {
+    font-size: 1rem !important; /* 16px */
+  }
+}
+
+/* ============================================
+   Offline Robot & Overlay Animations
+   ============================================ */
+
+/* Robot floating animation - subtle and refined */
+@keyframes robot-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Eye blinking animation */
+@keyframes robot-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* Antenna pulse - subtle glow */
+@keyframes antenna-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Signal search rings emanating from antenna */
+@keyframes signal-search {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+}
+
+/* Arm wave animation - subtle sway */
+@keyframes arm-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+/* Chest indicator pulse - gentle breathing */
+@keyframes chest-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Loading dots animation */
+@keyframes dot-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+/* Robot component styles */
+.offline-robot {
+  /* Base floating animation for all states */
+  .robot-body {
+    animation: robot-float 3s ease-in-out infinite;
+    transform-origin: center center;
+  }
+
+  /* Eye blinking */
+  .eye {
+    transform-origin: center center;
+    animation: robot-blink 4s ease-in-out infinite;
+  }
+
+  .eye--right {
+    animation-delay: 0.2s;
+  }
+
+  /* Antenna pulse */
+  .antenna-ball {
+    animation: antenna-pulse 2s ease-in-out infinite;
+  }
+
+  /* Chest indicator */
+  .chest-indicator {
+    animation: chest-pulse 2s ease-in-out infinite;
+  }
+}
+
+/* Searching state - active signal search */
+.offline-robot--searching {
+  .signal-ring {
+    animation: signal-search 2s ease-out infinite;
+  }
+
+  .signal-ring--1 {
+    animation-delay: 0s;
+  }
+
+  .signal-ring--2 {
+    animation-delay: 0.4s;
+  }
+
+  .signal-ring--3 {
+    animation-delay: 0.8s;
+  }
+
+  .arm--left {
+    transform-origin: 15px 66px;
+    animation: arm-wave 1.5s ease-in-out infinite;
+  }
+}
+
+/* Reconnecting state - hopeful, faster animations */
+.offline-robot--reconnecting {
+  .robot-body {
+    animation-duration: 2s;
+  }
+
+  .antenna-ball {
+    animation-duration: 1s;
+  }
+
+  .signal-ring {
+    animation: signal-search 1.5s ease-out infinite;
+  }
+
+  .signal-ring--1 {
+    animation-delay: 0s;
+  }
+
+  .signal-ring--2 {
+    animation-delay: 0.3s;
+  }
+
+  .signal-ring--3 {
+    animation-delay: 0.6s;
+  }
+}
+
+/* Waiting state - calm, minimal animation */
+.offline-robot--waiting {
+  .robot-body {
+    animation-duration: 4s;
+  }
+
+  .antenna-ball {
+    animation: antenna-pulse 3s ease-in-out infinite;
+  }
+
+  /* No signal rings in waiting state */
+  .signal-ring {
+    display: none;
+  }
+}
+
+/* Offline Overlay styles */
+.offline-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-void);
+  padding: 1.5rem;
+}
+
+.offline-overlay__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 400px;
+  gap: 1.5rem;
+}
+
+.offline-overlay__robot {
+  /* Robot already has animations, just contain it */
+}
+
+.offline-overlay__message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.offline-overlay__title {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--color-paper);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.offline-overlay__subtitle {
+  font-size: 0.75rem; /* 12px - body text */
+  font-weight: 300;
+  color: var(--color-stone);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Loading dots */
+.offline-overlay__dots {
+  display: flex;
+  gap: 0.5rem;
+  height: 24px;
+  align-items: center;
+}
+
+.offline-overlay__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-stone);
+  animation: dot-bounce 1.4s ease-in-out infinite;
+}
+
+.offline-overlay__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.offline-overlay__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Actions */
+.offline-overlay__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.offline-overlay__countdown {
+  font-size: 0.625rem; /* 10px - align with text-caption */
+  color: var(--color-stone);
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.offline-overlay__retry-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-paper);
+  background: transparent;
+  border: 1px solid rgba(163, 163, 163, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.offline-overlay__retry-btn:hover:not(:disabled) {
+  border-color: rgba(163, 163, 163, 0.4);
+  background: rgba(163, 163, 163, 0.05);
+}
+
+.offline-overlay__retry-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.offline-overlay__retry-btn--loading {
+  border-color: var(--color-indigo);
+}
+
+/* Last connected */
+.offline-overlay__last-connected {
+  font-size: 0.625rem;
+  color: var(--color-stone);
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* Light mode adjustments */
+.light .offline-overlay {
+  background: var(--color-void);
+}
+
+.light .offline-overlay__retry-btn {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.light .offline-overlay__retry-btn:hover:not(:disabled) {
+  border-color: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ============================================
+   Pull-to-Refresh (Mobile PWA)
+   ============================================ */
+
+.pull-to-refresh-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pull-to-refresh-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+  transition: opacity 0.15s ease;
+}
+
+.pull-to-refresh-indicator--visible {
+  opacity: 1;
+}
+
+.pull-to-refresh-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-paper);
+  transition: transform 0.1s ease;
+}
+
+.pull-to-refresh-spinner--active {
+  animation: ptr-spin 1s linear infinite;
+}
+
+@keyframes ptr-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pull-to-refresh-text {
+  font-size: 0.625rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-stone);
+}
+
+.pull-to-refresh-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: transform 0.2s ease;
+  /* Prevent overscroll on iOS for pull-to-refresh to work */
+  overscroll-behavior-y: contain;
+}
+
+/* Only show pull-to-refresh on touch devices */
+@media (pointer: fine) {
+  .pull-to-refresh-indicator {
+    display: none;
+  }
+
+  .pull-to-refresh-content {
+    overscroll-behavior-y: auto;
+  }
+}

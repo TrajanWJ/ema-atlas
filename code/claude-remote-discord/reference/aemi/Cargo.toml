@@ -1,0 +1,51 @@
+[package]
+name = "aemi"
+version = "0.1.1"
+edition = "2021"
+authors = ["sam <sam@jennifersoft.com>"]
+description = "LLM CLI routing tool with Telegram and Discord bot integration"
+license = "MIT"
+repository = "https://github.com/KyongSik-Yoon/aemi"
+homepage = "https://www.jennifersoft.com"
+keywords = ["cli", "ai", "llm", "telegram", "discord", "claude", "codeX", "gemini", "opencode"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+dirs = "5"
+libc = "0.2"
+regex = "1"
+rand = "0.8"
+base64 = "0.22"
+sha2 = "0.10"
+hex = "0.4"
+async-trait = "0.1"
+teloxide = { version = "0.13", default-features = false, features = ["macros", "rustls", "ctrlc_handler"] }
+serenity = { version = "0.12", default-features = false, features = ["client", "gateway", "rustls_backend", "model"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[[bin]]
+name = "aemi"
+path = "src/main.rs"
+
+[profile.dev.package."*"]
+opt-level = 1
+
+[profile.release]
+opt-level = 2
+lto = "thin"
+codegen-units = 16
+strip = true
+
+[lints.rust]
+unsafe_code = "warn"
+
+[lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"

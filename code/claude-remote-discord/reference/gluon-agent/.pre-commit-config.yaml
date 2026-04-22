@@ -1,0 +1,17 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.7
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: biome-check
+        name: biome check (web-ui)
+        entry: bash -c 'cd web-ui && bun run check'
+        language: system
+        files: ^web-ui/src/
+        types_or: [ts, tsx, javascript, jsx, json]
+        pass_filenames: false

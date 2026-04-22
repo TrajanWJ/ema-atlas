@@ -1,0 +1,30 @@
+---
+title: "Human Agent Co-Working"
+type: collaboration-model
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - agent-work
+  - shell-hq
+format: gfm
+---
+
+# Human Agent Co-Working
+
+## Goal
+Humans and agents should be able to work in the same workspace with shared:
+- workstreams
+- sessions
+- graph context
+- review surfaces
+- approvals
+- chronicle history
+
+## Important behavior
+- agents do not disappear into hidden loops
+- humans can inspect or attach mid-flight
+- reviews and handoffs are first-class

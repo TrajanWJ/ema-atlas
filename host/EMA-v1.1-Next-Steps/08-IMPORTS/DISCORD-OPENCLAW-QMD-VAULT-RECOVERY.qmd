@@ -1,0 +1,61 @@
+---
+title: "Discord OpenClaw + QMD + Vault Recovery"
+type: recovery-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - knowledge
+  - agent-work
+  - shell-hq
+  - productivity
+format: gfm
+---
+
+# Discord OpenClaw + QMD + Vault Recovery
+
+## Goal
+Recover the old Discord/OpenClaw operating pattern — including QMD, vault habits, session memory, graph/query workflows, and agent-readable context — and reconcile it into EMA instead of treating it as a separate dead system.
+
+## Recovery principle
+Do **not** restore the old system verbatim.
+Recover:
+- the strongest mechanisms
+- the working conventions
+- the operational feel
+- the useful memory/query flows
+
+Translate them into EMA-native language and structure.
+
+## What to recover
+- Discord as a real command/control and ambient ops surface
+- QMD indexing/query habits
+- vault-style graph knowledge and dense linking
+- session summaries / memory promotion / chronicle habits
+- inbox/capture/promote workflows
+- maintenance / freshness / health scoring
+- ontology-sync / graph extraction ambitions
+- human+agent shared context patterns
+
+## What to avoid
+- restoring old vocabulary if it narrows EMA incorrectly
+- reintroducing fragmented source-of-truth split
+- keeping vault/Discord/agent memory as detached subsystems
+
+## Reconciliation target
+EMA should absorb these as regions/capabilities of one system:
+- Discord operations surface
+- QMD/graph/query substrate
+- shared memory/chronicle/recall substrate
+- capture/promote/maintenance loops
+- human+agent workspace conventions
+
+## Immediate deliverables
+- legacy system inventory
+- mechanism-by-mechanism recovery map
+- language translation map
+- source-of-truth reconciliation map
+- migration / revival sequence

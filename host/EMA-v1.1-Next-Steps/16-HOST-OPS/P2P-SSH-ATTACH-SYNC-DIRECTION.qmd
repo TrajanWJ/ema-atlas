@@ -1,0 +1,45 @@
+---
+title: "P2P SSH Attach Sync Direction"
+type: architecture-note
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - cross-pollination-mined
+  - planning-synthesis
+tracks:
+  - host-ops
+  - shell-hq
+  - code-vapp
+format: gfm
+---
+
+# P2P SSH Attach Sync Direction
+
+## Goal
+EMA should support a family of access/coordination modes:
+- local-first
+- SSH attach
+- peer-to-peer-ish remote presence where feasible
+- shared workspace/session sync
+- device and host awareness
+
+## What matters most
+Not branding the transport.
+What matters is the user experience that:
+- the workspace persists
+- sessions are attachable
+- remote hosts feel native to the workspace
+- humans and agents can rendezvous in the same context
+
+## Non-goals
+- inventing a totally bespoke remote desktop stack before core workspace semantics exist
+- conflating file sync, session sync, and live presence into one blurry idea
+
+## Better framing
+Separate:
+- file/object sync
+- session attach/mirror
+- host control
+- graph/query access
+- approval/security boundaries

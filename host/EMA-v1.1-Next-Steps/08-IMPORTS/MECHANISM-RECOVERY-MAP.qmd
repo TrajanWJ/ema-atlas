@@ -1,0 +1,44 @@
+---
+title: "Mechanism Recovery Map"
+type: reconciliation-map
+plane: planning
+status: active
+freshness: recent
+provenance:
+  - legacy-reference
+  - planning-synthesis
+tracks:
+  - knowledge
+  - shell-hq
+  - agent-work
+format: gfm
+---
+
+# Mechanism Recovery Map
+
+## Recover -> Translate -> Re-home
+
+### Discord command loop
+- Recover: quick command/response operations surface
+- Translate: EMA command/ops surface
+- Re-home: Shell / HQ / Discord surface
+
+### Vault/QMD knowledge substrate
+- Recover: filesystem truth + query + linking + graphability
+- Translate: EMA document/graph/query substrate
+- Re-home: Knowledge / Canon / Recall region
+
+### Session summaries / recall
+- Recover: cross-session continuity and durable summaries
+- Translate: chronicle / review / recall
+- Re-home: Chronicle/Review subsystem
+
+### Inbox/capture/promote
+- Recover: capture first, classify later, promote when warranted
+- Translate: EMA capture pipeline
+- Re-home: Inbox / daily steering / knowledge promotion
+
+### Maintenance and freshness
+- Recover: health scoring, stale detection, frontmatter and link discipline
+- Translate: graph health and workspace maintenance
+- Re-home: maintenance/quality system

@@ -1,0 +1,44 @@
+---
+title: "OpenClaw EMA Write Paths"
+type: operations-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - shell-hq
+  - knowledge
+  - agent-work
+format: gfm
+---
+
+# OpenClaw EMA Write Paths
+
+## Goal
+Define where live work should be written so the system becomes durable instead of evaporating into chat/session state.
+
+## Write path rules
+### Session output
+- destination: chronicle / session-summary pages
+- contains: what happened, outcomes, next steps, important links
+
+### Important lesson or failure
+- destination: learnings / memory / gotchas page
+- contains: context, issue, fix, lesson, future rule
+
+### Runtime/config discovery
+- destination: system truth / ops page
+- contains: current fact, source/provenance, date, implications
+
+### Project/workstream movement
+- destination: project/workstream page
+- contains: current phase, changes, blockers, active bindings
+
+### Raw capture
+- destination: inbox/capture page
+- contains: rough fragment, source, date, later classification needed
+
+### Durable architecture or policy insight
+- destination: canon page
+- contains: clearer distilled truth rather than raw session narration

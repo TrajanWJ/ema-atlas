@@ -1,0 +1,39 @@
+---
+title: "Workspace Query Habits"
+type: query-guide
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - knowledge
+  - shell-hq
+format: gfm
+---
+
+# Workspace Query Habits
+
+## Goal
+Make the Ultimate Wiki and workspace actually useful through repeatable query habits.
+
+## Query types
+- by system/topic
+- by workstream/project
+- by object/concept
+- by source family
+- by freshness
+- by canon vs chronicle vs operations
+
+## Useful patterns
+- ask for current truth first
+- then ask for recent chronicle
+- then ask for related legacy/import pages
+- prefer mixed answers instead of single isolated notes
+
+## Example asks
+- current gateway/auth truth
+- all pages about Discord/OpenClaw loop
+- recent chronicle touching vault recovery
+- canon plus recent reality for host bindings

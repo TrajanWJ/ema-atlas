@@ -1,0 +1,32 @@
+---
+title: "Current OpenClaw Ops Hub"
+type: hub
+plane: reality
+status: active
+freshness: recent
+provenance:
+  - live-session
+  - host-inspected
+tracks:
+  - shell-hq
+  - agent-work
+format: gfm
+---
+
+# Current OpenClaw Ops Hub
+
+## Purpose
+Entry point for current OpenClaw operational truth.
+
+## Core connected pages
+- [Current OpenClaw Truth 2026-04-14](../04-CANON/CURRENT-OPENCLAW-TRUTH-2026-04-14.qmd)
+- [OpenClaw Knowledge Ingest Plan](../01-PLANS/OPENCLAW-KNOWLEDGE-INGEST-PLAN.qmd)
+- [OpenClaw EMA Write Paths](../01-PLANS/OPENCLAW-EMA-WRITE-PATHS.qmd)
+- [OpenClaw Discord Vault Loop](../01-PLANS/OPENCLAW-DISCORD-VAULT-LOOP.qmd)
+- [Source of Truth Reconciliation](../04-CANON/SOURCE-OF-TRUTH-RECONCILIATION.qmd)
+
+## Main active truths
+- gateway runtime is up
+- channels are connected
+- memory is active
+- security/config cleanup is needed

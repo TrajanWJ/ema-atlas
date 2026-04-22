@@ -1,0 +1,36 @@
+---
+title: "Source of Truth Reconciliation"
+type: canon-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+tracks:
+  - shell-hq
+  - knowledge
+format: gfm
+---
+
+# Source of Truth Reconciliation
+
+## Runtime truth
+- active config
+- gateway/runtime state
+- host/process/service reality
+- actual channel and agent behavior
+
+## Durable knowledge truth
+- Ultimate Wiki pages
+- canon docs
+- operations pages
+- chronicle/review/recall pages
+
+## Conversational surfaces
+- Discord and other chats
+- command surfaces, not final truth by themselves
+
+## Rule
+Chats initiate, clarify, and steer.
+Durable pages preserve.
+Runtime proves.

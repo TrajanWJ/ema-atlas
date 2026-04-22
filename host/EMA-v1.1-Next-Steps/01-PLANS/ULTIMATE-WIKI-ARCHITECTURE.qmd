@@ -1,0 +1,59 @@
+---
+title: "Ultimate Wiki Architecture"
+type: architecture-note
+plane: canon
+status: active
+freshness: recent
+provenance:
+  - planning-synthesis
+  - legacy-reference
+tracks:
+  - knowledge
+  - shell-hq
+  - agent-work
+format: gfm
+---
+
+# Ultimate Wiki Architecture
+
+## Goal
+Create one reconciled knowledge backbone that combines:
+- old vault power
+- current OpenClaw reality
+- live workspace knowledge
+- the best EMA concepts
+
+## Core role
+The Ultimate Wiki is:
+- filesystem-first
+- QMD/query-friendly
+- human-usable
+- agent-readable
+- chronicle/review/recall capable
+- source-of-truth aware
+- operationally useful, not decorative
+
+## Main layers
+### 1. Identity and worldview
+What the system is, what it is for, how to think about it.
+
+### 2. System truth
+OpenClaw, hosts, channels, gateway, agents, services, nodes, runtime facts.
+
+### 3. Knowledge substrate
+QMD, metadata, linking rules, query habits, graph health, maintenance loops.
+
+### 4. Agent and workspace knowledge
+Agent roster, capabilities, workflows, writeback rules, memory, session behaviors.
+
+### 5. Projects and workstreams
+Active systems, efforts, migrations, codebases, recovery tracks.
+
+### 6. Chronicle and recall
+Session summaries, key events, lessons, reviews, recoveries, decisions.
+
+### 7. Imports and inspirations
+External systems, old vault lineage, EMA concepts, architectural references.
+
+## Principle
+This should become the durable system-of-understanding for everything, not just a note archive.

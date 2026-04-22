@@ -1,0 +1,37 @@
+---
+title: "2026-04-14 OpenClaw Ultimate Wiki Bootstrap Session"
+type: chronicle-entry
+plane: chronicle
+status: active
+freshness: recent
+provenance:
+  - live-session
+  - planning-synthesis
+tracks:
+  - knowledge
+  - shell-hq
+  - agent-work
+format: gfm
+---
+
+# 2026-04-14 OpenClaw Ultimate Wiki Bootstrap Session
+
+## What happened
+This session pivoted away from EMA-as-app ideation and toward recovering the old Discord/OpenClaw/QMD/vault system into one new Ultimate Wiki / knowledge backbone.
+
+## Key outcomes
+- treated the old vault as first-class prior art
+- defined the Ultimate Wiki direction
+- wrote architecture, source-map, migration, ingest, query, writeback, and source-of-truth docs
+- reframed the goal as bootstrapable through current OpenClaw + Discord + vault/QMD + durable writeback
+
+## Important current truth learned
+- OpenClaw is running and actively in use
+- the current system already has real runtime, channels, agents, and memory
+- the next step is no longer just planning; it is active ingest and writeback
+
+## Next steps
+- ingest current OpenClaw truth into durable pages
+- begin old-vault mapping into new hub structure
+- create stronger hub/index pages
+- use this session as the first true chronicle entry in the new system

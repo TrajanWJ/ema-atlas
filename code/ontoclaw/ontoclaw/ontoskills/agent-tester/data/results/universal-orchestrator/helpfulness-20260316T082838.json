@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082838",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes actionable fix (pip install requests, pip3 install requests) and mentions virtual environments with activation commands for both Unix and Windows."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.92,
+        "reason": "Response thoroughly explains conflict markers (<<<, ===, >>>), provides clear steps to resolve conflicts, and explicitly mentions git add and git commit. Also covers additional useful topics like lockfile regeneration, duplicate keys, JSON validation, and --ours/--theirs options. Minor deduction because it noted no active conflict exists (which is accurate but wasn't part of the evaluation criteria)."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes well over 2 diagnostic commands (top, htop, ps aux, mpstat, pidstat, uptime, iostat, iotop, strace, lsof) with detailed explanations of output interpretation, including how to sort in top, what different CPU metrics mean, and a symptom-to-check table for identifying culprits."
+      }
+    }
+  ]
+}

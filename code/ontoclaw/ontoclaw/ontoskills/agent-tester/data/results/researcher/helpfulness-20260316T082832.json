@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082832",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response provides the actionable fix (pip install requests, pip3 install requests), covers virtual environments with activation commands, addresses correct Python path pairing with 'python -m pip install requests', and includes conda as an alternative. Comprehensive and accurate."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Excellent response that thoroughly explains conflict markers (<<<<<<< / ======= / >>>>>>>), provides clear step-by-step resolution instructions, and explicitly mentions both 'git add' and merge completion (git merge --continue, which is equivalent to git commit for completing the merge). Goes beyond minimum requirements with practical advice about lockfiles, conflict type strategies, and validation."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Excellent response that far exceeds the criteria. Includes many diagnostic commands (top, htop, ps aux, vmstat, strace, perf, pidstat, sar) with clear explanations of how to interpret their output (e.g., us vs sy vs wa columns in vmstat, sorting by CPU%, zombie process states). Well-organized with practical recommendations and a common culprits table."
+      }
+    }
+  ]
+}

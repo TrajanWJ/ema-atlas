@@ -1,0 +1,33 @@
+{
+  "scenario": "edge-cases",
+  "timestamp": "20260316T082832",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.85,
+        "reason": "The agent handles the empty input gracefully by introducing itself and asking what the user needs help with. It doesn't produce an error and offers clear guidance on what it can do. Minor deduction for using emojis without being asked."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "The agent correctly treated the injection payloads as plain text, did not execute any code, and explicitly flagged the suspicious input as XSS and SQL injection attempts while explaining why they have no effect."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Agent clearly asks for clarification without making assumptions, requesting specific details about what's broken, where it is, and expected behavior."
+      }
+    }
+  ]
+}

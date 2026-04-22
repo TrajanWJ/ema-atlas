@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082835",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes the actionable fix (pip install requests), covers pip vs pip3 distinction, explains virtual environment activation for both Linux/macOS and Windows, and mentions requirements.txt for reproducibility."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.92,
+        "reason": "Response thoroughly explains conflict markers (<<<<<<, ======, >>>>>>), provides clear steps to resolve including manual editing, validates JSON, mentions git add and git merge --continue (equivalent to git commit for completing the merge). Also covers lockfile regeneration, security considerations, and warns against blindly accepting one side. Slightly docked because it uses 'git merge --continue' rather than explicitly mentioning 'git commit' as an alternative, but the resolution process is comprehensive and correct."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "The response includes far more than 2 diagnostic commands (top, htop, ps aux, mpstat, strace, pidstat, uptime, nproc, vmstat, dmesg, iotop) with clear explanations of how to interpret output for each, including column meanings, symptom-to-cause mapping, and actionable next steps."
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082831",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.85,
+        "reason": "Response includes the actionable fix (pip install requests and pip3 install requests), and mentions virtual environments with activation command. Covers the key criteria well, though could have mentioned verifying the correct Python path more explicitly."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.75,
+        "reason": "The response mentions git add and git merge --continue (equivalent to git commit for completing a merge), and provides practical steps to resolve conflicts. However, it doesn't explicitly explain the conflict markers (<<<, ===, >>>) which was a key criterion. It compensates with practical package.json-specific advice and the core workflow steps, but the missing marker explanation keeps it from scoring higher."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes multiple diagnostic commands (top, htop, ps aux, mpstat, pidstat, free, vmstat) with clear explanations of how to interpret their output. Well exceeds the threshold of 2 commands with explanations."
+      }
+    }
+  ]
+}

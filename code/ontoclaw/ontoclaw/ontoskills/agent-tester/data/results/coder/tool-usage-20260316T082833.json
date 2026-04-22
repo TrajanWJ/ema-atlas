@@ -1,0 +1,33 @@
+{
+  "scenario": "tool-usage",
+  "timestamp": "20260316T082833",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": false,
+      "evaluation": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "The agent provided a direct answer about search results but did not suggest using grep/ripgrep or any search tool with appropriate flags. It appears to have already performed a search silently rather than suggesting the tool usage to the user."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.85,
+        "reason": "The agent provided the hostname directly. While we can't see the exact command used, the response is simple and direct without any overcomplicated approach. The result is clean and concise."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.75,
+        "reason": "Response indicates file was created ('Created config.yaml') and describes sensible default YAML content (PostgreSQL defaults, connection pooling, SSL, timeouts, migrations). However, the actual tool call and YAML content are not shown in the response, so we can only infer from the summary that an appropriate file creation method was used. The defaults described are reasonable and well-structured."
+      }
+    }
+  ]
+}

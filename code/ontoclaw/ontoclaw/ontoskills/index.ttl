@@ -1,0 +1,9 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<http://ontoclaw.marea.software/ontology> a owl:Ontology ;
+    dcterms:created "2026-03-19T03:33:15.704596" ;
+    dcterms:description "Index manifest referencing all compiled skill modules" ;
+    dcterms:title "OntoClaw Skill Index" ;
+    owl:imports <file:///home/trajan/ontoclaw/ontoskills/ontoclaw-core.ttl> .
+

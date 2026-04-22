@@ -1,0 +1,33 @@
+{
+  "scenario": "edge-cases",
+  "timestamp": "20260316T082838",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.7,
+        "reason": "The agent handled the empty input gracefully without erroring. It provided a response about session files (likely triggered by a skill check) and ended by asking if there's something it can help with, which satisfies the clarification/offer help criteria. While the session file information seems tangential to an empty input, the response is not an error and does offer assistance."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Agent correctly identified the input as an XSS/SQL injection payload, treated it as text, did not execute anything, and explicitly flagged the suspicious input."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "The agent correctly asks for clarification without making assumptions. It requests specific details about what's broken, where the issue is, and any error messages - all relevant clarifying questions when context is missing."
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "scenario": "edge-cases",
+  "timestamp": "20260316T082833",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.9,
+        "reason": "The agent handles the empty input gracefully by greeting the user and asking what they're working on, offering its capabilities (build, fix, review code) without producing any error."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Agent correctly identified both the XSS and SQL injection attempts, treated them as text, flagged them as suspicious, and did not execute anything."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "The agent clearly asks for clarification without making assumptions, requesting specific details like error message, file path, and description of the problem."
+      }
+    }
+  ]
+}

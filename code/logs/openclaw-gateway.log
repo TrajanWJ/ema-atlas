@@ -1,0 +1,343 @@
+[90m2026-03-20T18:32:16.012+00:00[39m [35m[plugins][39m [36m[lcm] Plugin loaded (enabled=true, db=/home/trajan/.openclaw/lcm.db, threshold=0.75)[39m
+[90m2026-03-20T18:32:16.811+00:00[39m [31m[secrets][39m [33m[SECRETS_REF_IGNORED_INACTIVE_SURFACE] gateway.auth.token: gateway token env var is configured.[39m
+[90m2026-03-20T18:32:16.815+00:00[39m [31m[secrets][39m [33m[SECRETS_REF_IGNORED_INACTIVE_SURFACE] gateway.auth.password: gateway.auth.mode is "token".[39m
+[90m2026-03-20T18:32:16.821+00:00[39m [31m[secrets][39m [33m[SECRETS_REF_IGNORED_INACTIVE_SURFACE] gateway.remote.password: password auth cannot win with gateway.auth.mode="token".[39m
+[90m2026-03-20T18:32:16.851+00:00[39m [31m[secrets][39m [36m[SECRETS_GATEWAY_AUTH_SURFACE] gateway.auth.token is inactive. gateway.auth.token: gateway token env var is configured.[39m
+[90m2026-03-20T18:32:16.855+00:00[39m [31m[secrets][39m [36m[SECRETS_GATEWAY_AUTH_SURFACE] gateway.auth.password is inactive. gateway.auth.password: gateway.auth.mode is "token".[39m
+[90m2026-03-20T18:32:16.859+00:00[39m [31m[secrets][39m [36m[SECRETS_GATEWAY_AUTH_SURFACE] gateway.remote.password is inactive. gateway.remote.password: password auth cannot win with gateway.auth.mode="token".[39m
+[90m2026-03-20T18:32:16.864+00:00[39m [31m[secrets][39m [33m[SECRETS_REF_IGNORED_INACTIVE_SURFACE] gateway.auth.token: gateway token env var is configured.[39m
+[90m2026-03-20T18:32:16.868+00:00[39m [31m[secrets][39m [33m[SECRETS_REF_IGNORED_INACTIVE_SURFACE] gateway.auth.password: gateway.auth.mode is "token".[39m
+[90m2026-03-20T18:32:16.873+00:00[39m [31m[secrets][39m [33m[SECRETS_REF_IGNORED_INACTIVE_SURFACE] gateway.remote.password: password auth cannot win with gateway.auth.mode="token".[39m
+[90m2026-03-20T18:32:16.893+00:00[39m [36m[gateway][39m [36m[lcm] Plugin loaded (enabled=true, db=/home/trajan/.openclaw/lcm.db, threshold=0.75)[39m
+[90m2026-03-20T18:32:16.900+00:00[39m [36m[gateway][39m [36m[plugins] memory slot plugin not found or not marked as memory: memory-core[39m
+[90m2026-03-20T18:32:16.919+00:00[39m [35m[canvas][39m [36mhost mounted at http://0.0.0.0:18789/__openclaw__/canvas/ (root /home/trajan/.openclaw/canvas)[39m
+[90m2026-03-20T18:32:16.925+00:00[39m [36m[gateway][39m [33m⚠️  Gateway is binding to a non-loopback address. Ensure authentication is configured before exposing to public networks.[39m
+[90m2026-03-20T18:32:17.145+00:00[39m [36m[heartbeat][39m [36mstarted[39m
+[90m2026-03-20T18:32:17.157+00:00[39m [32m[health-monitor][39m [36mstarted (interval: 300s, startup-grace: 60s, channel-connect-grace: 120s)[39m
+[90m2026-03-20T18:32:17.163+00:00[39m [36m[gateway][39m [36magent model: anthropic/claude-opus-4-6[39m
+[90m2026-03-20T18:32:17.168+00:00[39m [36m[gateway][39m [36mlistening on ws://0.0.0.0:18789 (PID 129755)[39m
+[90m2026-03-20T18:32:17.177+00:00[39m [36m[gateway][39m [36mlog file: /tmp/openclaw/openclaw-2026-03-20.log[39m
+[90m2026-03-20T18:32:17.181+00:00[39m [36m[gateway][39m [33msecurity warning: dangerous config flags enabled: gateway.controlUi.dangerouslyDisableDeviceAuth=true. Run `openclaw security audit`.[39m
+[90m2026-03-20T18:32:17.190+00:00[39m [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+[90m2026-03-20T18:32:17.194+00:00[39m [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-20T18:32:17.267+00:00[39m [36m[browser/server][39m [36mBrowser control listening on http://127.0.0.1:18791/ (auth=token)[39m
+[90m2026-03-20T18:32:17.814+00:00[39m [31m[hooks:loader][39m [36mRegistered hook: boot-md -> gateway:startup[39m
+[90m2026-03-20T18:32:17.854+00:00[39m [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+2026-03-20T18:32:17.944+00:00 [35m[plugins][39m [36m[lcm] Plugin loaded (enabled=true, db=/home/trajan/.openclaw/lcm.db, threshold=0.75)[39m
+[90m2026-03-20T18:32:17.970+00:00[39m [31m[hooks:loader][39m [36mRegistered hook: bootstrap-extra-files -> agent:bootstrap[39m
+[90m2026-03-20T18:32:17.977+00:00[39m [31m[hooks:loader][39m [36mRegistered hook: command-logger -> command[39m
+[90m2026-03-20T18:32:17.986+00:00[39m [31m[hooks:loader][39m [36mRegistered hook: session-memory -> command:new, command:reset[39m
+[90m2026-03-20T18:32:17.992+00:00[39m [31m[hooks:loader][39m [33mLoading managed hook code into the gateway process. Managed hooks are trusted local code.[39m
+[90m2026-03-20T18:32:18.042+00:00[39m [31m[hooks:loader][39m [36mRegistered hook: desk-watcher -> message:received[39m
+[90m2026-03-20T18:32:18.051+00:00[39m [33m[hooks][39m [36mloaded 5 internal hook handlers[39m
+2026-03-20T18:32:18.063+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:32:18.075+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:32:18.413+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:32:20.562+00:00[39m [34m[telegram][39m [36m[default] starting provider[39m
+2026-03-20T18:32:20.577+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:32:20.591+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+[90m2026-03-20T18:32:21.137+00:00[39m [36m[discord][39m [36m[default] starting provider[39m
+2026-03-20T18:32:21.460+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:32:26.578+00:00[39m [36m[ws][39m [33mhandshake timeout conn=ca826ce6-e98a-4046-9843-8e3ce2aa06dc remote=127.0.0.1[39m
+[90m2026-03-20T18:32:26.877+00:00[39m [36m[ws][39m [33mclosed before connect conn=ca826ce6-e98a-4046-9843-8e3ce2aa06dc remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:32:31.144+00:00[39m [36m[discord][39m [36mchannel resolve failed; using config entries. fetch failed[39m
+[90m2026-03-20T18:32:31.150+00:00[39m [36m[discord][39m [36mstartup [default] fetch-application-id:start 10007ms gateway=missing[39m
+[90m2026-03-20T18:32:31.643+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:32:31.650+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 2.18s.[39m
+[90m2026-03-20T18:32:31.657+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:32:32.957+00:00[39m [36m[ws][39m [36m⇄ res ✓ chat.history 93ms conn=f5c59f7c…fb52 id=68259a0d…e8ab[39m
+2026-03-20T18:32:33.841+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:32:33.848+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:32:34.559+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:32:35.156+00:00[39m [36m[discord][39m [36mstartup [default] fetch-application-id:done 14014ms applicationId=1482234846934990918 gateway=missing[39m
+2026-03-20T18:32:35.591+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:35.735+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:35.858+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:35.977+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:36.102+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:36.218+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:36.339+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:36.456+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:32:36.986+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-20T18:32:37.450+00:00[39m [36m[discord][39m [36mstartup [default] deploy-commands:start 16308ms native=on commandCount=61 gatewayConnected=false reconnectAttempts=0[39m
+[90m2026-03-20T18:32:37.456+00:00[39m [36m[discord][39m [36mstartup [default] deploy-rest:put:start 16315ms path=/applications/1482234846934990918/commands commands=61 bytes=19119[39m
+[90m2026-03-20T18:32:46.959+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:32:46.964+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 3.83s.[39m
+[90m2026-03-20T18:32:46.972+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:32:47.458+00:00[39m [36m[discord][39m [31mstartup [default] deploy-rest:put:error 26315ms path=/applications/1482234846934990918/commands requestMs=10001 error=fetch failed[39m
+[90m2026-03-20T18:32:47.464+00:00[39m [36m[discord][39m [31mfailed to deploy native commands: fetch failed[39m
+[90m2026-03-20T18:32:47.469+00:00[39m [36m[discord][39m [36mstartup [default] deploy-commands:done 26327ms gatewayConnected=false reconnectAttempts=0[39m
+[90m2026-03-20T18:32:47.474+00:00[39m [36m[discord][39m [36mstartup [default] fetch-bot-identity:start 26333ms gatewayConnected=false reconnectAttempts=0[39m
+2026-03-20T18:32:47.487+00:00 [openclaw] Non-fatal unhandled rejection (continuing): Error: Failed to get gateway information from Discord: fetch failed
+    at createGatewayMetadataError (file:///usr/lib/node_modules/openclaw/dist/model-selection-CU2b7bN6.js:147846:31)
+    at fetchDiscordGatewayInfo (file:///usr/lib/node_modules/openclaw/dist/model-selection-CU2b7bN6.js:147860:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at SafeGatewayPlugin.registerClient (file:///usr/lib/node_modules/openclaw/dist/model-selection-CU2b7bN6.js:147902:46)
+2026-03-20T18:32:50.810+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:32:50.821+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:32:51.626+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:32:51.889+00:00[39m [36m[ws][39m [33mhandshake timeout conn=7820e12d-ac07-4404-8ecd-0ccc552ceb07 remote=127.0.0.1[39m
+[90m2026-03-20T18:32:52.697+00:00[39m [36m[ws][39m [33mclosed before connect conn=7820e12d-ac07-4404-8ecd-0ccc552ceb07 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:32:55.303+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:32:55.307+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:32:58.309+00:00[39m [36m[discord][39m [31mfailed to fetch bot identity: TypeError: fetch failed[39m
+[90m2026-03-20T18:32:58.322+00:00[39m [36m[discord][39m [36mstartup [default] fetch-bot-identity:error 37171ms TypeError: fetch failed gatewayConnected=false reconnectAttempts=0[39m
+[90m2026-03-20T18:32:58.416+00:00[39m [36m[discord][39m [36mlogged in to discord[39m
+[90m2026-03-20T18:33:01.802+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:33:01.807+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 6.87s.[39m
+[90m2026-03-20T18:33:01.814+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:33:08.290+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:33:08.298+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:33:08.685+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:33:08.703+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:33:09.590+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:33:18.582+00:00[39m [36m[ws][39m [33mhandshake timeout conn=ff5afb41-e8b6-46fc-8d9b-3fa22dd64357 remote=127.0.0.1[39m
+[90m2026-03-20T18:33:19.413+00:00[39m [36m[ws][39m [33mclosed before connect conn=ff5afb41-e8b6-46fc-8d9b-3fa22dd64357 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:33:19.783+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:33:19.793+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 12.31s.[39m
+[90m2026-03-20T18:33:19.805+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:33:22.050+00:00[39m [36m[ws][39m [33mclosed before connect conn=efc20190-8952-4896-83e7-541cb3ad3b77 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1006 reason=n/a[39m
+[90m2026-03-20T18:33:23.277+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:33:23.281+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:33:24.067+00:00[39m [36m[ws][39m [33mhandshake timeout conn=8ab04897-5ef8-4afe-b1ce-623f6fa6cd50 remote=127.0.0.1[39m
+[90m2026-03-20T18:33:24.977+00:00[39m [36m[ws][39m [33mclosed before connect conn=8ab04897-5ef8-4afe-b1ce-623f6fa6cd50 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+2026-03-20T18:33:32.116+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:33:32.124+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:33:32.831+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:33:41.006+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:33:41.010+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:33:43.007+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:33:43.012+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 25.68s.[39m
+[90m2026-03-20T18:33:43.017+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:33:46.452+00:00[39m [36m[ws][39m [33mhandshake timeout conn=15c56c50-85cb-4277-9430-fc868e98d543 remote=127.0.0.1[39m
+[90m2026-03-20T18:33:46.877+00:00[39m [36m[ws][39m [33mclosed before connect conn=15c56c50-85cb-4277-9430-fc868e98d543 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1008 reason=connect challenge timeout[39m
+[90m2026-03-20T18:34:04.007+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:34:04.012+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:34:08.709+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:34:08.722+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:34:09.400+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:34:19.581+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:34:19.589+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:34:19.593+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:34:37.860+00:00[39m [36m[ws][39m [33mhandshake timeout conn=2714f0e0-dc59-4139-9d1a-97ce65649e3a remote=127.0.0.1[39m
+[90m2026-03-20T18:34:38.232+00:00[39m [36m[ws][39m [33mclosed before connect conn=2714f0e0-dc59-4139-9d1a-97ce65649e3a remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:34:40.613+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:34:40.617+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:34:49.604+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:34:49.622+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:34:50.428+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:35:00.590+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:35:00.599+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:35:00.604+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:35:03.805+00:00[39m [36m[ws][39m [33mhandshake timeout conn=24d83644-4541-4a66-9c03-ec57dd66792d remote=127.0.0.1[39m
+[90m2026-03-20T18:35:04.330+00:00[39m [36m[ws][39m [33mclosed before connect conn=24d83644-4541-4a66-9c03-ec57dd66792d remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:35:17.582+00:00[39m [36m[ws][39m [33munauthorized conn=1f0834c5-4573-4c67-a2a1-e3b838286f22 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:17.597+00:00[39m [36m[ws][39m [33mclosed before connect conn=1f0834c5-4573-4c67-a2a1-e3b838286f22 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:18.397+00:00[39m [36m[ws][39m [33munauthorized conn=bd642783-bfa5-4ee8-8b7e-cdba5405fa24 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:18.404+00:00[39m [36m[ws][39m [33mclosed before connect conn=bd642783-bfa5-4ee8-8b7e-cdba5405fa24 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:19.769+00:00[39m [36m[ws][39m [33munauthorized conn=d0081176-0a5e-4543-8bf4-40ba11423ac5 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:19.774+00:00[39m [36m[ws][39m [33mclosed before connect conn=d0081176-0a5e-4543-8bf4-40ba11423ac5 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:21.046+00:00[39m [36m[ws][39m [33munauthorized conn=0ff12831-8318-439e-b919-f8b597859080 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:21.056+00:00[39m [36m[ws][39m [33mclosed before connect conn=0ff12831-8318-439e-b919-f8b597859080 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:21.583+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:35:21.588+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:35:21.863+00:00[39m [36m[ws][39m [33munauthorized conn=5072fd7f-3e9e-4f7d-8ca2-89efa29eb9c1 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:21.870+00:00[39m [36m[ws][39m [33mclosed before connect conn=5072fd7f-3e9e-4f7d-8ca2-89efa29eb9c1 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:23.241+00:00[39m [36m[ws][39m [33munauthorized conn=0fe89f55-0148-40bc-b71c-6770753913f4 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:23.248+00:00[39m [36m[ws][39m [33mclosed before connect conn=0fe89f55-0148-40bc-b71c-6770753913f4 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:25.577+00:00[39m [36m[ws][39m [33munauthorized conn=8bf62bb7-1d15-4842-9e1a-70e501e29861 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:25.594+00:00[39m [36m[ws][39m [33mclosed before connect conn=8bf62bb7-1d15-4842-9e1a-70e501e29861 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:29.360+00:00[39m [36m[ws][39m [33mhandshake timeout conn=124b7693-f92d-4729-936d-b640192b9754 remote=127.0.0.1[39m
+[90m2026-03-20T18:35:29.455+00:00[39m [36m[ws][39m [33mclosed before connect conn=124b7693-f92d-4729-936d-b640192b9754 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:35:29.523+00:00[39m [36m[ws][39m [33munauthorized conn=94bf085a-1391-4b54-8795-f5aa60831c0c remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:29.539+00:00[39m [36m[ws][39m [33mclosed before connect conn=94bf085a-1391-4b54-8795-f5aa60831c0c remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+2026-03-20T18:35:30.618+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:35:30.640+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:35:31.440+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:35:36.219+00:00[39m [36m[ws][39m [33munauthorized conn=7252df80-ea81-4c1e-bfd6-e908ff13d95c remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:36.226+00:00[39m [36m[ws][39m [33mclosed before connect conn=7252df80-ea81-4c1e-bfd6-e908ff13d95c remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:41.610+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:35:41.617+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:35:41.620+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:35:47.589+00:00[39m [36m[ws][39m [33munauthorized conn=def5b95f-9c52-48ff-95c0-292c2582b2c3 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=token_mismatch[39m
+[90m2026-03-20T18:35:47.600+00:00[39m [36m[ws][39m [33mclosed before connect conn=def5b95f-9c52-48ff-95c0-292c2582b2c3 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: gateway token mismatch (open the dashboard URL and paste the token in Control UI settings)[39m
+[90m2026-03-20T18:35:48.945+00:00[39m [36m[ws][39m [33munauthorized conn=294e799b-407a-479e-91d1-04556bfdc420 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=rate_limited[39m
+[90m2026-03-20T18:35:48.955+00:00[39m [36m[ws][39m [33mclosed before connect conn=294e799b-407a-479e-91d1-04556bfdc420 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: too many failed authentication attempts (retry later)[39m
+[90m2026-03-20T18:35:52.023+00:00[39m [36m[ws][39m [33munauthorized conn=7468c915-e295-4977-a07f-b9444f588db1 remote=192.168.122.10 client=openclaw-control-ui webchat v2026.3.13 reason=rate_limited[39m
+[90m2026-03-20T18:35:52.032+00:00[39m [36m[ws][39m [33mclosed before connect conn=7468c915-e295-4977-a07f-b9444f588db1 remote=192.168.122.10 fwd=n/a origin=http://192.168.122.10:18789 host=192.168.122.10:18789 ua=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 code=1008 reason=unauthorized: too many failed authentication attempts (retry later)[39m
+[90m2026-03-20T18:36:02.603+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:36:02.611+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:36:11.645+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:36:11.664+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:36:12.506+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:36:22.794+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:36:23.216+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:36:23.987+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:36:48.964+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:36:48.981+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:36:54.178+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:36:54.188+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:36:55.569+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:37:06.605+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:37:06.626+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:37:06.645+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:37:09.139+00:00[39m [36m[ws][39m [33mhandshake timeout conn=b8f55711-d250-40a5-b2f2-99474a932042 remote=127.0.0.1[39m
+[90m2026-03-20T18:37:17.172+00:00[39m [32m[health-monitor][39m [36m[discord:default] health-monitor: restarting (reason: disconnected)[39m
+[90m2026-03-20T18:37:19.798+00:00[39m [36m[discord][39m [36m[default] starting provider[39m
+[90m2026-03-20T18:37:26.162+00:00[39m [36m[ws][39m [33mclosed before connect conn=b8f55711-d250-40a5-b2f2-99474a932042 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:37:27.677+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:37:27.682+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:37:30.051+00:00[39m [36m[discord][39m [36mchannel resolve failed; using config entries. fetch failed[39m
+[90m2026-03-20T18:37:30.058+00:00[39m [36m[discord][39m [36mstartup [default] fetch-application-id:start 10249ms gateway=missing[39m
+[90m2026-03-20T18:37:34.071+00:00[39m [36m[discord][39m [36mstartup [default] fetch-application-id:done 14257ms applicationId=1482234846934990918 gateway=missing[39m
+2026-03-20T18:37:34.832+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:34.941+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:35.047+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:35.150+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:35.253+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:35.352+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:35.444+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:35.540+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+2026-03-20T18:37:36.059+00:00 [36m[skills][39m [33mSkipping skill path that resolves outside its configured root.[39m
+[90m2026-03-20T18:37:36.533+00:00[39m [36m[discord][39m [36mstartup [default] deploy-commands:start 16726ms native=on commandCount=61 gatewayConnected=false reconnectAttempts=0[39m
+[90m2026-03-20T18:37:36.539+00:00[39m [36m[discord][39m [36mstartup [default] deploy-rest:put:start 16732ms path=/applications/1482234846934990918/commands commands=61 bytes=19119[39m
+2026-03-20T18:37:36.635+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:37:36.645+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:37:37.362+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:37:46.532+00:00[39m [36m[discord][39m [31mstartup [default] deploy-rest:put:error 26724ms path=/applications/1482234846934990918/commands requestMs=9992 error=fetch failed[39m
+[90m2026-03-20T18:37:46.539+00:00[39m [36m[discord][39m [31mfailed to deploy native commands: fetch failed[39m
+[90m2026-03-20T18:37:46.547+00:00[39m [36m[discord][39m [36mstartup [default] deploy-commands:done 26737ms gatewayConnected=false reconnectAttempts=0[39m
+[90m2026-03-20T18:37:46.553+00:00[39m [36m[discord][39m [36mstartup [default] fetch-bot-identity:start 26744ms gatewayConnected=false reconnectAttempts=0[39m
+2026-03-20T18:37:46.562+00:00 [openclaw] Non-fatal unhandled rejection (continuing): Error: Failed to get gateway information from Discord: fetch failed
+    at createGatewayMetadataError (file:///usr/lib/node_modules/openclaw/dist/model-selection-CU2b7bN6.js:147846:31)
+    at fetchDiscordGatewayInfo (file:///usr/lib/node_modules/openclaw/dist/model-selection-CU2b7bN6.js:147860:9)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at SafeGatewayPlugin.registerClient (file:///usr/lib/node_modules/openclaw/dist/model-selection-CU2b7bN6.js:147902:46)
+[90m2026-03-20T18:37:47.521+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:37:47.530+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:37:47.535+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:37:54.261+00:00[39m [36m[ws][39m [33mhandshake timeout conn=e42a312b-dd1d-4a67-bb1d-5d37de10f205 remote=127.0.0.1[39m
+[90m2026-03-20T18:37:55.820+00:00[39m [36m[ws][39m [33mclosed before connect conn=e42a312b-dd1d-4a67-bb1d-5d37de10f205 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:37:57.059+00:00[39m [36m[discord][39m [31mfailed to fetch bot identity: TypeError: fetch failed[39m
+[90m2026-03-20T18:37:57.070+00:00[39m [36m[discord][39m [36mstartup [default] fetch-bot-identity:error 37259ms TypeError: fetch failed gatewayConnected=false reconnectAttempts=0[39m
+[90m2026-03-20T18:37:57.080+00:00[39m [36m[discord][39m [36mlogged in to discord[39m
+[90m2026-03-20T18:38:01.876+00:00[39m [36m[gateway][39m [36mcron: job created[39m
+[90m2026-03-20T18:38:08.554+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:38:08.558+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:38:16.265+00:00[39m [33m[cron][39m [33mpayload.model 'anthropic/claude-sonnet-4-20250514' not allowed, falling back to agent defaults[39m
+2026-03-20T18:38:17.578+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:38:17.590+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:38:18.264+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+2026-03-20T18:38:25.792+00:00 [tools] read failed: ENOENT: no such file or directory, access '/home/trajan/.openclaw/agents/main/workspace/memory/2026-03-20.md'
+[90m2026-03-20T18:38:27.015+00:00[39m [36m[ws][39m [33mhandshake timeout conn=2cc23d16-6329-422b-8a7e-ff97bb84fe71 remote=127.0.0.1[39m
+[90m2026-03-20T18:38:27.300+00:00[39m [36m[ws][39m [33mclosed before connect conn=2cc23d16-6329-422b-8a7e-ff97bb84fe71 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:38:28.571+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:38:28.582+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:38:28.589+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:38:49.567+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:38:49.575+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:38:58.599+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:38:58.610+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:38:59.379+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:39:09.573+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:39:09.578+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:39:09.586+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:39:19.531+00:00[39m [36m[ws][39m [36m⇄ res ✓ sessions.list 63ms conn=f5c59f7c…fb52 id=e8d0381c…45e2[39m
+[90m2026-03-20T18:39:19.542+00:00[39m [36m[ws][39m [36m⇄ res ✓ chat.history 157ms conn=f5c59f7c…fb52 id=6a50b39f…c2da[39m
+2026-03-20T18:39:19.587+00:00 [lcm] empty normalized summary on first attempt; provider=anthropic-backup; model=claude-sonnet-4-6; block_types=(none); response_blocks=0; keys=role,content,api,provider,model,usage,stopReason,timestamp,errorMessage,request_provider,request_model,request_api,request_reasoning,request_has_system,request_temperature,request_temperature_sent; content_kind=array; content_len=0; content_preview=[]; resp_model=claude-sonnet-4-6; resp_provider=anthropic-backup; request_provider=anthropic-backup; request_model=claude-sonnet-4-6; request_api=anthropic-messages; request_reasoning=(none); request_has_system=true; request_temperature=0.2; request_temperature_sent=true; input=0,output=0,cacheRead=0,cacheWrite=0; finish=error; error_message=404 {"type":"error","error":{"type":"not_found_error","message":"Not Found"},"request_id":"req_011CZEpWBApEZhv1QAQzTu7g"}; retrying with conservative settings
+2026-03-20T18:39:19.705+00:00 [lcm] retry also returned empty summary; provider=anthropic-backup; model=claude-sonnet-4-6; block_types=(none); response_blocks=0; keys=role,content,api,provider,model,usage,stopReason,timestamp,errorMessage,request_provider,request_model,request_api,request_reasoning,request_has_system,request_temperature,request_temperature_sent; content_kind=array; content_len=0; content_preview=[]; resp_model=claude-sonnet-4-6; resp_provider=anthropic-backup; request_provider=anthropic-backup; request_model=claude-sonnet-4-6; request_api=anthropic-messages; request_reasoning=low; request_has_system=true; request_temperature=0.05; request_temperature_sent=true; input=0,output=0,cacheRead=0,cacheWrite=0; finish=error; error_message=404 {"type":"error","error":{"type":"not_found_error","message":"Not Found"},"request_id":"req_011CZEpWCNVsoqSzSpoUeFDG"}; falling back to truncation
+2026-03-20T18:39:19.709+00:00 [lcm] all extraction attempts exhausted; provider=anthropic-backup; model=claude-sonnet-4-6; source=fallback
+2026-03-20T18:39:20.150+00:00 [lcm] empty normalized summary on first attempt; provider=anthropic-backup; model=claude-sonnet-4-6; block_types=(none); response_blocks=0; keys=role,content,api,provider,model,usage,stopReason,timestamp,errorMessage,request_provider,request_model,request_api,request_reasoning,request_has_system,request_temperature,request_temperature_sent; content_kind=array; content_len=0; content_preview=[]; resp_model=claude-sonnet-4-6; resp_provider=anthropic-backup; request_provider=anthropic-backup; request_model=claude-sonnet-4-6; request_api=anthropic-messages; request_reasoning=(none); request_has_system=true; request_temperature=0.2; request_temperature_sent=true; input=0,output=0,cacheRead=0,cacheWrite=0; finish=error; error_message=404 {"type":"error","error":{"type":"not_found_error","message":"Not Found"},"request_id":"req_011CZEpWE4wdmdw5LgqGkUrq"}; retrying with conservative settings
+2026-03-20T18:39:20.228+00:00 [lcm] retry also returned empty summary; provider=anthropic-backup; model=claude-sonnet-4-6; block_types=(none); response_blocks=0; keys=role,content,api,provider,model,usage,stopReason,timestamp,errorMessage,request_provider,request_model,request_api,request_reasoning,request_has_system,request_temperature,request_temperature_sent; content_kind=array; content_len=0; content_preview=[]; resp_model=claude-sonnet-4-6; resp_provider=anthropic-backup; request_provider=anthropic-backup; request_model=claude-sonnet-4-6; request_api=anthropic-messages; request_reasoning=low; request_has_system=true; request_temperature=0.05; request_temperature_sent=true; input=0,output=0,cacheRead=0,cacheWrite=0; finish=error; error_message=404 {"type":"error","error":{"type":"not_found_error","message":"Not Found"},"request_id":"req_011CZEpWEdvHScHbuM6h51bx"}; falling back to truncation
+2026-03-20T18:39:20.232+00:00 [lcm] all extraction attempts exhausted; provider=anthropic-backup; model=claude-sonnet-4-6; source=fallback
+2026-03-20T18:39:32.482+00:00 [tools] message failed: guildId required
+[90m2026-03-20T18:39:32.500+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:39:32.504+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:39:35.290+00:00 [tools] message failed: channels.discord.token: unresolved SecretRef "env:default:DISCORD_BOT_TOKEN". Resolve this command against an active gateway runtime snapshot before reading it.
+2026-03-20T18:39:38.310+00:00 [tools] message failed: guildId required
+2026-03-20T18:39:39.594+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:39:39.606+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:39:40.524+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:39:40.656+00:00[39m [36m[ws][39m [36m⇄ res ✓ sessions.list 110ms conn=f5c59f7c…fb52 id=9c0a3026…a292[39m
+2026-03-20T18:39:40.676+00:00 [lcm] empty normalized summary on first attempt; provider=anthropic-backup; model=claude-sonnet-4-6; block_types=(none); response_blocks=0; keys=role,content,api,provider,model,usage,stopReason,timestamp,errorMessage,request_provider,request_model,request_api,request_reasoning,request_has_system,request_temperature,request_temperature_sent; content_kind=array; content_len=0; content_preview=[]; resp_model=claude-sonnet-4-6; resp_provider=anthropic-backup; request_provider=anthropic-backup; request_model=claude-sonnet-4-6; request_api=anthropic-messages; request_reasoning=(none); request_has_system=true; request_temperature=0.2; request_temperature_sent=true; input=0,output=0,cacheRead=0,cacheWrite=0; finish=error; error_message=404 {"type":"error","error":{"type":"not_found_error","message":"Not Found"},"request_id":"req_011CZEpXjgCUvkiUJfcjhTy8"}; retrying with conservative settings
+2026-03-20T18:39:40.792+00:00 [lcm] retry also returned empty summary; provider=anthropic-backup; model=claude-sonnet-4-6; block_types=(none); response_blocks=0; keys=role,content,api,provider,model,usage,stopReason,timestamp,errorMessage,request_provider,request_model,request_api,request_reasoning,request_has_system,request_temperature,request_temperature_sent; content_kind=array; content_len=0; content_preview=[]; resp_model=claude-sonnet-4-6; resp_provider=anthropic-backup; request_provider=anthropic-backup; request_model=claude-sonnet-4-6; request_api=anthropic-messages; request_reasoning=low; request_has_system=true; request_temperature=0.05; request_temperature_sent=true; input=0,output=0,cacheRead=0,cacheWrite=0; finish=error; error_message=404 {"type":"error","error":{"type":"not_found_error","message":"Not Found"},"request_id":"req_011CZEpXkaGWQ91ojcBCGPKj"}; falling back to truncation
+2026-03-20T18:39:40.796+00:00 [lcm] all extraction attempts exhausted; provider=anthropic-backup; model=claude-sonnet-4-6; source=fallback
+[90m2026-03-20T18:39:44.734+00:00[39m [36m[ws][39m [36m⇄ res ✓ config.get 3001ms conn=dc5cfae4…a6f5 id=001adba3…2ff6[39m
+[90m2026-03-20T18:39:53.241+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:39:53.250+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:39:53.255+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:40:07.284+00:00[39m [36m[ws][39m [33mhandshake timeout conn=8e0779a2-732c-4d03-aa3b-1da6a85679e1 remote=127.0.0.1[39m
+[90m2026-03-20T18:40:07.763+00:00[39m [36m[ws][39m [33mclosed before connect conn=8e0779a2-732c-4d03-aa3b-1da6a85679e1 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:40:14.226+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:40:14.234+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:40:14.632+00:00[39m [36m[ws][39m [33mhandshake timeout conn=ee2f2c51-b92f-4a5d-9c34-92d1e08b8bce remote=127.0.0.1[39m
+[90m2026-03-20T18:40:15.461+00:00[39m [36m[ws][39m [33mclosed before connect conn=ee2f2c51-b92f-4a5d-9c34-92d1e08b8bce remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+2026-03-20T18:40:23.264+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:40:23.273+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:40:23.964+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:40:34.153+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:40:34.161+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:40:34.165+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:40:40.434+00:00[39m [36m[ws][39m [33mhandshake timeout conn=3861e1d9-476e-425c-9ae8-378b2c1e3002 remote=127.0.0.1[39m
+[90m2026-03-20T18:40:41.392+00:00[39m [36m[ws][39m [33mclosed before connect conn=3861e1d9-476e-425c-9ae8-378b2c1e3002 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:40:55.154+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:40:55.162+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:41:04.183+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:41:04.195+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:41:05.287+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:41:07.984+00:00[39m [36m[ws][39m [33mhandshake timeout conn=1232fc9f-e0bd-450a-b4a4-72d3973ea8ed remote=127.0.0.1[39m
+[90m2026-03-20T18:41:08.374+00:00[39m [36m[ws][39m [33mclosed before connect conn=1232fc9f-e0bd-450a-b4a4-72d3973ea8ed remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+[90m2026-03-20T18:41:16.115+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:41:16.127+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:41:16.136+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+2026-03-20T18:41:36.608+00:00 [tools] message failed: fetch failed
+[90m2026-03-20T18:41:37.097+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:41:37.106+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:41:46.145+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:41:46.159+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:41:46.849+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:41:57.033+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:41:57.062+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:41:57.079+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:42:01.243+00:00[39m [36m[ws][39m [33mhandshake timeout conn=6bdf07e0-877d-4505-a142-87b7c8cb2a75 remote=127.0.0.1[39m
+[90m2026-03-20T18:42:02.609+00:00[39m [36m[ws][39m [33mclosed before connect conn=6bdf07e0-877d-4505-a142-87b7c8cb2a75 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1008 reason=connect challenge timeout[39m
+[90m2026-03-20T18:42:18.054+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:42:18.070+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:42:27.109+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:42:27.146+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:42:28.361+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:42:38.890+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:42:38.970+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:42:39.047+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+2026-03-20T18:42:40.616+00:00 [tools] message failed: fetch failed
+[90m2026-03-20T18:42:42.113+00:00[39m [36m[ws][39m [33mhandshake timeout conn=a4d2bd16-e385-483c-9e08-7dff73f07a8f remote=127.0.0.1[39m
+[90m2026-03-20T18:43:06.136+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:43:06.173+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+2026-03-20T18:43:09.072+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:43:09.098+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:43:10.816+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:43:12.191+00:00[39m [36m[ws][39m [33mclosed before connect conn=a4d2bd16-e385-483c-9e08-7dff73f07a8f remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1006 reason=n/a[39m
+[90m2026-03-20T18:43:17.415+00:00[39m [36m[ws][39m [36m⇄ res ✓ cron.list 58ms conn=1d4bce5f…2c16 id=1c81ac9d…e6b3[39m
+[90m2026-03-20T18:43:17.441+00:00[39m [31m[diagnostic][39m [33mlane wait exceeded: lane=session:agent:main:cron:45107626-7fdf-4092-9b31-ba2647f96e8b waitedMs=125728 queueAhead=0[39m
+[90m2026-03-20T18:43:23.344+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:43:23.356+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:43:23.363+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:43:33.157+00:00[39m [36m[ws][39m [36m⇄ res ✗ status 0ms errorCode=INVALID_REQUEST errorMessage=missing scope: operator.read conn=2a0c3a84…e7d5 id=ba03a5bc…f422[39m
+[90m2026-03-20T18:43:33.163+00:00[39m [36m[ws][39m [36m⇄ res ✗ system-presence 1ms errorCode=INVALID_REQUEST errorMessage=missing scope: operator.read conn=2a0c3a84…e7d5 id=26fffe0e…1fd2[39m
+[90m2026-03-20T18:43:33.169+00:00[39m [36m[ws][39m [36m⇄ res ✗ config.get 0ms errorCode=INVALID_REQUEST errorMessage=missing scope: operator.read conn=2a0c3a84…e7d5 id=bc3c8ecf…52c9[39m
+[90m2026-03-20T18:43:44.911+00:00[39m [36m[ws][39m [33mhandshake timeout conn=8e680ab1-ec35-42e4-aef0-919ef8ed2c21 remote=127.0.0.1[39m
+[90m2026-03-20T18:43:44.997+00:00[39m [34m[telegram][39m [31msetMyCommands failed: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:43:45.004+00:00[39m [34m[telegram][39m [31mcommand sync failed: HttpError: Network request for 'setMyCommands' failed![39m
+[90m2026-03-20T18:43:45.256+00:00[39m [36m[ws][39m [33mclosed before connect conn=8e680ab1-ec35-42e4-aef0-919ef8ed2c21 remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m
+2026-03-20T18:43:53.373+00:00 [34m[telegram][39m [36mautoSelectFamily=true (default-node22)[39m
+2026-03-20T18:43:53.386+00:00 [34m[telegram][39m [36mdnsResultOrder=ipv4first (default-node22)[39m
+2026-03-20T18:43:54.157+00:00 [34m[telegram][39m [33mfetch fallback: enabling sticky IPv4-only dispatcher (codes=ETIMEDOUT,ENETUNREACH)[39m
+[90m2026-03-20T18:44:04.355+00:00[39m [34m[telegram][39m [31mdeleteMyCommands failed: Network request for 'deleteMyCommands' failed![39m
+[90m2026-03-20T18:44:04.368+00:00[39m [34m[telegram][39m [31mdeleteWebhook failed: Network request for 'deleteWebhook' failed![39m
+[90m2026-03-20T18:44:04.373+00:00[39m [34m[telegram][39m [31mwebhook cleanup failed: Network request for 'deleteWebhook' failed!; retrying in 30s.[39m
+[90m2026-03-20T18:44:09.739+00:00[39m [36m[gateway][39m [36msignal SIGTERM received[39m
+[90m2026-03-20T18:44:09.745+00:00[39m [36m[gateway][39m [36mreceived SIGTERM; shutting down[39m
+[90m2026-03-20T18:44:09.826+00:00[39m [35m[plugins][39m [36mopik: exporter metrics flushSuccesses=0 flushFailures=0 flushRetries=0 traceUpdateErrors=0 traceEndErrors=0 spanUpdateErrors=0 spanEndErrors=0[39m
+[90m2026-03-20T18:44:09.835+00:00[39m [34m[gmail-watcher][39m [36mgmail watcher stopped[39m
+[90m2026-03-20T18:44:11.100+00:00[39m [36m[ws][39m [33mhandshake timeout conn=f573dae9-c5f6-4beb-9348-b586a4294e9f remote=127.0.0.1[39m
+[90m2026-03-20T18:44:11.370+00:00[39m [36m[ws][39m [33mclosed before connect conn=f573dae9-c5f6-4beb-9348-b586a4294e9f remote=127.0.0.1 fwd=n/a origin=n/a host=127.0.0.1:18789 ua=n/a code=1000 reason=n/a[39m

@@ -1,0 +1,24 @@
+# CLAUDE.md — {{NAME}} Workspace
+
+## Identity
+- **Agent:** {{EMOJI}} {{NAME}} (`{{ID}}`)
+- **Role:** {{SCOPE}}
+
+## Workspace
+- Working directory: `~/.openclaw/agents/{{ID}}/workspace/`
+- Main agent workspace: `~/.openclaw/agents/main/workspace/`
+- Vault: `/home/trajan/vault/`
+
+## Key Files
+- `SOUL.md` — Your personality and operating principles
+- `discord-output-format.md` — How to format Discord messages (read from main workspace if not local)
+
+## Shared Resources
+- Read `~/.openclaw/agents/main/workspace/USER.md` for user context
+- Read `~/.openclaw/agents/main/workspace/TOOLS.md` for system environment
+- Vault search: `qmd search "query"` for semantic search
+
+## Output Protocol
+- Report status as DONE/DONE_WITH_CONCERNS/BLOCKED/NEEDS_CONTEXT
+- Include evidence for completion claims (command output, file contents)
+- Keep output within token budget specified by dispatcher

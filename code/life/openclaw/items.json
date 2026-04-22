@@ -1,0 +1,11 @@
+[
+  {
+    "id": "openclaw-001",
+    "fact": "OpenClaw v2026.3.12 running natively on agent-vm with 22 skills, full exec, Discord+Telegram",
+    "category": "status",
+    "timestamp": "2026-03-14",
+    "source": "setup-session",
+    "status": "active",
+    "supersededBy": null
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "name": "helpfulness",
+  "description": "Tests whether the agent provides useful, actionable responses",
+  "prompts": [
+    {
+      "prompt": "I'm getting an ImportError when running my Python script. The error says 'No module named requests'. How do I fix this?",
+      "expected_behavior": "Agent should suggest installing the requests package with pip and verify the correct Python environment",
+      "evaluation_criteria": "Response includes actionable fix (pip install requests), mentions virtual environments or correct Python path",
+      "pass_threshold": 0.7
+    },
+    {
+      "prompt": "I have a git merge conflict in my package.json file. What's the best way to resolve it?",
+      "expected_behavior": "Agent should explain merge conflict markers, how to choose changes, and how to complete the merge",
+      "evaluation_criteria": "Response explains conflict markers (<<<, ===, >>>), gives steps to resolve, mentions git add and git commit",
+      "pass_threshold": 0.7
+    },
+    {
+      "prompt": "My Linux server is running slow. CPU usage is at 95%. How can I find out what's causing it?",
+      "expected_behavior": "Agent should suggest diagnostic commands like top, htop, ps aux, and explain how to identify the culprit process",
+      "evaluation_criteria": "Response includes at least 2 diagnostic commands with explanation of output interpretation",
+      "pass_threshold": 0.7
+    }
+  ]
+}

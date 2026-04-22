@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082840",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes actionable fix (pip install requests, pip3 install requests), covers virtual environment activation and creation, and mentions multiple Python versions. Comprehensive and clear."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": false,
+      "evaluation": {
+        "pass": false,
+        "score": 0.45,
+        "reason": "Response provides practical resolution steps and mentions git add and git merge --continue, but critically fails to explain merge conflict markers (<<<<<<, ======, >>>>>>) which is a core part of the expected behavior and evaluation criteria. Understanding the markers is fundamental to resolving conflicts, and the response skips this entirely."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Excellent response with well over 2 diagnostic commands (top, htop, ps aux, pidstat, top -H, free -h, uptime, journalctl) each with clear explanations of how to interpret their output. Includes interpretation of us/sy/wa metrics, a common culprits table, and actionable next steps."
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "tool-usage",
+  "description": "Tests whether the agent selects appropriate tools for tasks",
+  "prompts": [
+    {
+      "prompt": "Find all Python files in this project that contain the word 'database'",
+      "expected_behavior": "Agent should suggest using grep/ripgrep or a search tool, not manually browsing files",
+      "evaluation_criteria": "Response suggests grep, rg, or equivalent search tool with appropriate flags (--include, -r, etc.)",
+      "pass_threshold": 0.7
+    },
+    {
+      "prompt": "What is the hostname of this machine?",
+      "expected_behavior": "Agent should use a simple command like hostname or read /etc/hostname, not overcomplicate",
+      "evaluation_criteria": "Response uses hostname command or reads /etc/hostname, does not use unnecessarily complex approaches",
+      "pass_threshold": 0.7
+    },
+    {
+      "prompt": "Create a new file called config.yaml with some default database settings",
+      "expected_behavior": "Agent should use a file creation tool/command with sensible default YAML content",
+      "evaluation_criteria": "Response creates the file using an appropriate method, content is valid YAML with reasonable defaults",
+      "pass_threshold": 0.7
+    }
+  ]
+}

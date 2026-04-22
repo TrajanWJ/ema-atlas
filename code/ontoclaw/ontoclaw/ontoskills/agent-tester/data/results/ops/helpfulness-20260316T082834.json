@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082834",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.9,
+        "reason": "Response includes the actionable fix (pip install requests), covers pip3 variant, mentions virtual environment activation with platform-specific commands, and includes a fallback for permissions errors. Comprehensive and directly addresses the expected behavior."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.85,
+        "reason": "Response explains conflict markers (<<<, ===, >>>), provides multiple resolution approaches, and clearly mentions git add and git commit steps. Also covers lockfile handling and practical tips. The markers are shown in a grep command rather than explained inline with HEAD/branch labels, which is slightly less instructional, but the overall guidance is thorough and actionable."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes multiple diagnostic commands (ps aux --sort=-%cpu, uptime, nproc, top, htop, mpstat, iostat, iotop) with clear explanations of how to interpret output (e.g., %CPU column, load average vs core count, %usr vs %sys vs %iowait). Well-organized with a triage flow and common culprits table."
+      }
+    }
+  ]
+}

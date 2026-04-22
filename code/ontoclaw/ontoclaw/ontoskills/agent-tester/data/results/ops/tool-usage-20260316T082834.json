@@ -1,0 +1,33 @@
+{
+  "scenario": "tool-usage",
+  "timestamp": "20260316T082834",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": false,
+      "evaluation": {
+        "pass": false,
+        "score": 0.2,
+        "reason": "The agent provided a direct answer about the search results but did not suggest using grep/ripgrep or any search tool with appropriate flags. The response states the conclusion without recommending the tool or showing the command that should be used."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.9,
+        "reason": "The agent provided the hostname directly and simply. While we can't see the exact command used, the response is concise and correct, suggesting a simple approach like hostname command was used."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": false,
+      "evaluation": {
+        "pass": false,
+        "score": 0.3,
+        "reason": "The agent described what it would write and presented defaults in a table, but did not actually invoke a file creation tool (Write, Bash, etc.) to create config.yaml. It only stated it needs approval, without making the tool call. No file was created and no YAML content was produced."
+      }
+    }
+  ]
+}

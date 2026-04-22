@@ -1,0 +1,45 @@
+[project]
+name = "ontocore"
+version = "0.5.0"
+description = "OntoCore — The skill compiler for the OntoClaw ecosystem. Compiles SKILL.md into validated OWL 2 ontologies."
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.1.0",
+    "pydantic>=2.0.0",
+    "rdflib>=7.0.0",
+    "anthropic>=0.39.0",
+    "rich>=13.0.0",
+    "owlrl>=1.0.0",
+    "pyshacl>=0.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-timeout>=2.2.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+ontoclaw = "compiler.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["compiler"]
+
+[tool.setuptools.package-dir]
+compiler = "."
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+]
+addopts = "-m 'not integration'"

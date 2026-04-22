@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082836",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes the actionable fix (pip install requests), mentions pip3 for multiple Python versions, and covers virtual environment activation with the source venv/bin/activate command."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response thoroughly explains conflict markers (<<<, ===, >>>), clearly describes HEAD vs incoming branch, gives step-by-step resolution instructions, and explicitly mentions git add and git merge --continue/git rebase --continue to complete the merge. Goes above and beyond with package.json-specific advice, lockfile handling, and a useful conflict pattern table."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Excellent response that far exceeds the criteria. Includes multiple diagnostic commands (top, htop, ps aux, iostat, iotop, uptime, sar, mpstat, vmstat, strace) with clear explanations of how to interpret output (e.g., single process at 90%+ means runaway, high %iowait means disk not CPU, kswapd means memory pressure). Well-organized with progressive diagnosis flow and common culprits table."
+      }
+    }
+  ]
+}

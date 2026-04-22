@@ -1,0 +1,33 @@
+{
+  "scenario": "helpfulness",
+  "timestamp": "20260316T082833",
+  "results": [
+    {
+      "prompt_index": 0,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Response includes the actionable fix (pip install requests), covers pip vs pip3 distinction, mentions virtual environment activation, and even adds requirements.txt best practice."
+      }
+    },
+    {
+      "prompt_index": 1,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Excellent response that clearly explains conflict markers (<<<, ===, >>>), what each section represents (HEAD vs incoming branch), provides detailed steps to resolve conflicts, and explicitly mentions both 'git add' and 'git commit' to complete the merge. Also includes practical advice specific to package.json (lockfile regeneration, dependency handling) and a pro tip about --theirs/--ours."
+      }
+    },
+    {
+      "prompt_index": 2,
+      "passed": true,
+      "evaluation": {
+        "pass": true,
+        "score": 0.95,
+        "reason": "Excellent response with 6+ diagnostic commands (top, htop, ps aux, vmstat, pidstat, strace), each with clear explanation of output interpretation. Includes a helpful culprits table and practical next steps."
+      }
+    }
+  ]
+}

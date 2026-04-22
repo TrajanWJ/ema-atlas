@@ -159,44 +159,27 @@ surfaces:
 If we pick the chosen option and it turns out wrong, what's the
 migration shape?
 
-- **From `N:M` to `Project-inside-Space`.** For each Project,
-  pick one canonical Space (or fail the migration if the Project is
-  in zero or more than one). Drop the join table. Time: days, plus
-  user-facing data review for ambiguous Projects.
-- **From `N:M` to `Space-inside-Project`.** Symmetric: for each
-  Space, pick one canonical Project. Drop the join table. Time:
-  days, with the same ambiguity caveat.
-- **From `N:M` to `disjoint-with-shared-membership`.** Drop both
-  cross-references; keep the membership tables as the only link.
-  Easy in schema terms; collab objects keyed by Space stay valid.
-  Time: days.
-- **From `Project-inside-Space` or `Space-inside-Project` to
-  `N:M`.** Promote the single foreign key to a join table; backfill
-  with one row per existing relationship. Trivial schema-wise; the
-  cost is downstream (every read site that assumed singularity now
-  has to handle a list). Time: 1-2 weeks of touch-up across
-  consumers.
-- **From any inside-the-other variant to
-  `disjoint-with-shared-membership`.** Drop the foreign key; demand
-  that any existing artifact that depended on the containment now
-  carries an explicit cross-reference. Need a one-time backfill that
-  walks every Collaboration object and writes its Project/Space
-  binding explicitly. Time: 1-2 weeks; the audit story for "before
-  this date, Project/Space relationship was implicit" needs a
-  one-time event.
-- **From `disjoint-with-shared-membership` to anything containment-
-  shaped.** Hardest. There is no recorded relationship to migrate
-  from; you have to *infer* one (e.g. "the Project the Member who
-  created this Space first joined"). Likely needs human review per
-  Space.
+- **A → B / A → C.** For each Project (or Space), pick a canonical
+  Space (or Project), or fail the migration on ambiguity. Drop the
+  join table. Days, plus data review for ambiguous rows.
+- **A → D.** Drop both cross-references; membership tables stay.
+  Days; collab objects keyed by Space remain valid.
+- **B / C → A.** Promote the single foreign key to a join table.
+  Trivial schema-side; the cost is downstream — every read site
+  that assumed singularity now handles a list. 1-2 weeks of
+  touch-up.
+- **B / C → D.** Drop the foreign key; backfill any artifact that
+  depended on containment with an explicit cross-reference; emit
+  a one-time "implicit relationship cutoff" audit event. 1-2 weeks.
+- **D → containment-shaped.** Hardest — no recorded relationship to
+  migrate from. Infer (e.g. "Project the Space's creator first
+  joined") and human-review per Space.
 - **What records does the chosen option produce that would have to
-  be rewritten on migration?** For A: the `project_spaces` join
-  table and any `event_log` row with a Space scope. For B: every
-  `Project` row's `space: SpaceId` foreign key. For C: every
-  `Space` row's `project: ProjectId` foreign key, and Collaboration
-  object scope keys that assumed Project-uniqueness. For D: nothing
-  in the schema, but every artifact that *should* have been bridged
-  but wasn't is invisible to migration.
+  be rewritten on migration?** A: `project_spaces` join + every
+  Space-scoped `event_log` row. B: every `Project.space` foreign
+  key. C: every `Space.project` foreign key, plus collab object
+  scope keys assuming Project-uniqueness. D: nothing in the schema,
+  but un-bridged artifacts are invisible to migration.
 
 ## Provenance
 

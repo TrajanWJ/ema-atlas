@@ -7,6 +7,39 @@ Each entry names the commit purpose, not the file diff — for diffs see `git lo
 > was renamed to `TrajanWJ/ema-atlas` on 2026-04-22 once the atlas Next.js
 > app became the center of gravity. The old URL still redirects.
 
+## 2026-04-22 — wave 7: Gleam scaffold + canvas SVG embed + collab+surfaces build-steps + /api/graph + frontier doctrine
+
+- 5 background subagents (all delivered):
+  - build-steps 05 + 06 (collab substrate skeleton + surfaces skeleton).
+    05 codes against per-object event-log under sqlight with explicit
+    `migration.replay_into(YjsTarget|RiakDtTarget|HybridTarget)` shape.
+    06 codes against mist v6.0.3 + wisp v2.2.2, ws_hub before endpoint
+    under rest_for_one, build-time grep gate proving surface code
+    never calls event_log.append/2 (P1 enforcement).
+  - `research/scaffold/` Gleam project (14 files): gleam.toml +
+    manifest.toml + 7 supervisor modules + 4 actor stubs +
+    `test/ema_test.gleam` gleam_qcheck scaffold. Reference shape only.
+  - canvas SVG embed: `lib/diagrams.ts` + inline SVG via
+    dangerouslySetInnerHTML; "{N} diagram(s)" chip on /parts/[slug].
+  - 3 more frontier doctrine extracts (codebase-frontend-layer,
+    codebase-mission-control-claude, codebase-place-org-openclaw).
+  - /api/graph + /api/graph/[topic] route handlers + content/api-spec.md
+    (OpenAPI-style, all 23 routes documented with stability column).
+- Foreground: MAP.md (one-screen wall map), NEXT.md (priority-ordered
+  what-to-do-next), content/artifacts/inventory.md (verified counts).
+- User-side parallel additions integrated:
+  - app/{chat,hq,threads,wiki}/page.tsx — 4 vApp preview routes
+  - lib/ema-atlas.ts topLevelRoutes additions
+
+## 2026-04-22 — wave 6: 24 Mermaid SVGs + content/artifacts/inventory
+
+- All 24 `.mmd` → `.svg` rendered via @mermaid-js/mermaid-cli (added
+  as devDependency).
+- Inventory grouping every deliverable by media type (briefs, slides,
+  canvas, diagrams, decision/futures cards, research, vApp briefs,
+  demo narrative, decision matrix template, build-step starters,
+  routes). Counts verified.
+
 ## 2026-04-22 — wave 5: v0.0.3 build-step starters + atlas detail routes (in flight)
 
 - 3 background subagents:

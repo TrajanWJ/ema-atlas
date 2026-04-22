@@ -1,0 +1,101 @@
+[
+  {
+    "description": "Temporary public transfer pack for EMA/Hermes rewrite handoff",
+    "isFork": false,
+    "isPrivate": false,
+    "name": "ema-transfer-pack-20260422-060938",
+    "nameWithOwner": "TrajanWJ/ema-transfer-pack-20260422-060938",
+    "updatedAt": "2026-04-22T06:28:22Z",
+    "url": "https://github.com/TrajanWJ/ema-transfer-pack-20260422-060938"
+  },
+  {
+    "description": "Proslync client demo v1 \u2014 Expo React Native mobile app",
+    "isFork": false,
+    "isPrivate": true,
+    "name": "proslync-mobile-app-v1",
+    "nameWithOwner": "TrajanWJ/proslync-mobile-app-v1",
+    "updatedAt": "2026-04-21T17:44:22Z",
+    "url": "https://github.com/TrajanWJ/proslync-mobile-app-v1"
+  },
+  {
+    "description": "Operator-grade NIL marketing site \u2014 live demo at proslync-hero.vercel.app",
+    "isFork": false,
+    "isPrivate": false,
+    "name": "proslync-website",
+    "nameWithOwner": "TrajanWJ/proslync-website",
+    "updatedAt": "2026-04-18T17:06:05Z",
+    "url": "https://github.com/TrajanWJ/proslync-website"
+  },
+  {
+    "description": "Proslync client demo v1 \u2014 phone-frame preview harness",
+    "isFork": false,
+    "isPrivate": true,
+    "name": "proslync-device-preview-v1",
+    "nameWithOwner": "TrajanWJ/proslync-device-preview-v1",
+    "updatedAt": "2026-04-15T13:51:08Z",
+    "url": "https://github.com/TrajanWJ/proslync-device-preview-v1"
+  },
+  {
+    "description": "",
+    "isFork": false,
+    "isPrivate": true,
+    "name": "place.org",
+    "nameWithOwner": "TrajanWJ/place.org",
+    "updatedAt": "2026-04-13T21:31:00Z",
+    "url": "https://github.com/TrajanWJ/place.org"
+  },
+  {
+    "description": "",
+    "isFork": false,
+    "isPrivate": false,
+    "name": "ema",
+    "nameWithOwner": "TrajanWJ/ema",
+    "updatedAt": "2026-04-13T06:57:21Z",
+    "url": "https://github.com/TrajanWJ/ema"
+  },
+  {
+    "description": "Lightweight desktop companion for place.org \u2014 transparent native popout windows via local WebSocket bridge",
+    "isFork": false,
+    "isPrivate": true,
+    "name": "place-companion",
+    "nameWithOwner": "TrajanWJ/place-companion",
+    "updatedAt": "2026-04-03T04:39:51Z",
+    "url": "https://github.com/TrajanWJ/place-companion"
+  },
+  {
+    "description": "Agent OS \u2014 what an AI-native operating system actually looks like",
+    "isFork": false,
+    "isPrivate": false,
+    "name": "agent-os-demo",
+    "nameWithOwner": "TrajanWJ/agent-os-demo",
+    "updatedAt": "2026-03-20T11:28:57Z",
+    "url": "https://github.com/TrajanWJ/agent-os-demo"
+  },
+  {
+    "description": "Doing expirements with multiple ai agents",
+    "isFork": false,
+    "isPrivate": true,
+    "name": "Executive",
+    "nameWithOwner": "TrajanWJ/Executive",
+    "updatedAt": "2024-10-15T17:41:04Z",
+    "url": "https://github.com/TrajanWJ/Executive"
+  },
+  {
+    "description": "Doing expirements with multiple ai agents",
+    "isFork": false,
+    "isPrivate": true,
+    "name": "Multi-agent-expirements",
+    "nameWithOwner": "TrajanWJ/Multi-agent-expirements",
+    "updatedAt": "2024-09-05T01:30:33Z",
+    "url": "https://github.com/TrajanWJ/Multi-agent-expirements"
+  },
+  {
+    "description": "\ud83e\udd16 Assemble, configure, and deploy autonomous AI Agents in your browser.",
+    "isFork": true,
+    "isPrivate": false,
+    "name": "AgentGPT",
+    "nameWithOwner": "TrajanWJ/AgentGPT",
+    "updatedAt": "2023-04-11T14:24:21Z",
+    "url": "https://github.com/TrajanWJ/AgentGPT"
+  }
+]

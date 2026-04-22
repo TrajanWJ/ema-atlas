@@ -1,0 +1,38 @@
+{
+  "name": "place.org",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4817",
+    "build": "next build",
+    "start": "next start -p 4817",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@types/matter-js": "^0.20.2",
+    "better-sqlite3": "^12.8.0",
+    "matter-js": "^0.20.0",
+    "motion": "^12.38.0",
+    "next": "16.2.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-rnd": "^10.5.3",
+    "wa-sqlite": "^1.0.0",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.8",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.1",
+    "jsdom": "^29.0.1",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^4.1.0"
+  }
+}

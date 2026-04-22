@@ -1,0 +1,45 @@
+{
+  "name": "place.org",
+  "short_name": "place",
+  "description": "A virtual desktop OS that actually works",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "theme_color": "#060610",
+  "background_color": "#060610",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Desk", "url": "/desk" },
+    { "name": "New Note", "url": "/?action=new-note" },
+    { "name": "Start Timer", "url": "/?action=start-timer" },
+    { "name": "Brain Dump", "url": "/?action=brain-dump" }
+  ],
+  "share_target": {
+    "action": "/share-receiver",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "shared_title",
+      "text": "shared_text",
+      "url": "shared_url"
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/open-file",
+      "accept": { "text/markdown": [".md"], "text/plain": [".txt"] }
+    }
+  ],
+  "protocol_handlers": [
+    { "protocol": "web+place", "url": "/protocol?target=%s" }
+  ]
+}

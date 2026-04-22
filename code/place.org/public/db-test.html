@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head><title>DB Persistence Test</title></head>
+<body>
+<pre id="log"></pre>
+<script type="module">
+const el = document.getElementById('log');
+function print(msg) { el.textContent += msg + '\n'; }
+
+const w = new Worker('/db-worker.js', { type: 'module' });
+w.onerror = (e) => print('WORKER CRASH: ' + (e.message || e));
+
+function send(msg) {
+  return new Promise((resolve, reject) => {
+    const handler = (e) => {
+      if (e.data.id === msg.id) {
+        w.removeEventListener('message', handler);
+        if (e.data.type === 'error') reject(new Error(e.data.message));
+        else resolve(e.data);
+      }
+    };
+    w.addEventListener('message', handler);
+    w.postMessage(msg);
+  });
+}
+
+async function run() {
+  const initResult = await send({ id: 'init', type: 'init' });
+  print('Storage mode: ' + (initResult.storageMode || 'UNKNOWN'));
+
+  // Count BEFORE insert
+  const before = await send({ id: 'q1', type: 'query', sql: "SELECT COUNT(*) as c FROM inbox", params: [] });
+  const countBefore = before.rows[0]?.c ?? 0;
+  print('Rows before insert: ' + countBefore);
+
+  // Always insert a new unique row
+  const id = 'test-' + Date.now();
+  await send({ id: 'w1', type: 'exec', sql: `INSERT INTO inbox (id,content,source,processed,created_at,updated_at,user_id) VALUES ('${id}','item-${countBefore + 1}','text',0,datetime('now'),datetime('now'),'guest')`, params: [] });
+
+  // Count AFTER insert
+  const after = await send({ id: 'q2', type: 'query', sql: "SELECT COUNT(*) as c FROM inbox", params: [] });
+  const countAfter = after.rows[0]?.c ?? 0;
+  print('Rows after insert: ' + countAfter);
+
+  if (countBefore > 0) {
+    print('');
+    print('*** PERSISTENCE CONFIRMED — ' + countBefore + ' rows survived refresh ***');
+  }
+  print('');
+  print('Refresh to verify count keeps going up.');
+}
+
+run().catch(e => print('ERROR: ' + e.message));
+</script>
+</body>
+</html>

@@ -4,9 +4,9 @@
   "version": "0.0.5",
   "identifier": "org.ema.desktop",
   "build": {
-    "beforeDevCommand": "pnpm --filter @ema/web dev",
+    "beforeDevCommand": "bash -lc 'lsof -nP -iTCP:5173 -sTCP:LISTEN >/dev/null 2>&1 || pnpm --filter @ema/web dev -- --host localhost --port 5173'",
     "beforeBuildCommand": "pnpm --filter @ema/web build",
-    "devUrl": "http://127.0.0.1:5173",
+    "devUrl": "http://localhost:5173",
     "frontendDist": "../../web/dist"
   },
   "app": {

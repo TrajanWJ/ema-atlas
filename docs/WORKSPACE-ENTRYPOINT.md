@@ -6,19 +6,20 @@ Use this repo as the implementation root for EMA `0.0.5`.
 
 Read:
 
-1. `../../doctrine/planning/EMA-0.0.5-LANGUAGE-LOCK.md`
-2. `../../doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md`
-3. `../../doctrine/planning/EMA-0.0.5-PASSOVER-AND-PREP.md`
-4. `../../doctrine/planning/lane3-domain-model-and-system-design.md`
-5. `../../data-model/EMA-DATA-TREATMENT-AND-SOURCE-OF-TRUTH.md`
-6. `architecture/08-vanilla-workspace.md`
-7. `architecture/09-see-agent-work.md`
-8. `agents/see-agent-work-agent-usage.md`
-9. `architecture/10-first-boot.md`
-10. `architecture/11-transport-and-auth-survey.md`
-11. `architecture/12-hermes-integration.md`
-12. `architecture/13-peer-computer-access.md`
-13. `plans/IMPLEMENTATION-ROADMAP.md`
+1. `orchestration/STATUS.md`
+2. `../../doctrine/planning/EMA-0.0.5-LANGUAGE-LOCK.md`
+3. `../../doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md`
+4. `../../doctrine/planning/EMA-0.0.5-PASSOVER-AND-PREP.md`
+5. `../../doctrine/planning/lane3-domain-model-and-system-design.md`
+6. `../../data-model/EMA-DATA-TREATMENT-AND-SOURCE-OF-TRUTH.md`
+7. `architecture/08-vanilla-workspace.md`
+8. `architecture/09-see-agent-work.md`
+9. `agents/see-agent-work-agent-usage.md`
+10. `architecture/10-first-boot.md`
+11. `architecture/11-transport-and-auth-survey.md`
+12. `architecture/12-hermes-integration.md`
+13. `operations/peer-computer-access.md`
+14. `plans/IMPLEMENTATION-ROADMAP.md`
 
 ## First build assumptions
 
@@ -71,7 +72,7 @@ Read:
   flying yet) — shortlist in `architecture/11-transport-and-auth-survey.md`;
   default is Iroh sidecar.
 - Trusted dev peer computer access — SSH/admin bootstrap rail in
-  `architecture/13-peer-computer-access.md`; Tailscale is not default.
+  `operations/peer-computer-access.md`; Tailscale is not default.
 - Lane / handoff / proposal vApp surfaces.
 - Tauri window capability partitioning beyond the single `main` window.
 

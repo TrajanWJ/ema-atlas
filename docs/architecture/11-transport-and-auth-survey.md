@@ -236,8 +236,8 @@ bounded contexts, no new event families.
   local ones.
 
 For the trusted-dev bootstrap rail before Iroh lands, see
-`13-peer-computer-access.md`. That rail uses OS-native SSH/admin access for
-operator work and does not replace the EMA-native Iroh plan.
+`../operations/peer-computer-access.md`. That rail uses OS-native SSH/admin
+access for operator work and does not replace the EMA-native Iroh plan.
 
 Three capabilities that should exist in `secret_ref`-adjacent
 storage by the time this wave starts:

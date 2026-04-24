@@ -77,6 +77,7 @@ EMA-0.0.5--4-24/
 
 ## Supporting docs
 
+- [docs/orchestration/STATUS.md](./docs/orchestration/STATUS.md)
 - [docs/WORKSPACE-ENTRYPOINT.md](./docs/WORKSPACE-ENTRYPOINT.md)
 - [docs/dev/p2p-dev-updates.md](./docs/dev/p2p-dev-updates.md)
 - [docs/architecture/08-vanilla-workspace.md](./docs/architecture/08-vanilla-workspace.md)
@@ -84,6 +85,8 @@ EMA-0.0.5--4-24/
 - [docs/architecture/10-first-boot.md](./docs/architecture/10-first-boot.md)
 - [docs/architecture/11-transport-and-auth-survey.md](./docs/architecture/11-transport-and-auth-survey.md)
 - [docs/architecture/12-hermes-integration.md](./docs/architecture/12-hermes-integration.md)
+- [docs/architecture/FOLDER-AUDIT-2026-04-24.md](./docs/architecture/FOLDER-AUDIT-2026-04-24.md)
+- [docs/operations/peer-computer-access.md](./docs/operations/peer-computer-access.md)
 - [docs/vapps/see-agent-work.md](./docs/vapps/see-agent-work.md)
 - [docs/cli/see-agent-work.md](./docs/cli/see-agent-work.md)
 - [docs/agents/see-agent-work-agent-usage.md](./docs/agents/see-agent-work-agent-usage.md)

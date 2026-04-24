@@ -149,13 +149,20 @@ if [[ -d "$ROOT/apps/daemon/src" ]]; then
 fi
 
 # --- 5. index references -----------------------------------------------
+# Only check orchestrator prompt files, matched by the *-ORCHESTRATOR-PROMPT(-V<n>)?.md
+# naming convention. Other backticked .md references in the index (e.g. CHANGELOG.md,
+# docs/operations/*.md) are scope descriptions, not canonical-prompt requirements.
+#
+# A referenced prompt is considered present if it exists anywhere under PROMPTS_DIR
+# (top-level for active prompts, archive/<date>/ for archived ones).
 if [[ -f "$INDEX_FILE" ]]; then
   while IFS= read -r ref; do
+    [[ -z "$ref" ]] && continue
     index_targets_checked=$((index_targets_checked + 1))
-    if [[ ! -f "$PROMPTS_DIR/$ref" && ! -f "$PROMPTS_DIR/archive/2026-04-24/$ref" ]]; then
+    if ! find "$PROMPTS_DIR" -type f -name "$ref" 2>/dev/null | grep -q .; then
       missing_index_targets+=("$ref")
     fi
-  done < <(grep -oE '`[A-Z][A-Z0-9-]*\.md`' "$INDEX_FILE" | tr -d '`' | sort -u)
+  done < <(grep -oE '`[A-Z][A-Z0-9_-]*-ORCHESTRATOR-PROMPT(-V[0-9]+)?\.md`' "$INDEX_FILE" | tr -d '`' | sort -u)
 fi
 
 # --- 6. ledger-check ----------------------------------------------------

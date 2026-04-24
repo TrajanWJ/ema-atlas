@@ -1,13 +1,28 @@
 # Lane L-see-agent-work-8-region — See Agent Work 8-Region First Screen
 
 Owning orchestrator: **Product Surface Donor**
-Status: queued (next product move)
+Status: **landed 2026-04-24** in commit `40ba1ea` on branch `lane/surface-slice-a-see-agent-work`
 Opened: 2026-04-24
-Ledger entry: see `docs/orchestration/STATUS.md` lanes table
+Landed: 2026-04-24 by the parallel Product Surface Donor worker session
+Ledger entry: see `docs/orchestration/STATUS.md` lanes table (and the session-close block at 2026-04-24T15:20)
 
-## Goal
+## Where the code actually lives
 
-Make `apps/web/src/app/agent-work-page.tsx` inhabited. Replace the current stub with the 8-region operator first screen defined in `doctrine/research/EMA-0.0.5-SURFACE-DONOR-MATRIX.md` and `docs/vapps/see-agent-work.md`. The vdesktop shell and IPC client already exist — what's missing is this surface rendered to the vision bar.
+- **Region components:** `apps/web/src/app/see-agent-work/{TopSwarmPulse,MissionRail,LaneBoard,VcalendarStrip,AgentRoster,CommandPanel,AgentInstructionPanel,ChronicleStrip}.tsx` (plus barrel)
+- **Page composing the 8 regions:** `apps/web/src/app/agent-work-page.tsx`
+- **Mock projection additions:** `apps/web/src/app/mock-projections.ts` — exports `CHRONICLE_MAX = 200`, adds `recent_events[]`, derives `agentWorkLaneSummary`
+- **Lane status rewire:** `apps/web/src/app/hq-page.tsx` — Lane status panel reads `agentWorkLaneSummary`
+- **Styling:** `apps/web/src/app/styles.css` — `.ema-saw-*` classes with 21+ `RIP:` provenance markers (place.org glass tiers, codebase-frontend-layer density, agent-os-bridge state vocabulary, lineage-original-elixir-ema bounded buffer, mission-control-claude role display)
+
+**Path difference from this lane file's original proposal:** components landed under `apps/web/src/app/see-agent-work/`, not `apps/web/src/vapps/see-agent-work/`. Treat `apps/web/src/app/see-agent-work/` as canonical going forward.
+
+## This file's role now
+
+Reference spec for Slice B–E carry-over and for anyone extending the 8 regions. Region definitions and discipline rules below still stand; target paths updated above.
+
+## Goal (original, for context)
+
+Make `apps/web/src/app/agent-work-page.tsx` inhabited. Replace the current stub with the 8-region operator first screen defined in `doctrine/research/EMA-0.0.5-SURFACE-DONOR-MATRIX.md` and `docs/vapps/see-agent-work.md`. The vdesktop shell and IPC client already exist — what's missing is this surface rendered to the vision bar. **(Landed — see above for actual file paths.)**
 
 ## Read First
 
@@ -23,12 +38,13 @@ Make `apps/web/src/app/agent-work-page.tsx` inhabited. Replace the current stub 
 10. `sources/snapshots/ema 0.0.3/ema-atlas/graph/nodes/codebase-frontend-layer.qmd` — read-only observer + bounded buffers
 11. `sources/snapshots/ema 0.0.3/ema-atlas/graph/nodes/lineage-original-elixir-ema.qmd` — CHRONICLE_MAX = 200
 
-## Scope (files you may edit)
+## Scope (files touched by the landed slice)
 
-- `runtime/EMA-0.0.5--4-24/apps/web/src/app/agent-work-page.tsx` — replace stub
-- `runtime/EMA-0.0.5--4-24/apps/web/src/vapps/see-agent-work/` — may create region components here
-- `runtime/EMA-0.0.5--4-24/apps/web/src/app/styles.css` — region layout + palette use via `ema-design-system`
-- `runtime/EMA-0.0.5--4-24/apps/web/src/app/mock-projections.ts` — read `seeAgentWorkProjection`; do NOT add self-report entries
+- `runtime/EMA-0.0.5--4-24/apps/web/src/app/agent-work-page.tsx` — composes 8 regions
+- `runtime/EMA-0.0.5--4-24/apps/web/src/app/see-agent-work/` — region components + barrel
+- `runtime/EMA-0.0.5--4-24/apps/web/src/app/hq-page.tsx` — Lane status rewired to `agentWorkLaneSummary`
+- `runtime/EMA-0.0.5--4-24/apps/web/src/app/styles.css` — `.ema-saw-*` classes with RIP provenance markers
+- `runtime/EMA-0.0.5--4-24/apps/web/src/app/mock-projections.ts` — `CHRONICLE_MAX`, `recent_events`, `agentWorkLaneSummary`
 
 ## Out of scope (handoff, don't cross-edit)
 

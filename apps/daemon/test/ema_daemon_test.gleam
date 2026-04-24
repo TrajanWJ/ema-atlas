@@ -56,6 +56,34 @@ pub fn first_boot_seeds_once_test() {
   let _ = delete_file(path)
 }
 
+pub fn first_boot_appends_ordered_seed_events_to_sqlite_test() {
+  let path = tmp_path("ema-first-boot-events.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(_) = first_boot.seed_if_needed(bus_subject)
+
+  should.equal(event_kind_org_rows(path), [
+    #("device.registered", first_boot.org_id),
+    #("actor.created", first_boot.org_id),
+    #("actor.created", first_boot.org_id),
+    #("actor.created", first_boot.org_id),
+    #("org.created", first_boot.org_id),
+    #("space.created", first_boot.org_id),
+    #("project.created", first_boot.org_id),
+    #("blueprint.document.created", first_boot.org_id),
+    #("blueprint.section.added", first_boot.org_id),
+    #("blueprint.section.added", first_boot.org_id),
+    #("attachment.created", first_boot.org_id),
+    #("attachment.linked", first_boot.org_id),
+    #("blueprint.attachment.linked", first_boot.org_id),
+  ])
+
+  let _ = delete_file(path)
+}
+
 pub fn org_create_appends_default_space_test() {
   let path = tmp_path("ema-org-create.db")
   let _ = delete_file(path)
@@ -93,3 +121,6 @@ fn tmp_path(suffix: String) -> String
 
 @external(erlang, "ema_test_helpers", "delete_file")
 fn delete_file(path: String) -> Result(Nil, Nil)
+
+@external(erlang, "ema_test_helpers", "event_kind_org_rows")
+fn event_kind_org_rows(path: String) -> List(#(String, String))

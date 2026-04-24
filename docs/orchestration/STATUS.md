@@ -6,6 +6,123 @@ Every session — Codex, Claude CLI, or human — reads this file on cold start.
 Coordinator: Claude (replacement orchestrator, consolidated role).
 Last coordinator sweep: 2026-04-24T15:20-04:00.
 
+## Session close 2026-04-24 — Canon Writers Slice A
+
+Slice: A — First-Boot Seed Actually Emits.
+
+Files changed:
+- `apps/daemon/test/ema_daemon_test.gleam`
+- `apps/daemon/test/ema_test_helpers.erl`
+
+Audit result:
+- `apps/daemon/src/ema_swarm_coordination/first_boot.gleam` already constructs
+  13 event envelopes and sends them through `bus.append` via
+  `seed_if_needed/1`.
+- `apps/daemon/src/ema_daemon/supervisor.gleam` already wires the seed path
+  immediately after `bus.start` and before IPC starts.
+- Idempotency guard is `bus.event_exists(bus_subject, "org.created",
+  first_boot.org_id)`, so relaunch against the same canonical DB skips seed.
+- All emitted kinds are present in `packages/contracts/events/catalog.v0.md`;
+  no catalog or id-prefix additions were needed.
+
+Test coverage added:
+- `first_boot_appends_ordered_seed_events_to_sqlite_test` reads the real
+  SQLite `events` table and asserts ordered first-boot rows, including the
+  founding `org.created` -> `space.created` -> `project.created` chain.
+- `ema_test_helpers:event_kind_org_rows/1` is a test-only SQLite reader.
+
+Boot evidence:
+```
+first_count=13
+second_count=13
+device.registered|org:01J00000000000000000000001
+actor.created|org:01J00000000000000000000001
+actor.created|org:01J00000000000000000000001
+actor.created|org:01J00000000000000000000001
+org.created|org:01J00000000000000000000001
+space.created|org:01J00000000000000000000001
+project.created|org:01J00000000000000000000001
+...
+```
+
+Verification:
+- `cd apps/daemon && gleam build && gleam test` — green, 4 tests passed.
+- `bash scripts/contract-check.sh` — OK.
+- `node tooling/m1-round-trip.mjs` — `m1-round-trip: OK`.
+
+Remaining in this lane:
+- Slice B should make `ema_orgs` a fully validated command writer beyond the
+  current early `org.create` path: slug/language-lock validation, typed errors,
+  stronger replay/projection assertions, and IPC result shape confirmation.
+
+## Session close 2026-04-24 — Desktop Launcher Correction Slice A
+
+Slice: Desktop Launcher Correction A — Bundle Audit.
+
+Files changed:
+- `apps/desktop/src-tauri/tauri.conf.json`
+
+Audit results:
+- `/Users/tawj/Desktop/EMA 0.0.5.app/Contents/MacOS/ema-desktop` still reports
+  `Mach-O 64-bit executable arm64`; no AppleScript `applet` regression.
+- Installed bundle `Info.plist` still has `CFBundleExecutable=ema-desktop`,
+  `CFBundleIdentifier=org.ema.desktop`, package type `APPL`, version `0.0.5`.
+- Daemon is live on `127.0.0.1:49555` (pid 47943), and
+  `node tooling/m1-round-trip.mjs` returned `m1-round-trip: OK`.
+- Tauri dev initially failed because raw Vite exited on the already-live
+  port 5173. Patched `beforeDevCommand` to no-op when that port is already
+  listening, preserving the web dev server as the primary dev surface.
+- Tauri `devUrl` now uses canonical `http://localhost:5173`.
+- CSP remains narrow:
+  `default-src 'self'; connect-src 'self' ws://127.0.0.1:49555; style-src 'self' 'unsafe-inline'`.
+
+Verification:
+- `file "/Users/tawj/Desktop/EMA 0.0.5.app/Contents/MacOS/ema-desktop"` —
+  Mach-O arm64.
+- `pnpm --filter @ema/desktop tauri dev` — clean after the port-idempotency
+  patch; compiled and launched `target/debug/ema-desktop`.
+- `open -n "/Users/tawj/Desktop/EMA 0.0.5.app"` — launched installed bundle
+  as `ema-desktop`; test instance was quit after smoke check.
+- Direct devtools CSP-console inspection was not available from this terminal
+  run; no launch-time CSP errors surfaced in the Tauri foreground process.
+
+Next slice: B — first-launch daemon detect + labelled "Start EMA daemon?"
+affordance.
+
+## Session close 2026-04-24 — Codebase Architecture Slice A Folder Audit
+
+Slice: Codebase Architecture & Extensibility A — Folder Audit.
+
+Audit report:
+- `docs/architecture/FOLDER-AUDIT-2026-04-24.md`
+
+Safe move executed:
+- `docs/architecture/13-peer-computer-access.md` →
+  `docs/operations/peer-computer-access.md` (2 importers rewired:
+  `docs/WORKSPACE-ENTRYPOINT.md`,
+  `docs/architecture/11-transport-and-auth-survey.md`).
+
+Coordinator-review lanes opened:
+- `docs/orchestration/lanes/L-vapp-path-reconciliation.md`
+- `docs/orchestration/lanes/L-web-generated-source-twins.md`
+- `docs/orchestration/lanes/L-surface-core-adapter-reconciliation.md`
+- `docs/orchestration/lanes/L-surface-slice-plan-archive.md`
+
+Inventory/context updates:
+- Root `README.md`, runtime `README.md`, `docs/WORKSPACE-ENTRYPOINT.md`, and
+  `inventory/WORKSPACE-INVENTORY.md` now point cold readers at this live
+  ledger.
+
+Verification:
+- `bash scripts/lint.sh` could not run because `scripts/lint.sh` does not
+  exist yet.
+- `bash scripts/contract-check.sh` green.
+- `cd apps/daemon && gleam build && gleam test` green.
+- `pnpm -r typecheck` green (currently only workspace packages with a
+  `typecheck` script run it).
+- `pnpm --filter @ema/web build` green.
+- `node tooling/m1-round-trip.mjs` green against the live daemon.
+
 ## Session close 2026-04-24T15:20 (Product Surface Donor worker, meta-drift recovery + Slice A)
 
 A prior master-orchestrator session drifted hard: invented three rogue
@@ -125,6 +242,107 @@ Risks and notes:
 
 Next slice: B — populate `docs/orchestration/lanes/L-<id>.md` for every lane in this STATUS.md.
 
+## Session close 2026-04-24 — Workspace Hygiene Slices B–G
+
+Slice: Workspace Hygiene B–G landed in a single continuous sweep after Slice A.
+
+**Slice B — Populate `docs/orchestration/lanes/`**
+- Created `docs/orchestration/lanes/` and wrote five lane files:
+  `L-ipc-client-finish.md`, `L-projections-topbar.md`, `L-writers-org-space.md`,
+  `L-see-agent-work-docs.md`, `L-honest-mocks.md` (retrospective for the
+  closed lane).
+- Each file contains: status, owner, read-first, scope (exact paths),
+  dependencies, exit criteria, reporting template, ledger anchor.
+- STATUS.md lane-table rows now link to the matching lane file.
+
+**Slice C — `scripts/stop-ema-dev.sh`**
+- New clean-shutdown companion to `start-ema-dev.sh`. Reads pid files,
+  SIGTERM → grace → SIGKILL, removes stale pid files, leaves logs alone.
+  `--force-port-kill` flag (off by default) gates the cross-PID port-safety-net
+  step per the "don't kill unrelated user sessions" non-negotiable.
+- Help output verified; not executed against the live daemon (pid 47943) to
+  preserve the running user session.
+
+**Slice D — `scripts/contract-check.sh` upgrade**
+- Three error classes: `missing-from-catalog`, `misspelled-kind` (Levenshtein
+  ≤ 2, suggests closest known kind), `unknown-id-prefix`.
+- `--json` output for CI.
+- `--test-fixture` subcommand runs against `test/fixtures/bad-kinds/` and
+  asserts exit 1 with all three classes raised. Fixture file ships under
+  `test/fixtures/bad-kinds/bad_source.gleam` with deliberately wrong kind
+  (`org.greated`), unknown kind (`dispatch.teleported`), and unregistered
+  prefix (`orgx:`).
+- Verified: real tree → OK exit 0; JSON → parseable; fixture → all three
+  errors classified, suggestion is `org.created`.
+
+**Slice E — Donor Translation Pipeline**
+- Created `docs/operations/donor-translation.md` defining the four verdicts
+  (`copy` / `adapt` / `inspire` / `reject`), the `SOURCE:` header format
+  with donor branch + commit sha + reviewer, lane-ticket requirement for any
+  `copy`/`adapt`, forbidden `copy` targets (topology, event shape, daemon
+  authority, contracts, IPC plumbing, routing shell), and a 7-item translator
+  checklist.
+- Linked from STATUS.md under `## Operational docs`.
+- Not linked from `doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md` —
+  that file is outside this orchestrator's ownership boundary. Flagged as a
+  coordinator follow-up.
+
+**Slice F — `scripts/swarm-sweep.sh`**
+- Read-only six-check sweep: pids vs processes, port listeners, git branches
+  (merged / unmerged / stale > 7d), placeholder writer modules (≤10 lines),
+  ORCHESTRATOR-INDEX.md file references resolve on disk, ledger-check passes.
+- Human + `--json` output modes. Cron-compatible.
+- Surfaced real meta-drift on first run: INDEX still listed V2 briefs as
+  Active while a parallel session had archived them. Fixed by moving the V2
+  rows from Active to Archived (now 8 canonical specialists + 5 archived
+  entries), and repointing the two redirect stubs at
+  `CODEX-ORCHESTRATOR-PROMPT.md` and `CLAUDE-ORCHESTRATOR-PROMPT.md` at
+  `HANDOFF-2026-04-24.md` (the dissolution memo).
+
+**Slice G — `scripts/ledger-check.sh`**
+- Grep-based assertion that every canonical orchestrator prompt references
+  `docs/orchestration/STATUS.md`. Excludes redirect stubs (first-line "has
+  been superseded"), the index, and handoff notes.
+- Referenced by `swarm-sweep.sh` check #6.
+- Current tree: 8/8 canonical prompts cite STATUS.md.
+
+**Post-landing verification (all rc=0):**
+```
+contract-check.sh                 → OK
+contract-check.sh --json          → parseable JSON
+contract-check.sh --test-fixture  → fixture fails correctly (rc=1 from child)
+ledger-check.sh                   → 8/8 canonical prompts cite STATUS.md
+swarm-sweep.sh                    → OK, no drift
+stop-ema-dev.sh --help            → parses (not run against live daemon)
+```
+
+**Files changed this sweep:**
+- Created: `docs/orchestration/lanes/L-*.md` (5 files),
+  `docs/operations/donor-translation.md`, `scripts/stop-ema-dev.sh`,
+  `scripts/swarm-sweep.sh`, `scripts/ledger-check.sh`,
+  `test/fixtures/bad-kinds/bad_source.gleam`.
+- Upgraded: `scripts/contract-check.sh`.
+- Edited (this STATUS.md): added `## Operational docs` section; lane-table
+  rows now link to lane files.
+- Edited (orchestrator-prompts): `ORCHESTRATOR-INDEX.md` Active/Archived
+  reconciliation (10 → 8 canonical, 3 → 5 archived);
+  `CODEX-ORCHESTRATOR-PROMPT.md` and `CLAUDE-ORCHESTRATOR-PROMPT.md` redirect
+  stubs repointed at `HANDOFF-2026-04-24.md`.
+
+**Coordinator follow-ups flagged:**
+1. `doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md` should gain a
+   reference to `docs/operations/donor-translation.md` (outside hygiene
+   ownership boundary).
+2. One unmerged git branch `lane/surface-slice-a-see-agent-work` is present —
+   informational only, not stale yet.
+3. Five placeholder writer modules remain at ≤10 lines (identity, invites,
+   memberships, replication, blueprint) — expected pre-writer state; flagged
+   for the Canon Writers lane sweep.
+
+Next: outside this orchestrator's scope — Provenance lane (git init,
+CHANGELOG), Canon Writers lanes (first-boot seed, org/space writers),
+Runtime Vertical Slice lanes (IPC client audit close-out, topbar projection).
+
 ## Read-first order for any new session
 
 1. This file (`docs/orchestration/STATUS.md`)
@@ -169,20 +387,35 @@ The wrapper's idempotency check is port-based (`lsof -iTCP:49555 -sTCP:LISTEN`),
 
 ## Orchestration specializations
 
-Under the single coordinator, two specialist orchestrator roles are now
-defined. Each specialist scopes lanes inside its ownership boundary and
-reports back to the coordinator.
+Three product lane specialists (canonical 3-lane split per memory
+`ema-lane-orchestration-split.md`). Each scopes lanes inside its ownership
+boundary and reports back to the coordinator.
 
+- **Product Surface Donor Orchestrator** — owns web surface, vApps, shell
+  chrome, donor UX translation. Files: `apps/web/src/app/`, `apps/web/src/vapps/`,
+  `apps/web/src/shell/` (chrome only; runtime slice owns data wiring).
+  Prompt at `doctrine/planning/orchestrator-prompts/PRODUCT-SURFACE-DONOR-ORCHESTRATOR-PROMPT.md`.
+  **Slice A (See Agent Work 8-region first screen) landed in commit `40ba1ea` on lane branch `lane/surface-slice-a-see-agent-work`.**
+  Carry-over slices queued: B (HQ lane deepening + sparklines + CLI preview), C (global command palette), D (chronicle frame-type polish), E (CLI/vApp vocabulary notes).
 - **Runtime Vertical Slice Orchestrator** — owns the daemon ↔ surface data
   path. Files: `packages/surface-core/`, `packages/contracts/ipc/`,
-  `apps/web/src/lib/ipc/`, `apps/web/src/shell/`, daemon IPC/projection
-  code under `apps/daemon/src/`. Prompt at
-  `doctrine/planning/orchestrator-prompts/RUNTIME-VERTICAL-SLICE-ORCHESTRATOR-PROMPT.md`.
-  Active slices: **Slice A (IPC Client Comes Alive)** and
-  **Slice B (Real Topbar Projection)**.
-- **Product Surface Donor Orchestrator** — not yet staffed; will own
-  visual/UX expansion and donor-UI translation. Do not bleed those edits
-  into the Runtime Slice lanes.
+  `apps/web/src/lib/ipc/`, daemon IPC/projection code under `apps/daemon/src/`.
+  Prompt at `doctrine/planning/orchestrator-prompts/RUNTIME-VERTICAL-SLICE-ORCHESTRATOR-PROMPT.md`.
+  Active slices: **L-ipc-client-finish** and **L-projections-topbar**.
+- **Desktop Launcher Correction Orchestrator** — owns native Tauri bundle,
+  CSP, first-launch daemon-detect, tray icon, launchd autostart. Files:
+  `apps/desktop/`, `scripts/install-daemon-launchd.sh`, `docs/operations/desktop-install.md`.
+  Prompt at `doctrine/planning/orchestrator-prompts/DESKTOP-LAUNCHER-CORRECTION-ORCHESTRATOR-PROMPT.md`.
+  Active slices: **L-launcher-bundle-audit**, **L-launcher-daemon-detect**, **L-launcher-tray**.
+
+Meta orchestrators (non-product, support the three above): Canon Writers
+(inside Runtime Slice scope per canonical split — treat as a sub-role),
+Provenance & Version Control, Workspace Hygiene & Swarm Meta, Code Quality
+& Language Idiom, Codebase Architecture & Extensibility. All have canonical
+prompts in `doctrine/planning/orchestrator-prompts/`. Three now carry
+**Vision Anchors** (Shipping Shape / Donor Preservation / Extensibility
+Anchors); Provenance and Code Quality stay silent where vision grounding
+would add noise.
 
 ## Lanes
 
@@ -201,6 +434,10 @@ Reality check against what is actually on disk (not what old plan docs claimed):
 | [`L-writers-org-space`](lanes/L-writers-org-space.md) | queued | (none — specialist TBD; Codex worker brief lists this as recommended first slice) | `apps/daemon/src/ema_orgs/`, `ema_spaces/`, catalog entries in `packages/contracts/events/` | `org.created` + `space.created` (default-same-name) accepted as real commands, persisted, projected. |
 | [`L-see-agent-work-docs`](lanes/L-see-agent-work-docs.md) | queued | unassigned | `docs/cli/see-agent-work.md`, `docs/agents/see-agent-work-agent-usage.md` | Operational runbook: every CLI command has a worked example; an external session can follow the runbook cold. |
 | [`L-honest-mocks`](lanes/L-honest-mocks.md) | closed 2026-04-24 | coordinator | `apps/web/src/app/mock-projections.ts` | Self-reported "Codex: active" agentWork entries removed; `MOCK_PROJECTION_LABEL` confirmed rendered on topbar, hq-page, agent-work-page, blueprint, git-ema panels, placeholder-page. |
+| [`L-see-agent-work-8-region`](lanes/L-see-agent-work-8-region.md) | **landed 2026-04-24** (commit `40ba1ea`, lane branch) | Product Surface Donor Orch | `apps/web/src/app/see-agent-work/` (8 region components), `apps/web/src/app/agent-work-page.tsx`, `apps/web/src/app/mock-projections.ts`, `apps/web/src/app/hq-page.tsx`, `apps/web/src/app/styles.css` | 8 regions rendered; `CHRONICLE_MAX = 200` exported; 21+ `RIP:` provenance markers; language-lock clean; `pnpm --filter @ema/web build` green. |
+| `L-launcher-bundle-audit` | queued | Desktop Launcher Correction Orch | `apps/desktop/src-tauri/tauri.conf.json`, `/Users/tawj/Desktop/EMA 0.0.5.app` | `file Contents/MacOS/ema-desktop` returns Mach-O arm64; bundle launches and loads web; CSP allows `ws://127.0.0.1:49555`; no regressions vs commit `42fb50f`. |
+| `L-launcher-daemon-detect` | queued | Desktop Launcher Correction Orch | `apps/desktop/` + shell plugin wiring | First-launch shows labeled "EMA daemon not running" panel if port 49555 isn't listening; Start button (mocked initially) dismisses on hello_ack. |
+| `L-launcher-tray` | queued | Desktop Launcher Correction Orch | `apps/desktop/src-tauri/src/`, tray assets | macOS tray icon reflects daemon state (active/paused/down) within 5 s of change; uses ema-design-system palette. |
 
 ## Blockers
 

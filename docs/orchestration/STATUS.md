@@ -4,7 +4,77 @@ Canonical live ledger for the 0.0.5 buildout. One coordinator, many workers.
 Every session — Codex, Claude CLI, or human — reads this file on cold start.
 
 Coordinator: Claude (replacement orchestrator, consolidated role).
-Last coordinator sweep: 2026-04-24T15:20-04:00.
+Last coordinator sweep: 2026-04-24T15:45-04:00.
+
+## Session close 2026-04-24T15:45 — Cross-lane Donor Inventory
+
+Worker: Cross-lane research session acting under Codebase Architecture & Extensibility.
+
+Context: prior session landed Slice A (See Agent Work first screen) citing 6 donors from
+`EMA-0.0.5-SURFACE-DONOR-MATRIX.md`. User observed there are **far more** extractable
+assets in ema-atlas's 34 branches and in the TrajanWJ GitHub ring — "so many valuable
+assets and documentation in atlas. it deserves more." Specifically called out the "full
+Elixir Tauri build with working transparency" as underdone.
+
+Mined 18 atlas codebase/lineage branches + 12 docs-* branches + 16 TrajanWJ repos via
+three parallel Explore agents. Findings landed on branch
+`lane/cross-lane-donor-inventory` (commit `8db658d`).
+
+Files written:
+- `doctrine/research/EMA-0.0.5-FULL-DONOR-INVENTORY.md` (new, ~500 lines). Cross-lane
+  donor inventory: Runtime (5 donors) + Desktop Launcher (3) + Doctrine pulls (12) + GH
+  ring inventory. Priority intake lists per lane + handoff-trigger template.
+- `doctrine/research/EMA-0.0.5-SURFACE-DONOR-MATRIX.md` (extended). Two new rows:
+  §7.5 `codebase-place-org-openclaw` (glass morphism, popout-launcher, companion-bridge,
+  additive-only fork seam, graceful degradation) and §7.75 `codebase-execudeck`
+  (trust zones Zone 0/1/2, schema-driven mutations).
+
+Crown-jewel locator (direct answer to the user's "full Elixir Tauri transparency build"):
+
+- **Half 1 — Elixir daemon** lives in `ema-atlas origin/codebase-ema:code/ema/daemon/`.
+  Contains `control_plane/`, `babysitter/`, `sessions/`, `workspace/shared`,
+  `surfaces/hermes_client.ex` (typed EMA-truth / Hermes-execution seam),
+  `second_brain/indexer.ex`. Substrate is Elixir/Phoenix/OTP; EMA 0.0.5 carries the
+  shape forward in Gleam/BEAM.
+- **Half 2 — Tauri transparent companion** lives in
+  `ema-atlas origin/codebase-place-companion:code/place-companion/src-tauri/`. Rust + Tauri
+  v2 + objc2. `.transparent(true)` + macOS `NSWindow.setOpaque:false` via objc2 unsafe
+  (Tauri issue #13415 workaround) + Linux `xprop _NET_WM_CM_S0` compositor check +
+  localhost WebSocket on ports 27182–27189 with origin allowlist +
+  `ActivationPolicy::Accessory` tray daemon + `macos-private-api` feature flag.
+  **Production-ready; port wholesale to `apps/desktop/src-tauri/src/`.**
+- **Integration spec (the glue)** lives in `ema-atlas origin/codebase-place-org-openclaw:
+  code/place.org-openclaw/docs/superpowers/specs/2026-03-24-companion-app-design.md`
+  plus `popout-launcher.ts` and `companion-bridge.ts` on the browser side. Absorb into
+  new `docs/architecture/14-companion-bridge.md`.
+
+Naming correction recorded in the inventory: the two halves were **never** compiled into
+one repo. The "Elixir Tauri" integration is a WebSocket seam, not a shared build. Future
+agents chasing a single "Elixir Tauri" repo should read the inventory's Crown Jewel section
+first.
+
+Also captured: the `docs-place-org-era-research` branch contains the aesthetic manifesto
+(time-of-day color breathing, bioluminescent glow NOT neon, 5-min idle screensaver, spring
+easing, calm-tech posture) that the user's "looks horrible" feedback was pointing at.
+Flagged as top-priority doctrine pull: `doctrine/design/place-org-ux-manifesto.md`.
+
+Priority intake (top 3 per lane; full list in the inventory):
+
+- Runtime Vertical Slice: port `hermes_client.ex` shape into Gleam `ema_exec_control`;
+  extract claudeforge session-manager invariants into contract tests; define
+  `packages/surface-core/src/companion-bridge/` client contract.
+- Desktop Launcher Correction: copy place-companion `src-tauri/src/*.rs` verbatim into
+  EMA; absorb companion-app-design spec into `docs/architecture/14-companion-bridge.md`;
+  add `check_status` daemon probe per superman pattern.
+- Product Surface Donor (post Slice A): write `doctrine/design/place-org-ux-manifesto.md`;
+  write `docs/vapps/catalog-reconciliation.md` for the 35-vApp donor vs current renderer
+  discrepancy; consider opt-in "pop out vApp" affordance when the companion-bridge lands.
+
+Lane discipline: this research sits in `doctrine/research/` which is shared across
+orchestrators. No code touched; no runtime files modified. All findings are read-only
+snapshots ready for each lane owner to act on.
+
+Branch: `lane/cross-lane-donor-inventory`. Commit: `8db658d`.
 
 ## Session close 2026-04-24 — Canon Writers Slice A
 

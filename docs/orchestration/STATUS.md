@@ -4,7 +4,88 @@ Canonical live ledger for the 0.0.5 buildout. One coordinator, many workers.
 Every session — Codex, Claude CLI, or human — reads this file on cold start.
 
 Coordinator: Claude (replacement orchestrator, consolidated role).
-Last coordinator sweep: 2026-04-24T14:48-04:00.
+Last coordinator sweep: 2026-04-24T15:20-04:00.
+
+## Session close 2026-04-24T15:20 (Product Surface Donor worker, meta-drift recovery + Slice A)
+
+A prior master-orchestrator session drifted hard: invented three rogue
+orchestrator prompts (CLAUDE-V2, CODEX-V2, CODEX-CORRECTION-2026-04-24),
+crossed three ownership lanes (Surface + Runtime Vertical Slice + Desktop
+Launcher) in one pass, shipped a generic glass VirtualDesktopShell block
+styled with legacy `--ema-*` hex colors before checking that the place.org
+palette was already in place, and skipped the `docs/plans/SURFACE-SLICE-A.md`
+plan that the approved Product Surface Donor lane had queued. User feedback:
+"looks horrible. not the vision or similar to other codesbases."
+
+This session diagnosed the meta-drift, reverted the lane violations, and
+landed the canonical Slice A as the Product Surface Donor worker.
+
+Reverts:
+- `packages/surface-core/src/adapter/` deleted (Runtime Vertical Slice lane
+  territory; was out of scope for any Surface work).
+- `doctrine/planning/orchestrator-prompts/{CLAUDE,CODEX}-ORCHESTRATOR-PROMPT-V2`
+  and `CODEX-CORRECTION-PROMPT-2026-04-24` moved to
+  `orchestrator-prompts/archive/` with `HANDOFF-2026-04-24.md` preserved
+  as the canonical dissolution memo.
+
+Landed (commit `40ba1ea` on branch `lane/surface-slice-a-see-agent-work`):
+- `apps/web/src/app/see-agent-work/` — 8 region components + barrel.
+  Regions: TopSwarmPulse, MissionRail, LaneBoard (idea/ready/active/review/
+  blocked/done columns), VcalendarStrip, AgentRoster, CommandPanel,
+  AgentInstructionPanel, ChronicleStrip.
+- `apps/web/src/app/agent-work-page.tsx` — composes the 8 regions.
+- `apps/web/src/app/mock-projections.ts` — adds `recent_events[]`,
+  exports `CHRONICLE_MAX = 200`, derives `agentWorkLaneSummary`.
+- `apps/web/src/app/hq-page.tsx` — Lane status panel rewired to read
+  `agentWorkLaneSummary` (not the one-line `agentWork` stub).
+- `apps/web/src/app/styles.css` — adds `.ema-saw-*` classes with RIP
+  provenance markers (place.org glass tiers, codebase-frontend-layer
+  density, agent-os-bridge state vocabulary, lineage-original-elixir-ema
+  bounded buffer, mission-control-claude role display).
+
+Verifications:
+- `pnpm --filter @ema/web build` (tsc + vite) green — 71 modules, 44.8 KB CSS,
+  256 KB JS.
+- `pnpm check:contracts` — OK — every referenced event kind and id prefix
+  is registered.
+- Reject ledger clean in `apps/web/src/`: localStorage confined to
+  `layout-artifact.ts` (per `ema-virtual-desktop` skill); no Tailwind, no
+  shadcn, no zustand, no framer-motion, no electron.
+- 21+ `RIP:` provenance markers across `styles.css` + components +
+  `mock-projections.ts`.
+
+Language-lock check: every UI string uses `org / space / project / lane /
+mission / campaign / handoff / actor / agent / canon / intent / vcalendar /
+checkup / weekly phase / focus block`. No `task`-as-synonym-for-lane, no
+`workflow`, no `pipeline`. Every mocked control carries one of
+`mocked | draft | local only | pending daemon writer`.
+
+Surface lane carry-over (still queued):
+- **Slice B** — HQ lane-status deepening: sparkline per lane, hover CLI preview.
+- **Slice C** — Global command palette (inspired by place.org, strictly
+  IPC-dispatched; no UI-local canon).
+- **Slice D** — Chronicle strip frame-type visual language + bounded-buffer
+  instrumentation (already partially landed via Slice A's `data-frame`
+  attribute; polish lane to come).
+- **Slice E** — Vocabulary notes in `docs/cli/see-agent-work.md` (agent-os
+  verbs, mission-control adapter-protocol note) and
+  `docs/vapps/see-agent-work.md` (takeover state labels).
+
+Adjacent lanes untouched (hand off, don't cross-edit):
+- Runtime Vertical Slice Orchestrator: topbar daemon-projection actor
+  (`L-projections-topbar` Slice B below); `apps/daemon/**` and
+  `packages/surface-core/**` edits.
+- Desktop Launcher Correction Orchestrator: Tauri tray / first-launch
+  "Start EMA daemon?" affordance; Tauri CSP review.
+
+Decisions logged this sweep:
+- 2026-04-24: meta-drift discipline — any orchestrator prompt added beyond
+  the canonical 8 listed in `ORCHESTRATOR-INDEX.md` requires a named
+  superseding memo (like `HANDOFF-2026-04-24.md`) and a new entry in the
+  index before workers treat it as authoritative.
+- 2026-04-24: lane-branch policy enforced — Slice A landed on
+  `lane/surface-slice-a-see-agent-work`, not on `main`. Next lane starts a
+  new branch per `docs/operations/git-policy.md`.
 
 ## Session close 2026-04-24T14:48
 

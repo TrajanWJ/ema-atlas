@@ -35,7 +35,7 @@
 
 -type supervisor_error() :: {child_failed_to_start, binary(), binary()}.
 
--file("src/ema_daemon/supervisor.gleam", 57).
+-file("src/ema_daemon/supervisor.gleam", 62).
 -spec describe_start_error(gleam@otp@actor:start_error()) -> binary().
 describe_start_error(E) ->
     case E of
@@ -49,7 +49,7 @@ describe_start_error(E) ->
             <<"init exited"/utf8>>
     end.
 
--file("src/ema_daemon/supervisor.gleam", 32).
+-file("src/ema_daemon/supervisor.gleam", 34).
 ?DOC(" Start bus + registry + IPC, wire them together.\n").
 -spec start() -> {ok, started_tree()} | {error, supervisor_error()}.
 start() ->
@@ -61,7 +61,14 @@ start() ->
         <<"EMA_IPC_BIND"/utf8>>,
         <<"127.0.0.1"/utf8>>
     ),
-    Port = 49555,
+    Port = begin
+        _pipe = ema_daemon@ema_env:getenv_or(
+            <<"EMA_IPC_PORT"/utf8>>,
+            <<"49555"/utf8>>
+        ),
+        _pipe@1 = gleam_stdlib:parse_int(_pipe),
+        gleam@result:unwrap(_pipe@1, 49555)
+    end,
     case ema_daemon@bus:start(Db_path) of
         {error, E} ->
             {error,
@@ -95,7 +102,7 @@ start() ->
             end
     end.
 
--file("src/ema_daemon/supervisor.gleam", 65).
+-file("src/ema_daemon/supervisor.gleam", 70).
 -spec children() -> list(binary()).
 children() ->
     [<<"bus"/utf8>>, <<"registry"/utf8>>, <<"shell_ipc"/utf8>>].

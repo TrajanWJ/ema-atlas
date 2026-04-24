@@ -49,7 +49,13 @@ export function createIpcClient(options: IpcClientOptions): IpcClient {
 
   return {
     connect() {
-      if (socket && socket.readyState !== WebSocket.CLOSED) return;
+      if (
+        socket &&
+        (socket.readyState === WebSocket.OPEN ||
+          socket.readyState === WebSocket.CONNECTING)
+      ) {
+        return;
+      }
       manuallyClosed = false;
       socket = new WebSocket(options.url);
       socket.addEventListener("open", () => {

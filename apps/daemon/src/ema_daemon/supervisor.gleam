@@ -18,7 +18,9 @@ import ema_daemon/ema_env
 import ema_daemon/registry
 import ema_shell_ipc/ema_shell_ipc
 import gleam/erlang/process.{type Subject}
+import gleam/int
 import gleam/otp/actor
+import gleam/result
 
 pub type StartedTree {
   StartedTree(bus: Subject(bus.Msg), registry: Subject(registry.Msg))
@@ -32,7 +34,10 @@ pub type SupervisorError {
 pub fn start() -> Result(StartedTree, SupervisorError) {
   let db_path = ema_env.getenv_or("EMA_CANONICAL_DB", "./canonical.db")
   let bind_addr = ema_env.getenv_or("EMA_IPC_BIND", "127.0.0.1")
-  let port = 49_555
+  let port =
+    ema_env.getenv_or("EMA_IPC_PORT", "49555")
+    |> int.parse
+    |> result.unwrap(49_555)
 
   case bus.start(db_path) {
     Error(e) -> Error(ChildFailedToStart("bus", describe_start_error(e)))

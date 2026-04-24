@@ -60,18 +60,40 @@ The wrapper's idempotency check is port-based (`lsof -iTCP:49555 -sTCP:LISTEN`),
 | W3 | See Agent Work | UI only, no writers | `agent-work-page.tsx` renders mock swarms/missions/lanes; no `swarm.start` or `lane.open` handler in the daemon. |
 | W4–W7 | Actors/Soul/Proposals/Runtime/Collab | not started | Design only. |
 
+## Orchestration specializations
+
+Under the single coordinator, two specialist orchestrator roles are now
+defined. Each specialist scopes lanes inside its ownership boundary and
+reports back to the coordinator.
+
+- **Runtime Vertical Slice Orchestrator** — owns the daemon ↔ surface data
+  path. Files: `packages/surface-core/`, `packages/contracts/ipc/`,
+  `apps/web/src/lib/ipc/`, `apps/web/src/shell/`, daemon IPC/projection
+  code under `apps/daemon/src/`. Prompt at
+  `doctrine/planning/orchestrator-prompts/RUNTIME-VERTICAL-SLICE-ORCHESTRATOR-PROMPT.md`.
+  Active slices: **Slice A (IPC Client Comes Alive)** and
+  **Slice B (Real Topbar Projection)**.
+- **Product Surface Donor Orchestrator** — not yet staffed; will own
+  visual/UX expansion and donor-UI translation. Do not bleed those edits
+  into the Runtime Slice lanes.
+
 ## Lanes
 
-Lane scope is disjoint. One owner per lane. Lane prompts live under `docs/orchestration/lanes/` once scoped (none yet — next coordinator move).
+Lane scope is disjoint. One owner per lane. Lane prompts live under `docs/orchestration/lanes/` once scoped (none written yet — next coordinator move).
+
+Reality check against what is actually on disk (not what old plan docs claimed):
+
+- **M1 round-trip passes today.** `node tooling/m1-round-trip.mjs` against the live daemon on 49555 returns `m1-round-trip: OK`. The wire protocol (hello → hello_ack → subscribe → command → event stream) is working against `debug.ping` and synthetic `dispatch.started/ended` events.
+- **IPC client exists** — `packages/surface-core/src/ipc-client/index.ts` is a real 217-line WS client with pending-request map and projection subscriptions, not the stub my earlier diagnosis claimed. React hooks in `apps/web/src/lib/ipc/` are thin wrappers that correctly read from an `IpcContext` provider.
+- **What's missing for Slice B:** a daemon-side projection actor emitting `topbar.projection`, and swapping the topbar's `mockTopbar` import for `useProjection("topbar.projection")`.
 
 | Lane | Status | Owner | Files | Exit criteria |
 |---|---|---|---|---|
-| `L-m1-roundtrip` | **next** | unassigned | `apps/daemon/src/ema_daemon/*.gleam`, `apps/cli/src/commands/ping.ts`, `tooling/m1-round-trip.mjs` | `m1-round-trip.mjs` script calls daemon WS, appends one test event, subscribes, sees it streamed back. |
-| `L-writers-org-space` | queued | unassigned | `apps/daemon/src/ema_orgs/`, `ema_spaces/`, plus catalog entries in `packages/contracts/events/` | `org.created` + `space.created` (default-same-name) accepted as commands, projected, visible in topbar projection. |
-| `L-projections-topbar` | queued | unassigned | `apps/daemon/src/ema_projections/topbar.gleam`, `packages/surface-core/src/ipc-client/use-projection.ts` | Topbar reads live projection instead of `mockTopbar`. |
+| `L-ipc-client-finish` (Slice A) | in-progress (wire alive, hooks need audit) | Runtime Slice Orch | `packages/surface-core/src/ipc-client/`, `apps/web/src/lib/ipc/`, `tooling/m1-round-trip.mjs` | All 7 minimum-behaviors in Runtime-Slice-Orchestrator prompt met: reconnect w/ backoff, clear offline state to hooks, UI never writes raw frames. `m1-round-trip.mjs` still green. |
+| `L-projections-topbar` (Slice B) | queued | Runtime Slice Orch | daemon-side `apps/daemon/src/ema_projections/topbar.gleam` (new), `apps/web/src/shell/topbar.tsx`, `apps/web/src/shell/*-selector.tsx` | Topbar renders "Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5" from `useProjection("topbar.projection")`, not `mockTopbar`. Event trail contains seed or command events backing the projection. |
+| `L-writers-org-space` | queued | (none — specialist TBD; Codex worker brief lists this as recommended first slice) | `apps/daemon/src/ema_orgs/`, `ema_spaces/`, catalog entries in `packages/contracts/events/` | `org.created` + `space.created` (default-same-name) accepted as real commands, persisted, projected. |
 | `L-see-agent-work-docs` | queued | unassigned | `docs/cli/see-agent-work.md`, `docs/agents/see-agent-work-agent-usage.md` | Operational runbook: every CLI command has a worked example; an external session can follow the runbook cold. |
-| `L-ipc-client` | queued | unassigned | `packages/surface-core/src/ipc-client/` | Real WS client replaces the stubbed hook. |
-| `L-honest-mocks` | **closed this sweep** | coordinator | `apps/web/src/app/mock-projections.ts` | Self-reported "Codex: active" agentWork entries removed; source of truth for worker status is this ledger, not UI mocks. |
+| `L-honest-mocks` | closed 2026-04-24 | coordinator | `apps/web/src/app/mock-projections.ts` | Self-reported "Codex: active" agentWork entries removed; `MOCK_PROJECTION_LABEL` confirmed rendered on topbar, hq-page, agent-work-page, blueprint, git-ema panels, placeholder-page. |
 
 ## Blockers
 

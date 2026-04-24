@@ -5,7 +5,7 @@
 
 import WebSocket, { type RawData } from "ws";
 
-export const DAEMON_URL = "ws://127.0.0.1:49555";
+export const DAEMON_URL = process.env.EMA_DAEMON_URL ?? "ws://127.0.0.1:49555";
 export const HELLO_TIMEOUT_MS = 5_000;
 export const COMMAND_TIMEOUT_MS = 15_000;
 

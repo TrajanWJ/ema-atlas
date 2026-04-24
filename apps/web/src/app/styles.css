@@ -834,3 +834,300 @@ a {
     display: grid;
   }
 }
+
+/* ===========================================================
+ * Virtual Desktop — root shell per doctrine/research/virtual-desktop-deep.md
+ * =========================================================== */
+
+.ema-desktop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+}
+
+.ema-desktop__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* --- Wallpaper ----------------------------------------------------- */
+
+.ema-wallpaper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: background 600ms ease;
+}
+
+.ema-wallpaper[data-scene="scene-forest"] {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(143, 208, 106, 0.22), transparent 38rem),
+    radial-gradient(circle at 82% 72%, rgba(122, 162, 255, 0.18), transparent 34rem),
+    linear-gradient(150deg, #0a110b 0%, #0f1813 52%, #060a07 100%);
+}
+
+.ema-wallpaper[data-scene="scene-ember"] {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(255, 184, 107, 0.26), transparent 34rem),
+    radial-gradient(circle at 16% 78%, rgba(255, 107, 107, 0.16), transparent 30rem),
+    linear-gradient(135deg, #140b06 0%, #1a120a 50%, #070403 100%);
+}
+
+.ema-wallpaper[data-scene="scene-dusk"] {
+  background:
+    radial-gradient(circle at 72% 22%, rgba(122, 162, 255, 0.22), transparent 40rem),
+    radial-gradient(circle at 22% 78%, rgba(180, 132, 255, 0.18), transparent 32rem),
+    linear-gradient(145deg, #070a14 0%, #0d1220 52%, #050711 100%);
+}
+
+.ema-wallpaper[data-scene="scene-slate"] {
+  background:
+    radial-gradient(circle at 50% 14%, rgba(243, 239, 226, 0.08), transparent 38rem),
+    linear-gradient(135deg, #0b0d0b 0%, #15191a 50%, #07090a 100%);
+}
+
+/* --- Dock --------------------------------------------------------- */
+
+.ema-dock {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  margin: 0 auto 1.25rem;
+  max-width: max-content;
+  background: var(--ema-panel-strong);
+  border: 1px solid var(--ema-wire);
+  border-radius: 18px;
+  box-shadow: var(--ema-shadow);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.ema-dock__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.5rem 0.75rem;
+  min-width: 4.75rem;
+  color: var(--ema-ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 120ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.ema-dock__tile:hover {
+  background: var(--ema-rail);
+  border-color: var(--ema-wire);
+  transform: translateY(-1px);
+}
+
+.ema-dock__tile.is-open {
+  background: var(--ema-rail);
+  border-color: var(--ema-wire);
+}
+
+.ema-dock__tile-eyebrow {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ema-ash);
+}
+
+.ema-dock__tile-label {
+  font-family: var(--ema-font-display);
+  font-size: 0.95rem;
+  color: var(--ema-ink);
+}
+
+.ema-dock__tile-status {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  margin-top: 0.2rem;
+  background: var(--ema-ash);
+}
+
+.ema-dock__tile-status[data-status="live"] {
+  background: var(--ema-green);
+}
+
+.ema-dock__tile-status[data-status="projection"] {
+  background: var(--ema-amber);
+}
+
+.ema-dock__tile-status[data-status="placeholder"] {
+  background: var(--ema-wire);
+}
+
+/* --- Window ------------------------------------------------------- */
+
+.ema-window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 420px;
+  min-height: 280px;
+  background: var(--ema-panel-strong);
+  border: 1px solid var(--ema-wire);
+  border-radius: 14px;
+  box-shadow: var(--ema-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.ema-window__header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  background: linear-gradient(180deg, rgba(243, 239, 226, 0.04), transparent 90%);
+  border-bottom: 1px solid var(--ema-wire);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.ema-window__header:active {
+  cursor: grabbing;
+}
+
+.ema-window__title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  line-height: 1.05;
+}
+
+.ema-window__title-eyebrow {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ema-ash);
+}
+
+.ema-window__title strong {
+  font-family: var(--ema-font-display);
+  font-size: 1rem;
+  color: var(--ema-ink);
+}
+
+.ema-window__controls {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.ema-window__control {
+  width: 1.35rem;
+  height: 1.35rem;
+  line-height: 1;
+  padding: 0;
+  color: var(--ema-ash);
+  background: var(--ema-rail);
+  border: 1px solid var(--ema-wire);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.ema-window__control:hover {
+  color: var(--ema-ink);
+  background: var(--ema-wire);
+}
+
+.ema-window__control--close:hover {
+  color: var(--ema-black);
+  background: var(--ema-red);
+  border-color: var(--ema-red);
+}
+
+.ema-window__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0;
+}
+
+.ema-window__resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: nwse-resize;
+}
+
+.ema-window__resize::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--ema-wire);
+  border-bottom: 2px solid var(--ema-wire);
+  border-bottom-right-radius: 4px;
+}
+
+/* --- Presence (stub wiring) --------------------------------------- */
+
+.ema-presence {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.ema-presence__cursor {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ema-presence-color, var(--ema-blue));
+  font-size: 0.72rem;
+  will-change: transform;
+}
+
+.ema-presence__cursor-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 2px var(--ema-black);
+}
+
+.ema-presence__cursor-label {
+  padding: 0.1rem 0.4rem;
+  background: var(--ema-panel-strong);
+  border: 1px solid var(--ema-wire);
+  border-radius: 6px;
+  color: var(--ema-ink);
+}
+
+/* --- Topbar re-tuning for VDS root ------------------------------- */
+
+.ema-topbar {
+  position: relative;
+  z-index: 40;
+}
+
+/* Legacy .ema-shell styles remain harmless — no longer mounted. */

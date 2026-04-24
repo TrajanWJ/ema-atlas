@@ -83,7 +83,7 @@ async function runHelp(args) {
 
 // src/ws-client.ts
 import WebSocket from "ws";
-var DAEMON_URL = "ws://127.0.0.1:49555";
+var DAEMON_URL = process.env.EMA_DAEMON_URL ?? "ws://127.0.0.1:49555";
 var HELLO_TIMEOUT_MS = 5e3;
 var COMMAND_TIMEOUT_MS = 15e3;
 var DaemonUnreachableError = class extends Error {

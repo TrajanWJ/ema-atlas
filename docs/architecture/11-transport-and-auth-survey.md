@@ -235,6 +235,10 @@ bounded contexts, no new event families.
   `dispatch.*` events from remote sessions the same way it consumes
   local ones.
 
+For the trusted-dev bootstrap rail before Iroh lands, see
+`13-peer-computer-access.md`. That rail uses OS-native SSH/admin access for
+operator work and does not replace the EMA-native Iroh plan.
+
 Three capabilities that should exist in `secret_ref`-adjacent
 storage by the time this wave starts:
 
@@ -256,6 +260,8 @@ storage by the time this wave starts:
 
 - Wave 1: none of the above is wired. Replication bytes do not fly; auth
   is local-only; no remote surfaces.
+- Dev/operator bootstrap: SSH peer access is the practical path for the first
+  trusted peer; Tailscale remains optional and non-default.
 - Wave N (replication): Iroh sidecar + signed events + peer pairing.
 - Wave N+1 (delegation): Biscuit tokens for Hermes seam + connectors.
 - Wave N+2 (remote surfaces): LiveKit + tmate-class tunnels on top of

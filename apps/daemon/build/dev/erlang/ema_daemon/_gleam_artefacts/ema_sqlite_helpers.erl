@@ -98,7 +98,9 @@ select_orgs(Db) ->
 
 collect_org_rows(Stmt, Acc) ->
     case esqlite3:step(Stmt) of
+        [Id, Name] -> collect_org_rows(Stmt, [{to_binary(Id), to_binary(Name)} | Acc]);
         {row, {Id, Name}} -> collect_org_rows(Stmt, [{to_binary(Id), to_binary(Name)} | Acc]);
+        {row, [Id, Name]} -> collect_org_rows(Stmt, [{to_binary(Id), to_binary(Name)} | Acc]);
         '$done' -> lists:reverse(Acc);
         _ -> lists:reverse(Acc)
     end.
@@ -112,7 +114,11 @@ select_recent_events(Db) ->
 
 collect_event_rows(Stmt, Acc) ->
     case esqlite3:step(Stmt) of
+        [Txid, Kind, Ts, Payload] ->
+            collect_event_rows(Stmt, [{Txid, to_binary(Kind), to_binary(Ts), to_binary(Payload)} | Acc]);
         {row, {Txid, Kind, Ts, Payload}} ->
+            collect_event_rows(Stmt, [{Txid, to_binary(Kind), to_binary(Ts), to_binary(Payload)} | Acc]);
+        {row, [Txid, Kind, Ts, Payload]} ->
             collect_event_rows(Stmt, [{Txid, to_binary(Kind), to_binary(Ts), to_binary(Payload)} | Acc]);
         '$done' -> lists:reverse(Acc);
         _ -> lists:reverse(Acc)
@@ -143,7 +149,7 @@ join_json([One | Rest]) ->
 
 extract_json_string(PayloadJson, Key) ->
     Payload = to_binary(PayloadJson),
-    Pattern = [<<"\"">>, Key, <<"\":\"">>],
+    Pattern = iolist_to_binary([<<"\"">>, Key, <<"\":\"">>]),
     case binary:split(Payload, Pattern) of
         [_Before, After] ->
             hd(binary:split(After, <<"\"">>));
@@ -169,6 +175,8 @@ json_escape(<<"\t", Rest/binary>>, Acc) ->
 json_escape(<<Char/utf8, Rest/binary>>, Acc) ->
     json_escape(Rest, [unicode:characters_to_binary([Char]) | Acc]).
 
+classify_step(Row) when is_list(Row) ->
+    {ok, {step_row, Row}};
 classify_step({row, Row}) ->
     {ok, {step_row, Row}};
 classify_step('$done') ->

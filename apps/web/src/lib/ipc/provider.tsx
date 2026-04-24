@@ -23,5 +23,5 @@ export function IpcProvider({ children }: { children: ReactNode }) {
 function inferDaemonUrl(): string {
   // In dev the daemon is on 127.0.0.1:49555. Surfaces never talk to a
   // remote host; EMA's remote reach is daemon→daemon replication.
-  return "ws://127.0.0.1:49555";
+  return import.meta.env.VITE_EMA_DAEMON_URL ?? "ws://127.0.0.1:49555";
 }

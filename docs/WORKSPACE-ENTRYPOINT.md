@@ -17,7 +17,8 @@ Read:
 9. `architecture/10-first-boot.md`
 10. `architecture/11-transport-and-auth-survey.md`
 11. `architecture/12-hermes-integration.md`
-12. `plans/IMPLEMENTATION-ROADMAP.md`
+12. `architecture/13-peer-computer-access.md`
+13. `plans/IMPLEMENTATION-ROADMAP.md`
 
 ## First build assumptions
 
@@ -69,6 +70,8 @@ Read:
 - Replication transport (the event family is stubbed; bytes aren't
   flying yet) — shortlist in `architecture/11-transport-and-auth-survey.md`;
   default is Iroh sidecar.
+- Trusted dev peer computer access — SSH/admin bootstrap rail in
+  `architecture/13-peer-computer-access.md`; Tailscale is not default.
 - Lane / handoff / proposal vApp surfaces.
 - Tauri window capability partitioning beyond the single `main` window.
 

@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./ipc-client": "./src/ipc-client/index.ts",
     "./selectors": "./src/selectors/index.ts",
-    "./projections": "./src/projections/index.ts"
+    "./projections": "./src/projections/index.ts",
+    "./adapter": "./src/adapter/index.ts"
   },
   "dependencies": {
     "@ema/contracts": "workspace:*"

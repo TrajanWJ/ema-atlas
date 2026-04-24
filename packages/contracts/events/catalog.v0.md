@@ -1,0 +1,152 @@
+# Event catalog — v0
+
+Authoritative list of every event kind. One row per kind. Sorted by
+family, then by kind.
+
+Contract check: every `<family>.<verb>` string that appears in daemon
+or surface code must appear in this list.
+
+## org
+
+- `org.created`
+- `org.renamed`
+- `org.settings_updated`
+- `org.archived`
+
+## actor
+
+- `actor.created`
+- `actor.assigned_to_project`
+
+## space
+
+- `space.created`
+- `space.renamed`
+- `space.settings_updated`
+- `space.archived`
+- `space.member_added`
+- `space.member_removed`
+
+## project
+
+- `project.created`
+- `project.renamed`
+- `project.archived`
+- `project.moved`               (cross-space move, preserves lineage)
+
+## membership
+
+- `membership.role_granted`
+- `membership.role_revoked`
+- `membership.removed`
+
+## invite
+
+- `invite.created`
+- `invite.accepted`
+- `invite.revoked`
+- `invite.expired`
+
+## device
+
+- `device.registered`
+- `device.renamed`
+- `device.revoked`
+- `device.key_rotated`
+
+## peer
+
+- `peer.seen`
+- `peer.unreachable`
+- `peer.trust_established`
+- `peer.trust_revoked`
+
+## lease
+
+- `lease.issued`
+- `lease.renewed`
+- `lease.released`
+- `lease.expired`
+- `lease.superseded`            (split-brain resolution)
+
+## replication
+
+- `replication.batch_sent`
+- `replication.batch_applied`
+- `replication.diverged`
+- `replication.resynced`
+
+## lane
+
+- `lane.opened`
+- `lane.closed`
+- `lane.item_added`
+- `lane.item_moved`
+
+## handoff
+
+- `handoff.requested`
+- `handoff.accepted`
+- `handoff.rejected`
+- `handoff.completed`
+
+## proposal
+
+- `proposal.drafted`
+- `proposal.submitted`
+- `proposal.accepted`
+- `proposal.rejected`
+- `proposal.superseded`
+
+## incident
+
+- `incident.opened`
+- `incident.noted`
+- `incident.resolved`
+
+## dispatch
+
+- `dispatch.started`             (Hermes seam)
+- `dispatch.scope_granted`
+- `dispatch.ended`
+
+## execution
+
+- `execution.started`            (Hermes seam)
+- `execution.ended`
+- `execution.failed`
+
+## tool
+
+- `tool.invoked`                 (Hermes seam)
+- `tool.returned`
+- `tool.errored`
+
+## blueprint
+
+- `blueprint.document.created`
+- `blueprint.document.renamed`
+- `blueprint.document.archived`
+- `blueprint.section.added`
+- `blueprint.section.renamed`
+- `blueprint.section.moved`
+- `blueprint.section.removed`
+- `blueprint.section.promoted_to_proposal`
+- `blueprint.comment.added`
+- `blueprint.comment.resolved`
+- `blueprint.attachment.linked`
+- `blueprint.attachment.unlinked`
+
+## attachment
+
+- `attachment.created`
+- `attachment.renamed`
+- `attachment.deleted`
+- `attachment.linked`
+- `attachment.unlinked`
+
+## connector
+
+- `connector.connected`
+- `connector.disconnected`
+- `connector.linked_resource_imported`

@@ -1,0 +1,1 @@
+-record(not_in_catalog, {kind :: binary()}).

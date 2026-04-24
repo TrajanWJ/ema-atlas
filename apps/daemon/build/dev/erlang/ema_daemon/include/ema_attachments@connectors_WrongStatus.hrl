@@ -1,0 +1,1 @@
+-record(wrong_status, {expected :: ema_attachments@connectors:status()}).

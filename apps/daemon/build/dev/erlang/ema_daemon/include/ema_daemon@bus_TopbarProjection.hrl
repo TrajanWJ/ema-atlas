@@ -1,0 +1,1 @@
+-record(topbar_projection, {reply :: gleam@erlang@process:subject(binary())}).

@@ -1,0 +1,12 @@
+{
+  "name": "@ema/design-system",
+  "version": "0.0.5-dev",
+  "private": true,
+  "description": "EMA design-system primitives.",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css"
+  }
+}

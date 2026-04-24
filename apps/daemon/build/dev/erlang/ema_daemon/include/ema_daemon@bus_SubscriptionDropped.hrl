@@ -1,0 +1,1 @@
+-record(subscription_dropped, {reason :: binary()}).

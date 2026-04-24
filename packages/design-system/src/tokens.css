@@ -1,0 +1,19 @@
+/* EMA 0.0.5 — design tokens (wave 1, minimal). */
+
+:root {
+  --ema-bg:           #0b0d10;
+  --ema-surface:      #15181d;
+  --ema-surface-2:    #1b1f26;
+  --ema-border:       #2a2f38;
+  --ema-text:         #e6e9ef;
+  --ema-text-muted:   #9aa3b2;
+  --ema-accent:       #7aa2ff;
+  --ema-accent-hot:   #ffb86b;
+  --ema-danger:       #ff6b6b;
+
+  --ema-radius-sm:    4px;
+  --ema-radius-md:    8px;
+
+  --ema-font-sans:    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ema-font-mono:    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}

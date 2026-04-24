@@ -1,0 +1,1 @@
+-record(invalid_args, {reason :: binary()}).

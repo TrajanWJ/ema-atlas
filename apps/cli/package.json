@@ -1,0 +1,28 @@
+{
+  "name": "@ema/cli",
+  "version": "0.0.5-dev",
+  "private": true,
+  "description": "EMA 0.0.5 — command-line surface over the daemon IPC.",
+  "type": "module",
+  "bin": {
+    "ema": "./dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/ws": "^8.5.12",
+    "tsup": "^8.3.0",
+    "typescript": "^5.5.0"
+  }
+}

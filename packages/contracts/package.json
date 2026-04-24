@@ -1,0 +1,13 @@
+{
+  "name": "@ema/contracts",
+  "version": "0.0.5-dev",
+  "private": true,
+  "description": "EMA contracts: event catalog, IPC protocol, and shared type docs.",
+  "type": "module",
+  "exports": {
+    ".": "./README.md",
+    "./events/*": "./events/*.md",
+    "./ipc/*": "./ipc/*.md",
+    "./types/*": "./types/*.md"
+  }
+}

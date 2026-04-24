@@ -1,0 +1,21 @@
+{
+  "name": "ema-runtime",
+  "version": "0.0.5-dev",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "cli": "pnpm --filter @ema/cli exec ema",
+    "dev:daemon": "bash scripts/dev-daemon.sh",
+    "dev:web": "bash scripts/dev-web.sh",
+    "dev:desktop": "bash scripts/dev-desktop.sh",
+    "check:contracts": "bash scripts/contract-check.sh",
+    "p2p:update:pack": "node tooling/p2p-dev-update.mjs pack",
+    "p2p:update:serve": "node tooling/p2p-dev-update.mjs serve --pack",
+    "p2p:update:check": "node tooling/p2p-dev-update.mjs check",
+    "p2p:update:apply": "node tooling/p2p-dev-update.mjs apply"
+  },
+  "devDependencies": {
+    "ws": "^8.20.0"
+  }
+}

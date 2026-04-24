@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="EMA logo">
+  <defs>
+    <radialGradient id="halo" cx="26%" cy="18%" r="82%">
+      <stop offset="0%" stop-color="#8fd06a" stop-opacity="0.44"/>
+      <stop offset="46%" stop-color="#182015" stop-opacity="0.96"/>
+      <stop offset="100%" stop-color="#070806"/>
+    </radialGradient>
+    <linearGradient id="wire" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3efe2"/>
+      <stop offset="52%" stop-color="#ffb86b"/>
+      <stop offset="100%" stop-color="#8fd06a"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.56 0 0 0 0 0.82 0 0 0 0 0.42 0 0 0 0.7 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="216" fill="url(#halo)"/>
+  <path d="M184 242h656v540H184z" fill="none" stroke="#f3efe2" stroke-opacity="0.18" stroke-width="18"/>
+  <path d="M248 318h528M248 706h528M248 318v388M776 318v388" fill="none" stroke="#f3efe2" stroke-opacity="0.18" stroke-width="10"/>
+  <path d="M512 182v660M182 512h660" fill="none" stroke="#8fd06a" stroke-opacity="0.32" stroke-width="10"/>
+  <path d="M242 660V364h154l116 184 116-184h154v296h-94V464L548 660h-72L340 464v196h-98z" fill="url(#wire)" filter="url(#glow)"/>
+  <path d="M236 776h552" stroke="#ffb86b" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="236" cy="776" r="26" fill="#8fd06a"/>
+  <circle cx="788" cy="776" r="26" fill="#8fd06a"/>
+</svg>

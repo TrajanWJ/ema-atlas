@@ -1,0 +1,21 @@
+{
+  "schema": "ema.dev_update.v0",
+  "channel": "dev",
+  "product": "ema",
+  "version": "0.0.5-dev",
+  "build_id": "20260424172035",
+  "peer_id": "Ashleys-Air",
+  "created_at": "2026-04-24T17:20:35.831Z",
+  "archive": {
+    "path": "/ema-dev-update/ema-dev-update-0.0.5-dev-20260424172035.tgz",
+    "filename": "ema-dev-update-0.0.5-dev-20260424172035.tgz",
+    "size_bytes": 59827,
+    "sha256": "16c9b1d2554a29739e7002de28b3e4a567009002193b8d8774de617280e3b81b",
+    "format": "tar+gzip"
+  },
+  "apply": {
+    "mode": "replace_files",
+    "backup": "tarball_before_apply",
+    "restart_required": true
+  }
+}

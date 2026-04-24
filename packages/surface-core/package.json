@@ -1,0 +1,17 @@
+{
+  "name": "@ema/surface-core",
+  "version": "0.0.5-dev",
+  "private": true,
+  "description": "Framework-agnostic EMA surface logic: IPC client, selectors, projections.",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ipc-client": "./src/ipc-client/index.ts",
+    "./selectors": "./src/selectors/index.ts",
+    "./projections": "./src/projections/index.ts"
+  },
+  "dependencies": {
+    "@ema/contracts": "workspace:*"
+  }
+}

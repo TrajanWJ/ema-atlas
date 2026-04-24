@@ -1,0 +1,17 @@
+{
+  "name": "@ema/desktop",
+  "version": "0.0.5-dev",
+  "private": true,
+  "description": "EMA 0.0.5 — native desktop shell (Tauri v2).",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "dependencies": {
+    "@ema/web": "workspace:*"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
+  }
+}

@@ -57,8 +57,10 @@ export function createIpcClient(options: IpcClientOptions): IpcClient {
         return;
       }
       manuallyClosed = false;
-      socket = new WebSocket(options.url);
-      socket.addEventListener("open", () => {
+      const ws = new WebSocket(options.url);
+      socket = ws;
+      ws.addEventListener("open", () => {
+        if (socket !== ws) return;
         sendRaw({
           v: 0,
           id: messageId("hello"),
@@ -70,16 +72,19 @@ export function createIpcClient(options: IpcClientOptions): IpcClient {
           sendRaw({ v: 0, id: messageId("sub"), type: "subscribe", channel: name });
         }
       });
-      socket.addEventListener("message", (event) => {
+      ws.addEventListener("message", (event) => {
+        if (socket !== ws) return;
         if (typeof event.data !== "string") return;
         handleMessage(event.data);
       });
-      socket.addEventListener("close", () => {
+      ws.addEventListener("close", () => {
+        if (socket !== ws) return;
         socket = null;
         failPending("ipc socket closed");
         notifyOffline();
       });
-      socket.addEventListener("error", () => {
+      ws.addEventListener("error", () => {
+        if (socket !== ws) return;
         if (manuallyClosed) return;
         failPending("ipc socket error");
       });

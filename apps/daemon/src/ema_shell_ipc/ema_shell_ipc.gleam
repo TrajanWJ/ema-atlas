@@ -70,13 +70,7 @@ fn route(
     },
     on_close: fn(state) {
       case state.subscribed {
-        True -> {
-          process.send(
-            bus_subj,
-            bus.Unsubscribe(state.bus_delivery, process.new_subject()),
-          )
-          Nil
-        }
+        True -> bus.unsubscribe(bus_subj, state.bus_delivery)
         False -> Nil
       }
     },
@@ -184,17 +178,11 @@ fn handle_text(
         }
         "subscribe" -> {
           let _ = send_projection_snapshot(conn, bus_subj, incoming.channel)
-          process.send(
-            bus_subj,
-            bus.Subscribe(state.bus_delivery, None, process.new_subject()),
-          )
+          bus.subscribe(bus_subj, state.bus_delivery, None)
           mist.continue(ConnState(..state, subscribed: True))
         }
         "unsubscribe" -> {
-          process.send(
-            bus_subj,
-            bus.Unsubscribe(state.bus_delivery, process.new_subject()),
-          )
+          bus.unsubscribe(bus_subj, state.bus_delivery)
           mist.continue(ConnState(..state, subscribed: False))
         }
         "command" ->

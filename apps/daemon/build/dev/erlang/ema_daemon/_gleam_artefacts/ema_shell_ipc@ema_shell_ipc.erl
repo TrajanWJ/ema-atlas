@@ -35,7 +35,7 @@
         gleam@option:option(binary()),
         gleam@option:option(binary())}.
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 410).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 398).
 -spec projection_message(binary(), binary()) -> binary().
 projection_message(Name, Data_json) ->
     <<<<<<<<"{\"v\":0,\"type\":\"projection\",\"name\":\""/utf8, Name/binary>>/binary,
@@ -43,7 +43,7 @@ projection_message(Name, Data_json) ->
             Data_json/binary>>/binary,
         "}"/utf8>>.
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 418).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 406).
 -spec send_projection(
     mist@internal@websocket:websocket_connection(),
     binary(),
@@ -53,7 +53,7 @@ send_projection(Conn, Name, Data_json) ->
     _ = mist:send_text_frame(Conn, projection_message(Name, Data_json)),
     nil.
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 389).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 377).
 -spec event_message(integer(), ema_daemon@event_envelope:envelope()) -> binary().
 event_message(_, Env) ->
     gleam@json:to_string(
@@ -79,7 +79,7 @@ event_message(_, Env) ->
         )
     ).
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 118).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 112).
 -spec handle_bus_delivery(
     conn_state(),
     ema_daemon@bus:delivery(),
@@ -132,7 +132,7 @@ handle_bus_delivery(State, Delivery, Conn) ->
             )
     end.
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 371).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 359).
 -spec err(binary(), binary(), binary()) -> binary().
 err(In_reply_to, Class, Message) ->
     gleam@json:to_string(
@@ -149,7 +149,7 @@ err(In_reply_to, Class, Message) ->
         )
     ).
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 427).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 415).
 -spec send_projection_snapshot(
     mist@internal@websocket:websocket_connection(),
     gleam@erlang@process:subject(ema_daemon@bus:msg()),
@@ -188,7 +188,7 @@ send_projection_snapshot(Conn, Bus_subj, Channel) ->
             nil
     end.
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 359).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 347).
 -spec command_ok(binary(), list(binary())) -> binary().
 command_ok(In_reply_to, Event_ids) ->
     gleam@json:to_string(
@@ -204,7 +204,7 @@ command_ok(In_reply_to, Event_ids) ->
         )
     ).
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 456).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 444).
 -spec run_debug_ping(gleam@erlang@process:subject(ema_daemon@bus:msg())) -> list(binary()).
 run_debug_ping(Bus_subj) ->
     Now = ema_time_ffi:iso_now(),
@@ -243,7 +243,7 @@ run_debug_ping(Bus_subj) ->
             end end
     ).
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 349).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 337).
 -spec pong(binary()) -> binary().
 pong(In_reply_to) ->
     gleam@json:to_string(
@@ -254,7 +254,7 @@ pong(In_reply_to) ->
         )
     ).
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 336).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 324).
 -spec hello_ack() -> binary().
 hello_ack() ->
     gleam@json:to_string(
@@ -270,7 +270,7 @@ hello_ack() ->
         )
     ).
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 302).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 290).
 -spec decode_envelope(binary()) -> {ok, incoming()} | {error, binary()}.
 decode_envelope(Raw) ->
     Decoder = begin
@@ -336,7 +336,7 @@ decode_envelope(Raw) ->
             {error, <<"decode failed"/utf8>>}
     end.
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 164).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 158).
 -spec handle_text(
     conn_state(),
     binary(),
@@ -371,12 +371,10 @@ handle_text(State, Text, Conn, Bus_subj) ->
                         Bus_subj,
                         erlang:element(5, Incoming)
                     ),
-                    gleam@erlang@process:send(
+                    ema_daemon@bus:subscribe(
                         Bus_subj,
-                        {subscribe,
-                            erlang:element(2, State),
-                            none,
-                            gleam@erlang@process:new_subject()}
+                        erlang:element(2, State),
+                        none
                     ),
                     mist:continue(
                         {conn_state,
@@ -386,11 +384,9 @@ handle_text(State, Text, Conn, Bus_subj) ->
                     );
 
                 <<"unsubscribe"/utf8>> ->
-                    gleam@erlang@process:send(
+                    ema_daemon@bus:unsubscribe(
                         Bus_subj,
-                        {unsubscribe,
-                            erlang:element(2, State),
-                            gleam@erlang@process:new_subject()}
+                        erlang:element(2, State)
                     ),
                     mist:continue(
                         {conn_state,
@@ -507,7 +503,7 @@ handle_text(State, Text, Conn, Bus_subj) ->
             end
     end.
 
--file("src/ema_shell_ipc/ema_shell_ipc.gleam", 102).
+-file("src/ema_shell_ipc/ema_shell_ipc.gleam", 96).
 -spec handle_ws(
     conn_state(),
     mist:websocket_message(ws_custom()),
@@ -555,13 +551,10 @@ route(Req, Bus_subj) ->
         end,
         fun(State@1) -> case erlang:element(4, State@1) of
                 true ->
-                    gleam@erlang@process:send(
+                    ema_daemon@bus:unsubscribe(
                         Bus_subj,
-                        {unsubscribe,
-                            erlang:element(2, State@1),
-                            gleam@erlang@process:new_subject()}
-                    ),
-                    nil;
+                        erlang:element(2, State@1)
+                    );
 
                 false ->
                     nil

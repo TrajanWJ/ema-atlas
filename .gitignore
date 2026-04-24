@@ -1,0 +1,51 @@
+# macOS
+.DS_Store
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Node / pnpm
+node_modules/
+**/node_modules/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Web build output
+dist/
+coverage/
+.vite/
+
+# Gleam / BEAM build output
+build/
+*.beam
+*.ez
+
+# Rust / Tauri build output
+target/
+**/src-tauri/target/
+
+# EMA local dev state
+.ema-dev/
+.ema-dev-updates/
+
+# Local databases and runtime artifacts
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.pid
+*.log
+
+# Archives and generated snapshots
+*.tar
+*.tar.gz
+*.tgz
+*.zip

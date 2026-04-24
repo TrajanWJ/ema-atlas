@@ -1,1 +1,0 @@
--record(drive_ref, {drive_file_id :: binary(), owner_email :: binary()}).

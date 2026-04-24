@@ -1,1 +1,0 @@
--record(link_point, {object_kind :: binary(), object_id :: binary()}).

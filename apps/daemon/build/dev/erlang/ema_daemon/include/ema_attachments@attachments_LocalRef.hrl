@@ -1,1 +1,0 @@
--record(local_ref, {blob_id :: binary()}).

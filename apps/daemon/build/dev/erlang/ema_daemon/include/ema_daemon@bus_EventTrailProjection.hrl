@@ -1,1 +1,0 @@
--record(event_trail_projection, {reply :: gleam@erlang@process:subject(binary())}).

@@ -1,1 +1,0 @@
--record(project, {id :: binary(), space_id :: binary(), name :: binary()}).

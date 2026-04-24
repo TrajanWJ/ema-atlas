@@ -1,1 +1,0 @@
--record(organization, {id :: binary(), name :: binary()}).

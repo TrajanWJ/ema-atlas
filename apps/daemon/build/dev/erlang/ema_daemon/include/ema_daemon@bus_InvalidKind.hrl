@@ -1,1 +1,0 @@
--record(invalid_kind, {kind :: binary()}).

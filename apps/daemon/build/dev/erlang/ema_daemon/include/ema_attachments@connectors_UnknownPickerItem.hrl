@@ -1,1 +1,0 @@
--record(unknown_picker_item, {id :: binary()}).

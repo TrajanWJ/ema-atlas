@@ -1,1 +1,0 @@
--record(list, {reply :: gleam@erlang@process:subject(list(binary()))}).

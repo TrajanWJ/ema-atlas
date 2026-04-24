@@ -1,1 +1,0 @@
--record(persistence_failed, {reason :: binary()}).

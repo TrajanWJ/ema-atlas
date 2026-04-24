@@ -1,1 +1,0 @@
--record(child_failed_to_start, {child :: binary(), reason :: binary()}).

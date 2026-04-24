@@ -6,6 +6,158 @@ Every session — Codex, Claude CLI, or human — reads this file on cold start.
 Coordinator: Claude (replacement orchestrator, consolidated role).
 Last coordinator sweep: 2026-04-24T15:45-04:00.
 
+## Session close 2026-04-24T20:10Z — Canon Writers Slice B (Master Design Doc)
+
+Slice: Canon Writers B — Master Design Doc Bootstrap.
+
+Branch: `lane/canon-writers-master-design-doc` (pre-existing; per
+orchestrator prompt).
+
+Commits: STATUS.md only in this sweep. The master design doc lives under
+`/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/doctrine/` which is NOT a git
+repository (`git -C /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING status`
+returned `fatal: not a git repository`), so no commit was created there —
+the doc was written directly to disk. Per orchestrator prompt per-slice
+hygiene rule, `git add docs/orchestration/STATUS.md` only; no `git add -A`.
+
+File written: `doctrine/master/EMA-DESIGN-DOC.md` — rewritten from the
+61-line shell into the full 21-section master design doc per the user's
+blueprint. 2333 lines, 35 `## ` headings (21 required sections + nested
+sub-blocks), language-lock clean (no `Project -> Space` containment
+text, no `cannon` misspellings).
+
+21 sections authored, in order: Executive Summary (rewritten from "ADIL
+WISPR SLOP" into tight executive prose; preserves the north-star
+sentence; names Adil's wholesaling REI + founding operators); Core
+Thesis (Karpathy "IDEs need to get bigger" + one-sentence lock + five
+commitments); Problem EMA Solves (Notion/Miro/chat-first/automation
+critique + six-property counter); Design Principles (Gleam/BEAM; intent
+vs canon; agents-need-environments; daemon/surfaces; honest mocks;
+peripheral view with Ready Player One framing preserved; user-voice
+preservation; no generic SaaS; collaboration as force multiplier); EMA
+Ontology (full glossary with ID prefixes; alley/bolero marked as
+product vocabulary per language-lock §9); Canonical Workflow (intent →
+proposal → plan → spec → execution → canon with per-stage who-creates /
+who-approves / what-can-change / what-must-remain-preserved); Product
+Model (four-stack: shared workspace + control plane + harness + multi-
+app shell; "EMA is not an OS" explicit); Core Product Surfaces (9
+surfaces each with what/who/renders/doesn't-own/truth-relationship);
+Agent Model (identity/soul/membership/capability + spawn-to-action path
++ agent days/weeks + peripheral view); Soul Model (DEEPEST section per
+user instruction; what-it-is, how-provided, how-it-shapes-behavior,
+what-makes-it-powerful, how-bounded-safely, how-evolves, souls-as-moat;
+Andrew Tate demonstration vector preserved verbatim with third-party-
+modeled-soul safety bounds labeled); Memory and Context Model (seven
+layers + drowning-vs-starving + forefront-of-mind construction);
+Temporal System (vCalendar / agent days/weeks / weekly phases /
+checkups / cadence / real-world time); Project / Org / Space Structure
+(locked topology + scoping + hard-vs-soft boundaries); Debate,
+Simulation, and Stress Testing (structured format + simulated
+stakeholders + stress-test + output structure; "debate does not
+directly mutate canon" preserved); Harness / Control Plane / Runtime
+(EMA/daemon/control plane/Hermes/harness/driver/provider/runtime/
+surfaces distinction + ownership table + execution path + donor-
+grounded patterns from lineage-original-elixir-ema, codebase-ema,
+codebase-place-companion); Governance and Trust (approval gates +
+autonomy boundaries + bad-canon correction + authority logging +
+trust zones Zone 0/1/2 from codebase-execudeck); MVP Definition (must-
+include + excludes + 10-step first-proof-workflow); Risks and Failure
+Modes (brutal-honesty posture across conceptual/product/technical/
+trust/organizational/over-complexity/context-quality); Validation Plan
+(internal EMA-builds-EMA + external Adil wholesaling REI + measurable
+signals + long-term validation); Open Questions (must-answer / can-
+defer / long-term strategic with 10 strategic entries); Closing Frame
+("Without EMA, you have no consistent logic and system and framework
+for the AI to operate within" preserved verbatim; "Without it, we are
+unprepared. With it, we can begin." close).
+
+Gold thoughts preserved verbatim or near-verbatim: Ready Player One
+environment metaphor (§4.6, §9.6); Andrew Tate soul-depth demonstration
+(§10.2 with safety bounds §10.6); humanity-leveled-up-via-collaboration
+framing (§21); Karpathy living-wiki-as-moat (§10.8, §11.4); intent →
+canon pipeline as CANONICAL (§4.2, §6); agents-need-environments (§4.3
+with instruction to write on the wall); "Without EMA…" closing (§21).
+
+Language-lock compliance: `Organization -> Space -> Project` topology
+used throughout (§13); `canon` spelled correctly (no `cannon`); `intent
+/ canon / lane / handoff / mission / campaign / soul / workstream`
+vocabulary locked and consistent; `task` used only as a distinct object
+from `lane` per 0.0.3 shared-agent-swarm-workspace doctrine (`queue_item
+-> lane -> task -> execution -> outcome`), never as a synonym for lane;
+alley and bolero explicitly marked as product vocabulary with lockdown
+pending; no generic SaaS admin-panel language; HQ explicitly
+distinguished from admin-panel posture.
+
+Verification:
+- `wc -l doctrine/master/EMA-DESIGN-DOC.md` → 2333 lines (target 1500+).
+- `grep -c "^## " doctrine/master/EMA-DESIGN-DOC.md` → 35 (target ≥21).
+- `grep -E "Project -> Space|cannon" doctrine/master/EMA-DESIGN-DOC.md`
+  → no matches.
+
+Scope discipline: no runtime code touched; no orchestrator-prompts
+touched; no doctrine/research files touched; no STATUS.md sections
+beyond this new session-close entry; no `apps/desktop/src-tauri/**`
+touched (parallel orchestrator active on that tree).
+
+Recommended next lane: Slice C — Project Overview Document + Technical
+Document + Styling/UX Mentality Document. These three refine the master
+doc into implementation-ready specs. Suggested order: (1) `doctrine/
+master/EMA-PROJECT-OVERVIEW.md` (PRD-shaped); (2) `doctrine/master/EMA-
+TECHNICAL-DESIGN.md` (event catalog + writer topology + IPC shape +
+supervision tree + donor-translation map); (3) `doctrine/master/EMA-
+STYLING-UX-MENTALITY.md` (aesthetic + interaction manifesto, absorbing
+the place.org-ux-manifesto referenced in DOC1 of the Full Donor
+Inventory).
+
+Risks / next blockers:
+- Master doc references `doctrine/design/place-org-ux-manifesto.md`
+  which does not yet exist (top-priority in `EMA-0.0.5-FULL-DONOR-
+  INVENTORY.md` DOC1). Next Canon Writers slice should create it or
+  add a redirect pointer.
+- `task`-vocabulary usage is load-bearing (distinct from lane per 0.0.3
+  doctrine). If the runtime ever subsumes task into lane, this doc
+  needs the same consolidation.
+- Master doc lacks a "Doctrine revision history" block; future slices
+  should add one or standardize doc-header versioning.
+
+
+## Canon update 2026-04-24 — Web vDesktop stack locked
+
+Decision: `@ema/web` is now canonically the **Next.js + React + Motion +
+Zustand** browser vDesktop. This is not an experiment and not a temporary
+detour. The purpose is to reflect the original `place.org` desktop system with
+least resistance: place.org's donor code, icons, SVGs, window manager concepts,
+launcher, dock, Motion patterns, and Zustand state shape should be copied or
+adapted forward rather than re-created as Vite lookalikes.
+
+Canonical runtime files:
+- `apps/web/app/` — runnable Next app surface.
+- `apps/web/app/page.tsx` — current place.org-style vDesktop shell with
+  Launchpad as the first window.
+- `apps/web/app/globals.css` — current desktop visual system.
+- `apps/web/src/place-donor/place-org/` — copied place.org donor payload
+  (intentionally excluded from the Next build until pieces are adapted).
+- `apps/web/src/place-reflection/` — adaptation/shim area for donor-derived
+  components.
+
+Canonical commands:
+- `pnpm --filter @ema/web dev` starts Next on `http://localhost:5173`.
+- `pnpm --filter @ema/web build` runs `next build`.
+
+Routing / ownership:
+- Web vDesktop Surface owns browser desktop posture: Launchpad-as-vApp,
+  dock, wallpaper, window chrome, place.org visual fidelity, and the
+  Next/Motion/Zustand surface.
+- Desktop Launcher Correction owns the Tauri/native shell only. It embeds
+  the web surface but does not own the browser vDesktop design or stack.
+- Runtime Vertical Slice owns daemon-backed IPC/projection reality. It should
+  integrate with the Next web surface rather than reintroducing a Vite runtime.
+
+Verification already run in this slice:
+- `pnpm --filter @ema/web build` — clean.
+- Playwright smoke of `http://localhost:5173/` — `.place-desktop`, 1 window,
+  9 dock icons, no console errors, no horizontal overflow.
+
 ## Session close 2026-04-24T15:45 — Cross-lane Donor Inventory
 
 Worker: Cross-lane research session acting under Codebase Architecture & Extensibility.
@@ -437,7 +589,7 @@ M1 milestone (daemon ↔ WS round-trip) is the exit gate for W1.
 | Service | Pid | Port | Source | Status |
 |---|---|---|---|---|
 | EMA daemon (Gleam/BEAM) | 47943 | `ws://127.0.0.1:49555` | `apps/daemon`, started via `gleam run` at 14:32 | **alive** |
-| EMA web dev (Vite) | 40269 | `http://127.0.0.1:5173` | `apps/web`, `pnpm --filter @ema/web dev` | **alive** |
+| EMA web dev (Next) | 40269 | `http://127.0.0.1:5173` | `apps/web`, `pnpm --filter @ema/web dev` | **superseded by canon Next stack; pid may be stale** |
 | `start-ema-dev.sh` wrapper | 41730 | — | idle; the wrapper's original daemon (pid 41762) died from earlier compile errors before the files were fixed | **idle** |
 
 `.ema-dev/pids/daemon.pid` now reflects 47943 (live). `.ema-dev/pids/web.pid` now reflects 40269 (live).
@@ -450,7 +602,7 @@ The wrapper's idempotency check is port-based (`lsof -iTCP:49555 -sTCP:LISTEN`),
 |---|---|---|---|
 | W0 | Doctrine + contracts | landed | Architecture docs (12), vApp specs (3), ID registry (44 prefixes), event catalog. |
 | W1 | Daemon scaffold | **compiles green, M1 not proven** | `gleam build` clean. Bus/registry/supervisor/event_envelope present. WS listener on 49555. End-to-end append+subscribe round-trip not yet demonstrated. |
-| W1 | Web shell | rendering, all mocked | Topbar, selectors, vApp layouts — reading `mock-projections.ts`. |
+| W1 | Web shell | Next vDesktop canon | `apps/web/app/` is the runnable surface; Launchpad opens first inside a place.org-style desktop. Runtime data is still mocked/projection-labeled until IPC integration catches up. |
 | W2 | Blueprint + git-ema writers | not started | Empty dirs at `apps/daemon/src/ema_blueprint/`, `ema_attachments/`. UI shows a mock Blueprint tree and git-ema attachment list. |
 | W3 | See Agent Work | UI only, no writers | `agent-work-page.tsx` renders mock swarms/missions/lanes; no `swarm.start` or `lane.open` handler in the daemon. |
 | W4–W7 | Actors/Soul/Proposals/Runtime/Collab | not started | Design only. |

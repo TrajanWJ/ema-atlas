@@ -1,123 +1,827 @@
+/*
+ * EMA 0.0.5 — web shell stylesheet
+ *
+ * Design system provenance (direct rip — see
+ * `doctrine/research/EMA-0.0.5-SURFACE-DONOR-MATRIX.md`):
+ *   Place.org (ema-atlas branch origin/codebase-place-org)
+ *     code/place.org/app/globals.css
+ *     code/place.org/src/components/desktop/*
+ *     code/place.org/docs/design/tokens.md
+ *   Ripped sections below are marked `RIP: place.org ...`.
+ *
+ * Doctrine:
+ *   sources/snapshots/ema 0.0.3/ema-atlas/content/vapps/virtual-desktop-deep.md
+ *   doctrine/research/EMA-0.0.5-SURFACE-DONOR-MATRIX.md
+ *
+ * Reject ledger:
+ *   - No Tailwind @import (we ship plain CSS on Vite).
+ *   - No shadcn / Zustand / framer-motion runtime deps in apps/web.
+ *   - No localStorage/OPFS as canonical truth.
+ *   - No tray agent in apps/web.
+ */
+
+/* ============================================================ */
+/* RIP: place.org globals.css :root tokens (verbatim palette).   */
+/* EMA adds `--ema-*` aliases that reference place.org vars so   */
+/* existing class names work without refactor.                   */
+/* ============================================================ */
+
 :root {
   color-scheme: dark;
-  --ema-ink: #f3efe2;
-  --ema-ash: #a9b0a4;
-  --ema-rail: rgba(243, 239, 226, 0.08);
-  --ema-wire: rgba(243, 239, 226, 0.16);
-  --ema-black: #070806;
-  --ema-green: #8fd06a;
-  --ema-amber: #ffb86b;
-  --ema-red: #ff6b6b;
-  --ema-blue: #7aa2ff;
-  --ema-panel: rgba(18, 22, 18, 0.76);
-  --ema-panel-strong: rgba(27, 31, 26, 0.92);
+
+  /* Surfaces */
+  --place-void: #060610;
+  --place-base: #08090E;
+  --place-surface-1: #0E1017;
+  --place-surface-2: #141620;
+  --place-surface-3: #1A1D2A;
+
+  /* Text (white at opacity) */
+  --place-text-primary: rgba(255, 255, 255, 0.87);
+  --place-text-secondary: rgba(255, 255, 255, 0.60);
+  --place-text-tertiary: rgba(255, 255, 255, 0.40);
+  --place-text-muted: rgba(255, 255, 255, 0.25);
+  --place-text-ghost: rgba(255, 255, 255, 0.12);
+
+  /* Primary (Teal) */
+  --place-primary-900: #064E3B;
+  --place-primary-700: #0A7558;
+  --place-primary-500: #0D9373;
+  --place-primary-400: #2DD4A8;
+  --place-primary-300: #5EEAD4;
+  --place-primary-200: #99F6E4;
+  --place-primary-50:  #CCFBF1;
+  --place-primary-glow:   rgba(13, 147, 115, 0.25);
+  --place-primary-subtle: rgba(13, 147, 115, 0.10);
+  --place-primary-border: rgba(45, 212, 168, 0.20);
+
+  /* Secondary (Slate Blue) */
+  --place-secondary-900: #1E3A6E;
+  --place-secondary-700: #2B5298;
+  --place-secondary-500: #4B7BE5;
+  --place-secondary-400: #6B95F0;
+  --place-secondary-300: #93B4F6;
+  --place-secondary-200: #BDD1FA;
+  --place-secondary-50:  #E0ECFD;
+  --place-secondary-glow:   rgba(75, 123, 229, 0.25);
+  --place-secondary-subtle: rgba(75, 123, 229, 0.10);
+  --place-secondary-border: rgba(107, 149, 240, 0.20);
+
+  /* Tertiary (Amber) */
+  --place-tertiary-900: #78350F;
+  --place-tertiary-700: #92400E;
+  --place-tertiary-500: #D97706;
+  --place-tertiary-400: #F59E0B;
+  --place-tertiary-300: #FBBF24;
+  --place-tertiary-200: #FDE68A;
+  --place-tertiary-50:  #FEF3C7;
+  --place-tertiary-glow:   rgba(217, 119, 6, 0.25);
+  --place-tertiary-subtle: rgba(217, 119, 6, 0.10);
+  --place-tertiary-border: rgba(245, 158, 11, 0.20);
+
+  /* Semantic (never themed) */
+  --place-error:   #E24B4A;
+  --place-success: #22C55E;
+  --place-warning: #EAB308;
+
+  /* Borders */
+  --place-border-subtle:  rgba(255, 255, 255, 0.04);
+  --place-border-default: rgba(255, 255, 255, 0.08);
+  --place-border-strong:  rgba(255, 255, 255, 0.15);
+
+  /* Typography */
+  --place-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --place-font-mono: "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
+  --place-font-weight-base: 400;
+  --place-font-weight-heading: 600;
+  --place-line-height: 1.5;
+
+  /* Easing */
+  --place-ease-smooth: cubic-bezier(0.65, 0.05, 0, 1);
+
+  /* Glass tier tints */
+  --glass-bg-ambient:  rgba(14, 16, 23, 0.40);
+  --glass-bg-surface:  rgba(14, 16, 23, 0.55);
+  --glass-bg-elevated: rgba(14, 16, 23, 0.65);
+  --glass-bg-accent:   rgba(10, 30, 25, 0.60);
+  --glass-blur-ambient:  6px;
+  --glass-blur-surface:  20px;
+  --glass-blur-elevated: 28px;
+  --glass-blur-accent:   32px;
+
+  /* Back-compat aliases (RIP from place.org globals.css) */
+  --bg-deep: var(--place-void);
+  --bg-surface: var(--place-surface-1);
+  --bg-glass: rgba(255, 255, 255, 0.02);
+  --text-primary: var(--place-text-primary);
+  --text-secondary: var(--place-text-secondary);
+  --accent-blue: var(--place-secondary-400);
+  --accent-success: var(--place-success);
+  --accent-warm: var(--place-tertiary-400);
+  --accent-urgent: var(--place-error);
+  --border: var(--place-border-default);
+  --border-hover: var(--place-border-strong);
+  --glow: var(--place-secondary-glow);
+  --glass-blur: 16px;
+  --ease-smooth: var(--place-ease-smooth);
+
+  /* EMA aliases — preserve existing `ema-*` classnames, point at
+     place.org palette so the virtual desktop + topbar + panels all
+     inherit the ripped scheme. The previous warm-cream palette was
+     drift and is retired. */
+  --ema-ink:   var(--place-text-primary);
+  --ema-ash:   var(--place-text-secondary);
+  --ema-rail:  var(--place-border-subtle);
+  --ema-wire:  var(--place-border-default);
+  --ema-black: var(--place-void);
+  --ema-green: var(--place-primary-400);
+  --ema-amber: var(--place-tertiary-400);
+  --ema-red:   var(--place-error);
+  --ema-blue:  var(--place-secondary-400);
+  --ema-panel: var(--glass-bg-surface);
+  --ema-panel-strong: var(--glass-bg-elevated);
   --ema-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
-  --ema-font-display: "Avenir Next Condensed", "DIN Condensed", "Gill Sans",
-    var(--ema-font-sans);
+  --ema-font-sans: var(--place-font-sans);
+  --ema-font-mono: var(--place-font-mono);
+  --ema-font-display: var(--place-font-sans);
+  --ema-radius-sm: 6px;
+  --ema-radius-md: 10px;
+  --ema-radius-lg: 16px;
 }
 
-* {
-  box-sizing: border-box;
+/* RIP: place.org light mode */
+[data-theme="light"] {
+  --place-void: #f5f5f7;
+  --place-base: #ececee;
+  --place-surface-1: #e2e2e6;
+  --place-surface-2: #d8d8dc;
+  --place-surface-3: #ccccd0;
+  --place-text-primary: rgba(0, 0, 0, 0.87);
+  --place-text-secondary: rgba(0, 0, 0, 0.60);
+  --place-text-tertiary: rgba(0, 0, 0, 0.40);
+  --place-text-muted: rgba(0, 0, 0, 0.25);
+  --place-border-default: rgba(0, 0, 0, 0.10);
+  --place-border-subtle: rgba(0, 0, 0, 0.05);
+  --place-border-strong: rgba(0, 0, 0, 0.18);
 }
+
+/* RIP: place.org contrast modes */
+[data-contrast="increased"] {
+  --place-text-primary: rgba(255, 255, 255, 0.95);
+  --place-text-secondary: rgba(255, 255, 255, 0.75);
+  --place-border-default: rgba(255, 255, 255, 0.15);
+}
+[data-contrast="high"] {
+  --place-text-primary: #ffffff;
+  --place-text-secondary: rgba(255, 255, 255, 0.85);
+  --place-text-tertiary: rgba(255, 255, 255, 0.65);
+  --place-border-default: rgba(255, 255, 255, 0.25);
+  --place-border-strong: rgba(255, 255, 255, 0.35);
+}
+[data-theme="light"][data-contrast="increased"] {
+  --place-text-primary: rgba(0, 0, 0, 0.95);
+  --place-text-secondary: rgba(0, 0, 0, 0.75);
+  --place-border-default: rgba(0, 0, 0, 0.18);
+}
+[data-theme="light"][data-contrast="high"] {
+  --place-text-primary: #000000;
+  --place-text-secondary: rgba(0, 0, 0, 0.85);
+  --place-border-default: rgba(0, 0, 0, 0.30);
+}
+
+/* ============================================================ */
+/* Reset                                                         */
+/* ============================================================ */
+
+* { box-sizing: border-box; }
 
 html {
   min-height: 100%;
-  background: var(--ema-black);
+  background: var(--place-void);
 }
 
+/* RIP: place.org body */
 body {
-  min-width: 320px;
-  min-height: 100vh;
+  background-color: var(--place-void);
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-weight: var(--place-font-weight-base);
+  line-height: var(--place-line-height);
+  overflow: hidden;
+  height: 100dvh;
+  width: 100dvw;
   margin: 0;
-  color: var(--ema-ink);
-  font-family: var(--ema-font-sans);
-  background:
-    radial-gradient(circle at 12% 8%, rgba(143, 208, 106, 0.16), transparent 34rem),
-    radial-gradient(circle at 86% 4%, rgba(255, 184, 107, 0.14), transparent 28rem),
-    linear-gradient(135deg, #080907 0%, #111411 46%, #050605 100%);
 }
 
-body::before {
+button, select, a { font: inherit; }
+button, select { color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.48; }
+a { color: inherit; text-decoration: none; }
+
+/* RIP: place.org title bar variants */
+[data-titlebar="compact"] .window-titlebar { height: 28px; font-size: 0.7rem; }
+[data-titlebar="hidden"] .window-titlebar { display: none; }
+
+/* ============================================================ */
+/* RIP: place.org scrollbars (webkit + firefox)                 */
+/* ============================================================ */
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; margin: 4px 0; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 9999px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
+::-webkit-scrollbar-thumb:active { background: rgba(255, 255, 255, 0.25); }
+::-webkit-scrollbar-corner { background: transparent; }
+*:hover::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.10); }
+*:hover::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.20); }
+*:hover::-webkit-scrollbar-thumb:active { background: rgba(255, 255, 255, 0.30); }
+
+[role="dialog"] ::-webkit-scrollbar { width: 5px; height: 5px; }
+[role="dialog"] ::-webkit-scrollbar-track { background: transparent; margin: 2px; }
+[role="dialog"] ::-webkit-scrollbar-thumb {
+  background: var(--place-primary-subtle);
+  border-radius: 9999px;
+}
+[role="dialog"] ::-webkit-scrollbar-thumb:hover { background: var(--place-primary-border); }
+[role="dialog"] ::-webkit-scrollbar-thumb:active { background: var(--place-primary-400); }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+[role="dialog"] * { scrollbar-color: var(--place-primary-subtle) transparent; }
+
+textarea::-webkit-scrollbar { width: 4px; }
+textarea::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+}
+textarea::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
+
+/* ============================================================ */
+/* RIP: place.org glass tiers                                   */
+/* ============================================================ */
+
+.glass-ambient {
+  background: var(--glass-bg-ambient);
+  backdrop-filter: blur(var(--glass-blur-ambient)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-ambient)) saturate(120%);
+}
+.glass-surface {
+  background: var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.glass-elevated,
+.glass {
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-accent {
+  background: var(--glass-bg-accent);
+  backdrop-filter: blur(var(--glass-blur-accent)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-accent)) saturate(180%);
+  border: 1px solid var(--place-primary-border);
+}
+
+/* ============================================================ */
+/* RIP: place.org animations                                    */
+/* ============================================================ */
+
+.gradient-text { display: inline-block; }
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--place-surface-1) 25%,
+    rgba(91, 156, 245, 0.06) 50%,
+    var(--place-surface-1) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+.skeleton.rounded { border-radius: 9999px; }
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes mic-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(226, 75, 74, 0.4);
+  }
+  50% {
+    opacity: 0.85;
+    box-shadow: 0 0 0 6px rgba(226, 75, 74, 0);
+  }
+}
+
+.resize-handle-glow { transition: background 0.2s ease !important; }
+.resize-handle-glow:hover { background: rgba(45, 212, 168, 0.15) !important; }
+
+.dock-icon-btn:hover {
+  color: var(--place-secondary-400) !important;
+  box-shadow:
+    0 0 12px 2px var(--place-secondary-glow),
+    0 0 4px 1px rgba(75, 123, 229, 0.1);
+}
+
+/* Place.org place-gradient-shift (wallpaper ambient shift) */
+@keyframes place-gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* Derived from place.org ActivityPulse (breathing dot) */
+@keyframes ema-activity-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px 0 rgba(138, 180, 255, 0.20);
+    opacity: 0.7;
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(138, 180, 255, 0.45);
+    opacity: 1;
+  }
+}
+
+/* RIP: place.org view transitions */
+::view-transition-old(root) { animation: vt-fade-out 150ms ease-out; }
+::view-transition-new(root) { animation: vt-fade-in 150ms ease-in; }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in  { from { opacity: 0; } }
+
+/* ============================================================ */
+/* RIP: place.org range slider                                  */
+/* ============================================================ */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  height: 4px;
+}
+input[type="range"]::-webkit-slider-track {
+  background: var(--place-surface-3);
+  border-radius: 2px;
+  height: 4px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--place-primary-400);
+  border: 2px solid var(--place-void);
+  margin-top: -5px;
+}
+input[type="range"]::-moz-range-track {
+  background: var(--place-surface-3);
+  border-radius: 2px;
+  height: 4px;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--place-primary-400);
+  border: 2px solid var(--place-void);
+}
+
+/* RIP: place.org WCO */
+.ambient-bar-wco {
+  position: fixed;
+  top: 0;
+  left: env(titlebar-area-x, 0);
+  width: env(titlebar-area-width, 100%);
+  height: env(titlebar-area-height, 40px);
+  -webkit-app-region: drag;
+}
+.ambient-bar-wco button,
+.ambient-bar-wco input,
+.ambient-bar-wco a,
+.ambient-bar-wco span[role="button"],
+.ambient-bar-wco [onclick] { -webkit-app-region: no-drag; }
+
+/* ============================================================ */
+/* RIP: place.org markdown preview                              */
+/* ============================================================ */
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+  color: var(--place-secondary-400);
+  margin: 0.75em 0 0.35em;
+  line-height: 1.3;
+}
+.markdown-preview h1 { font-size: 1.4rem; }
+.markdown-preview h2 { font-size: 1.2rem; }
+.markdown-preview h3 { font-size: 1.05rem; }
+.markdown-preview p { margin: 0 0 0.6em; }
+.markdown-preview blockquote {
+  border-left: 3px solid var(--place-secondary-400);
+  margin: 0.5em 0;
+  padding: 0.25em 0 0.25em 0.85em;
+  color: var(--place-text-secondary);
+  font-style: italic;
+}
+.markdown-preview ul,
+.markdown-preview ol { margin: 0.4em 0 0.6em 1.25em; padding: 0; }
+.markdown-preview li { margin-bottom: 0.2em; }
+.markdown-preview code {
+  background: var(--bg-glass);
+  border: 1px solid var(--place-border-default);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  font-family: var(--place-font-mono);
+  font-size: 0.9em;
+}
+.markdown-preview hr {
+  border: none;
+  border-top: 1px solid var(--place-border-strong);
+  margin: 0.9em 0;
+}
+.markdown-preview strong { color: var(--place-text-primary); }
+.markdown-preview em { color: var(--place-text-secondary); font-style: italic; }
+
+/* ============================================================ */
+/* Virtual Desktop shell (place.org-lineage five layers)         */
+/* ============================================================ */
+
+.ema-desktop {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--place-text-primary);
+  background: var(--place-void);
+}
+
+/* Layer 1 — wallpaper */
+.ema-wallpaper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   pointer-events: none;
-  content: "";
+}
+
+.ema-wallpaper[data-scene="scene-forest"] {
+  background:
+    radial-gradient(1200px 800px at 20% 20%, rgba(13, 147, 115, 0.22), transparent 60%),
+    radial-gradient(1000px 700px at 80% 90%, rgba(75, 123, 229, 0.18), transparent 60%),
+    linear-gradient(135deg, #060610, #0a1628, #0d0a20, #060610);
+  background-size: 100% 100%, 100% 100%, 400% 400%;
+  animation: place-gradient-shift 30s ease infinite;
+}
+.ema-wallpaper[data-scene="scene-ember"] {
+  background:
+    radial-gradient(1000px 700px at 15% 85%, rgba(217, 119, 6, 0.22), transparent 60%),
+    radial-gradient(1100px 800px at 85% 15%, rgba(226, 75, 74, 0.16), transparent 60%),
+    linear-gradient(135deg, #060610, #1a0a0a, #1a1308, #060610);
+  background-size: 100% 100%, 100% 100%, 400% 400%;
+  animation: place-gradient-shift 45s ease infinite;
+}
+.ema-wallpaper[data-scene="scene-dusk"] {
+  background:
+    radial-gradient(1200px 900px at 50% 0%, rgba(75, 123, 229, 0.22), transparent 60%),
+    radial-gradient(900px 700px at 50% 100%, rgba(13, 147, 115, 0.14), transparent 65%),
+    linear-gradient(180deg, #050610, #0c0f20, #080a12);
+}
+.ema-wallpaper[data-scene="scene-slate"] {
+  background-color: var(--place-void);
   background-image:
-    linear-gradient(rgba(243, 239, 226, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(243, 239, 226, 0.035) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(circle at top, black 0%, transparent 76%);
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.ema-wallpaper:not([data-scene]),
+.ema-wallpaper[data-scene=""] {
+  background-color: var(--place-void);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 
-button,
-select,
-a {
-  font: inherit;
+/* Layer 2 — window stage */
+.ema-desktop__stage {
+  position: absolute;
+  inset: 64px 0 96px 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
-button,
-select {
-  color: inherit;
+/* Layer 3 — dock */
+.ema-dock {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-button {
-  cursor: pointer;
+.ema-dock__tile {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  min-width: 96px;
+  padding: 8px 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  text-align: left;
+  transition:
+    transform 120ms var(--place-ease-smooth),
+    color 200ms ease,
+    box-shadow 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease;
+}
+.ema-dock__tile:hover {
+  transform: translateY(-4px);
+  color: var(--place-secondary-400);
+  background: rgba(91, 156, 245, 0.08);
+  border-color: var(--place-secondary-border);
+  box-shadow:
+    0 0 12px 2px var(--place-secondary-glow),
+    0 0 4px 1px rgba(75, 123, 229, 0.1);
+}
+.ema-dock__tile.is-open {
+  color: var(--place-secondary-400);
+  border-color: var(--place-secondary-border);
+  background: rgba(91, 156, 245, 0.12);
+}
+.ema-dock__tile-eyebrow {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.ema-dock__tile-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.ema-dock__tile-status {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--place-text-muted);
+}
+.ema-dock__tile-status[data-status="live"] {
+  background: var(--place-primary-400);
+  animation: ema-activity-pulse 2.4s ease-in-out infinite;
+}
+.ema-dock__tile-status[data-status="projection"] {
+  background: var(--place-secondary-400);
+}
+.ema-dock__tile-status[data-status="placeholder"] {
+  background: var(--place-tertiary-400);
+  opacity: 0.6;
 }
 
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.48;
+/* Layer 5 — presence */
+.ema-presence {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.ema-presence__cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 4px;
+  border-radius: 999px;
+  background: rgba(10, 12, 18, 0.72);
+  color: var(--place-text-primary);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  border: 1px solid var(--ema-presence-color, var(--place-secondary-400));
+  box-shadow: 0 0 10px var(--ema-presence-color, var(--place-secondary-glow));
+  transition: transform 60ms linear;
+}
+.ema-presence__cursor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ema-presence-color, var(--place-secondary-400));
+}
+.ema-presence__cursor-label {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* ============================================================ */
+/* Window frame                                                  */
+/* ============================================================ */
+
+.ema-window {
+  position: absolute;
+  display: grid;
+  grid-template-rows: 42px 1fr;
+  pointer-events: auto;
+  min-width: 420px;
+  min-height: 280px;
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+.ema-window:focus-within {
+  border-color: rgba(91, 156, 245, 0.4);
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(75, 123, 229, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.ema-shell {
-  min-height: 100vh;
+.ema-window__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  cursor: grab;
+  user-select: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  border-bottom: 1px solid var(--place-border-default);
 }
+.ema-window__header:active { cursor: grabbing; }
+
+.ema-window__title {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.ema-window__title-eyebrow {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ema-window__title strong {
+  overflow: hidden;
+  color: var(--place-text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.005em;
+}
+
+.ema-window__controls {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.ema-window__control {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-size: 0.86rem;
+  line-height: 1;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+.ema-window__control--min:hover {
+  color: var(--place-tertiary-400);
+  background: var(--place-tertiary-subtle);
+  border-color: var(--place-tertiary-border);
+}
+.ema-window__control--close:hover {
+  color: var(--place-error);
+  background: rgba(226, 75, 74, 0.12);
+  border-color: rgba(226, 75, 74, 0.32);
+}
+
+.ema-window__body {
+  overflow: auto;
+  padding: 20px;
+  color: var(--place-text-primary);
+  background: transparent;
+}
+
+.ema-window__resize {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background:
+    linear-gradient(135deg, transparent 55%, rgba(255, 255, 255, 0.22) 56%, rgba(255, 255, 255, 0.22) 60%, transparent 61%),
+    linear-gradient(135deg, transparent 70%, rgba(255, 255, 255, 0.22) 71%, rgba(255, 255, 255, 0.22) 75%, transparent 76%);
+  cursor: nwse-resize;
+  transition: background 0.2s ease;
+}
+.ema-window__resize:hover {
+  background:
+    linear-gradient(135deg, transparent 55%, rgba(45, 212, 168, 0.45) 56%, rgba(45, 212, 168, 0.45) 60%, transparent 61%),
+    linear-gradient(135deg, transparent 70%, rgba(45, 212, 168, 0.45) 71%, rgba(45, 212, 168, 0.45) 75%, transparent 76%);
+}
+
+/* ============================================================ */
+/* Topbar                                                        */
+/* ============================================================ */
 
 .ema-topbar {
-  position: sticky;
+  position: absolute;
   top: 0;
-  z-index: 20;
+  left: 0;
+  right: 0;
+  z-index: 5;
   display: grid;
   grid-template-columns: auto minmax(220px, 1fr) minmax(180px, auto) auto;
   gap: 18px;
   align-items: center;
-  min-height: 74px;
-  padding: 12px 24px;
-  border-bottom: 1px solid var(--ema-wire);
-  background: rgba(7, 8, 6, 0.82);
-  backdrop-filter: blur(18px);
+  min-height: 56px;
+  padding: 8px 18px;
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  border-bottom: 1px solid var(--place-border-default);
+}
+.ema-topbar[data-offline="true"] {
+  border-bottom-color: var(--place-tertiary-border);
 }
 
 .ema-topbar__brand {
   display: grid;
-  width: 82px;
-  height: 48px;
+  width: 74px;
+  height: 40px;
   place-items: center;
-  border: 1px solid rgba(143, 208, 106, 0.48);
+  border: 1px solid var(--place-primary-border);
+  border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(143, 208, 106, 0.2), transparent),
-    rgba(9, 11, 8, 0.94);
-  box-shadow: inset 0 0 22px rgba(143, 208, 106, 0.12);
+    linear-gradient(135deg, var(--place-primary-subtle), transparent),
+    rgba(9, 11, 18, 0.84);
+  box-shadow: inset 0 0 16px var(--place-primary-glow);
 }
-
 .ema-topbar__brand span {
-  font-family: var(--ema-font-display);
-  font-size: 1.5rem;
-  font-weight: 800;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 1.1rem;
+  font-weight: 700;
   letter-spacing: 0.12em;
   line-height: 0.9;
 }
-
 .ema-topbar__brand small {
-  color: var(--ema-amber);
-  font-family: var(--ema-font-mono);
-  font-size: 0.62rem;
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.56rem;
   letter-spacing: 0.18em;
 }
 
@@ -128,29 +832,34 @@ a {
   gap: 8px;
   align-items: center;
 }
-
-.ema-topbar__sep {
-  color: rgba(243, 239, 226, 0.28);
-}
+.ema-topbar__sep { color: var(--place-text-muted); }
 
 .ema-selector {
   max-width: 220px;
-  min-height: 36px;
-  padding: 0 32px 0 12px;
-  border: 1px solid var(--ema-wire);
-  border-radius: var(--ema-radius-sm);
-  background: rgba(243, 239, 226, 0.06);
-  color: var(--ema-ink);
+  min-height: 32px;
+  padding: 0 28px 0 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 0.84rem;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.ema-selector:hover { border-color: var(--place-border-strong); }
+.ema-selector:focus {
+  outline: none;
+  border-color: var(--place-secondary-400);
+  box-shadow: 0 0 0 3px var(--place-secondary-subtle);
 }
 
 .ema-topbar__project-sense {
   display: grid;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
-  padding-left: 18px;
-  border-left: 1px solid var(--ema-wire);
+  padding-left: 14px;
+  border-left: 1px solid var(--place-border-default);
 }
-
 .ema-topbar__project-sense span,
 .ema-kicker,
 .ema-surface-nav__item span,
@@ -158,17 +867,17 @@ a {
 .ema-surface-card span,
 .ema-placeholder-card span,
 .ema-work-card p {
-  color: var(--ema-amber);
-  font-family: var(--ema-font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
-
 .ema-topbar__project-sense strong {
   overflow: hidden;
-  color: var(--ema-ink);
-  font-size: 0.9rem;
+  color: var(--place-text-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -177,107 +886,64 @@ a {
 .ema-pill {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
+  min-height: 24px;
   padding: 0 10px;
-  border: 1px solid rgba(143, 208, 106, 0.42);
+  border: 1px solid var(--place-primary-border);
   border-radius: 999px;
-  background: rgba(143, 208, 106, 0.1);
-  color: var(--ema-green);
-  font-family: var(--ema-font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-
 .ema-pill--hot {
-  border-color: rgba(255, 184, 107, 0.48);
-  background: rgba(255, 184, 107, 0.12);
-  color: var(--ema-amber);
+  border-color: var(--place-tertiary-border);
+  background: var(--place-tertiary-subtle);
+  color: var(--place-tertiary-400);
 }
 
 .ema-connectors-indicator {
-  min-height: 34px;
-  padding: 8px 11px;
-  border: 1px solid var(--ema-wire);
-  border-radius: var(--ema-radius-sm);
-  background: rgba(243, 239, 226, 0.06);
-  color: var(--ema-ash);
-  font-family: var(--ema-font-mono);
-  font-size: 0.76rem;
+  min-height: 28px;
+  padding: 6px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.72rem;
 }
-
 .ema-connectors-indicator[data-on="true"] {
-  border-color: rgba(143, 208, 106, 0.46);
-  color: var(--ema-green);
+  border-color: var(--place-primary-border);
+  color: var(--place-primary-400);
+  box-shadow: 0 0 8px 1px var(--place-primary-glow);
 }
 
-.ema-shell__grid {
-  display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
-  gap: 22px;
-  width: min(1680px, 100%);
-  margin: 0 auto;
-  padding: 22px;
-}
-
-.ema-surface-nav {
-  position: sticky;
-  top: 96px;
-  display: grid;
-  align-self: start;
-  gap: 9px;
-}
-
-.ema-surface-nav__item {
-  display: grid;
-  gap: 5px;
-  padding: 14px;
-  border: 1px solid var(--ema-wire);
-  background:
-    linear-gradient(90deg, rgba(243, 239, 226, 0.08), transparent),
-    rgba(10, 12, 9, 0.78);
-  transition:
-    border-color 160ms ease,
-    transform 160ms ease,
-    background 160ms ease;
-}
-
-.ema-surface-nav__item strong {
-  font-family: var(--ema-font-display);
-  font-size: 1.2rem;
-  letter-spacing: 0.03em;
-}
-
-.ema-surface-nav__item:hover,
-.ema-surface-nav__item.is-active {
-  border-color: rgba(255, 184, 107, 0.52);
-  background:
-    linear-gradient(100deg, rgba(255, 184, 107, 0.16), transparent),
-    rgba(20, 23, 18, 0.94);
-  transform: translateX(4px);
-}
-
-.ema-shell__body {
-  min-width: 0;
-}
+/* ============================================================ */
+/* vApp body (HQ, Blueprint, git-ema, See Agent Work)            */
+/* ============================================================ */
 
 .ema-hq,
 .ema-vapp,
 .ema-settings {
-  animation: ema-rise 420ms ease both;
+  animation: ema-rise 380ms var(--place-ease-smooth) both;
+  color: var(--place-text-primary);
 }
 
 .ema-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 410px);
   gap: 24px;
-  min-height: 332px;
-  padding: clamp(24px, 5vw, 56px);
-  border: 1px solid var(--ema-wire);
+  min-height: 260px;
+  padding: clamp(20px, 4vw, 44px);
+  border: 1px solid var(--place-border-default);
+  border-radius: 14px;
   background:
-    linear-gradient(125deg, rgba(143, 208, 106, 0.18), transparent 34%),
-    linear-gradient(280deg, rgba(255, 184, 107, 0.18), transparent 36%),
-    rgba(13, 16, 13, 0.82);
+    linear-gradient(125deg, var(--place-primary-subtle), transparent 34%),
+    linear-gradient(280deg, var(--place-tertiary-subtle), transparent 36%),
+    var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(160%);
   box-shadow: var(--ema-shadow);
 }
 
@@ -286,20 +952,21 @@ a {
 .ema-settings h1 {
   max-width: 980px;
   margin: 0;
-  font-family: var(--ema-font-display);
-  font-size: clamp(2.8rem, 7vw, 6.9rem);
-  font-weight: 900;
-  letter-spacing: -0.055em;
-  line-height: 0.86;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: clamp(2.2rem, 5.6vw, 4.8rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
 }
 
 .ema-hero__copy,
 .ema-vapp__tagline,
 .ema-settings p {
   max-width: 720px;
-  color: var(--ema-ash);
-  font-size: 1.02rem;
-  line-height: 1.65;
+  color: var(--place-text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .ema-hero__card,
@@ -308,10 +975,13 @@ a {
 .ema-bp-doc,
 .ema-work-card,
 .ema-placeholder-card {
-  border: 1px solid var(--ema-wire);
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
   background:
-    linear-gradient(135deg, rgba(243, 239, 226, 0.065), transparent),
-    var(--ema-panel);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.03), transparent),
+    var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
   box-shadow: var(--ema-shadow);
 }
 
@@ -321,16 +991,16 @@ a {
   gap: 12px;
   padding: 22px;
 }
-
 .ema-hero__card strong {
-  font-family: var(--ema-font-display);
-  font-size: 1.8rem;
-  line-height: 0.95;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
 }
-
 .ema-hero__card p {
   margin: 0;
-  color: var(--ema-ash);
+  color: var(--place-text-secondary);
   line-height: 1.55;
 }
 
@@ -338,51 +1008,45 @@ a {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin: 14px 0 22px;
+  margin: 14px 0 20px;
 }
-
 .ema-pulse-card {
-  min-height: 128px;
+  min-height: 120px;
   padding: 16px;
-  border: 1px solid var(--ema-wire);
-  background: rgba(243, 239, 226, 0.055);
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: var(--glass-bg-surface);
 }
-
 .ema-pulse-card strong {
   display: block;
   margin: 12px 0 8px;
-  font-family: var(--ema-font-display);
+  color: var(--place-text-primary);
   font-size: 2rem;
+  font-weight: 700;
   line-height: 0.9;
 }
-
 .ema-pulse-card p {
   margin: 0;
-  color: var(--ema-ash);
-  font-size: 0.88rem;
+  color: var(--place-text-secondary);
+  font-size: 0.86rem;
   line-height: 1.45;
 }
 
 .ema-hq__matrix {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
-  gap: 18px;
+  gap: 16px;
 }
-
 .ema-hq__matrix--lower {
   grid-template-columns: 0.9fr 1fr 1fr;
-  margin-top: 18px;
+  margin-top: 16px;
 }
 
 .ema-panel,
 .ema-vapp__section,
-.ema-bp-doc {
-  padding: 20px;
-}
+.ema-bp-doc { padding: 18px; }
 
-.ema-panel--wide {
-  min-height: 360px;
-}
+.ema-panel--wide { min-height: 320px; }
 
 .ema-panel__heading,
 .ema-vapp__header--split {
@@ -390,7 +1054,7 @@ a {
   gap: 16px;
   align-items: start;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .ema-panel__heading h2,
@@ -399,10 +1063,12 @@ a {
 .ema-placeholder-card h2,
 .ema-work-card h2 {
   margin: 0;
-  font-family: var(--ema-font-display);
-  font-size: clamp(1.6rem, 3vw, 2.5rem);
-  letter-spacing: -0.035em;
-  line-height: 0.95;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
 .ema-surface-board,
@@ -415,126 +1081,122 @@ a {
 
 .ema-surface-card {
   display: grid;
-  min-height: 152px;
+  min-height: 140px;
   padding: 16px;
-  border: 1px solid var(--ema-wire);
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
   background:
-    linear-gradient(145deg, rgba(143, 208, 106, 0.13), transparent),
-    rgba(6, 8, 6, 0.68);
+    linear-gradient(145deg, var(--place-primary-subtle), transparent),
+    rgba(6, 8, 12, 0.68);
   transition:
     border-color 160ms ease,
-    transform 160ms ease;
+    transform 160ms var(--place-ease-smooth),
+    background 160ms ease;
 }
-
 .ema-surface-card:hover {
-  border-color: rgba(255, 184, 107, 0.58);
+  border-color: var(--place-secondary-border);
   transform: translateY(-3px);
+  background:
+    linear-gradient(145deg, var(--place-secondary-subtle), transparent),
+    rgba(10, 14, 20, 0.78);
 }
-
 .ema-surface-card strong {
   align-self: end;
-  font-family: var(--ema-font-display);
-  font-size: 2rem;
-  line-height: 0.9;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 0.95;
 }
-
 .ema-surface-card small {
-  color: var(--ema-ash);
-  font-family: var(--ema-font-mono);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
   text-transform: uppercase;
 }
 
 .ema-control-stack,
-.ema-lane-list {
-  display: grid;
-  gap: 10px;
-}
+.ema-lane-list { display: grid; gap: 10px; }
 
 .ema-control-button {
   display: grid;
   width: 100%;
-  gap: 6px;
-  padding: 14px;
-  border: 1px solid var(--ema-wire);
-  border-radius: 0;
-  background: rgba(243, 239, 226, 0.055);
+  gap: 5px;
+  padding: 12px 14px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
   text-align: left;
   transition:
     border-color 160ms ease,
-    background 160ms ease;
+    background 160ms ease,
+    transform 120ms var(--place-ease-smooth);
 }
-
 .ema-control-button:hover {
-  border-color: rgba(143, 208, 106, 0.5);
-  background: rgba(143, 208, 106, 0.08);
+  border-color: var(--place-primary-border);
+  background: var(--place-primary-subtle);
+  transform: translateY(-1px);
 }
-
 .ema-control-button span {
-  color: var(--ema-ink);
-  font-weight: 700;
+  color: var(--place-text-primary);
+  font-weight: 600;
 }
-
 .ema-control-button strong {
-  color: var(--ema-amber);
-  font-family: var(--ema-font-mono);
-  font-size: 0.72rem;
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
-
 .ema-control-button small {
-  color: var(--ema-ash);
+  color: var(--place-text-secondary);
   line-height: 1.45;
 }
+.ema-control-button--compact { margin-top: auto; }
 
-.ema-control-button--compact {
-  margin-top: auto;
-}
-
-.ema-link-lattice {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
+.ema-link-lattice { display: flex; flex-wrap: wrap; gap: 8px; }
 .ema-link-lattice a,
 .ema-text-link {
-  border-bottom: 1px solid rgba(255, 184, 107, 0.5);
-  color: var(--ema-amber);
-  font-family: var(--ema-font-mono);
-  font-size: 0.8rem;
+  border-bottom: 1px solid var(--place-tertiary-border);
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.78rem;
+  transition: color 160ms ease, border-color 160ms ease;
 }
-
 .ema-link-lattice a {
-  padding: 7px 9px;
-  border: 1px solid var(--ema-wire);
-  background: rgba(243, 239, 226, 0.04);
+  padding: 6px 9px;
+  border: 1px solid var(--place-border-default);
+  background: rgba(255, 255, 255, 0.03);
+}
+.ema-link-lattice a:hover,
+.ema-text-link:hover {
+  color: var(--place-tertiary-300);
+  border-color: var(--place-tertiary-border);
 }
 
 .ema-lane-row {
   padding: 12px;
-  border-left: 3px solid rgba(143, 208, 106, 0.66);
-  background: rgba(243, 239, 226, 0.045);
+  border-left: 3px solid var(--place-primary-400);
+  border-radius: 0 8px 8px 0;
+  background: rgba(255, 255, 255, 0.035);
 }
-
 .ema-lane-row span {
-  color: var(--ema-amber);
-  font-family: var(--ema-font-mono);
-  font-size: 0.72rem;
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
   text-transform: uppercase;
 }
-
 .ema-lane-row strong {
   float: right;
-  color: var(--ema-green);
-  font-family: var(--ema-font-mono);
-  font-size: 0.72rem;
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
   text-transform: uppercase;
 }
-
 .ema-lane-row p {
   clear: both;
   margin: 8px 0 0;
-  color: var(--ema-ash);
+  color: var(--place-text-secondary);
   line-height: 1.45;
 }
 
@@ -545,28 +1207,24 @@ a {
   padding: 0;
   list-style: none;
 }
-
 .ema-event-trail li {
   display: grid;
   grid-template-columns: 54px 92px minmax(0, 1fr);
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(243, 239, 226, 0.08);
+  border-bottom: 1px solid var(--place-border-subtle);
 }
-
 .ema-event-trail--roomy li {
   grid-template-columns: 64px 160px minmax(0, 1fr);
 }
-
 .ema-event-trail time,
 .ema-event-trail strong {
-  color: var(--ema-amber);
-  font-family: var(--ema-font-mono);
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
   font-size: 0.74rem;
 }
-
 .ema-event-trail span {
-  color: var(--ema-ash);
+  color: var(--place-text-secondary);
   line-height: 1.4;
 }
 
@@ -578,21 +1236,21 @@ a {
 
 .ema-vapp__header,
 .ema-settings {
-  padding: 28px;
-  border: 1px solid var(--ema-wire);
+  padding: 26px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 14px;
   background:
-    linear-gradient(110deg, rgba(255, 184, 107, 0.12), transparent),
-    rgba(13, 16, 13, 0.8);
+    linear-gradient(110deg, var(--place-tertiary-subtle), transparent),
+    var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
 }
-
-.ema-vapp__header h1 {
-  font-size: clamp(2.5rem, 6vw, 5.5rem);
-}
+.ema-vapp__header h1 { font-size: clamp(1.9rem, 4vw, 3.2rem); }
 
 .ema-connectors-panel__note,
 .ema-projection-note,
 .ema-attachments__empty {
-  color: var(--ema-ash);
+  color: var(--place-text-secondary);
 }
 
 .ema-connectors-panel__list,
@@ -612,56 +1270,61 @@ a {
   gap: 10px;
   align-items: center;
   padding: 12px;
-  border: 1px solid var(--ema-wire);
-  background: rgba(243, 239, 226, 0.045);
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
 }
-
 .ema-connector-row button,
 .ema-attachment-row button,
 .ema-bp-section__attach {
-  min-height: 34px;
-  border: 1px solid rgba(143, 208, 106, 0.42);
-  border-radius: 0;
-  background: rgba(143, 208, 106, 0.08);
-  color: var(--ema-green);
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 6px;
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.ema-connector-row button:hover,
+.ema-attachment-row button:hover,
+.ema-bp-section__attach:hover {
+  background: rgba(45, 212, 168, 0.15);
+  border-color: var(--place-primary-400);
 }
 
 .ema-connector-row__label,
 .ema-attachment-row__name,
 .ema-bp-section__title {
-  font-weight: 800;
+  color: var(--place-text-primary);
+  font-weight: 600;
 }
-
 .ema-connector-row__state,
 .ema-attachment-row__source {
-  color: var(--ema-ash);
-  font-family: var(--ema-font-mono);
-  font-size: 0.82rem;
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.78rem;
 }
-
 .ema-attachment-row {
   grid-template-columns: 44px minmax(140px, 1fr) minmax(140px, 0.8fr) auto;
 }
-
 .ema-attachment-row__kind {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   place-items: center;
-  border: 1px solid var(--ema-wire);
-  color: var(--ema-amber);
+  border: 1px solid var(--place-border-default);
+  border-radius: 6px;
+  color: var(--place-tertiary-400);
 }
 
-.ema-bp-doc {
-  display: grid;
-  gap: 16px;
-}
-
+.ema-bp-doc { display: grid; gap: 16px; }
 .ema-bp-section-tree {
   padding-left: 16px;
-  border-left: 1px solid rgba(255, 184, 107, 0.3);
+  border-left: 1px solid var(--place-tertiary-border);
 }
-
 .ema-bp-section-tree li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -669,34 +1332,34 @@ a {
   align-items: start;
   padding: 8px 0;
 }
-
-.ema-bp-section-tree .ema-bp-section-tree {
-  grid-column: 1 / -1;
-}
+.ema-bp-section-tree .ema-bp-section-tree { grid-column: 1 / -1; }
 
 .ema-work-card,
 .ema-placeholder-card {
   display: grid;
   gap: 12px;
-  min-height: 220px;
+  min-height: 200px;
   padding: 18px;
 }
-
 .ema-work-card span {
   width: max-content;
   padding: 4px 8px;
-  border: 1px solid rgba(143, 208, 106, 0.42);
-  color: var(--ema-green);
-  font-family: var(--ema-font-mono);
-  font-size: 0.74rem;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 999px;
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
   text-transform: uppercase;
 }
-
 .ema-work-card strong,
 .ema-placeholder-card p {
-  color: var(--ema-ash);
+  color: var(--place-text-secondary);
   line-height: 1.5;
 }
+
+/* ============================================================ */
+/* Modal / picker                                                */
+/* ============================================================ */
 
 .ema-modal {
   position: fixed;
@@ -706,25 +1369,25 @@ a {
   place-items: center;
   padding: 20px;
 }
-
 .ema-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0, 0, 0, 0.68);
   backdrop-filter: blur(8px);
 }
-
 .ema-modal__panel {
   position: relative;
   z-index: 1;
   width: min(720px, 100%);
   max-height: min(680px, 88vh);
   overflow: auto;
-  border: 1px solid rgba(255, 184, 107, 0.5);
-  background: var(--ema-panel-strong);
+  border: 1px solid var(--place-tertiary-border);
+  border-radius: 14px;
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-elevated)) saturate(180%);
   box-shadow: var(--ema-shadow);
 }
-
 .ema-modal__header,
 .ema-picker__item {
   display: grid;
@@ -732,402 +1395,734 @@ a {
   gap: 12px;
   align-items: center;
   padding: 14px;
-  border-bottom: 1px solid var(--ema-wire);
+  border-bottom: 1px solid var(--place-border-default);
 }
-
 .ema-modal__header h3 {
   margin: 0;
-  font-family: var(--ema-font-display);
-  font-size: 1.7rem;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
-
 .ema-modal__header button,
 .ema-picker__item button {
-  min-height: 34px;
-  border: 1px solid rgba(143, 208, 106, 0.42);
-  background: rgba(143, 208, 106, 0.08);
-  color: var(--ema-green);
-}
-
-.ema-picker__list {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ema-picker__kind {
-  color: var(--ema-amber);
-  font-family: var(--ema-font-mono);
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 6px;
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
   font-size: 0.76rem;
 }
-
-@keyframes ema-rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.ema-picker__list { display: grid; margin: 0; padding: 0; list-style: none; }
+.ema-picker__kind {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.74rem;
 }
 
+/* ============================================================ */
+/* Dormant side-nav shell (still used by some code paths)        */
+/* ============================================================ */
+
+.ema-shell { min-height: 100vh; }
+.ema-shell__grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px;
+}
+.ema-shell__body { min-width: 0; }
+
+.ema-surface-nav {
+  position: sticky;
+  top: 88px;
+  display: grid;
+  align-self: start;
+  gap: 8px;
+}
+.ema-surface-nav__item {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  transition:
+    border-color 160ms ease,
+    transform 160ms var(--place-ease-smooth),
+    background 160ms ease;
+}
+.ema-surface-nav__item strong {
+  color: var(--place-text-primary);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.ema-surface-nav__item:hover,
+.ema-surface-nav__item.is-active {
+  border-color: var(--place-secondary-border);
+  background: var(--place-secondary-subtle);
+  transform: translateX(3px);
+}
+
+/* ============================================================ */
+/* Rise-in                                                        */
+/* ============================================================ */
+
+@keyframes ema-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================ */
+/* Responsive                                                    */
+/* ============================================================ */
+
 @media (max-width: 1120px) {
-  .ema-topbar {
-    grid-template-columns: auto 1fr auto;
-  }
-
-  .ema-topbar__project-sense {
-    display: none;
-  }
-
+  .ema-topbar { grid-template-columns: auto 1fr auto; }
+  .ema-topbar__project-sense { display: none; }
   .ema-shell__grid,
   .ema-hero,
   .ema-hq__matrix,
-  .ema-hq__matrix--lower {
-    grid-template-columns: 1fr;
-  }
-
+  .ema-hq__matrix--lower { grid-template-columns: 1fr; }
   .ema-surface-nav {
     position: static;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
   .ema-pulse-grid,
   .ema-surface-board,
   .ema-placeholder-grid,
-  .ema-work-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .ema-work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ema-desktop__stage { inset: 56px 0 88px 0; }
 }
 
 @media (max-width: 720px) {
-  .ema-topbar {
-    position: static;
-    grid-template-columns: 1fr;
-    padding: 14px;
-  }
-
-  .ema-shell__grid {
-    padding: 14px;
-  }
-
+  .ema-topbar { position: static; grid-template-columns: 1fr; padding: 12px; }
+  .ema-shell__grid { padding: 12px; }
   .ema-surface-nav,
   .ema-pulse-grid,
   .ema-surface-board,
   .ema-placeholder-grid,
-  .ema-work-grid {
-    grid-template-columns: 1fr;
-  }
-
+  .ema-work-grid { grid-template-columns: 1fr; }
   .ema-connector-row,
   .ema-attachment-row,
   .ema-event-trail li,
-  .ema-event-trail--roomy li {
-    grid-template-columns: 1fr;
-  }
-
+  .ema-event-trail--roomy li { grid-template-columns: 1fr; }
   .ema-panel__heading,
-  .ema-vapp__header--split {
-    display: grid;
+  .ema-vapp__header--split { display: grid; }
+  .ema-desktop__stage { inset: 112px 0 92px 0; }
+  .ema-dock { max-width: calc(100% - 24px); overflow-x: auto; }
+}
+
+/* ============================================================ */
+/* Reduced motion                                                */
+/* ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* ===========================================================
- * Virtual Desktop — root shell per doctrine/research/virtual-desktop-deep.md
- * =========================================================== */
+/* ============================================================ */
+/* See Agent Work — Surface Slice A                              */
+/* RIP: place.org liquid-glass ambient + elevated tiers          */
+/*      (adopt via existing .glass-* tiers in this file)         */
+/* RIP: codebase-frontend-layer HQ operator-dashboard density    */
+/*      (adapt — dense panels, every mock carries visible tag)   */
+/* RIP: codebase-agent-os-bridge state vocabulary                */
+/*      (copy — idea/ready/active/review/blocked/done columns)   */
+/* RIP: lineage-original-elixir-ema @max_events 200              */
+/*      (adapt — CHRONICLE_MAX bounded buffer)                   */
+/* RIP: codebase-mission-control-claude density + role display   */
+/*      (inspire — "display only — not yet enforced" pill)       */
+/* ============================================================ */
 
-.ema-desktop {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: transparent;
+.ema-saw-root {
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 3vw, 28px);
 }
 
-.ema-desktop__stage {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-/* --- Wallpaper ----------------------------------------------------- */
-
-.ema-wallpaper {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  transition: background 600ms ease;
-}
-
-.ema-wallpaper[data-scene="scene-forest"] {
-  background:
-    radial-gradient(circle at 18% 22%, rgba(143, 208, 106, 0.22), transparent 38rem),
-    radial-gradient(circle at 82% 72%, rgba(122, 162, 255, 0.18), transparent 34rem),
-    linear-gradient(150deg, #0a110b 0%, #0f1813 52%, #060a07 100%);
-}
-
-.ema-wallpaper[data-scene="scene-ember"] {
-  background:
-    radial-gradient(circle at 80% 18%, rgba(255, 184, 107, 0.26), transparent 34rem),
-    radial-gradient(circle at 16% 78%, rgba(255, 107, 107, 0.16), transparent 30rem),
-    linear-gradient(135deg, #140b06 0%, #1a120a 50%, #070403 100%);
-}
-
-.ema-wallpaper[data-scene="scene-dusk"] {
-  background:
-    radial-gradient(circle at 72% 22%, rgba(122, 162, 255, 0.22), transparent 40rem),
-    radial-gradient(circle at 22% 78%, rgba(180, 132, 255, 0.18), transparent 32rem),
-    linear-gradient(145deg, #070a14 0%, #0d1220 52%, #050711 100%);
-}
-
-.ema-wallpaper[data-scene="scene-slate"] {
-  background:
-    radial-gradient(circle at 50% 14%, rgba(243, 239, 226, 0.08), transparent 38rem),
-    linear-gradient(135deg, #0b0d0b 0%, #15191a 50%, #07090a 100%);
-}
-
-/* --- Dock --------------------------------------------------------- */
-
-.ema-dock {
-  position: relative;
-  z-index: 30;
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  margin: 0 auto 1.25rem;
-  max-width: max-content;
-  background: var(--ema-panel-strong);
-  border: 1px solid var(--ema-wire);
-  border-radius: 18px;
-  box-shadow: var(--ema-shadow);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-}
-
-.ema-dock__tile {
-  display: flex;
-  flex-direction: column;
+.ema-saw-header {
   align-items: flex-start;
-  gap: 0.1rem;
-  padding: 0.5rem 0.75rem;
-  min-width: 4.75rem;
-  color: var(--ema-ink);
-  background: transparent;
-  border: 1px solid transparent;
+}
+.ema-saw-header__meta {
+  margin-top: 12px;
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.78rem;
+}
+.ema-saw-header__meta code {
+  color: var(--place-primary-400);
+  font-size: inherit;
+}
+.ema-saw-header__notice {
+  display: grid;
+  gap: 10px;
+  align-self: flex-start;
+  min-width: 280px;
+  padding: 18px;
+  border: 1px solid var(--place-border-default);
   border-radius: 12px;
-  cursor: pointer;
-  transition: transform 120ms ease, background 160ms ease, border-color 160ms ease;
+  background:
+    linear-gradient(145deg, var(--place-tertiary-subtle), transparent 60%),
+    var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+}
+.ema-saw-header__notice strong {
+  color: var(--place-text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.ema-saw-header__notice p {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.ema-saw-header__notice code {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.8em;
 }
 
-.ema-dock__tile:hover {
-  background: var(--ema-rail);
-  border-color: var(--ema-wire);
-  transform: translateY(-1px);
+.ema-saw-region {
+  padding: 18px;
 }
 
-.ema-dock__tile.is-open {
-  background: var(--ema-rail);
-  border-color: var(--ema-wire);
+.ema-saw-row {
+  display: grid;
+  gap: 14px;
+}
+.ema-saw-row--vcal-roster {
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+}
+.ema-saw-row--command-prompt {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
 }
 
-.ema-dock__tile-eyebrow {
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ema-ash);
+/* ---- Region 1 — Top swarm pulse ------------------------------ */
+
+.ema-saw-pulse__grid .ema-pulse-card[data-saw-pulse="blocked"] {
+  border-color: var(--place-tertiary-border);
+  background:
+    linear-gradient(145deg, var(--place-tertiary-subtle), transparent 60%),
+    var(--glass-bg-surface);
+}
+.ema-saw-pulse__grid .ema-pulse-card[data-saw-pulse="blocked"] strong {
+  color: var(--place-tertiary-400);
 }
 
-.ema-dock__tile-label {
-  font-family: var(--ema-font-display);
-  font-size: 0.95rem;
-  color: var(--ema-ink);
-}
+/* ---- Region 2 — Mission rail --------------------------------- */
 
-.ema-dock__tile-status {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  margin-top: 0.2rem;
-  background: var(--ema-ash);
-}
-
-.ema-dock__tile-status[data-status="live"] {
-  background: var(--ema-green);
-}
-
-.ema-dock__tile-status[data-status="projection"] {
-  background: var(--ema-amber);
-}
-
-.ema-dock__tile-status[data-status="placeholder"] {
-  background: var(--ema-wire);
-}
-
-/* --- Window ------------------------------------------------------- */
-
-.ema-window {
-  position: absolute;
-  top: 0;
-  left: 0;
+.ema-saw-mission-rail__track {
   display: flex;
-  flex-direction: column;
-  min-width: 420px;
-  min-height: 280px;
-  background: var(--ema-panel-strong);
-  border: 1px solid var(--ema-wire);
-  border-radius: 14px;
-  box-shadow: var(--ema-shadow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  overflow: hidden;
-  will-change: transform;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+}
+.ema-saw-mission-rail__group {
+  display: grid;
+  gap: 8px;
+  min-width: 280px;
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  scroll-snap-align: start;
+}
+.ema-saw-mission-rail__group-heading {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--place-border-subtle);
+}
+.ema-saw-mission-rail__group-heading strong {
+  color: var(--place-text-primary);
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+.ema-saw-mission-rail__group-heading small {
+  color: var(--place-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.ema-saw-mission-rail__group-heading .ema-pill {
+  justify-self: flex-start;
+}
+.ema-saw-mission-rail__missions {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ema-saw-mission-rail__empty {
+  padding: 10px;
+  color: var(--place-text-tertiary);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+.ema-saw-mission-card {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.ema-saw-mission-card:hover {
+  border-color: var(--place-secondary-border);
+  background: rgba(107, 149, 240, 0.06);
+}
+.ema-saw-mission-card strong {
+  color: var(--place-text-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.ema-saw-cli-hint {
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
 }
 
-.ema-window__header {
-  flex: 0 0 auto;
+/* ---- Region 3 — Lane board ----------------------------------- */
+
+.ema-saw-lane-board__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 1200px) {
+  .ema-saw-lane-board__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.ema-saw-lane-column {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.ema-saw-lane-column[data-column="active"] {
+  border-color: var(--place-primary-border);
+  background:
+    linear-gradient(180deg, var(--place-primary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-lane-column[data-column="blocked"] {
+  border-color: var(--place-tertiary-border);
+  background:
+    linear-gradient(180deg, var(--place-tertiary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-lane-column[data-column="review"] {
+  border-color: var(--place-secondary-border);
+}
+.ema-saw-lane-column__heading {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  padding: 0.5rem 0.85rem;
-  background: linear-gradient(180deg, rgba(243, 239, 226, 0.04), transparent 90%);
-  border-bottom: 1px solid var(--ema-wire);
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--place-border-subtle);
 }
-
-.ema-window__header:active {
-  cursor: grabbing;
+.ema-saw-lane-column__heading strong {
+  color: var(--place-text-primary);
+  font-family: var(--place-font-mono);
+  font-size: 0.82rem;
 }
-
-.ema-window__title {
+.ema-saw-lane-column__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ema-saw-lane-column__empty {
+  padding: 10px;
+  color: var(--place-text-tertiary);
+  font-size: 0.76rem;
+  font-style: italic;
+}
+.ema-saw-lane-card {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.ema-saw-lane-card strong {
+  color: var(--place-text-primary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.ema-saw-cli {
+  display: block;
+  overflow: hidden;
+  padding: 6px 8px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ema-saw-lane-card footer {
   display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  line-height: 1.05;
+  justify-content: flex-end;
 }
 
-.ema-window__title-eyebrow {
-  font-size: 0.6rem;
+/* ---- Region 4 — vCalendar strip ------------------------------ */
+
+.ema-saw-vcal-strip__blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ema-saw-vcal-block {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ema-saw-vcal-block[data-block-kind="focus"] {
+  border-color: var(--place-primary-border);
+  background:
+    linear-gradient(135deg, var(--place-primary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-vcal-block[data-block-kind="review"] {
+  border-color: var(--place-secondary-border);
+  background:
+    linear-gradient(135deg, var(--place-secondary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-vcal-block[data-block-kind="blocked"] {
+  border-color: var(--place-tertiary-border);
+  background:
+    linear-gradient(135deg, var(--place-tertiary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-vcal-block strong {
+  color: var(--place-text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.ema-saw-vcal-block small {
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
+}
+.ema-saw-vcal-strip__checkups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid var(--place-border-subtle);
+}
+.ema-saw-vcal-chip small {
+  color: inherit;
+  opacity: 0.7;
+  text-transform: none;
+}
+
+/* ---- Region 5 — Agent roster --------------------------------- */
+
+.ema-saw-roster__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.ema-saw-actor-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent),
+    var(--glass-bg-surface);
+}
+.ema-saw-actor-card[data-actor-kind="agent"] {
+  border-color: var(--place-secondary-border);
+}
+.ema-saw-actor-card[data-actor-kind="human"] {
+  border-color: var(--place-primary-border);
+}
+.ema-saw-actor-card header {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--place-border-subtle);
+}
+.ema-saw-actor-card header strong {
+  color: var(--place-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.ema-saw-actor-card__meta {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.ema-saw-actor-card__meta > div {
+  display: grid;
+  gap: 2px;
+}
+.ema-saw-actor-card__meta dt {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ema-saw-actor-card__meta dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 0.86rem;
+}
+.ema-saw-pill-tight {
+  padding: 0 7px;
+  min-height: 18px;
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+}
+
+/* ---- Region 6 — Command panel -------------------------------- */
+
+.ema-saw-command-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.ema-saw-cmd-btn {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ema-saw-cmd-btn[data-state="draft"] {
+  border-color: var(--place-secondary-border);
+}
+.ema-saw-cmd-btn__action {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-primary);
+  text-align: left;
+  cursor: not-allowed;
+  opacity: 0.94;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.ema-saw-cmd-btn__action:hover {
+  border-color: var(--place-tertiary-border);
+  background: var(--place-tertiary-subtle);
+}
+.ema-saw-cmd-btn__action span {
+  color: var(--place-text-primary);
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+.ema-saw-cmd-btn__action strong {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.ema-saw-cmd-btn__hint {
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+}
+.ema-saw-cmd-btn__copy {
+  justify-self: flex-start;
+  padding: 4px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+.ema-saw-cmd-btn__copy:hover {
+  border-color: var(--place-primary-border);
+  color: var(--place-primary-400);
+  background: var(--place-primary-subtle);
+}
+
+/* ---- Region 7 — Agent instruction panel ---------------------- */
+
+.ema-saw-prompt__scope {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ema-saw-prompt__scope > div {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.ema-saw-prompt__scope dt {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ema-saw-prompt__scope dd {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 0.88rem;
+  line-height: 1.3;
+}
+.ema-saw-prompt__block {
+  overflow: auto;
+  max-height: 360px;
+  padding: 12px 14px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.ema-saw-prompt__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+.ema-saw-prompt__copy {
+  padding: 6px 14px;
+}
+
+/* ---- Region 8 — Chronicle strip ------------------------------ */
+
+.ema-saw-chronicle__list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
+}
+.ema-saw-chronicle__item {
+  display: grid;
+  grid-template-columns: 60px 140px 100px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--place-border-subtle);
+  font-family: var(--place-font-mono);
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+.ema-saw-chronicle__item:last-child { border-bottom: none; }
+.ema-saw-chronicle__item time {
+  color: var(--place-text-tertiary);
+}
+.ema-saw-chronicle__actor {
+  color: var(--place-text-primary);
+  font-weight: 600;
+}
+.ema-saw-chronicle__kind {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-size: 0.66rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ema-ash);
+  text-align: center;
+}
+.ema-saw-chronicle__item[data-frame="command"] .ema-saw-chronicle__kind {
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+}
+.ema-saw-chronicle__item[data-frame="event"] .ema-saw-chronicle__kind {
+  background: var(--place-secondary-subtle);
+  color: var(--place-secondary-400);
+}
+.ema-saw-chronicle__item[data-frame="projection"] .ema-saw-chronicle__kind {
+  background: var(--place-tertiary-subtle);
+  color: var(--place-tertiary-400);
+}
+.ema-saw-chronicle__summary {
+  color: var(--place-text-secondary);
+  white-space: normal;
+}
+.ema-saw-chronicle__footer {
+  margin-top: 8px;
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  text-align: right;
 }
 
-.ema-window__title strong {
-  font-family: var(--ema-font-display);
-  font-size: 1rem;
-  color: var(--ema-ink);
+/* Responsive compaction */
+@media (max-width: 960px) {
+  .ema-saw-row--vcal-roster,
+  .ema-saw-row--command-prompt {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ema-saw-chronicle__item {
+    grid-template-columns: 56px 110px minmax(0, 1fr);
+  }
+  .ema-saw-chronicle__kind {
+    display: none;
+  }
 }
 
-.ema-window__controls {
-  display: flex;
-  gap: 0.35rem;
+@media (prefers-reduced-motion: reduce) {
+  .ema-saw-mission-card,
+  .ema-saw-cmd-btn__action,
+  .ema-saw-cmd-btn__copy {
+    transition: none;
+  }
 }
-
-.ema-window__control {
-  width: 1.35rem;
-  height: 1.35rem;
-  line-height: 1;
-  padding: 0;
-  color: var(--ema-ash);
-  background: var(--ema-rail);
-  border: 1px solid var(--ema-wire);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
-}
-
-.ema-window__control:hover {
-  color: var(--ema-ink);
-  background: var(--ema-wire);
-}
-
-.ema-window__control--close:hover {
-  color: var(--ema-black);
-  background: var(--ema-red);
-  border-color: var(--ema-red);
-}
-
-.ema-window__body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  padding: 0;
-}
-
-.ema-window__resize {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  cursor: nwse-resize;
-}
-
-.ema-window__resize::after {
-  content: "";
-  position: absolute;
-  right: 4px;
-  bottom: 4px;
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid var(--ema-wire);
-  border-bottom: 2px solid var(--ema-wire);
-  border-bottom-right-radius: 4px;
-}
-
-/* --- Presence (stub wiring) --------------------------------------- */
-
-.ema-presence {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  pointer-events: none;
-}
-
-.ema-presence__cursor {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--ema-presence-color, var(--ema-blue));
-  font-size: 0.72rem;
-  will-change: transform;
-}
-
-.ema-presence__cursor-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: currentColor;
-  box-shadow: 0 0 0 2px var(--ema-black);
-}
-
-.ema-presence__cursor-label {
-  padding: 0.1rem 0.4rem;
-  background: var(--ema-panel-strong);
-  border: 1px solid var(--ema-wire);
-  border-radius: 6px;
-  color: var(--ema-ink);
-}
-
-/* --- Topbar re-tuning for VDS root ------------------------------- */
-
-.ema-topbar {
-  position: relative;
-  z-index: 40;
-}
-
-/* Legacy .ema-shell styles remain harmless — no longer mounted. */

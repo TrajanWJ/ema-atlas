@@ -11,6 +11,7 @@ import { runStatus } from "./commands/status.js";
 import { runEvents } from "./commands/events.js";
 import { runSwarm } from "./commands/swarm.js";
 import { runOrg } from "./commands/org.js";
+import { runProject } from "./commands/project.js";
 
 async function main(): Promise<number> {
   const [, , cmd, ...rest] = process.argv;
@@ -30,6 +31,8 @@ async function main(): Promise<number> {
       return runEvents(args);
     case "org":
       return runOrg(args);
+    case "project":
+      return runProject(args);
     case "swarm":
       return runSwarm(args);
     default:

@@ -17,6 +17,7 @@ import ema_daemon/bus
 import ema_daemon/ema_env
 import ema_daemon/registry
 import ema_shell_ipc/ema_shell_ipc
+import ema_swarm_coordination/first_boot
 import gleam/erlang/process.{type Subject}
 import gleam/int
 import gleam/otp/actor
@@ -43,17 +44,22 @@ pub fn start() -> Result(StartedTree, SupervisorError) {
     Error(e) -> Error(ChildFailedToStart("bus", describe_start_error(e)))
     Ok(bus_started) -> {
       let bus_subject = bus_started.data
-      case registry.start() {
-        Error(e) ->
-          Error(ChildFailedToStart("registry", describe_start_error(e)))
-        Ok(registry_started) -> {
-          let registry_subject = registry_started.data
-          case ema_shell_ipc.start(bus_subject, bind_addr, port) {
-            Error(reason) -> Error(ChildFailedToStart("shell_ipc", reason))
-            Ok(_ipc) ->
-              Ok(StartedTree(bus: bus_subject, registry: registry_subject))
+      case first_boot.seed_if_needed(bus_subject) {
+        Error(first_boot.AppendFailed(reason)) ->
+          Error(ChildFailedToStart("first_boot", reason))
+        Ok(_) ->
+          case registry.start() {
+            Error(e) ->
+              Error(ChildFailedToStart("registry", describe_start_error(e)))
+            Ok(registry_started) -> {
+              let registry_subject = registry_started.data
+              case ema_shell_ipc.start(bus_subject, bind_addr, port) {
+                Error(reason) -> Error(ChildFailedToStart("shell_ipc", reason))
+                Ok(_ipc) ->
+                  Ok(StartedTree(bus: bus_subject, registry: registry_subject))
+              }
+            }
           }
-        }
       }
     }
   }

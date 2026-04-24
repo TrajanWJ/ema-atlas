@@ -10,6 +10,8 @@ export interface CommandInfo {
 export const COMMANDS: CommandInfo[] = [
   { name: "ping", summary: "Handshake with the daemon and print round-trip ms." },
   { name: "status", summary: "Print the current org / space / project from the topbar projection." },
+  { name: "org create", summary: "Create an organization and its same-name default space." },
+  { name: "project create", summary: "Create a project inside an organization space." },
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
   { name: "swarm list", summary: "List swarms for a project. (wave 1: stubbed)" },
   { name: "swarm show", summary: "Show a single swarm. (wave 1: stubbed)" },

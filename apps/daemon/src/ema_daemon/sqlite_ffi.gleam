@@ -107,12 +107,64 @@ pub fn persist_org_created(
   }
 }
 
+pub fn persist_space_created(
+  db: Db,
+  org_id: String,
+  space_id: String,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_space_created_raw(
+      db,
+      org_id,
+      space_id,
+      payload_json,
+      created_at,
+      actor,
+    )
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_project_created(
+  db: Db,
+  org_id: String,
+  space_id: String,
+  project_id: String,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_project_created_raw(
+      db,
+      org_id,
+      space_id,
+      project_id,
+      payload_json,
+      created_at,
+      actor,
+    )
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
 pub fn topbar_projection_json(db: Db) -> String {
   topbar_projection_json_raw(db)
 }
 
 pub fn event_trail_projection_json(db: Db) -> String {
   event_trail_projection_json_raw(db)
+}
+
+pub fn event_exists(db: Db, kind: String, org_id: String) -> Bool {
+  event_exists_raw(db, kind, org_id)
 }
 
 // --- FFI bindings to esqlite3 ------------------------------------------
@@ -151,11 +203,35 @@ fn persist_org_created_raw(
   actor: String,
 ) -> Result(Dynamic, Dynamic)
 
+@external(erlang, "ema_sqlite_helpers", "persist_space_created")
+fn persist_space_created_raw(
+  db: Db,
+  org_id: String,
+  space_id: String,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_project_created")
+fn persist_project_created_raw(
+  db: Db,
+  org_id: String,
+  space_id: String,
+  project_id: String,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
 @external(erlang, "ema_sqlite_helpers", "topbar_projection_json")
 fn topbar_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "event_trail_projection_json")
 fn event_trail_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "event_exists")
+fn event_exists_raw(db: Db, kind: String, org_id: String) -> Bool
 
 @external(erlang, "ema_sqlite_helpers", "classify_step")
 fn classify_step(raw: Dynamic) -> Result(StepResult, Error)

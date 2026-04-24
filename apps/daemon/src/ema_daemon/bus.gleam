@@ -41,6 +41,8 @@ pub type Msg {
   TopbarProjection(reply: Subject(String))
 
   EventTrailProjection(reply: Subject(String))
+
+  EventExists(kind: String, org_id: String, reply: Subject(Bool))
 }
 
 /// Messages sent to subscribers.
@@ -117,6 +119,22 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
           name TEXT NOT NULL,
           created_at TEXT NOT NULL,
           created_by TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS spaces (
+          id TEXT PRIMARY KEY,
+          org_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          is_default TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          created_by TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS projects (
+          id TEXT PRIMARY KEY,
+          space_id TEXT NOT NULL,
+          org_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          created_by TEXT NOT NULL
         );"
       case sqlite_ffi.exec(db, ddl) {
         Ok(Nil) -> Ok(db)
@@ -173,6 +191,11 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
 
     EventTrailProjection(reply) -> {
       process.send(reply, sqlite_ffi.event_trail_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    EventExists(kind, org_id, reply) -> {
+      process.send(reply, sqlite_ffi.event_exists(state.db, kind, org_id))
       actor.continue(state)
     }
   }
@@ -267,6 +290,35 @@ fn persist_compact_object(
         Ok(Nil) -> Ok(Nil)
         Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
       }
+    "space.created" ->
+      case
+        sqlite_ffi.persist_space_created(
+          db,
+          env.org_id,
+          opt_str(env.space_id),
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "project.created" ->
+      case
+        sqlite_ffi.persist_project_created(
+          db,
+          env.org_id,
+          opt_str(env.space_id),
+          opt_str(env.project_id),
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
     _ -> Ok(Nil)
   }
 }
@@ -342,4 +394,8 @@ pub fn topbar_projection_json(bus: Subject(Msg)) -> String {
 
 pub fn event_trail_projection_json(bus: Subject(Msg)) -> String {
   process.call(bus, 5000, fn(reply) { EventTrailProjection(reply) })
+}
+
+pub fn event_exists(bus: Subject(Msg), kind: String, org_id: String) -> Bool {
+  process.call(bus, 5000, fn(reply) { EventExists(kind, org_id, reply) })
 }

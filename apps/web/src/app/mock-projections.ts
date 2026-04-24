@@ -171,10 +171,16 @@ export const eventTrail = [
   },
 ];
 
+// Bounded buffer for the chronicle strip. Donor: lineage-original-elixir-ema
+// (@max_events 200). Surface lane caps at the same value.
+// RIP: lineage-original-elixir-ema @max_events → CHRONICLE_MAX (adapt)
+export const CHRONICLE_MAX = 200;
+
 // TODO(event-family: lane.*, handoff.*, proposal.*) replace with the live
 // See Agent Work projection sourced from daemon events. Until then this is
 // a placeholder. Worker status lives in docs/orchestration/STATUS.md, never
-// here.
+// here. Kept as a pointer-row so HQ can fall back if the richer
+// `seeAgentWorkProjection.lanes` is unavailable.
 export const agentWork = [
   {
     lane: "see docs/orchestration/STATUS.md",
@@ -334,7 +340,39 @@ export const seeAgentWorkProjection = {
   ],
   agent_instruction:
     "Work inside Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5. Keep the lane scoped, report changed files, preserve intent vs canon, and do not imply mocked controls executed real work.",
+  // Chronicle strip feed. Bounded by CHRONICLE_MAX. Wave 1: seeded from
+  // eventTrail + synthesized lane/handoff entries. Wave 2+: daemon-sourced.
+  recent_events: [
+    { ts: "13:56", actor: "web surface", kind: "event", summary: "Mounted HQ shell projection" },
+    { ts: "13:54", actor: "daemon projection", kind: "projection", summary: "topbar snapshot delivered on subscribe" },
+    { ts: "13:49", actor: "daemon bus", kind: "event", summary: "Topbar subscription attempted on ws://127.0.0.1:49555" },
+    { ts: "13:47", actor: "contracts", kind: "command_result", summary: "check:contracts OK — every referenced event kind is in catalog v0" },
+    { ts: "13:42", actor: "git-ema", kind: "event", summary: "Connector panel exposed fake OAuth affordances" },
+    { ts: "13:39", actor: "agent-work", kind: "event", summary: "Lane lane:01J00000000000000000000002 entered review" },
+    { ts: "13:31", actor: "blueprint", kind: "event", summary: "Section attachment targets prepared" },
+    { ts: "13:28", actor: "coordinator ledger", kind: "event", summary: "Handoff accepted: contracts → UI lane" },
+    { ts: "13:20", actor: "daemon seed", kind: "event", summary: "Founding-Fathers-EMA -> Founding-Fathers-EMA -> EMA 0.0.5 initialized" },
+    { ts: "13:18", actor: "daemon supervisor", kind: "event", summary: "ema_daemon_supervisor boot complete" },
+  ],
 };
+
+// HQ's Lane status panel reads this derived summary instead of the one-line
+// `agentWork` placeholder. Lane ownership is resolved through
+// `seeAgentWorkProjection.actors` so the panel speaks EMA object language.
+// Per SURFACE-SLICE-A.md §"Files touched" and `docs/vapps/see-agent-work.md`.
+export const agentWorkLaneSummary = seeAgentWorkProjection.lanes.map((lane) => {
+  const actor = seeAgentWorkProjection.actors.find(
+    (a) => a.id === lane.owner_actor_id,
+  );
+  return {
+    id: lane.id,
+    title: lane.title,
+    status: lane.status,
+    owner_label: actor ? actor.display_name : "unassigned",
+    owner_kind: actor ? actor.kind : ("unknown" as const),
+    cli: lane.cli,
+  };
+});
 
 export const doctrineCards = [
   {

@@ -1,6 +1,8 @@
+// RIP: codebase-frontend-layer read-only observer posture
+//      (adopt — HQ never writes canon; mocks carry visible tags)
 import {
   MOCK_PROJECTION_LABEL,
-  agentWork,
+  agentWorkLaneSummary,
   eventTrail,
   hqProjection,
   surfaceLinks,
@@ -126,11 +128,16 @@ export function HqPage() {
             </Link>
           </div>
           <div className="ema-lane-list">
-            {agentWork.map((lane) => (
-              <article key={lane.lane} className="ema-lane-row">
-                <span>{lane.lane}</span>
-                <strong>{lane.status}</strong>
-                <p>{lane.output}</p>
+            {agentWorkLaneSummary.map((lane) => (
+              <article key={lane.id} className="ema-lane-row" data-lane-status={lane.status}>
+                <span>
+                  {lane.owner_kind} · {lane.owner_label}
+                </span>
+                <strong>{lane.title}</strong>
+                <p>
+                  <span className="ema-pill ema-pill--hot">{lane.status}</span>
+                  <code>{lane.cli}</code>
+                </p>
               </article>
             ))}
           </div>

@@ -49,6 +49,8 @@ function emitError(msg) {
 var COMMANDS = [
   { name: "ping", summary: "Handshake with the daemon and print round-trip ms." },
   { name: "status", summary: "Print the current org / space / project from the topbar projection." },
+  { name: "org create", summary: "Create an organization and its same-name default space." },
+  { name: "project create", summary: "Create a project inside an organization space." },
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
   { name: "swarm list", summary: "List swarms for a project. (wave 1: stubbed)" },
   { name: "swarm show", summary: "Show a single swarm. (wave 1: stubbed)" },
@@ -510,6 +512,48 @@ async function runOrg(args) {
   }
 }
 
+// src/commands/project.ts
+async function runProject(args) {
+  const sub = args.positional[0];
+  if (sub !== "create") {
+    emitError(`ema project: unknown subcommand "${sub ?? ""}" (expected: create)`);
+    return 64;
+  }
+  const json = flagBool(args, "json");
+  const orgId = flagString(args, "org");
+  const spaceId = flagString(args, "space");
+  const name = flagString(args, "name") ?? args.positional.slice(1).join(" ");
+  if (!orgId || !spaceId || !name.trim()) {
+    emitError(`ema project create: missing --org, --space, or --name`);
+    emitError(`Usage: ema project create --org org:<id> --space space:<id> --name "EMA 0.0.5"`);
+    return 64;
+  }
+  try {
+    const c = await connect({ surface: "desktop" });
+    const result = await c.command("project.create", {
+      org_id: orgId,
+      space_id: spaceId,
+      name
+    });
+    c.close();
+    if (result.ok !== true) {
+      if (json) emitJson({ ok: false, error: result.error });
+      else emitError(`ema project create: ${result.error.class}: ${result.error.message}`);
+      return 1;
+    }
+    const events = result.events ?? [];
+    if (json) {
+      emitJson({ ok: true, org_id: orgId, space_id: spaceId, name, events });
+    } else {
+      emitPretty(`created project: ${name}`);
+      emitPretty(`events: ${events.join(", ") || "(none returned)"}`);
+    }
+    return 0;
+  } catch (err) {
+    return reportError(err, json);
+  }
+}
+
 // src/bin.ts
 async function main() {
   const [, , cmd, ...rest] = process.argv;
@@ -528,6 +572,8 @@ async function main() {
       return runEvents(args);
     case "org":
       return runOrg(args);
+    case "project":
+      return runProject(args);
     case "swarm":
       return runSwarm(args);
     default:

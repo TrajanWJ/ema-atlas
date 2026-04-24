@@ -4,11 +4,16 @@
 //// projections while IPC is stubbed, but this module is the canonical
 //// backend shape for the initial workspace.
 
+import ema_daemon/bus
 import ema_daemon/event_envelope.{type Envelope}
+import gleam/erlang/process.{type Subject}
+import gleam/list
 
 pub const boot_ts: String = "2026-04-24T00:00:00-04:00"
 
 pub const genesis_user_id: String = "user:01J00000000000000000000001"
+
+pub const genesis_device_id: String = "device:01J00000000000000000000000"
 
 pub const trajan_actor_id: String = "actor:01J00000000000000000000002"
 
@@ -112,6 +117,19 @@ pub type SeeAgentWorkSeed {
     agent_roles: List(String),
     mocked_controls: List(String),
   )
+}
+
+pub type SeedError {
+  AppendFailed(String)
+}
+
+pub fn seed_if_needed(
+  bus_subject: Subject(bus.Msg),
+) -> Result(List(String), SeedError) {
+  case bus.event_exists(bus_subject, "org.created", org_id) {
+    True -> Ok([])
+    False -> append_all(bus_subject, first_boot_events(), [])
+  }
 }
 
 pub fn workspace() -> FirstBootWorkspace {
@@ -229,6 +247,14 @@ pub fn see_agent_work_seed() -> SeeAgentWorkSeed {
 
 pub fn first_boot_events() -> List(Envelope) {
   [
+    envelope_with_actor(
+      event_id: "event:01J00000000000000000000100",
+      kind: "device.registered",
+      actor: "system:ema_identity",
+      space_id: event_envelope.none(),
+      project_id: event_envelope.none(),
+      payload_json: "{\"device_id\":\"device:01J00000000000000000000000\",\"user_id\":\"user:01J00000000000000000000001\",\"name\":\"trajan\",\"pubkey\":\"dev-genesis-pubkey\",\"bootstrap\":\"genesis\"}",
+    ),
     envelope(
       event_id: "event:01J00000000000000000000101",
       kind: "actor.created",
@@ -316,9 +342,42 @@ pub fn first_boot_events() -> List(Envelope) {
   ]
 }
 
+fn append_all(
+  bus_subject: Subject(bus.Msg),
+  events: List(Envelope),
+  appended: List(String),
+) -> Result(List(String), SeedError) {
+  case events {
+    [] -> Ok(list.reverse(appended))
+    [event, ..rest] ->
+      case bus.append(bus_subject, event) {
+        Ok(_) -> append_all(bus_subject, rest, [event.event_id, ..appended])
+        Error(e) -> Error(AppendFailed(describe_append_error(e)))
+      }
+  }
+}
+
 fn envelope(
   event_id event_id: String,
   kind kind: String,
+  space_id space_id: event_envelope.Option(String),
+  project_id project_id: event_envelope.Option(String),
+  payload_json payload_json: String,
+) -> Envelope {
+  envelope_with_actor(
+    event_id: event_id,
+    kind: kind,
+    actor: trajan_actor_id,
+    space_id: space_id,
+    project_id: project_id,
+    payload_json: payload_json,
+  )
+}
+
+fn envelope_with_actor(
+  event_id event_id: String,
+  kind kind: String,
+  actor actor: String,
   space_id space_id: event_envelope.Option(String),
   project_id project_id: event_envelope.Option(String),
   payload_json payload_json: String,
@@ -327,7 +386,7 @@ fn envelope(
     event_id: event_id,
     kind: kind,
     ts: boot_ts,
-    actor: trajan_actor_id,
+    actor: actor,
     org_id: org_id,
     space_id: space_id,
     project_id: project_id,
@@ -335,4 +394,12 @@ fn envelope(
     execution_id: event_envelope.none(),
     payload_json: payload_json,
   )
+}
+
+fn describe_append_error(e: bus.AppendError) -> String {
+  case e {
+    bus.InvalidKind(kind) -> "invalid event kind: " <> kind
+    bus.NotInCatalog(kind) -> "event kind not in catalog: " <> kind
+    bus.PersistenceFailed(reason) -> "persistence failed: " <> reason
+  }
 }

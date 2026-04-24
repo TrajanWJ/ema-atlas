@@ -19,6 +19,8 @@ import mist.{type Connection, type ResponseData}
 import ema_daemon/bus
 import ema_daemon/event_envelope.{type Envelope, Envelope}
 import ema_orgs/ema_orgs
+import ema_projects/ema_projects
+import ema_spaces/ema_spaces
 
 pub const default_port: Int = 49_555
 
@@ -131,6 +133,18 @@ fn handle_bus_delivery(
             "topbar",
             bus.topbar_projection_json(state.bus_subject),
           )
+        "space.created" ->
+          send_projection(
+            conn,
+            "topbar",
+            bus.topbar_projection_json(state.bus_subject),
+          )
+        "project.created" ->
+          send_projection(
+            conn,
+            "topbar",
+            bus.topbar_projection_json(state.bus_subject),
+          )
         _ -> Nil
       }
       mist.continue(state)
@@ -197,11 +211,11 @@ fn handle_text(
               case incoming.name {
                 Some(name) ->
                   case ema_orgs.create(bus_subj, name) {
-                    Ok(event_id) -> {
+                    Ok(event_ids) -> {
                       let _ =
                         mist.send_text_frame(
                           conn,
-                          command_ok(incoming.id, [event_id]),
+                          command_ok(incoming.id, event_ids),
                         )
                       let _ =
                         send_projection_snapshot(conn, bus_subj, Some("topbar"))
@@ -239,6 +253,163 @@ fn handle_text(
                     mist.send_text_frame(
                       conn,
                       err(incoming.id, "invalid_args", "missing args.name"),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("space.create") -> {
+              case incoming.org_id {
+                Some(org_id) ->
+                  case incoming.name {
+                    Some(name) ->
+                      case ema_spaces.create(bus_subj, org_id, name) {
+                        Ok(event_id) -> {
+                          let _ =
+                            mist.send_text_frame(
+                              conn,
+                              command_ok(incoming.id, [event_id]),
+                            )
+                          let _ =
+                            send_projection_snapshot(
+                              conn,
+                              bus_subj,
+                              Some("topbar"),
+                            )
+                          let _ =
+                            send_projection_snapshot(
+                              conn,
+                              bus_subj,
+                              Some("event_trail"),
+                            )
+                          mist.continue(state)
+                        }
+                        Error(ema_spaces.EmptyOrg) -> {
+                          let _ =
+                            mist.send_text_frame(
+                              conn,
+                              err(
+                                incoming.id,
+                                "invalid_args",
+                                "space org_id is required",
+                              ),
+                            )
+                          mist.continue(state)
+                        }
+                        Error(ema_spaces.EmptyName) -> {
+                          let _ =
+                            mist.send_text_frame(
+                              conn,
+                              err(
+                                incoming.id,
+                                "invalid_args",
+                                "space name is required",
+                              ),
+                            )
+                          mist.continue(state)
+                        }
+                        Error(ema_spaces.AppendFailed(reason)) -> {
+                          let _ =
+                            mist.send_text_frame(
+                              conn,
+                              err(incoming.id, "internal", reason),
+                            )
+                          mist.continue(state)
+                        }
+                      }
+                    None -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(incoming.id, "invalid_args", "missing args.name"),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                None -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(incoming.id, "invalid_args", "missing args.org_id"),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("project.create") -> {
+              case incoming.org_id, incoming.space_id, incoming.name {
+                Some(org_id), Some(space_id), Some(name) ->
+                  case ema_projects.create(bus_subj, org_id, space_id, name) {
+                    Ok(event_id) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(conn, bus_subj, Some("topbar"))
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(ema_projects.EmptyOrg) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(
+                            incoming.id,
+                            "invalid_args",
+                            "missing args.org_id",
+                          ),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(ema_projects.EmptySpace) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(
+                            incoming.id,
+                            "invalid_args",
+                            "missing args.space_id",
+                          ),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(ema_projects.EmptyName) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(
+                            incoming.id,
+                            "invalid_args",
+                            "project name is required",
+                          ),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(ema_projects.AppendFailed(reason)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(incoming.id, "internal", reason),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.space_id, or args.name",
+                      ),
                     )
                   mist.continue(state)
                 }
@@ -284,10 +455,38 @@ type Incoming {
     op: Option(String),
     channel: Option(String),
     name: Option(String),
+    org_id: Option(String),
+    space_id: Option(String),
+  )
+}
+
+type IncomingArgs {
+  IncomingArgs(
+    name: Option(String),
+    org_id: Option(String),
+    space_id: Option(String),
   )
 }
 
 fn decode_envelope(raw: String) -> Result(Incoming, String) {
+  let args_decoder = {
+    use name <- decode.optional_field(
+      "name",
+      None,
+      decode.optional(decode.string),
+    )
+    use org_id <- decode.optional_field(
+      "org_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use space_id <- decode.optional_field(
+      "space_id",
+      None,
+      decode.optional(decode.string),
+    )
+    decode.success(IncomingArgs(name: name, org_id: org_id, space_id: space_id))
+  }
   let decoder = {
     use id <- decode.field("id", decode.string)
     use kind <- decode.field("type", decode.string)
@@ -297,17 +496,19 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
-    use name <- decode.optional_field(
+    use args <- decode.optional_field(
       "args",
-      None,
-      decode.optional(decode.at(["name"], decode.string)),
+      IncomingArgs(name: None, org_id: None, space_id: None),
+      args_decoder,
     )
     decode.success(Incoming(
       id: id,
       kind: kind,
       op: op,
       channel: channel,
-      name: name,
+      name: args.name,
+      org_id: args.org_id,
+      space_id: args.space_id,
     ))
   }
   case json.parse(raw, decoder) {

@@ -18,6 +18,32 @@ Coordinator handoff landed. Specifically:
 
 Outcome: daemon compiles green (fix landed via a parallel session while coordinator was planning); daemon alive; web alive; W1 M1 round-trip is the next exit gate.
 
+## Session close 2026-04-24 — Workspace Hygiene Slice A
+
+Slice: Workspace Hygiene A — Orchestrator Prompt Reconciliation.
+
+Files changed in `doctrine/planning/orchestrator-prompts/`:
+- Created `archive/2026-04-24/` and moved three superseded prompts into it: `CODEX-ORCHESTRATOR-PROMPT.md` (V1), `CLAUDE-ORCHESTRATOR-PROMPT.md` (V1), `CODEX-CORRECTION-PROMPT-2026-04-24.md` (one-shot recovery).
+- Wrote one-line redirect stubs at the three original paths pointing at the canonical successor.
+- Rewrote `ORCHESTRATOR-INDEX.md` with `## Ledger anchor`, `## Active Prompts` (9 rows), `## Archived Prompts` (3 rows), and expanded `## Collision Rules`.
+- Added `## Ledger anchor` section to all 9 canonical prompts: Runtime Vertical Slice, Product Surface Donor, Canon Writers, Provenance & Version Control, Workspace Hygiene & Swarm Meta, Code Quality & Language Idiom, Codebase Architecture & Extensibility, Codex V2, Claude V2. No body edits on any of them.
+
+Prompts reconciled (old → new):
+- `CODEX-ORCHESTRATOR-PROMPT.md` → `archive/2026-04-24/CODEX-ORCHESTRATOR-PROMPT.md` (superseded by `CODEX-ORCHESTRATOR-PROMPT-V2.md`).
+- `CLAUDE-ORCHESTRATOR-PROMPT.md` → `archive/2026-04-24/CLAUDE-ORCHESTRATOR-PROMPT.md` (superseded by `CLAUDE-ORCHESTRATOR-PROMPT-V2.md`).
+- `CODEX-CORRECTION-PROMPT-2026-04-24.md` → `archive/2026-04-24/CODEX-CORRECTION-PROMPT-2026-04-24.md` (guardrails absorbed into V2 preamble).
+
+Lane files written: 0 — Slice B.
+Scripts added/upgraded: 0 — Slices C / D / F / G.
+Sweeps enabled: no — Slice F.
+Ledger gate enforced: no — Slice G (`scripts/ledger-check.sh` lands then).
+
+Risks and notes:
+- Two canonical prompts (`CODE-QUALITY-AND-LANGUAGE-IDIOM-ORCHESTRATOR-PROMPT.md`, `CODEBASE-ARCHITECTURE-AND-EXTENSIBILITY-ORCHESTRATOR-PROMPT.md`) were present in the folder but absent from the Workspace Hygiene prompt's original "Current state to reconcile" list. They were absorbed into Active Prompts during reconciliation. Coordinator should confirm long-term status.
+- Codex V2, Claude V2, and Provenance still contain body references to `CODEX-CORRECTION-PROMPT-2026-04-24.md`. Those links now resolve to a redirect stub; the archived file at `archive/2026-04-24/` remains authoritative if correction-specific detail is needed. Out of scope for Slice A per the hygiene orchestrator's ownership boundary (no body edits on other orchestrators' prompts).
+
+Next slice: B — populate `docs/orchestration/lanes/L-<id>.md` for every lane in this STATUS.md.
+
 ## Read-first order for any new session
 
 1. This file (`docs/orchestration/STATUS.md`)
@@ -89,11 +115,11 @@ Reality check against what is actually on disk (not what old plan docs claimed):
 
 | Lane | Status | Owner | Files | Exit criteria |
 |---|---|---|---|---|
-| `L-ipc-client-finish` (Slice A) | in-progress (wire alive, hooks need audit) | Runtime Slice Orch | `packages/surface-core/src/ipc-client/`, `apps/web/src/lib/ipc/`, `tooling/m1-round-trip.mjs` | All 7 minimum-behaviors in Runtime-Slice-Orchestrator prompt met: reconnect w/ backoff, clear offline state to hooks, UI never writes raw frames. `m1-round-trip.mjs` still green. |
-| `L-projections-topbar` (Slice B) | queued | Runtime Slice Orch | daemon-side `apps/daemon/src/ema_projections/topbar.gleam` (new), `apps/web/src/shell/topbar.tsx`, `apps/web/src/shell/*-selector.tsx` | Topbar renders "Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5" from `useProjection("topbar.projection")`, not `mockTopbar`. Event trail contains seed or command events backing the projection. |
-| `L-writers-org-space` | queued | (none — specialist TBD; Codex worker brief lists this as recommended first slice) | `apps/daemon/src/ema_orgs/`, `ema_spaces/`, catalog entries in `packages/contracts/events/` | `org.created` + `space.created` (default-same-name) accepted as real commands, persisted, projected. |
-| `L-see-agent-work-docs` | queued | unassigned | `docs/cli/see-agent-work.md`, `docs/agents/see-agent-work-agent-usage.md` | Operational runbook: every CLI command has a worked example; an external session can follow the runbook cold. |
-| `L-honest-mocks` | closed 2026-04-24 | coordinator | `apps/web/src/app/mock-projections.ts` | Self-reported "Codex: active" agentWork entries removed; `MOCK_PROJECTION_LABEL` confirmed rendered on topbar, hq-page, agent-work-page, blueprint, git-ema panels, placeholder-page. |
+| [`L-ipc-client-finish`](lanes/L-ipc-client-finish.md) (Slice A) | in-progress (wire alive, hooks need audit) | Runtime Slice Orch | `packages/surface-core/src/ipc-client/`, `apps/web/src/lib/ipc/`, `tooling/m1-round-trip.mjs` | All 7 minimum-behaviors in Runtime-Slice-Orchestrator prompt met: reconnect w/ backoff, clear offline state to hooks, UI never writes raw frames. `m1-round-trip.mjs` still green. |
+| [`L-projections-topbar`](lanes/L-projections-topbar.md) (Slice B) | queued | Runtime Slice Orch | daemon-side `apps/daemon/src/ema_projections/topbar.gleam` (new), `apps/web/src/shell/topbar.tsx`, `apps/web/src/shell/*-selector.tsx` | Topbar renders "Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5" from `useProjection("topbar.projection")`, not `mockTopbar`. Event trail contains seed or command events backing the projection. |
+| [`L-writers-org-space`](lanes/L-writers-org-space.md) | queued | (none — specialist TBD; Codex worker brief lists this as recommended first slice) | `apps/daemon/src/ema_orgs/`, `ema_spaces/`, catalog entries in `packages/contracts/events/` | `org.created` + `space.created` (default-same-name) accepted as real commands, persisted, projected. |
+| [`L-see-agent-work-docs`](lanes/L-see-agent-work-docs.md) | queued | unassigned | `docs/cli/see-agent-work.md`, `docs/agents/see-agent-work-agent-usage.md` | Operational runbook: every CLI command has a worked example; an external session can follow the runbook cold. |
+| [`L-honest-mocks`](lanes/L-honest-mocks.md) | closed 2026-04-24 | coordinator | `apps/web/src/app/mock-projections.ts` | Self-reported "Codex: active" agentWork entries removed; `MOCK_PROJECTION_LABEL` confirmed rendered on topbar, hq-page, agent-work-page, blueprint, git-ema panels, placeholder-page. |
 
 ## Blockers
 
@@ -109,6 +135,10 @@ Reality check against what is actually on disk (not what old plan docs claimed):
 5. **Every new event kind requires same-change updates to `packages/contracts/events/catalog.v0.md` and the family file.** Every new ID prefix requires updating `packages/contracts/types/ids.md`.
 6. **Worker status lives here, not in product UI.** The See Agent Work panel reads projections; self-status never ships to surface.
 7. **Coordinator diffs actual files vs claimed summary before a lane closes.**
+
+## Operational docs
+
+- [`docs/operations/donor-translation.md`](../operations/donor-translation.md) — donor verdict rules (`copy` / `adapt` / `inspire` / `reject`), `SOURCE:` header format, forbidden `copy` targets, translator checklist. Required reading for any Canon Writers / Runtime Slice / Product Surface Donor lane that pulls from `sources/snapshots/` or `atlas/ema-atlas/`.
 
 ## Decisions logged
 

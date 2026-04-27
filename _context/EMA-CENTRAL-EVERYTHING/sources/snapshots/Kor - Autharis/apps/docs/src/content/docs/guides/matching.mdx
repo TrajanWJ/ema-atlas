@@ -1,0 +1,61 @@
+---
+title: Matching model
+description: How Autharis scores and ranks talent for a given job request.
+---
+
+Matching in Autharis is **deterministic, explainable, and auditable**. The
+same `(request, talent)` pair produces the same score every time, and every
+score comes with a breakdown that admins can open in the matching dossier.
+
+Two implementations of the same contract live in the monorepo:
+
+- **Lane E4** — `autharis/lib/matching/**` — the in-process TypeScript
+  reference implementation consumed by the Next.js app.
+- **Lane F7** — `services/matching/**` — a standalone Python 3.12 + FastAPI
+  scorer that exposes `POST /score` and `POST /rank` against the same
+  contract.
+
+## The score
+
+`score(request, talent)` returns a number in `[0, 1]` with a structured
+breakdown. The weights are a starting cadence — not a final answer — and
+every weight is logged per run so drift can be inspected later.
+
+Components (current cadence):
+
+- **Skill overlap** — Jaccard-style overlap between the request's required
+  skills and the talent's declared skills.
+- **Industry fit** — one of exact match, adjacent industry, or unrelated.
+- **Timezone fit** — hours of overlap between the request's window and the
+  talent's working hours.
+- **Rate fit** — whether the talent's rate falls inside the request's budget
+  band.
+- **History signal** — past completions, ratings, and dispute-free weeks.
+
+## Ranking
+
+`rank(request, candidates)` returns the top-N candidates with their full
+breakdown. The admin matching dossier at `/admin/matching/[runId]` renders
+one card per candidate with a sparkline per component so operators can see
+*why* a candidate ranked where they did.
+
+## Calling the scorer
+
+From the Next.js app use the E4 module directly:
+
+```ts
+import { score, rank } from '@/lib/matching';
+
+const ranked = rank(jobRequest, talentPool, { topN: 8 });
+```
+
+From other services, call the Python scorer over HTTP:
+
+```sh
+curl -s -X POST http://localhost:4020/rank \
+  -H 'content-type: application/json' \
+  -d '{"request": {...}, "candidates": [...], "topN": 8}' | jq
+```
+
+Both return the same ranked list shape — the TypeScript and Python
+implementations are held in sync by the E4/F7 contract.

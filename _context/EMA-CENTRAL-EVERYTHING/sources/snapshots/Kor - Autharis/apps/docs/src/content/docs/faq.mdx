@@ -1,0 +1,63 @@
+---
+title: FAQ
+description: Common questions about the Autharis ecosystem.
+---
+
+## Platform
+
+### What is Autharis?
+
+A remote hourly talent marketplace. Clients post briefs, vetted talent
+accept engagements, and Autharis handles matching, timesheets, invoicing,
+and payouts. See the [platform overview](/overview/platform/).
+
+### Who is it for?
+
+Three roles: **clients** hiring fractional talent, **talent** looking for
+remote hourly work, and **admins** who keep the queue honest. Each has a
+dedicated surface — see [roles](/overview/roles/).
+
+### Why so many stacks?
+
+The monorepo is intentionally multi-stack (Next.js, Astro, Fastify, Python,
+Bun) so each deliverable picks the runtime that fits. Shared packages
+(`@autharis/tokens`, `@autharis/ui`, `@autharis/sdk`) keep the surfaces
+coherent.
+
+## Building against it
+
+### How do I call the API?
+
+Either hit the HTTP endpoints directly (see the
+[API reference](/api/reference/)) or use the typed
+[TypeScript SDK](/api/sdk/).
+
+### Is there an OpenAPI spec?
+
+Yes — `services/api` publishes OpenAPI 3.1 at
+`http://localhost:4010/openapi.json` and a Swagger UI at `/docs`.
+
+### Can I self-host?
+
+Every service ships with a Dockerfile. The Fastify API, the Bun WebSocket
+gateway, and the Python matcher run standalone. The Next.js app deploys
+on any Node 20+ host.
+
+## Matching and payments
+
+### Is matching deterministic?
+
+Yes. `score(request, talent)` returns the same result for the same input
+every time, and every ranking is auditable in the admin matching dossier.
+See the [matching guide](/guides/matching/).
+
+### When do payouts land?
+
+Payouts follow the configured cadence — typically weekly — after invoices
+settle. Admin holds, audit checkpoints, and disputes can delay release.
+See the [payments guide](/guides/payments/).
+
+### Who pays the platform fee?
+
+The client. The fee appears as a line item on each invoice, so the talent
+payout is the billable total minus the fee.

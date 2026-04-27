@@ -1,0 +1,7 @@
+id,name,title,city,timezone,rate,availability_hours,categories,skills,industries,status,score,years_exp
+t-001,Amara Okafor,Operations lead previously at Cedar Health,Lagos,GMT,42,20,ops|care,Project Coordination|Care Coordination|Notion|Intake|QA Review,Healthcare|SaaS,Active,94,8
+t-002,Daniel Ruiz,CX specialist ex-Linear support,Mexico City,CT,38,25,cx|ai,Zendesk|Intercom|LLM Output Review|QA Review|Chat Support,SaaS|Consumer,Active,89,6
+t-003,Priya Menon,Research analyst & project support,Bengaluru,IST,45,15,rsrch|ops,Market Research|Desk Research|Notion|Project Coordination,Fintech|Consumer,Active,82,5
+t-004,Jakob Lindqvist,Technical support to RAG evals,Stockholm,CET,52,12,ai|cx,LLM Output Review|RAG Evals|QA Review|Annotation,AI|Developer Tools,Active,78,7
+t-005,Nia Thompson,Executive assistant fintech,Atlanta,ET,40,30,admin|ops,Calendar Mgmt|Email Triage|Travel Coordination|Invoice Admin,Fintech,Active,75,9
+t-006,Miguel Alvarez,Sales dev outbound specialist,Buenos Aires,ART,36,20,sales|admin,Outreach|Lead Qualification|SDR Support,SaaS,Pending,68,4

@@ -1,0 +1,6 @@
+id,title,category,client,hours_per_week,duration,timezone,budget_low,budget_high,skills,industry,status,posted,matches
+jr-001,Patient intake coordinator — evenings,care,Cedar Health Co-op,20,3 months,GMT ± 3,40,55,Care Coordination|Intake|Project Coordination,Healthcare,Matched,2026-04-20,4
+jr-002,AI support review — overflow QA,ai,Lumen AI,15,Ongoing,Any,45,65,LLM Output Review|QA Review|Zendesk,AI,Shortlist ready,2026-04-22,3
+jr-003,Weekly market research brief,rsrch,Ladder Fintech,10,2 months,Any,40,60,Market Research|Desk Research,Fintech,Reviewing,2026-04-21,5
+jr-004,EA coverage — founder 20 hrs,admin,Ladder Fintech,20,Ongoing,ET,35,50,Calendar Mgmt|Email Triage|Travel Coordination,Fintech,Draft,,0
+jr-005,Outbound SDR support — B2B SaaS,sales,Helio Labs,15,2 months,Any,30,45,Outreach|Lead Qualification|SDR Support,SaaS,Matched,2026-04-18,2

@@ -1,0 +1,58 @@
+---
+id: lineage-original-elixir-ema
+type: lineage
+era: ema-daemon
+status: canonical
+contributes: [authority, execution, doctrine]
+preserves_from: []
+inspires: [codebase-ema]
+superseded_by: [codebase-ema]
+adjacent_to: []
+referenced_in_docs: [03-architectural-evolution-and-major-decisions.md, SYSTEM_GRAPH.md]
+key_artifacts: [code/daemon/lib/ema/control_plane, code/daemon/lib/ema/babysitter, code/daemon/lib/ema/sessions, code/daemon/lib/ema/claude]
+aliases: []
+load_priority: 2
+---
+# lineage-original-elixir-ema
+
+Isolated snapshot of the original Elixir/Phoenix EMA daemon plus
+Tauri-era architecture docs. Confirms that the daemon-first authority model
+predates the current rewrite. Compare against `codebase-ema` to see what
+survived vs what got refactored.
+
+## Why this matters
+
+The earliest visible Elixir/Phoenix EMA daemon, before the current rewrite. Confirms that the daemon-first authority model and the `control_plane/` shape are not new — they're the foundation that survived.
+
+## What lives here
+
+- `code/daemon/lib/ema/control_plane/` — predecessor of the current control plane
+- `code/daemon/lib/ema/babysitter/` — earliest babysitter implementation
+- `code/daemon/lib/ema/sessions/` — predecessor session registry
+- `code/daemon/lib/ema/claude/` — Claude provider integration (predecessor of the harness driver layer)
+
+## Where it connects
+
+- Superseded by: `codebase-ema`
+- Useful for: comparing what survived vs what got refactored
+
+## How to load it efficiently
+
+```bash
+git diff origin/lineage-original-elixir-ema:code/daemon/lib/ema/control_plane \
+        origin/codebase-ema:code/ema/daemon/lib/ema/control_plane
+```
+
+## Doctrine extracted (2026-04-22)
+
+Carries forward (principles, not code):
+- **Ordered supervision tree, infra before surface** — `Ema.Application` lists children in deliberate order: config supervisor → repo → pubsub → registries → workspace → sessions → control plane → babysitter → surfaces → endpoint last (`code/daemon/lib/ema/application.ex` `start/2` children list, with the trailing comment "Phoenix Endpoint — last so infra is up first"). EMA's Gleam daemon needs the same explicit ordering, not implicit dependency-graph startup.
+- **Explicit takeover state machine, not implicit promotion** — the babysitter encodes `idle → armed → active → cooldown → idle` with a separate `:suppressed` escape valve and a default 5-minute cooldown (`code/daemon/lib/ema/babysitter/takeover_manager.ex` `@moduledoc` "Transitions" + `@default_cooldown_ms 300_000`). Authority handoffs in EMA must be a named state machine with operator override, never an ad-hoc flag.
+- **Event log as PubSub projection, bounded** — `EventLog` subscribes to a single `Events.topic()` and keeps only the last 200 events in a GenServer projection (`code/daemon/lib/ema/control_plane/event_log.ex` `@max_events 200` + `Phoenix.PubSub.subscribe`). The Gleam control plane should treat operator views as ephemeral projections off a durable bus, with a hard upper bound.
+- **One-for-one isolation per concern** — `Supervisor.start_link(children, strategy: :one_for_one)` ensures one failing component (e.g. `Stream.Babysitter`) does not cascade-restart unrelated trees (`code/daemon/lib/ema/application.ex` `opts` line). EMA's daemon should preserve fault-isolation per surface/session/driver instead of single-process fragility.
+
+Leaves behind (residue):
+- Phoenix-specific `EmaWeb.Endpoint`, `Phoenix.PubSub`, and the `Ecto.Repo` data layer.
+- Elixir BEAM idioms (`GenServer.cast`, `handle_info`, `Logger`) — replaced by Gleam actors / OTP-on-Gleam patterns in the rewrite.
+
+Topic relevance: `authority`, `execution`, `orchestration`, `doctrine`, `recovery`.

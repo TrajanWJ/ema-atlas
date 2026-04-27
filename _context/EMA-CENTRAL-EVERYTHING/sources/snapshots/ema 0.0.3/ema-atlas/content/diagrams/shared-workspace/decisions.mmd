@@ -1,0 +1,17 @@
+graph TD
+    Q1{Which artifact types are first-class in v1?}
+    Q1 -->|few + canonical| C1a[Cost: improvisation gets stranded]
+    Q1 -->|many + permissive| C1b[Cost: schema sprawl]
+
+    Q2{Thread vs workspace object?}
+    Q2 -->|always promote| C2a[Cost: ceremony for chatter]
+    Q2 -->|rarely promote| C2b[Cost: knowledge stays in scrollback]
+
+    Q3{File-shaped or DB-shaped?}
+    Q3 -->|file| C3a[Cost: weak query, weak edges]
+    Q3 -->|db| C3b[Cost: loses portability + greppability]
+
+    C1a --> Q2
+    C1b --> Q2
+    C2a --> Q3
+    C2b --> Q3

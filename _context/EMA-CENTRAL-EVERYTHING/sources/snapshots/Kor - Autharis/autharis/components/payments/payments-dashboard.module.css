@@ -1,0 +1,556 @@
+.shell {
+  --paper: #f4efe6;
+  --paper-strong: #fbf8f1;
+  --ink: #151515;
+  --ink-soft: rgba(21, 21, 21, 0.7);
+  --line: rgba(21, 21, 21, 0.12);
+  --shadow: 0 28px 60px rgba(25, 20, 14, 0.18);
+  --accent: #d5641e;
+  --accent-soft: rgba(213, 100, 30, 0.12);
+  --panel: rgba(255, 252, 247, 0.78);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(213, 100, 30, 0.14), transparent 30%),
+    linear-gradient(180deg, #efe7da 0%, #f8f4ed 52%, #efe7da 100%);
+  color: var(--ink);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(21, 21, 21, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 21, 21, 0.03) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 92%);
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, calc(100vw - 40px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.heroCopy,
+.heroPanel,
+.statCard,
+.toolbar,
+.recordCard,
+.sideCard {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.heroCopy {
+  padding: 36px;
+}
+
+.eyebrow,
+.sectionLabel,
+.invoiceId {
+  margin: 0;
+  font-family: "Courier New", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.heroCopy h1,
+.toolbar h2,
+.sideCard h2,
+.recordCard h3 {
+  margin: 14px 0 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  letter-spacing: -0.03em;
+  line-height: 0.96;
+}
+
+.heroCopy h1 {
+  font-size: clamp(3rem, 5vw, 5rem);
+}
+
+.lead,
+.copy,
+.footerNotes p,
+.stateRow p,
+.activityRow p,
+.metric p,
+.recordMeta {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  font-size: 0.98rem;
+}
+
+.lead {
+  margin-top: 18px;
+  max-width: 48rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.primaryAction,
+.secondaryAction,
+.inlineAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  text-decoration: none;
+  transition:
+    transform 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease;
+}
+
+.primaryAction,
+.secondaryAction {
+  min-height: 46px;
+  padding: 0 18px;
+  font-family: "Courier New", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.primaryAction {
+  background: var(--ink);
+  color: #fff8ef;
+}
+
+.secondaryAction,
+.inlineAction {
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.primaryAction:hover,
+.secondaryAction:hover,
+.inlineAction:hover,
+.segment:hover {
+  transform: translateY(-1px);
+}
+
+.heroPanel {
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(248, 241, 231, 0.88)),
+    radial-gradient(circle at top right, rgba(213, 100, 30, 0.14), transparent 46%);
+}
+
+.heroPanelHeader,
+.sampleHeader,
+.lineRow,
+.timelineRow,
+.stateRow,
+.activityRow,
+.recordHeader,
+.footer,
+.valueGrid {
+  display: flex;
+  gap: 12px;
+}
+
+.heroPanelHeader,
+.sampleHeader,
+.recordHeader,
+.footer {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.heroPanelHeader span,
+.sampleHeader span {
+  color: var(--ink-soft);
+  font-family: "Courier New", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.heroPanelGrid,
+.statGrid,
+.valueGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.heroPanelGrid,
+.statGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metric {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(21, 21, 21, 0.08);
+}
+
+.metric span {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metric strong {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.sampleBlock {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 22px;
+  background: #18130e;
+  color: #f4ecde;
+}
+
+.sampleBlock pre {
+  margin: 0;
+  overflow-x: auto;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  font-family: "Courier New", "SFMono-Regular", ui-monospace, monospace;
+}
+
+.statGrid {
+  margin-top: 22px;
+}
+
+.statCard {
+  padding: 22px 24px;
+  display: grid;
+  gap: 8px;
+}
+
+.statCard span {
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.statCard strong {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(1.6rem, 2.3vw, 2.3rem);
+  line-height: 1;
+}
+
+.statCard p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(310px, 0.85fr);
+  gap: 20px;
+  margin-top: 22px;
+}
+
+.main,
+.aside,
+.recordList,
+.stateList,
+.activityList,
+.lineList,
+.timeline,
+.footerNotes,
+.controls {
+  display: grid;
+  gap: 14px;
+}
+
+.toolbar,
+.recordCard,
+.sideCard {
+  padding: 24px;
+}
+
+.toolbar {
+  gap: 16px;
+}
+
+.controls {
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+  align-items: end;
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.segment {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--ink);
+  border-radius: 999px;
+  min-height: 40px;
+  padding: 0 14px;
+  cursor: pointer;
+  font-family: "Courier New", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.segment[data-active="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff8ef;
+}
+
+.search {
+  display: grid;
+  gap: 8px;
+}
+
+.search span {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.search input {
+  min-height: 44px;
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0 14px;
+  font: inherit;
+  color: var(--ink);
+}
+
+.recordCard {
+  gap: 18px;
+}
+
+.invoiceId {
+  color: var(--accent);
+}
+
+.recordMeta {
+  margin-top: 8px;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-family: "Courier New", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.statusPill[data-status="draft"] {
+  background: rgba(21, 21, 21, 0.08);
+}
+
+.statusPill[data-status="issued"] {
+  background: var(--accent-soft);
+  color: #7b3607;
+}
+
+.statusPill[data-status="paid"] {
+  background: rgba(45, 116, 70, 0.14);
+  color: #184d2a;
+}
+
+.statusPill[data-status="overdue"] {
+  background: rgba(161, 55, 31, 0.12);
+  color: #7a2817;
+}
+
+.statusPill[data-status="voided"] {
+  background: rgba(69, 69, 69, 0.1);
+  color: #434343;
+}
+
+.valueGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.copy {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.lineRow,
+.timelineRow,
+.stateRow,
+.activityRow {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.lineRow,
+.timelineRow,
+.stateRow {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.lineRow:first-child,
+.timelineRow:first-child,
+.stateRow:first-child,
+.activityRow:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.lineRow strong,
+.timelineRow strong,
+.stateRow strong,
+.activityRow strong {
+  display: block;
+  font-weight: 600;
+}
+
+.lineRow span,
+.timelineRow span,
+.stateRow span,
+.activityRow span {
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+
+.lineRow > div,
+.timelineRow > div,
+.stateRow > div,
+.activityRow > div {
+  max-width: 72%;
+}
+
+.timelineRow[data-tone="warning"] strong,
+.activityRow[data-tone="warning"] strong {
+  color: #7a2817;
+}
+
+.timelineRow[data-tone="positive"] strong,
+.activityRow[data-tone="positive"] strong {
+  color: #184d2a;
+}
+
+.footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.footerNotes {
+  max-width: 72%;
+}
+
+.footerActions {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.inlineAction {
+  min-height: 38px;
+  padding: 0 14px;
+  font-family: "Courier New", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sideCard {
+  gap: 14px;
+}
+
+.activityList {
+  gap: 16px;
+}
+
+.activityRow {
+  display: grid;
+  gap: 6px;
+}
+
+@media (max-width: 1080px) {
+  .hero,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .controls,
+  .valueGrid,
+  .heroPanelGrid,
+  .statGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    display: grid;
+    gap: 14px;
+  }
+
+  .footerNotes {
+    max-width: none;
+  }
+
+  .footerActions {
+    justify-items: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .frame {
+    width: min(100vw - 24px, 1240px);
+    padding: 24px 0 40px;
+  }
+
+  .heroCopy,
+  .heroPanel,
+  .toolbar,
+  .recordCard,
+  .sideCard,
+  .statCard {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .heroCopy h1 {
+    font-size: 2.6rem;
+  }
+}

@@ -1,0 +1,97 @@
+version: 2
+
+models:
+  - name: stg_talent
+    description: Normalized talent roster from seed_talent.csv.
+    columns:
+      - name: talent_sk
+        description: Surrogate key (md5 of talent_id).
+        tests: [not_null, unique]
+      - name: talent_id
+        description: Natural key (t-001 etc.).
+        tests: [not_null, unique]
+      - name: talent_name
+        tests: [not_null]
+      - name: hourly_rate
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Active', 'Pending', 'Paused', 'Retired']
+
+  - name: stg_jobs
+    description: Normalized job requests from seed_jobs.csv.
+    columns:
+      - name: job_sk
+        tests: [not_null, unique]
+      - name: job_id
+        tests: [not_null, unique]
+      - name: title
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Matched', 'Shortlist ready', 'Reviewing', 'Draft', 'Closed']
+
+  - name: stg_engagements
+    description: Normalized engagements from seed_engagements.csv.
+    columns:
+      - name: engagement_sk
+        tests: [not_null, unique]
+      - name: engagement_id
+        tests: [not_null, unique]
+      - name: job_id
+        tests: [not_null]
+      - name: talent_id
+        tests: [not_null]
+
+  - name: stg_timesheets
+    description: Normalized timesheet submissions.
+    columns:
+      - name: timesheet_sk
+        tests: [not_null, unique]
+      - name: timesheet_id
+        tests: [not_null, unique]
+      - name: engagement_id
+        tests: [not_null]
+      - name: hours
+        tests: [not_null]
+
+  - name: stg_invoices
+    description: Normalized invoices.
+    columns:
+      - name: invoice_sk
+        tests: [not_null, unique]
+      - name: invoice_id
+        tests: [not_null, unique]
+      - name: engagement_id
+        tests: [not_null]
+      - name: total_amount
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Paid', 'Sent', 'Draft', 'Overdue', 'Void']
+
+  - name: stg_events
+    description: Normalized event stream synthesized from scripts/export_events.py.
+    columns:
+      - name: event_sk
+        tests: [not_null, unique]
+      - name: event_id
+        tests: [not_null, unique]
+      - name: channel
+        tests: [not_null]
+      - name: event_type
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - match-found
+                - timesheet-submitted
+                - invoice-paid
+                - dispute-opened
+                - message-received

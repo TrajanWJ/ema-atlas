@@ -1,0 +1,40 @@
+---
+id: docs-host-vault-agent-modules-routing
+type: docs
+era: hybrid
+status: active
+contributes: [orchestration, driver]
+preserves_from: []
+inspires: []
+adjacent_to: [docs-host-vault-context, docs-clis-mcps-integrations]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-DAEMON-EXTRACTION-IMPL-NOTES.md, host/EMA-v1.1-Next-Steps/04-CANON/CATALOG.md, host/EMA-v1.1-Next-Steps/04-CANON/TS-RUNTIME-GAP-MAP-2026-04-13.md, host/EMA-v1.1-Next-Steps/05-WIKI/TOP-BAR-SPACES-ORGS-SPEC.md]
+aliases: []
+load_priority: 3
+---
+# docs-host-vault-agent-modules-routing
+
+Agent-module routing notes — direct prior art for the harness/driver registry.
+
+## Why this matters
+
+Direct prior art for the harness/driver registry. Holds the canon catalog and the TS-runtime-gap map that motivated the Elixir control-plane consolidation.
+
+## What lives here
+
+- `host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-DAEMON-EXTRACTION-IMPL-NOTES.md` — daemon extraction implementation notes
+- `host/EMA-v1.1-Next-Steps/04-CANON/CATALOG.md` — canon catalog (subsystems and ownership)
+- `host/EMA-v1.1-Next-Steps/04-CANON/TS-RUNTIME-GAP-MAP-2026-04-13.md` — what was lost in the TS→Elixir transition
+- `host/EMA-v1.1-Next-Steps/05-WIKI/TOP-BAR-SPACES-ORGS-SPEC.md` — early spec for the top-bar Spaces/Orgs nav (informs Open Question Q3)
+
+## Where it connects
+
+- Direct input to: `graph/edges/execution.md`, `graph/edges/identity.md`
+- Adjacent: `docs-clis-mcps-integrations`, `docs-host-system-launchpad-hq`
+
+## How to load it efficiently
+
+```bash
+git show origin/docs-host-vault-agent-modules-routing:host/EMA-v1.1-Next-Steps/04-CANON/CATALOG.md
+git show origin/docs-host-vault-agent-modules-routing:host/EMA-v1.1-Next-Steps/04-CANON/TS-RUNTIME-GAP-MAP-2026-04-13.md
+```

@@ -1,0 +1,19 @@
+# PLACEHOLDER — do not commit hashes here.
+#
+# `gleam build` (or `gleam deps download`) regenerates this file with
+# resolved package versions, hex hashes, and OTP-app dependencies. The
+# scaffold ships gleam.toml only; the user's first `gleam build` in
+# the real repo writes the authoritative manifest.toml.
+#
+# Reference shape (do NOT copy into the real project):
+#
+# packages = [
+#   { name = "gleam_stdlib", version = "...", build_tools = ["gleam"],
+#     requirements = [], otp_app = "gleam_stdlib", source = "hex",
+#     outer_checksum = "..." },
+#   ...
+# ]
+#
+# [requirements]
+# gleam_stdlib = { version = "..." }
+# ...

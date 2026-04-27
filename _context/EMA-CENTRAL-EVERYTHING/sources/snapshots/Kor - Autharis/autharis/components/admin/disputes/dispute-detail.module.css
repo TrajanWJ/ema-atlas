@@ -1,0 +1,316 @@
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #6d5348;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: #171412;
+}
+
+.backLink::before {
+  content: "<";
+}
+
+.caseMeta {
+  color: #756963;
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.hero {
+  overflow: hidden;
+  border-color: rgba(23, 20, 18, 0.08);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(247, 240, 232, 0.88)),
+    radial-gradient(circle at top right, rgba(208, 111, 74, 0.18), transparent 22rem);
+}
+
+.heroContent {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.heroHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.amountCard {
+  display: grid;
+  min-width: min(100%, 16rem);
+  gap: 0.25rem;
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.25rem;
+  background: rgba(23, 20, 18, 0.94);
+  padding: 1rem 1.1rem;
+  color: #f8f2eb;
+}
+
+.amountLabel {
+  color: rgba(248, 242, 235, 0.72);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.amountValue {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: -0.06em;
+}
+
+.amountHint {
+  color: rgba(248, 242, 235, 0.74);
+  font-size: 0.92rem;
+}
+
+.metaGrid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin: 0;
+}
+
+.metaItem {
+  display: grid;
+  gap: 0.25rem;
+  border-radius: 1.05rem;
+  background: rgba(255, 255, 255, 0.74);
+  padding: 0.9rem 1rem;
+}
+
+.metaItem dt {
+  color: #7c6e68;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metaItem dd {
+  margin: 0;
+  color: #171412;
+  font-weight: 600;
+}
+
+.metricsGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+}
+
+.metricCard {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 1rem;
+}
+
+.metricLabel {
+  color: #7c6e68;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+.metricNote {
+  margin: 0;
+  color: #5b4f4a;
+  line-height: 1.5;
+}
+
+.contentGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.3fr) minmax(18rem, 0.9fr);
+}
+
+.primaryColumn,
+.sidebarColumn {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.participantList,
+.evidenceList,
+.resolutionList,
+.stepList {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.participantCard,
+.evidenceCard,
+.resolutionCard,
+.stepCard {
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.64);
+  padding: 1rem;
+}
+
+.participantHeader,
+.resolutionHeader,
+.stepHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.participantRole {
+  margin: 0 0 0.15rem;
+  color: #7c6e68;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.participantName,
+.evidenceTitle,
+.resolutionTitle {
+  margin: 0;
+  font-size: 1.02rem;
+  letter-spacing: -0.03em;
+}
+
+.participantTime {
+  color: #6d5348;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.participantStance,
+.evidenceDetail,
+.resolutionDetail,
+.stepDetail {
+  margin: 0.5rem 0 0;
+  color: #594d49;
+  line-height: 1.55;
+}
+
+.evidenceMeta {
+  color: #7c6e68;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.resolutionCardRecommended {
+  border-color: rgba(208, 111, 74, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(208, 111, 74, 0.22);
+}
+
+.resolutionPayout {
+  margin: 0.25rem 0 0;
+  color: #6d5348;
+  font-weight: 700;
+}
+
+.resolutionRisk {
+  margin: 0.7rem 0 0;
+  color: #7c6e68;
+  font-size: 0.92rem;
+}
+
+.recommendedBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(208, 111, 74, 0.14);
+  padding: 0.35rem 0.7rem;
+  color: #9d4c2f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.stepCard {
+  position: relative;
+  overflow: hidden;
+}
+
+.stepCard::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.35rem;
+  height: 100%;
+  background: rgba(23, 20, 18, 0.14);
+  content: "";
+}
+
+.stepComplete::before {
+  background: #769755;
+}
+
+.stepCurrent::before {
+  background: #d06f4a;
+}
+
+.stepUpcoming::before {
+  background: #8f8179;
+}
+
+.stepOwner {
+  margin: 0.45rem 0 0;
+  color: #6d5348;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.actionList {
+  margin: 0;
+  padding-left: 1.05rem;
+  color: #594d49;
+  line-height: 1.6;
+}
+
+.actionList li + li {
+  margin-top: 0.55rem;
+}
+
+@media (max-width: 1080px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .heroHeader,
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .amountCard {
+    width: 100%;
+  }
+}

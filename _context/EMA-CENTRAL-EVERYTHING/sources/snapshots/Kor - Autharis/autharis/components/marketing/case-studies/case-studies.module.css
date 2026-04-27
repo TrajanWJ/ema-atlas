@@ -1,0 +1,761 @@
+.surface {
+  --paper: #f6ede0;
+  --paper-strong: #eadcc4;
+  --paper-soft: rgba(255, 248, 239, 0.82);
+  --card: rgba(255, 251, 245, 0.92);
+  --card-strong: rgba(255, 247, 236, 0.96);
+  --ink: #17120d;
+  --ink-soft: rgba(23, 18, 13, 0.72);
+  --ink-faint: rgba(23, 18, 13, 0.5);
+  --line: rgba(23, 18, 13, 0.12);
+  --line-strong: rgba(23, 18, 13, 0.22);
+  --accent: #bb5f2d;
+  --accent-deep: #8b3917;
+  --pine: #183129;
+  --gold: #dfb751;
+  --white: #fffdf8;
+  --shadow-lg: 0 28px 80px rgba(70, 40, 16, 0.16);
+  --shadow-md: 0 16px 44px rgba(70, 40, 16, 0.1);
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: var(--font-marketing-body), sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(223, 183, 81, 0.28), transparent 28%),
+    radial-gradient(circle at 84% 6%, rgba(24, 49, 41, 0.14), transparent 22%),
+    linear-gradient(180deg, #fcf8f1 0%, #f6ede0 42%, #eadcc4 100%);
+}
+
+.archiveHero,
+.detailHero {
+  position: relative;
+  overflow: clip;
+  padding: 28px clamp(1.2rem, 2vw, 2rem) 4rem;
+}
+
+.archiveHero::before,
+.detailHero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.88), transparent 34%),
+    url("/marketing/case-studies/archive-grid.svg");
+  opacity: 0.52;
+  pointer-events: none;
+}
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 1380px;
+  margin: 0 auto 2.2rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(255, 249, 241, 0.74);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 44px rgba(68, 42, 16, 0.08);
+}
+
+.brandLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.wordmarkGlyph {
+  display: inline-flex;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 0.85rem;
+  background: var(--pine);
+  color: var(--white);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.wordmarkGlyph svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wordmarkRing,
+.wordmarkHandPrimary,
+.wordmarkHandSecondary {
+  fill: none;
+  stroke: var(--white);
+}
+
+.wordmarkRing {
+  stroke-width: 1.35;
+}
+
+.wordmarkHandPrimary {
+  stroke: var(--gold);
+  stroke-width: 2.3;
+}
+
+.wordmarkHandSecondary {
+  stroke-width: 1.7;
+}
+
+.wordmarkPin {
+  fill: var(--white);
+}
+
+.wordmarkText {
+  font-family: var(--font-marketing-display), serif;
+  font-size: 1.7rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.nav,
+.headerActions,
+.heroActions,
+.tagRow,
+.storyMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.nav {
+  gap: 1.1rem;
+  margin-inline: auto;
+}
+
+.nav a,
+.secondaryAction,
+.backLink {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.nav a {
+  padding-bottom: 0.18rem;
+  border-bottom: 1px solid transparent;
+  font-size: 0.92rem;
+}
+
+.nav a:hover,
+.nav a:focus-visible,
+.secondaryAction:hover,
+.secondaryAction:focus-visible,
+.backLink:hover,
+.backLink:focus-visible {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.primaryAction,
+.secondaryAction,
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primaryAction {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+  color: var(--white);
+  box-shadow: 0 16px 30px rgba(139, 57, 23, 0.22);
+}
+
+.primaryAction:hover,
+.primaryAction:focus-visible,
+.cardLink:hover,
+.cardLink:focus-visible {
+  transform: translateY(-1px);
+}
+
+.secondaryAction {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.heroGrid,
+.detailShell,
+.detailBody {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(2rem, 4vw, 4.5rem);
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+.heroGrid {
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+  padding: 2.8rem 0 0;
+  align-items: start;
+}
+
+.detailShell,
+.detailBody {
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.66fr);
+}
+
+.heroCopy,
+.detailHeading {
+  max-width: 760px;
+}
+
+.heroEyebrow,
+.sectionIndex,
+.panelEyebrow,
+.storyLabel {
+  font-family: var(--font-marketing-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.heroEyebrow,
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0 0 1.4rem;
+  padding: 0.72rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(24, 49, 41, 0.1);
+  background: rgba(255, 249, 241, 0.78);
+}
+
+.heroEyebrow::before {
+  content: "";
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 999px;
+  background: var(--story-accent, var(--accent));
+  box-shadow: 0 0 0 0.3rem rgba(187, 95, 45, 0.12);
+}
+
+.heroCopy h1,
+.detailHeading h1,
+.sectionHeading h2,
+.narrativeCard h2,
+.finalCard h2 {
+  margin: 0;
+  font-family: var(--font-marketing-display), serif;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.heroCopy h1,
+.detailHeading h1 {
+  max-width: 11ch;
+  font-size: clamp(3.3rem, 8vw, 7rem);
+}
+
+.heroLead,
+.storySummary,
+.narrativeCard p,
+.quoteCard blockquote,
+.patternCard p,
+.artifactCard p,
+.timelineCard p,
+.metricCard p,
+.metricCard span,
+.panelShell p {
+  color: var(--ink-soft);
+}
+
+.heroLead,
+.storySummary {
+  max-width: 64ch;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.heroPanel,
+.detailSidebar,
+.detailRail {
+  display: grid;
+  gap: 1rem;
+}
+
+.panelShell,
+.featuredCard,
+.archiveCard,
+.patternCard,
+.finalCard,
+.sidebarCard,
+.narrativeCard,
+.quoteCard,
+.timelineCard,
+.metricCard {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
+}
+
+.panelShell,
+.featuredCard,
+.finalCard,
+.sidebarCard,
+.narrativeCard,
+.quoteCard {
+  padding: clamp(1.4rem, 2.8vw, 2rem);
+}
+
+.panelShell {
+  position: relative;
+  overflow: hidden;
+}
+
+.panelShell::after,
+.quoteCard::after {
+  content: "";
+  position: absolute;
+  inset: auto -2rem -2rem auto;
+  width: 11rem;
+  height: 11rem;
+  background: url("/marketing/case-studies/signal-weave.svg") no-repeat center / contain;
+  opacity: 0.44;
+  pointer-events: none;
+}
+
+.panelShell h2,
+.storySummary,
+.archiveCard h3,
+.patternCard h3,
+.timelineCard h3,
+.narrativeCard h2,
+.quoteCard blockquote {
+  margin: 0;
+}
+
+.metricGrid,
+.detailMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.metricCard {
+  padding: 1.1rem 1.15rem;
+}
+
+.metricCard dt,
+.metricCard p {
+  margin: 0;
+}
+
+.metricCard dd,
+.metricCard strong {
+  margin: 0.55rem 0;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1;
+}
+
+.section,
+.patternBand,
+.timelineSection,
+.relatedSection,
+.finalSection {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 clamp(1.2rem, 2vw, 2rem) 5rem;
+}
+
+.sectionHeading {
+  display: grid;
+  grid-template-columns: minmax(130px, 180px) minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.8rem;
+}
+
+.sectionHeading h2 {
+  max-width: 11ch;
+  font-size: clamp(2.2rem, 5vw, 4.4rem);
+}
+
+.featuredCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+  gap: 1.25rem;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.54), rgba(255, 247, 236, 0.84)),
+    var(--card-strong);
+}
+
+.storyMeta {
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.storyMeta span,
+.archiveCardTop span,
+.ledgerHeader span {
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(24, 49, 41, 0.08);
+  color: var(--pine);
+  font-size: 0.82rem;
+}
+
+.tag {
+  padding: 0.52rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(24, 49, 41, 0.14);
+  background: rgba(255, 255, 255, 0.56);
+  font-size: 0.82rem;
+}
+
+.featuredLedger,
+.patternGrid,
+.archiveGrid,
+.timelineList,
+.artifactList,
+.proofGrid,
+.cardStatRow {
+  display: grid;
+  gap: 1rem;
+}
+
+.archiveGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.archiveCard {
+  position: relative;
+  overflow: hidden;
+  padding: 1.35rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.68), transparent),
+    var(--card);
+}
+
+.archiveCard::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: var(--story-accent, var(--accent));
+}
+
+.archiveCardTop,
+.ledgerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.archiveCard h3 {
+  margin-top: 1rem;
+  font-family: var(--font-marketing-display), serif;
+  font-size: 1.85rem;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+.cardStatRow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1.2rem;
+}
+
+.cardStat {
+  padding: 0.85rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.cardStat strong {
+  display: block;
+  font-family: var(--font-marketing-display), serif;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.cardStat span {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--ink-faint);
+  font-size: 0.8rem;
+}
+
+.cardLink {
+  width: fit-content;
+  margin-top: 1rem;
+  padding-inline: 0;
+  min-height: auto;
+  color: var(--story-accent, var(--accent-deep));
+  background: transparent;
+  box-shadow: none;
+}
+
+.patternBand {
+  padding-top: 0.6rem;
+}
+
+.patternGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.patternCard {
+  min-height: 100%;
+  padding: 1.5rem;
+}
+
+.finalCard {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.4rem;
+  background:
+    linear-gradient(140deg, rgba(24, 49, 41, 0.08), rgba(187, 95, 45, 0.08)),
+    var(--card);
+}
+
+.arrowIcon {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.detailSurface {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(223, 183, 81, 0.2), transparent 30%),
+    radial-gradient(circle at 92% 8%, rgba(24, 49, 41, 0.18), transparent 22%),
+    linear-gradient(180deg, #fbf7ef 0%, #f3e8d7 52%, #e7d7bc 100%);
+}
+
+.detailHeading .heroLead {
+  margin-bottom: 0;
+}
+
+.backLink {
+  width: fit-content;
+}
+
+.sidebarList,
+.artifactList {
+  margin: 0;
+}
+
+.sidebarList {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.sidebarList div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.sidebarList dt {
+  color: var(--ink-faint);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.sidebarList dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.detailMetrics {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 clamp(1.2rem, 2vw, 2rem) 2.2rem;
+}
+
+.detailBody {
+  padding: 0 clamp(1.2rem, 2vw, 2rem) 4rem;
+}
+
+.narrativeColumn {
+  display: grid;
+  gap: 1rem;
+}
+
+.quoteCard {
+  position: relative;
+  overflow: hidden;
+}
+
+.quoteCard blockquote {
+  max-width: 24ch;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.quoteCard footer {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 1.2rem;
+}
+
+.quoteCard footer span {
+  color: var(--ink-faint);
+}
+
+.artifactCard {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.artifactCard strong {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.proofPill {
+  margin: 0;
+  padding: 1rem 1.05rem;
+  border-radius: var(--radius-md);
+  background: rgba(24, 49, 41, 0.08);
+}
+
+.timelineSection,
+.relatedSection {
+  padding-inline: clamp(1.2rem, 2vw, 2rem);
+}
+
+.timelineList {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.timelineCard {
+  position: relative;
+  padding: 1.35rem;
+}
+
+.timelineMarker {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: var(--story-accent, var(--accent));
+  box-shadow: 0 0 0 0.35rem rgba(187, 95, 45, 0.12);
+}
+
+@media (max-width: 1100px) {
+  .masthead,
+  .featuredCard,
+  .finalCard,
+  .detailShell,
+  .detailBody,
+  .heroGrid,
+  .sectionHeading {
+    grid-template-columns: 1fr;
+  }
+
+  .masthead {
+    display: grid;
+    justify-items: start;
+  }
+
+  .nav {
+    margin-inline: 0;
+  }
+
+  .archiveGrid,
+  .patternGrid,
+  .timelineList,
+  .metricGrid,
+  .detailMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .archiveHero,
+  .detailHero {
+    padding-inline: 1rem;
+  }
+
+  .section,
+  .patternBand,
+  .timelineSection,
+  .relatedSection,
+  .finalSection,
+  .detailMetrics,
+  .detailBody {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .heroCopy h1,
+  .detailHeading h1,
+  .sectionHeading h2,
+  .quoteCard blockquote {
+    max-width: none;
+  }
+
+  .archiveGrid,
+  .patternGrid,
+  .timelineList,
+  .metricGrid,
+  .detailMetrics,
+  .cardStatRow {
+    grid-template-columns: 1fr;
+  }
+
+  .masthead {
+    position: static;
+    padding: 1rem;
+    border-radius: 28px;
+  }
+
+  .nav {
+    gap: 0.75rem;
+  }
+
+  .panelShell,
+  .featuredCard,
+  .archiveCard,
+  .patternCard,
+  .finalCard,
+  .sidebarCard,
+  .narrativeCard,
+  .quoteCard,
+  .timelineCard,
+  .metricCard {
+    border-radius: 24px;
+  }
+}

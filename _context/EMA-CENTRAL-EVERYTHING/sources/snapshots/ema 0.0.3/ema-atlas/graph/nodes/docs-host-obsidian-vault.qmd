@@ -1,0 +1,32 @@
+---
+id: docs-host-obsidian-vault
+type: docs
+era: hybrid
+status: active
+contributes: [memory]
+preserves_from: []
+inspires: []
+adjacent_to: [docs-vault-wiki, docs-host-vault-context]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [host/JarvisAI_vault/Welcome.md, host/JarvisAI_vault/Architecture/System Overview.md, host/JarvisAI_vault/Research/Self-Hosted AI Agent Platforms 2026.md, host/Trajans_Tech_Serious_Vault/Home.md]
+aliases: []
+load_priority: 4
+---
+# docs-host-obsidian-vault
+
+Raw Obsidian vault export from host machine.
+
+## Stack & contents
+
+Pure markdown vault, ~6,665 files across `host/{JarvisAI_vault, Trajans_Tech_Serious_Vault, ...}`. No SOURCE_CONTEXT file (raw mirror).
+
+## Why this is here
+
+Largest single corpus of pre-existing knowledge. Use grep-first; never load the whole tree. Especially useful for prior research on agent platforms (`Research/Self-Hosted AI Agent Platforms 2026.md`) and architecture (`Architecture/System Overview.md`).
+
+## How to load it efficiently
+
+```bash
+git ls-tree -r origin/docs-host-obsidian-vault --name-only | grep -i <topic> | head
+git show origin/docs-host-obsidian-vault:host/JarvisAI_vault/Architecture/'System Overview.md'
+```

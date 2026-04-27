@@ -1,0 +1,418 @@
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.backLink {
+  color: #6a554b;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.caseMeta {
+  color: #7c6d66;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero {
+  display: grid;
+  gap: 1.25rem;
+  background:
+    linear-gradient(135deg, rgba(208, 111, 74, 0.14), rgba(255, 255, 255, 0.72)),
+    rgba(255, 252, 247, 0.94);
+}
+
+.heroHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.heroCopy {
+  display: grid;
+  gap: 0.65rem;
+  max-width: 48rem;
+}
+
+.heroCard {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 17rem;
+  max-width: 22rem;
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.35rem;
+  background: rgba(23, 20, 18, 0.9);
+  padding: 1rem 1.05rem;
+  color: #f8f2eb;
+}
+
+.heroLabel {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(248, 242, 235, 0.76);
+}
+
+.heroValue {
+  font-size: 1.03rem;
+  line-height: 1.55;
+}
+
+.heroHint {
+  margin: 0;
+  color: rgba(248, 242, 235, 0.74);
+}
+
+.metaGrid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.metaItem {
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.74);
+  padding: 0.95rem 1rem;
+}
+
+.metaItem dt {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #75645d;
+}
+
+.metaItem dd {
+  margin: 0.4rem 0 0;
+  color: #171412;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.snapshotGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.snapshotCard {
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.35rem;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 1rem;
+}
+
+.snapshotLabel {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #786860;
+}
+
+.snapshotValue {
+  margin: 0.4rem 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #171412;
+}
+
+.snapshotNote {
+  margin: 0.45rem 0 0;
+  color: #5d504a;
+  line-height: 1.55;
+}
+
+.metricGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.metricCard {
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.35rem;
+  background: rgba(255, 253, 249, 0.92);
+  padding: 1rem;
+}
+
+.metricLabel {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #77665e;
+}
+
+.metricValue {
+  margin: 0.45rem 0 0;
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: #171412;
+}
+
+.metricHealthy,
+.metricWatch,
+.metricCritical {
+  margin: 0.4rem 0 0;
+  line-height: 1.55;
+}
+
+.metricHealthy {
+  color: #4f6242;
+}
+
+.metricWatch {
+  color: #835f1a;
+}
+
+.metricCritical {
+  color: #9b3d2d;
+}
+
+.contentGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 0.85fr);
+}
+
+.primaryColumn,
+.sidebarColumn {
+  display: grid;
+  gap: 1rem;
+}
+
+.recommendation {
+  margin: 0;
+  font-size: 1.06rem;
+  line-height: 1.7;
+  color: #403633;
+}
+
+.noteList {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.noteCard {
+  border-radius: 1.1rem;
+  background: rgba(246, 240, 232, 0.9);
+  padding: 0.95rem 1rem;
+  color: #554943;
+}
+
+.noteCard p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.candidateList {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.candidateCard {
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.35rem;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 1rem;
+}
+
+.candidateHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.candidateName {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
+}
+
+.candidateMeta {
+  margin: 0.2rem 0 0;
+  color: #6d5d56;
+}
+
+.candidateAlignment {
+  margin: 0.85rem 0 0;
+  color: #4a403b;
+  line-height: 1.6;
+}
+
+.candidateGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.9rem;
+}
+
+.candidateColumn {
+  min-width: 0;
+}
+
+.columnLabel {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a665d;
+}
+
+.candidateFooter {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0.9rem;
+}
+
+.riskLine {
+  margin: 0;
+  color: #7f4e3f;
+  line-height: 1.55;
+}
+
+.signalGrid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.signalCard {
+  border-radius: 1.15rem;
+  background: rgba(246, 240, 232, 0.72);
+  padding: 0.95rem 1rem;
+}
+
+.signalLabel {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #77665d;
+}
+
+.signalValue {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #171412;
+}
+
+.signalNote {
+  margin: 0.35rem 0 0;
+  color: #594d47;
+  line-height: 1.55;
+}
+
+.checklist,
+.stepList,
+.concernList {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.checklistItem,
+.stepCard,
+.concernCard {
+  border: 1px solid rgba(23, 20, 18, 0.08);
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 0.95rem 1rem;
+}
+
+.checklistHeader,
+.stepHeader,
+.concernHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.checklistMeta,
+.stepDetail,
+.concernDetail {
+  margin: 0.45rem 0 0;
+  color: #5d504a;
+  line-height: 1.55;
+}
+
+.statusComplete,
+.statusActive,
+.statusQueued {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.26rem 0.7rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.statusComplete {
+  background: rgba(118, 151, 85, 0.14);
+  color: #48603b;
+}
+
+.statusActive {
+  background: rgba(208, 111, 74, 0.15);
+  color: #995031;
+}
+
+.statusQueued {
+  background: rgba(23, 20, 18, 0.06);
+  color: #6f625d;
+}
+
+.stepComplete {
+  background: rgba(118, 151, 85, 0.08);
+}
+
+.stepCurrent {
+  background: rgba(208, 111, 74, 0.1);
+  border-color: rgba(208, 111, 74, 0.22);
+}
+
+.stepUpcoming {
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.concernTitle {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 1080px) {
+  .snapshotGrid,
+  .metricGrid,
+  .metaGrid,
+  .contentGrid,
+  .candidateGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .heroCard {
+    min-width: 0;
+    max-width: none;
+  }
+}

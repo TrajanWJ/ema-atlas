@@ -1,0 +1,22 @@
+{
+  "run_id": "20260422-120626",
+  "base_url": "http://localhost:3000",
+  "cdp_port": 9222,
+  "screenshots": [
+    "20260422-120626-admin.png",
+    "20260422-120626-admin_tweaks=1.png",
+    "20260422-120626-auth.png",
+    "20260422-120626-brief.png",
+    "20260422-120626-case-studies.png",
+    "20260422-120626-client.png",
+    "20260422-120626-client_tweaks=1.png",
+    "20260422-120626-faq.png",
+    "20260422-120626-join.png",
+    "20260422-120626-marketing.png",
+    "20260422-120626-root.png",
+    "20260422-120626-talent.png",
+    "20260422-120626-talent_tweaks=1.png",
+    "20260422-120626-tweaks=1.png"
+  ],
+  "logs_dir": "e2e/logs/20260422-120626"
+}

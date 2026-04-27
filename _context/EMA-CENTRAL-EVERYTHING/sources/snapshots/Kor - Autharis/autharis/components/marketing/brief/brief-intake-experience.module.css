@@ -1,0 +1,766 @@
+.surface {
+  --paper: #f6ecde;
+  --paper-strong: #ecdfca;
+  --paper-soft: rgba(255, 249, 240, 0.82);
+  --ink: #17120f;
+  --ink-soft: rgba(23, 18, 15, 0.76);
+  --ink-faint: rgba(23, 18, 15, 0.56);
+  --line: rgba(23, 18, 15, 0.12);
+  --line-strong: rgba(23, 18, 15, 0.22);
+  --card: rgba(255, 252, 246, 0.88);
+  --card-strong: rgba(255, 248, 237, 0.95);
+  --accent: #b25f34;
+  --accent-deep: #7e3215;
+  --accent-soft: rgba(178, 95, 52, 0.14);
+  --pine: #1e362e;
+  --pine-soft: rgba(30, 54, 46, 0.12);
+  --gold: #d5b15d;
+  --white: #fffdf9;
+  --shadow-lg: 0 28px 80px rgba(74, 40, 17, 0.16);
+  --shadow-md: 0 18px 42px rgba(74, 40, 17, 0.1);
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: var(--font-marketing-body), sans-serif;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(213, 177, 93, 0.28), transparent 28%),
+    radial-gradient(circle at 88% 4%, rgba(178, 95, 52, 0.14), transparent 22%),
+    linear-gradient(180deg, #fcf8f1 0%, #f5ead7 42%, #e9dbc5 100%);
+}
+
+.heroSection {
+  position: relative;
+  overflow: clip;
+  padding: 28px clamp(1.2rem, 2vw, 2rem) 3.5rem;
+}
+
+.heroBackdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.84), transparent 34%),
+    linear-gradient(90deg, rgba(23, 18, 15, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(23, 18, 15, 0.04) 1px, transparent 1px);
+  background-size:
+    auto,
+    28px 28px,
+    28px 28px;
+  mask-image: linear-gradient(180deg, black 0%, rgba(0, 0, 0, 0.18) 100%);
+  pointer-events: none;
+}
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  max-width: 1360px;
+  margin: 0 auto 2.6rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.44);
+  border-radius: 999px;
+  background: rgba(255, 249, 241, 0.76);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 40px rgba(68, 42, 16, 0.08);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: fit-content;
+}
+
+.wordmarkGlyph {
+  display: inline-flex;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 0.85rem;
+  background: var(--pine);
+  color: var(--white);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.wordmarkGlyph svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wordmarkRing,
+.wordmarkHandPrimary,
+.wordmarkHandSecondary {
+  fill: none;
+  stroke: var(--white);
+}
+
+.wordmarkRing {
+  stroke-width: 1.35;
+}
+
+.wordmarkHandPrimary {
+  stroke: var(--gold);
+  stroke-width: 2.3;
+}
+
+.wordmarkHandSecondary {
+  stroke-width: 1.7;
+}
+
+.wordmarkPin {
+  fill: var(--white);
+}
+
+.wordmarkText {
+  font-family: var(--font-marketing-display), serif;
+  font-size: 1.7rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.nav,
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.nav {
+  margin-inline: auto;
+}
+
+.nav a,
+.secondaryAction {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.nav a {
+  padding-bottom: 0.18rem;
+  border-bottom: 1px solid transparent;
+  font-size: 0.92rem;
+}
+
+.nav a:hover,
+.nav a:focus-visible,
+.secondaryAction:hover,
+.secondaryAction:focus-visible {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.primaryAction {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+  color: var(--white);
+  text-decoration: none;
+  box-shadow: 0 16px 30px rgba(126, 50, 21, 0.22);
+}
+
+.primaryAction:hover,
+.primaryAction:focus-visible {
+  transform: translateY(-1px);
+}
+
+.secondaryAction {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.heroGrid,
+.builderGrid,
+.bottomGrid {
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 2rem);
+}
+
+.heroGrid {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+  align-items: start;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+.heroCopy {
+  padding: 2rem 0 0.5rem;
+}
+
+.eyebrow,
+.sectionIndex,
+.panelKicker,
+.blockLabel {
+  font-family: var(--font-marketing-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 1.4rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 54, 46, 0.1);
+  background: rgba(255, 249, 241, 0.8);
+  color: var(--pine);
+}
+
+.heroCopy h1,
+.sectionHeading h2 {
+  margin: 0;
+  font-family: var(--font-marketing-display), serif;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+}
+
+.heroCopy h1 {
+  max-width: 11ch;
+  font-size: clamp(3.3rem, 7vw, 6.4rem);
+  line-height: 0.95;
+}
+
+.heroLead {
+  max-width: 62ch;
+  margin: 1.35rem 0 0;
+  font-size: clamp(1.04rem, 2vw, 1.28rem);
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+
+.heroSupport {
+  max-width: 56ch;
+  margin: 1rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--ink-faint);
+}
+
+.principles,
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.principles {
+  display: grid;
+  gap: 0.9rem;
+  max-width: 50rem;
+  margin-top: 2rem;
+}
+
+.principles li,
+.list li {
+  position: relative;
+  padding-left: 1.1rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.principles li::before,
+.list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%);
+}
+
+.heroCard,
+.storyCard,
+.controlPanel,
+.previewCard,
+.timelineCard,
+.noteCard {
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(14px);
+}
+
+.heroCard {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 249, 241, 0.9)),
+    var(--card);
+}
+
+.heroCard::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border: 1px dashed rgba(23, 18, 15, 0.12);
+  border-radius: 22px;
+  pointer-events: none;
+}
+
+.heroCard h2,
+.previewHeader h3 {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.heroCard p,
+.storyCard p,
+.controlPanel p,
+.previewCard p,
+.timelineCard p,
+.noteCard p {
+  margin: 0;
+}
+
+.heroCard > p {
+  margin-top: 0.9rem;
+  padding-right: 1rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.snapshotGrid,
+.previewMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.snapshotGrid {
+  position: relative;
+  z-index: 1;
+  margin: 1.4rem 0 0;
+}
+
+.snapshotGrid div,
+.previewMeta div {
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.snapshotGrid dt,
+.previewMeta span {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.snapshotGrid dd,
+.previewMeta strong {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.storyBand,
+.builderSection,
+.timelineSection {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 clamp(1.2rem, 2vw, 2rem) 4rem;
+}
+
+.storyBand {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.storyCard {
+  padding: 1.25rem 1.2rem;
+  border-radius: 24px;
+  background: rgba(255, 252, 246, 0.78);
+}
+
+.storyCard p:last-child {
+  margin-top: 0.65rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.sectionHeading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.56fr);
+  gap: 1.4rem;
+  align-items: end;
+  margin-bottom: 1.8rem;
+}
+
+.sectionHeading h2 {
+  max-width: 14ch;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 0.98;
+}
+
+.sectionHeading > p {
+  margin: 0;
+  max-width: 34ch;
+  justify-self: end;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.scenarioGrid,
+.priorityGrid,
+.timelineGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.scenarioGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 1.4rem;
+}
+
+.scenarioCard,
+.scenarioCardActive,
+.choiceCard,
+.choiceCardActive,
+.priorityChip,
+.priorityChipActive {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.45);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.scenarioCard,
+.scenarioCardActive {
+  min-height: 100%;
+  padding: 1.4rem;
+  border-radius: 26px;
+  box-shadow: 0 12px 26px rgba(74, 40, 17, 0.08);
+}
+
+.scenarioCard:hover,
+.scenarioCard:focus-visible,
+.choiceCard:hover,
+.choiceCard:focus-visible,
+.priorityChip:hover,
+.priorityChip:focus-visible,
+.scenarioCardActive:hover,
+.scenarioCardActive:focus-visible,
+.choiceCardActive:hover,
+.choiceCardActive:focus-visible,
+.priorityChipActive:hover,
+.priorityChipActive:focus-visible {
+  transform: translateY(-2px);
+}
+
+.scenarioCard h3,
+.controlHeader h3 {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-marketing-display), serif;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.scenarioCard p:last-of-type,
+.scenarioCardActive p:last-of-type {
+  margin-top: 0.75rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.scenarioCard span,
+.scenarioCardActive span {
+  display: inline-flex;
+  margin-top: 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent-deep);
+}
+
+.scenarioCardActive,
+.choiceCardActive,
+.priorityChipActive {
+  border-color: rgba(178, 95, 52, 0.4);
+  background:
+    linear-gradient(180deg, rgba(178, 95, 52, 0.08), rgba(255, 255, 255, 0.86)),
+    rgba(255, 255, 255, 0.72);
+  box-shadow: 0 16px 34px rgba(126, 50, 21, 0.14);
+}
+
+.builderGrid {
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.78fr);
+  align-items: start;
+}
+
+.controlsColumn {
+  display: grid;
+  gap: 1rem;
+}
+
+.controlPanel,
+.previewCard,
+.noteCard {
+  padding: 1.35rem;
+  border-radius: 28px;
+}
+
+.controlHeader {
+  margin-bottom: 1rem;
+}
+
+.controlHeader h3 {
+  font-size: 1.35rem;
+}
+
+.choiceStack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.choiceCard,
+.choiceCardActive {
+  padding: 1rem 1.05rem;
+  border-radius: 20px;
+}
+
+.choiceCard strong,
+.choiceCardActive strong,
+.priorityChip strong,
+.priorityChipActive strong {
+  display: block;
+}
+
+.choiceCard span,
+.choiceCardActive span,
+.priorityChip span,
+.priorityChipActive span {
+  display: block;
+  margin-top: 0.4rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.priorityGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.priorityChip,
+.priorityChipActive {
+  min-height: 100%;
+  padding: 1rem;
+  border-radius: 20px;
+}
+
+.previewColumn {
+  position: sticky;
+  top: 5.7rem;
+}
+
+.previewCard {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 248, 237, 0.94)),
+    var(--card-strong);
+}
+
+.previewHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.previewBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: fit-content;
+  padding: 0.55rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 54, 46, 0.16);
+  background: rgba(30, 54, 46, 0.08);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pine);
+}
+
+.previewSummary {
+  margin-top: 0.95rem;
+  line-height: 1.72;
+  color: var(--ink-soft);
+}
+
+.previewMeta {
+  margin-top: 1rem;
+}
+
+.previewBlock {
+  margin-top: 1.05rem;
+  padding: 1rem 1rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.blockLabel {
+  color: var(--ink-faint);
+}
+
+.previewBlock p:last-child {
+  margin-top: 0.55rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.timelineGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.timelineCard,
+.noteCard {
+  padding: 1.2rem;
+  border-radius: 24px;
+}
+
+.timelineCard p:last-child,
+.noteCard p:last-child {
+  margin-top: 0.65rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.bottomGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+@media (max-width: 1120px) {
+  .masthead,
+  .heroGrid,
+  .sectionHeading,
+  .builderGrid,
+  .timelineGrid,
+  .bottomGrid,
+  .storyBand {
+    grid-template-columns: 1fr;
+  }
+
+  .masthead {
+    border-radius: 28px;
+  }
+
+  .nav {
+    margin-inline: 0;
+  }
+
+  .sectionHeading > p {
+    justify-self: start;
+    max-width: 56ch;
+  }
+
+  .previewColumn {
+    position: static;
+  }
+
+  .storyBand {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .scenarioGrid,
+  .priorityGrid,
+  .snapshotGrid,
+  .previewMeta,
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy h1 {
+    max-width: 12ch;
+  }
+}
+
+@media (max-width: 720px) {
+  .heroSection,
+  .storyBand,
+  .builderSection,
+  .timelineSection {
+    padding-inline: 1rem;
+  }
+
+  .masthead {
+    padding: 1rem;
+  }
+
+  .nav,
+  .headerActions {
+    width: 100%;
+  }
+
+  .nav a,
+  .primaryAction,
+  .secondaryAction {
+    width: 100%;
+  }
+
+  .heroCard,
+  .controlPanel,
+  .previewCard,
+  .timelineCard,
+  .noteCard,
+  .storyCard,
+  .scenarioCard,
+  .scenarioCardActive {
+    border-radius: 22px;
+  }
+
+  .heroCopy h1 {
+    font-size: clamp(2.6rem, 12vw, 4rem);
+  }
+
+  .sectionHeading h2 {
+    max-width: 12ch;
+  }
+}

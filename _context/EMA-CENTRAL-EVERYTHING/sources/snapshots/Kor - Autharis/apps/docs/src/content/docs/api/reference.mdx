@@ -1,0 +1,100 @@
+---
+title: HTTP API reference
+description: The Autharis Fastify API — endpoints, OpenAPI document, and usage notes.
+---
+
+The Autharis public HTTP API is a standalone **Fastify 5 + TypeScript**
+service (Lane F6) that lives at `services/api/`. It binds to `:4010` in
+development and emits an OpenAPI 3.1 document at `/openapi.json` plus
+interactive Swagger UI at `/docs`.
+
+:::note[Source of truth]
+The OpenAPI document at `http://localhost:4010/openapi.json` is authoritative.
+This page mirrors the route list for discoverability — schemas live in the
+OpenAPI doc.
+:::
+
+## Base URL
+
+| Environment | URL |
+| ----------- | --- |
+| Development | `http://localhost:4010` |
+| Swagger UI  | `http://localhost:4010/docs` |
+| OpenAPI     | `http://localhost:4010/openapi.json` |
+
+## Endpoints
+
+The service exposes **19 endpoints** across six domain resources plus
+liveness and OpenAPI introspection.
+
+### System
+
+| Method | Path            | Notes                      |
+| ------ | --------------- | -------------------------- |
+| GET    | `/healthz`      | Liveness probe             |
+| GET    | `/openapi.json` | OpenAPI 3.1 document       |
+| GET    | `/docs`         | Swagger UI                 |
+
+### Talent
+
+| Method | Path            | Notes          |
+| ------ | --------------- | -------------- |
+| GET    | `/talent`       | List talent    |
+| GET    | `/talent/:id`   | Get one talent |
+| POST   | `/talent`       | Create talent  |
+
+### Jobs
+
+| Method | Path         | Notes               |
+| ------ | ------------ | ------------------- |
+| GET    | `/jobs`      | List job requests   |
+| GET    | `/jobs/:id`  | Get one job request |
+| POST   | `/jobs`      | Create job request  |
+
+### Engagements
+
+| Method | Path                | Notes              |
+| ------ | ------------------- | ------------------ |
+| GET    | `/engagements`      | List engagements   |
+| GET    | `/engagements/:id`  | Get one engagement |
+| POST   | `/engagements`      | Create engagement  |
+
+### Timesheets
+
+| Method | Path               | Notes             |
+| ------ | ------------------ | ----------------- |
+| GET    | `/timesheets`      | List timesheets   |
+| GET    | `/timesheets/:id`  | Get one timesheet |
+| POST   | `/timesheets`      | Create timesheet  |
+
+### Invoices
+
+| Method | Path             | Notes           |
+| ------ | ---------------- | --------------- |
+| GET    | `/invoices`      | List invoices   |
+| GET    | `/invoices/:id`  | Get one invoice |
+| POST   | `/invoices`      | Create invoice  |
+
+### Admin queue
+
+| Method | Path                | Notes                   |
+| ------ | ------------------- | ----------------------- |
+| GET    | `/admin/queue`      | List admin queue        |
+| GET    | `/admin/queue/:id`  | Get one queue item      |
+| POST   | `/admin/queue`      | Create queue item       |
+
+## CORS allowlist
+
+The API accepts cross-origin requests from exactly three origins:
+
+- `http://localhost:3000` — autharis web (Next.js)
+- `http://localhost:4321` — hub (Astro)
+- `http://localhost:4000` — docs (this site)
+
+## Sample request
+
+```sh
+curl -s http://localhost:4010/talent | jq '.[0]'
+```
+
+For a typed client, see the [SDK guide](/api/sdk/).

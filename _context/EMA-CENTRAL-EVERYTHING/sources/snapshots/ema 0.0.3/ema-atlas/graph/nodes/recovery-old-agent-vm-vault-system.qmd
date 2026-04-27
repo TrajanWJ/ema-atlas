@@ -1,0 +1,33 @@
+---
+id: recovery-old-agent-vm-vault-system
+type: recovery
+era: hybrid
+status: archive
+contributes: [recovery]
+preserves_from: []
+inspires: []
+adjacent_to: []
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [agent-vm/dispatch/active-tasks.json, agent-vm/dispatch/agent-status.json, agent-vm/dispatch/archive/cleared-20260422/]
+aliases: []
+load_priority: 5
+---
+# recovery-old-agent-vm-vault-system
+
+Frozen agent-vm dispatch / status state. Useful as fixture data for
+control-plane replay tests; not a runtime input.
+
+## Stack & contents
+
+~12,875 files. Top-level dominated by archived dispatch JSON (github-trending, reddit-intel, utility-task, competitive-scan) under `agent-vm/dispatch/archive/cleared-20260422/` plus active-tasks/agent-status snapshots.
+
+## Why this is here
+
+**Fixture data**, not runtime. Use as event_log replay corpus when testing `codebase-ema/code/ema/daemon/lib/ema/control_plane/replay.ex`.
+
+## How to load it efficiently
+
+```bash
+git show origin/recovery-old-agent-vm-vault-system:agent-vm/dispatch/active-tasks.json | head -40
+git ls-tree origin/recovery-old-agent-vm-vault-system:agent-vm/dispatch/archive/cleared-20260422 | head
+```

@@ -1,0 +1,16 @@
+# Profiles for the Autharis warehouse.
+# Place this file at ~/.dbt/profiles.yml OR set DBT_PROFILES_DIR=./services/warehouse.
+autharis:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ./warehouse.duckdb
+      threads: 4
+      extensions:
+        - httpfs
+        - parquet
+    ci:
+      type: duckdb
+      path: ':memory:'
+      threads: 2

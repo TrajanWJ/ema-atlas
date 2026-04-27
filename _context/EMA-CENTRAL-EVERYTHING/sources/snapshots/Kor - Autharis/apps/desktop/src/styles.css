@@ -1,0 +1,139 @@
+/* apps/desktop — shell styling.
+ * Uses @autharis/tokens CSS custom properties directly (no Tailwind).
+ * Fallbacks are provided for every var so the shell remains legible even if
+ * the tokens package is unbuilt in a dev worktree.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--autharis-font-sans, system-ui, -apple-system, 'Segoe UI', sans-serif);
+  color: var(--autharis-color-ink, #0f1115);
+  background: var(--autharis-color-surface, #f7f7f6);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 48px 1fr;
+  grid-template-areas:
+    'title title'
+    'nav main';
+  height: 100vh;
+}
+
+.titlebar {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  background: var(--autharis-color-surface-raised, #ffffff);
+  border-bottom: 1px solid var(--autharis-color-border, #e5e5e2);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  -webkit-app-region: drag;
+}
+
+.titlebar .status {
+  margin-left: auto;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--autharis-color-muted, #6a6d72);
+  -webkit-app-region: no-drag;
+}
+
+.nav {
+  grid-area: nav;
+  background: var(--autharis-color-surface-raised, #ffffff);
+  border-right: 1px solid var(--autharis-color-border, #e5e5e2);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav button {
+  text-align: left;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--autharis-color-ink, #0f1115);
+}
+
+.nav button:hover {
+  background: var(--autharis-color-surface, #f2f2f0);
+}
+
+.nav button[aria-current='page'] {
+  background: var(--autharis-color-accent-soft, #e7efff);
+  color: var(--autharis-color-accent, #2558d6);
+  font-weight: 600;
+}
+
+.main {
+  grid-area: main;
+  padding: 20px 24px;
+  overflow: auto;
+}
+
+.view h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.view p.lede {
+  margin: 0 0 16px;
+  color: var(--autharis-color-muted, #6a6d72);
+}
+
+.card {
+  background: var(--autharis-color-surface-raised, #ffffff);
+  border: 1px solid var(--autharis-color-border, #e5e5e2);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.error {
+  color: var(--autharis-color-danger, #b42318);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--autharis-color-border, #e5e5e2);
+}
+
+th {
+  font-weight: 600;
+  color: var(--autharis-color-muted, #6a6d72);
+}

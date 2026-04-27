@@ -1,0 +1,8 @@
+packages:
+  - 'autharis'
+  - 'apps/*'
+  - 'packages/*'
+  - 'services/api'
+  - 'services/events'
+  # services/matching (Python + uv) — not a pnpm workspace member
+  # services/warehouse (Python + dbt + duckdb) — not a pnpm workspace member

@@ -1,0 +1,24 @@
+{
+  "name": "ema-atlas",
+  "version": "0.0.3",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.12.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vercel/config": "^1.0.0",
+    "typescript": "^5.0.0"
+  },
+  "//vercel": "@vercel/config provides the VercelConfig type used by vercel.ts. Run `npm i` to materialize it; the package is not yet in node_modules. See howto/deploy-atlas.md."
+}

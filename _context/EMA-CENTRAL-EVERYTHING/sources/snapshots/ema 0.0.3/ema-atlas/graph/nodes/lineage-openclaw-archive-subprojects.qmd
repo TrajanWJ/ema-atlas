@@ -1,0 +1,32 @@
+---
+id: lineage-openclaw-archive-subprojects
+type: lineage
+era: openclaw
+status: archive
+contributes: [recovery, doctrine]
+preserves_from: [lineage-openclaw]
+inspires: []
+adjacent_to: [lineage-openclaw]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [code/control-ui/openclaw-control-ui-source/ARCHITECTURE.md, code/control-ui/openclaw-control-ui-source/gateway-backend/auth.ts, code/bin/openclaw-doctor-safe.sh, code/backups/openclaw.json]
+aliases: []
+load_priority: 5
+---
+# lineage-openclaw-archive-subprojects
+
+Archived OpenClaw subprojects. Search-only; do not lift code.
+
+## Stack & contents
+
+TypeScript subprojects from `/home/trajan/archive/openclaw`. ~1,114 files. Includes a substantial gateway-backend with paired `.test.ts` files (auth, channel-health, boot, call) and helper bin scripts.
+
+## Why this is here
+
+Where to look for **how OpenClaw actually authenticated and routed** before EMA absorbed the doctrine. Useful when designing per-driver auth in the harness layer.
+
+## How to load it efficiently
+
+```bash
+git show origin/lineage-openclaw-archive-subprojects:code/control-ui/openclaw-control-ui-source/ARCHITECTURE.md
+git show origin/lineage-openclaw-archive-subprojects:code/control-ui/openclaw-control-ui-source/gateway-backend/auth.ts
+```

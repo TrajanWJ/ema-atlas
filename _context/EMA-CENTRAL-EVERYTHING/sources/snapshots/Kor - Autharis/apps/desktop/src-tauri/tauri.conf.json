@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Autharis Admin",
+  "version": "0.1.0",
+  "identifier": "com.autharis.desktop",
+  "build": {
+    "beforeDevCommand": "pnpm --filter @autharis/desktop dev",
+    "beforeBuildCommand": "pnpm --filter @autharis/desktop build",
+    "devUrl": "http://localhost:5174",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Autharis Admin",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 640,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: asset: https://asset.localhost; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' http://localhost:4010 ipc: asset: https://asset.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Productivity",
+    "shortDescription": "Autharis admin desktop",
+    "longDescription": "Native desktop shell for the Autharis admin surface — review queue, roster, disputes, and reports.",
+    "icon": [
+      "icons/icon.png"
+    ]
+  }
+}

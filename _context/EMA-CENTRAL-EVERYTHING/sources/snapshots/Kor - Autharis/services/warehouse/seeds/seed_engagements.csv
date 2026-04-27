@@ -1,0 +1,6 @@
+id,job_id,job_title,talent_id,talent_name,client,rate,status,started,hours_this_week,hours_approved,hours_pending
+e-001,jr-001,Patient intake coordinator — evenings,t-001,Amara Okafor,Cedar Health Co-op,48,Active,2026-04-06,18.5,142,18.5
+e-002,jr-002,AI support review — overflow QA,t-004,Jakob Lindqvist,Lumen AI,58,Active,2026-03-23,12,86,12
+e-003,jr-003,Weekly market research brief,t-003,Priya Menon,Ladder Fintech,50,Active,2026-04-15,10,20,10
+e-004,jr-005,Outbound SDR support — B2B SaaS,t-006,Miguel Alvarez,Helio Labs,38,Active,2026-04-10,8,24,8
+e-005,jr-001,Patient intake coordinator — evenings,t-002,Daniel Ruiz,Cedar Health Co-op,40,Paused,2026-02-14,0,60,0

@@ -1,0 +1,28 @@
+{
+  "name": "@autharis/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared design tokens — CSS custom properties + TS exports. Lane F2.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./dist/tokens.css",
+    "./deliverables": {
+      "types": "./dist/deliverables.d.ts",
+      "import": "./dist/deliverables.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && cp src/tokens.css dist/tokens.css",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,51 @@
+---
+title: Autharis Docs
+description: Official documentation for the Autharis remote hourly talent marketplace ecosystem.
+template: splash
+hero:
+  tagline: A remote hourly talent marketplace for clients, vetted talent, and the operators who keep the flywheel honest.
+  actions:
+    - text: Platform overview
+      link: /overview/platform/
+      icon: right-arrow
+      variant: primary
+    - text: API reference
+      link: /api/reference/
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Start here
+
+<CardGrid stagger>
+  <Card title="What is Autharis" icon="open-book">
+    A one-page tour of the surfaces, services, and packages that make up the
+    Autharis ecosystem. See [Platform overview](/overview/platform/).
+  </Card>
+  <Card title="Roles" icon="user">
+    Understand how clients, talent, and admins interact inside the product.
+    See [Roles](/overview/roles/).
+  </Card>
+  <Card title="Matching model" icon="puzzle">
+    The deterministic score that ranks talent against each brief. See
+    [Matching](/guides/matching/).
+  </Card>
+  <Card title="Payments & payouts" icon="document">
+    How timesheets turn into invoices, and how invoices turn into payouts. See
+    [Payments](/guides/payments/).
+  </Card>
+</CardGrid>
+
+## Build against Autharis
+
+The public HTTP API lives at `services/api` (Fastify 5, OpenAPI 3.1) and is
+documented in the [API reference](/api/reference/). A typed TypeScript client,
+`@autharis/sdk`, wraps it for web, CLI, mobile, and desktop consumers — see the
+[SDK guide](/api/sdk/).
+
+## How this project ships
+
+Autharis is built by a multi-agent swarm across non-overlapping lanes. If
+you are joining as an agent or reviewing decisions, read the
+[swarm process](/swarm/) page.

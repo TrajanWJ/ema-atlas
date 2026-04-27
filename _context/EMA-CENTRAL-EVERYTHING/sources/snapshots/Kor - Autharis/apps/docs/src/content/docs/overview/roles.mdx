@@ -1,0 +1,52 @@
+---
+title: Roles
+description: How clients, talent, and admins interact inside Autharis.
+---
+
+Autharis has three first-class roles. Each role sees a distinct product
+surface, but they share a common underlying data model — talent, job
+requests, engagements, timesheets, invoices, and admin-queue items.
+
+## Client
+
+Clients post **job requests**, review matched talent, start **engagements**,
+approve **timesheets**, and pay **invoices**.
+
+Primary surface: `/client` (and labs at `/client-request`, `/client-match`,
+`/client-finance`).
+
+Typical flow:
+
+1. Draft a brief in the request composer.
+2. Review the ranked match list (see the [matching model](/guides/matching/)).
+3. Open an engagement with the chosen talent.
+4. Approve submitted timesheets weekly.
+5. Settle invoices as they are issued (see [payments](/guides/payments/)).
+
+## Talent
+
+Talent maintain a **profile**, browse **opportunities**, accept engagements,
+submit **timesheets**, and watch payouts land on their **earnings ledger**.
+
+Primary surface: `/talent` (with deep dives at
+`/talent/opportunities/[id]`, `/talent/earnings/ledger`, and a public profile
+lab at `/talent-profile`).
+
+Typical flow:
+
+1. Keep profile skills, industries, and availability current.
+2. Apply to opportunities surfaced by the matcher.
+3. Log hours into the weekly timesheet.
+4. Track invoices as they progress from issued → paid → paid-out.
+
+## Admin
+
+Admins run the **activation queue**, keep the talent roster healthy, audit
+**matching runs**, handle **disputes**, and publish **weekly reports**.
+
+Primary surface: `/admin` (with drilldowns at `/admin/queue/[id]`,
+`/admin/matching/[runId]`, `/admin/disputes/[caseId]`, and
+`/admin/reports/weekly`).
+
+Admins never act on behalf of users silently — every override is logged in
+the audit trail and visible in the weekly workbook.

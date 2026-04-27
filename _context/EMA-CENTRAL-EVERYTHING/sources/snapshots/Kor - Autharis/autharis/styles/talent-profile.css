@@ -1,0 +1,406 @@
+.talent-public-page {
+  min-height: 100vh;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top left, color-mix(in oklch, var(--brand-terra) 18%, transparent), transparent 28%),
+    radial-gradient(circle at 85% 12%, color-mix(in oklch, var(--brand-lime) 16%, transparent), transparent 24%),
+    linear-gradient(180deg, color-mix(in oklch, var(--bg) 88%, white) 0%, var(--bg) 100%);
+  color: var(--ink);
+}
+
+.talent-public-hero,
+.talent-public-panel {
+  border: 1px solid color-mix(in oklch, var(--line) 92%, white);
+  border-radius: 28px;
+  box-shadow: var(--shadow-md);
+}
+
+.talent-public-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 360px);
+  gap: 24px;
+  padding: 30px;
+  background:
+    linear-gradient(140deg, color-mix(in oklch, var(--bg-raised) 88%, white) 0%, color-mix(in oklch, var(--brand-terra) 6%, var(--bg-raised)) 100%);
+}
+
+.talent-public-heroCopy,
+.talent-public-shareCard,
+.talent-public-panel,
+.talent-public-panel--stacked {
+  display: flex;
+  flex-direction: column;
+}
+
+.talent-public-kicker,
+.talent-public-chipRow,
+.talent-public-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.talent-public-identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.talent-public-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(135deg, var(--brand-ink) 0%, color-mix(in oklch, var(--brand-ink) 68%, var(--brand-terra)) 100%);
+  color: var(--brand-paper);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.talent-public-overline {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.talent-public-identity h1,
+.talent-public-shareHead h2,
+.talent-public-panelHead h2,
+.talent-public-listBlock h3,
+.talent-public-practiceCard h3,
+.talent-public-proofHead h3,
+.talent-public-opportunityHead h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.talent-public-identity h1 {
+  margin-top: 6px;
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  line-height: 0.95;
+}
+
+.talent-public-title,
+.talent-public-summary,
+.talent-public-copyBlock p,
+.talent-public-practiceCard p,
+.talent-public-proofHead p,
+.talent-public-proofCadence,
+.talent-public-opportunityCard p,
+.talent-public-opportunityCard span,
+.talent-public-note p {
+  color: var(--ink-3);
+  line-height: 1.55;
+}
+
+.talent-public-title {
+  margin: 8px 0 0;
+  font-size: 1rem;
+}
+
+.talent-public-summary {
+  max-width: 60ch;
+  margin: 20px 0 0;
+  font-size: 1.05rem;
+}
+
+.talent-public-actions {
+  margin-top: 24px;
+}
+
+.talent-public-shareCard {
+  gap: 18px;
+  padding: 24px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--bg) 40%, white) 0%, color-mix(in oklch, var(--bg-raised) 92%, var(--bg)) 100%);
+  border: 1px solid color-mix(in oklch, var(--line-strong) 70%, white);
+}
+
+.talent-public-shareHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.talent-public-shareHead h2 {
+  margin-top: 8px;
+  font-size: 1.5rem;
+  line-height: 1.05;
+}
+
+.talent-public-shareMeta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 12px;
+}
+
+.talent-public-shareMeta div,
+.talent-public-note,
+.talent-public-metricCard,
+.talent-public-practiceCard,
+.talent-public-proofCard,
+.talent-public-opportunityCard,
+.talent-public-availabilityCard {
+  border-radius: 20px;
+  border: 1px solid color-mix(in oklch, var(--line) 86%, white);
+  background: color-mix(in oklch, var(--bg) 56%, white);
+}
+
+.talent-public-shareMeta div {
+  padding: 14px;
+}
+
+.talent-public-shareMeta dt,
+.talent-public-metricCard span,
+.talent-public-availabilityCard span {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.talent-public-shareMeta dd,
+.talent-public-metricCard strong,
+.talent-public-availabilityCard strong {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.talent-public-note {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.talent-public-note p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.talent-public-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.talent-public-panel {
+  gap: 22px;
+  padding: 24px;
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--bg-raised) 90%, white) 0%, color-mix(in oklch, var(--bg) 94%, white) 100%);
+}
+
+.talent-public-panelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.talent-public-panelHead h2 {
+  margin-top: 8px;
+  font-size: clamp(1.55rem, 2.4vw, 2.2rem);
+  line-height: 1.05;
+  max-width: 18ch;
+}
+
+.talent-public-metrics,
+.talent-public-practiceGrid,
+.talent-public-opportunityList,
+.talent-public-availability {
+  display: grid;
+  gap: 14px;
+}
+
+.talent-public-metrics,
+.talent-public-practiceGrid,
+.talent-public-availability {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.talent-public-metricCard,
+.talent-public-practiceCard,
+.talent-public-proofCard,
+.talent-public-opportunityCard,
+.talent-public-availabilityCard {
+  padding: 18px;
+}
+
+.talent-public-metricCard strong {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: -0.05em;
+}
+
+.talent-public-metricCard p {
+  margin: 10px 0 0;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+
+.talent-public-copyBlock {
+  display: grid;
+  gap: 12px;
+}
+
+.talent-public-copyBlock p {
+  margin: 0;
+}
+
+.talent-public-inlineCheck {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.talent-public-practiceGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.talent-public-practiceCard {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.talent-public-iconBadge {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--accent) 12%, var(--bg));
+  color: var(--ink);
+}
+
+.talent-public-proofStack,
+.talent-public-panel--stacked {
+  gap: 14px;
+}
+
+.talent-public-proofCard ul,
+.talent-public-list {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  color: var(--ink-2);
+}
+
+.talent-public-proofHead,
+.talent-public-opportunityHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.talent-public-proofHead p,
+.talent-public-opportunityHead p {
+  margin: 6px 0 0;
+}
+
+.talent-public-proofCadence {
+  margin: 12px 0 0;
+}
+
+.talent-public-listBlock {
+  display: grid;
+  gap: 12px;
+}
+
+.talent-public-listBlock h3 {
+  font-size: 1.1rem;
+}
+
+.talent-public-pillGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.talent-public-opportunityList {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.talent-public-opportunityCard span {
+  display: block;
+  margin-top: 14px;
+  font-size: 0.9rem;
+}
+
+.talent-public-availabilityCard strong {
+  display: block;
+  margin-top: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@media (max-width: 1180px) {
+  .talent-public-page {
+    padding: 24px;
+  }
+
+  .talent-public-hero,
+  .talent-public-grid,
+  .talent-public-metrics,
+  .talent-public-availability,
+  .talent-public-opportunityList {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .talent-public-practiceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .talent-public-page {
+    padding: 18px;
+  }
+
+  .talent-public-hero,
+  .talent-public-panel {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .talent-public-identity {
+    align-items: flex-start;
+  }
+
+  .talent-public-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    font-size: 24px;
+  }
+
+  .talent-public-shareMeta,
+  .talent-public-practiceGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .talent-public-panelHead h2 {
+    max-width: none;
+  }
+}

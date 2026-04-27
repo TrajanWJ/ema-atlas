@@ -1,0 +1,31 @@
+---
+id: codebase-agent-os-demo-pages
+type: codebase
+era: hybrid
+status: inspiration
+contributes: [surface, ux-metaphor]
+preserves_from: [codebase-agent-os-demo]
+inspires: []
+adjacent_to: [codebase-agent-os-demo]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [code/agent-os-demo-pages/README.md, code/agent-os-demo-pages/index.html, code/agent-os-demo-pages/UPGRADE-PLAN.md, code/agent-os-demo-pages/local-server.js]
+aliases: []
+load_priority: 5
+---
+# codebase-agent-os-demo-pages
+
+Static/demo pages for the agent-OS demo. Mostly visual reference.
+
+## Stack & contents
+
+Vanilla JS / HTML, ~40 flat files. Multi-page demo (app.js, app3-app7.js, command/config/feed-detail pages) plus three QA-ROUND reports and an `UPGRADE-PLAN.md`.
+
+## Why this is here
+
+Earlier multi-page sibling of `codebase-agent-os-demo`. The `UPGRADE-PLAN.md` records the path that eventually led to v8.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-agent-os-demo-pages:code/agent-os-demo-pages/UPGRADE-PLAN.md
+```

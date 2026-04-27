@@ -1,0 +1,21 @@
+{
+  "name": "kor-autharis",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Autharis monorepo — remote hourly talent marketplace ecosystem.",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:hub": "pnpm --filter @autharis/hub dev",
+    "dev:web": "pnpm --filter autharis dev",
+    "dev:docs": "pnpm --filter @autharis/docs dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "swarm": "cat autharis/_shared/lanes.md"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}

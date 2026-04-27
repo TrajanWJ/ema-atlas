@@ -1,0 +1,34 @@
+---
+id: docs-frontend-interface-inspirations
+type: docs
+era: meta
+status: inspiration
+contributes: [surface, ux-metaphor]
+preserves_from: []
+inspires: []
+adjacent_to: [docs-host-system-launchpad-hq, design-review-fresh-context]
+referenced_in_docs: [05-fresh-context-project-app-model.md, SYSTEM_GRAPH.md]
+key_artifacts: [agent-vm/ema-docs/ARCHITECTURE.md, agent-vm/ema-docs/EMA-FULL-CONTEXT.md, agent-vm/ema-docs/ROADMAP_SYNTHESIS.md, agent-vm/ema-docs/HERMES-EMA-AI-ENGINE-INTERFACE-PLAN.md, agent-vm/frontend-layer/README.md]
+aliases: []
+load_priority: 4
+---
+# docs-frontend-interface-inspirations
+
+Curated visual/interaction inspirations for the frontend (Claude.ai design,
+Notion, Obsidian, etc).
+
+## Stack & contents
+
+Mixed markdown + Next.js workspace artifacts. ~3,089 files including `agent-vm/ema-docs/` (ARCHITECTURE, EMA-FULL-CONTEXT, ROADMAP_SYNTHESIS, HERMES-EMA-AI-ENGINE-INTERFACE-PLAN) plus heavy `agent-vm/frontend-layer/.next/` and `node_modules/` residue.
+
+## Why this is here
+
+Despite the 'inspirations' framing, this branch carries a **second copy of EMA's architecture docs** in `agent-vm/ema-docs/` — useful as a cross-check against `codebase-ema/code/ema/docs/`. Note the build artifacts in `agent-vm/frontend-layer/`; ignore them.
+
+## How to load it efficiently
+
+```bash
+git show origin/docs-frontend-interface-inspirations:agent-vm/ema-docs/ARCHITECTURE.md
+git show origin/docs-frontend-interface-inspirations:agent-vm/ema-docs/EMA-FULL-CONTEXT.md
+git show origin/docs-frontend-interface-inspirations:agent-vm/ema-docs/ROADMAP_SYNTHESIS.md
+```

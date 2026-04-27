@@ -1,0 +1,33 @@
+---
+id: codebase-agent-os-demo
+type: codebase
+era: hybrid
+status: inspiration
+contributes: [ux-metaphor, surface]
+preserves_from: []
+inspires: [codebase-agent-os-v8, codebase-agent-os-bridge, codebase-agent-os-demo-pages]
+adjacent_to: [codebase-agent-os-v8]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [code/agent-os-demo/README.md, code/agent-os-demo/index.html, code/agent-os-demo/app.js, code/agent-os-demo/AUDIT.md, code/agent-os-demo/local-server.js]
+aliases: []
+load_priority: 4
+---
+# codebase-agent-os-demo
+
+Conceptual AI-native OS demo. Donor of vApp / dashboard composition patterns.
+Mostly inspirational.
+
+## Stack & contents
+
+Vanilla JS / HTML/CSS, no package.json. ~32 flat files including `app.js` through `app6.js` (numbered iterations) plus three QA-ROUND markdown reports and `.serena/` project metadata.
+
+## Why this is here
+
+Earliest browser-only Agent OS demo. Useful as a 'shape' donor: how an OS-like surface composes apps without any framework underneath. Don't lift code; lift layout patterns.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-agent-os-demo:code/agent-os-demo/index.html
+git show origin/codebase-agent-os-demo:code/agent-os-demo/AUDIT.md
+```

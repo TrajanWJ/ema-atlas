@@ -1,0 +1,32 @@
+---
+id: codebase-agentgpt
+type: codebase
+era: hybrid
+status: archive
+contributes: [orchestration]
+preserves_from: []
+inspires: []
+adjacent_to: []
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [code/AgentGPT/README.md, code/AgentGPT/package.json, code/AgentGPT/prisma/schema.prisma, code/AgentGPT/src/components/AutonomousAgent.ts]
+aliases: []
+load_priority: 5
+---
+# codebase-agentgpt
+
+AgentGPT-derived experiment. Archive; no code reuse expected.
+
+## Stack & contents
+
+Next.js / TypeScript with Prisma. ~66 files under `code/AgentGPT/{src,prisma,aws}`. Snapshot of the `TrajanWJ/AgentGPT` fork with AWS CloudFormation deploy assets.
+
+## Why this is here
+
+Marked as a fork in `github-legacy-repos`. Donor of the **autonomous agent loop** pattern (`src/components/AutonomousAgent.ts`) — useful as a known-bad baseline to compare against EMA's explicit-lineage approach.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-agentgpt:code/AgentGPT/src/components/AutonomousAgent.ts
+git show origin/codebase-agentgpt:code/AgentGPT/prisma/schema.prisma
+```

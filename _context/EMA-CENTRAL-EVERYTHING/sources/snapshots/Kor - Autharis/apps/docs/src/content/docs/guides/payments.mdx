@@ -1,0 +1,56 @@
+---
+title: Payments & payouts
+description: How timesheets turn into invoices, and how invoices turn into payouts.
+---
+
+Payments in Autharis follow a single linear path: **timesheet → invoice →
+paid → paid-out**. The end-to-end simulation lives in Lane E3 at
+`autharis/components/payments/**`, `autharis/lib/payments/**`, and
+`autharis/app/api/payments/**`.
+
+## The lifecycle
+
+1. **Timesheet submitted** by talent at the end of each week.
+2. **Timesheet approved** by client (or auto-approved after the review
+   window expires).
+3. **Invoice issued** against the approved timesheet — line items derive
+   from billable hours × negotiated rate, plus the platform fee.
+4. **Invoice paid** by the client via the Stripe-style payment rail.
+5. **Payout released** to talent on the configured cadence (typically
+   weekly).
+
+Every step is observable from both the client finance packet at
+`/client-finance` and the talent earnings ledger at
+`/talent/earnings/ledger`.
+
+## Invoices
+
+An invoice is a printable, immutable record. Once issued, its line items do
+not change — any correction creates a credit note or a follow-up invoice.
+
+Each invoice carries:
+
+- A stable `id` (e.g. `inv-042`).
+- The underlying `engagementId` and `timesheetId`.
+- Line items, subtotal, platform fee, and total.
+- A status in `draft | issued | paid | void`.
+- The `paidAt` timestamp once settled.
+
+## Payouts
+
+A payout represents money moving from the Autharis ledger to the talent. It
+references one or more paid invoices and appears on the talent earnings
+ledger with a clear status: `scheduled`, `in-flight`, or `paid`.
+
+The talent payout packet at `/talent/earnings/ledger` shows:
+
+- Invoices rolled into the payout.
+- Any holds or audit checkpoints that delayed release.
+- The final paid amount after platform fees.
+
+## Webhooks
+
+Payment lifecycle events land at `POST /api/payments/webhook`. The shape is
+Stripe-compatible so real rails can swap in without changing consumers.
+Events fire on `invoice.issued`, `invoice.paid`, `payout.scheduled`, and
+`payout.paid`.

@@ -1,0 +1,19 @@
+graph TD
+    User[Human Operator]
+    CLI[code/ema/daemon/cli]
+    CP[code/ema/daemon/lib/ema/control_plane]
+    EL[control_plane/event_log.ex]
+    Lin[control_plane/lineage.ex]
+    Auth[control_plane/authority.ex]
+    DB[(SQLite append-only)]
+    Docs[ema-003-lineage-architecture-synthesis.md]
+
+    User --> CLI
+    CLI --> CP
+    CP --> EL
+    CP --> Lin
+    CP --> Auth
+    EL --> DB
+    Lin --> DB
+    Auth --> DB
+    Docs -.governs.-> CP

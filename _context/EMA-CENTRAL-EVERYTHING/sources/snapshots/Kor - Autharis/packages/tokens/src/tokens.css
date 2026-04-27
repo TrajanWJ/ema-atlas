@@ -1,0 +1,133 @@
+/* Autharis — design tokens v4
+   Light-default, modern. Single light/dark choice (no warm).
+   Tight sans; disciplined contrast. */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Type families — sans everything */
+  --font-display: 'Inter Tight', 'Geist', system-ui, sans-serif;
+  --font-body:    'Geist', 'Inter Tight', system-ui, sans-serif;
+  --font-mono:    'Geist Mono', ui-monospace, monospace;
+
+  /* Type scale */
+  --fs-xs: 11px; --fs-sm: 13px; --fs-base: 14px; --fs-md: 15px;
+  --fs-lg: 17px; --fs-xl: 20px; --fs-2xl: 26px; --fs-3xl: 34px;
+  --fs-4xl: 48px; --fs-5xl: 64px; --fs-6xl: 88px;
+
+  /* ——— Brand palette (fixed) ——— */
+  --brand-ink:       #0A0A0B;
+  --brand-ink-2:     #1A1A1D;
+  --brand-paper:     #F6F5F0;
+  --brand-cream:     #EDEBE0;
+  --brand-terra:     #E8552B;
+  --brand-lime:      #D4F755;
+  --brand-moss:      #5C8F3A;
+  --brand-sky:       #4B8FC9;
+  --brand-rose:      #F2B5A0;
+
+  /* LIGHT (default) — high contrast, clean */
+  --bg:              var(--brand-paper);
+  --bg-raised:       #FFFFFF;
+  --bg-sunken:       var(--brand-cream);
+  --bg-contrast:     var(--brand-ink);
+
+  --ink:             #111113;       /* near-black, high-contrast body */
+  --ink-2:           #333338;       /* strong secondary */
+  --ink-3:           #555560;       /* tertiary — still readable */
+  --ink-4:           #8A8A92;       /* meta */
+  --line:            #D9D7CE;
+  --line-soft:       #E6E4DA;
+  --line-strong:     #B0AEA4;
+
+  /* Accent (runtime-tweakable). --accent-ink and --accent-text are computed in app.jsx. */
+  --accent:          var(--brand-terra);
+  --accent-ink:      #FFFFFF;       /* text on accent — overridden live */
+  --accent-text:     var(--brand-terra); /* accent used as text — overridden live */
+  --accent-soft:     color-mix(in oklch, var(--accent) 12%, var(--bg));
+  --accent-line:     color-mix(in oklch, var(--accent) 45%, var(--line));
+
+  /* Semantic */
+  --pos:             #3E7A2A;
+  --neg:             #C13A22;
+  --warn:            #B07C0E;
+
+  /* Radii */
+  --r-xs: 2px; --r-sm: 4px; --r-md: 8px; --r-lg: 14px; --r-full: 999px;
+
+  --d-comfortable: 1; --d-compact: 0.82;
+
+  --shadow-sm: 0 1px 0 rgba(10,10,11,0.04);
+  --shadow-md: 0 1px 0 rgba(10,10,11,0.04), 0 12px 28px -12px rgba(10,10,11,0.18);
+  --shadow-lg: 0 2px 0 rgba(10,10,11,0.04), 0 32px 70px -24px rgba(10,10,11,0.25);
+
+  color-scheme: light;
+}
+
+/* DARK variant */
+[data-theme="dark"] {
+  --bg:              #0A0A0B;
+  --bg-raised:       #141416;
+  --bg-sunken:       #050506;
+  --bg-contrast:     var(--brand-paper);
+
+  --ink:             #F2F1EB;
+  --ink-2:           #C9C7BF;
+  --ink-3:           #95938B;
+  --ink-4:           #5F5D57;
+  --line:            #262629;
+  --line-soft:       #1A1A1C;
+  --line-strong:     #35353A;
+
+  --accent-soft:     color-mix(in oklch, var(--accent) 20%, var(--bg));
+  --accent-line:     color-mix(in oklch, var(--accent) 45%, var(--line));
+
+  --pos:             #6FC84A;
+  --neg:             #E8553A;
+  --warn:            #E8B324;
+
+  --shadow-sm: 0 1px 0 rgba(0,0,0,0.4);
+  --shadow-md: 0 1px 0 rgba(0,0,0,0.4), 0 12px 28px -12px rgba(0,0,0,0.55);
+  --shadow-lg: 0 2px 0 rgba(0,0,0,0.4), 0 32px 70px -24px rgba(0,0,0,0.7);
+
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+input, textarea, select { font: inherit; color: inherit; }
+a { color: inherit; }
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+.mono { font-family: var(--font-mono); }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.hr { border: 0; border-top: 1px solid var(--line); margin: 0; }
+.paper { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-md); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; border: 2px solid var(--bg); }

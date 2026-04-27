@@ -1,0 +1,43 @@
+{
+  "name": "@autharis/cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Autharis CLI — swarm status, talent list, invoice export, job create. Lane G2.",
+  "type": "module",
+  "bin": {
+    "autharis": "./bin/run.mjs"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "dev": "node --loader ts-node/esm ./bin/run.mjs",
+    "postinstall-local": "bash scripts/install-local.sh"
+  },
+  "dependencies": {
+    "@oclif/core": "^4.0.0",
+    "@autharis/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@oclif/test": "^4.0.0",
+    "@types/node": "^22.7.0",
+    "oclif": "^4.0.0",
+    "typescript": "^5.6.0"
+  },
+  "oclif": {
+    "bin": "autharis",
+    "dirname": "autharis",
+    "commands": "./dist/commands",
+    "topicSeparator": " ",
+    "topics": {
+      "swarm": { "description": "Inspect the Autharis swarm lane state." },
+      "talent": { "description": "Talent directory commands." },
+      "invoice": { "description": "Invoice commands." },
+      "job": { "description": "Job request commands." }
+    }
+  }
+}

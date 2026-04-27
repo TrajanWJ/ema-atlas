@@ -1,0 +1,32 @@
+---
+id: codebase-agent-os-v8
+type: codebase
+era: hybrid
+status: inspiration
+contributes: [ux-metaphor, surface]
+preserves_from: [codebase-agent-os-demo]
+inspires: []
+adjacent_to: [codebase-agent-os-demo, codebase-agent-os-bridge]
+referenced_in_docs: [SYSTEM_GRAPH.md]
+key_artifacts: [code/agent-os-v8/CLAUDE.md, code/agent-os-v8/package.json, code/agent-os-v8/vite.config.ts, code/agent-os-v8/src/main.ts]
+aliases: []
+load_priority: 4
+---
+# codebase-agent-os-v8
+
+Iteration v8 of the agent-OS demo line.
+
+## Stack & contents
+
+TypeScript + Vite. ~20 files under `code/agent-os-v8/src/{styles,views}` plus gateway and storage modules. Source recorded as `/home/trajan/Projects/agent-os-v8`.
+
+## Why this is here
+
+v8 of the Agent OS line — the cleanest TypeScript rewrite. The gateway/storage modular split is worth comparing against `codebase-agent-os-bridge` (Node) and the EMA daemon's own surface seam.
+
+## How to load it efficiently
+
+```bash
+git show origin/codebase-agent-os-v8:code/agent-os-v8/CLAUDE.md
+git show origin/codebase-agent-os-v8:code/agent-os-v8/vite.config.ts
+```

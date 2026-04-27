@@ -1,0 +1,42 @@
+---
+id: design-review-fresh-context
+type: meta
+era: meta
+status: active
+contributes: [identity, workspace, collab, ux-metaphor]
+preserves_from: [main]
+inspires: []
+adjacent_to: [docs-host-system-launchpad-hq, docs-frontend-interface-inspirations]
+referenced_in_docs: [05-fresh-context-project-app-model.md, SYSTEM_GRAPH.md]
+key_artifacts: [05-fresh-context-project-app-model.md, SOURCE_CONTEXT.md]
+aliases: [fresh-context]
+load_priority: 1
+---
+# design-review-fresh-context
+
+Latest direct-from-user product framing: project/space/org model, personal AI
+access rules, named app interfaces (Wiki, Chat, Threads, Agent vEnv,
+Blueprint), Launchpad/HQ/Virtual-Desktop top surfaces. This is the *current*
+PRD substrate — newer than anything in the codebase- branches.
+
+## Why this matters
+
+This branch carries the **newest** product framing the user gave directly: project/space/org model, personal-AI access semantics, named app surfaces (Wiki, Chat, Threads/Server, Agent vEnv, Blueprint), Launchpad/HQ/Virtual-Desktop. Newer than anything in the codebase- branches.
+
+## What lives here
+
+- `05-fresh-context-project-app-model.md` — the canonical statement
+- `SOURCE_CONTEXT.md` — provenance (direct user message)
+
+## Where it connects
+
+- `docs-host-system-launchpad-hq` (Launchpad/HQ specs)
+- `docs-frontend-interface-inspirations` (visual references)
+- `docs-ema-next-steps` (`VAPP-FINAL-VISION-CHECKLIST.md`, `ULTIMATE-WIKI-ARCHITECTURE.qmd`)
+- All `graph/edges/identity.md` consumers
+
+## How to load it efficiently
+
+```bash
+git show origin/design-review-fresh-context:05-fresh-context-project-app-model.md
+```

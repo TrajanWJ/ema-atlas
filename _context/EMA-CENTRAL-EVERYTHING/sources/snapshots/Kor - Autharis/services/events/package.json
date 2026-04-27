@@ -1,0 +1,20 @@
+{
+  "name": "@autharis/events",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bun WebSocket gateway for real-time notifications and messaging. Lane F8.",
+  "type": "module",
+  "main": "src/client.ts",
+  "exports": {
+    ".": "./src/client.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "start": "bun src/server.ts",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "bun-types": "^1.1.0"
+  }
+}

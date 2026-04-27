@@ -1,0 +1,19 @@
+graph TD
+    Wiki[code/ema/daemon/lib/ema/wiki]
+    Nodes[wiki/nodes.ex]
+    Edges[wiki/edges.ex]
+    Blueprint[wiki/blueprint.ex]
+    Graph[wiki/graph_view.ex]
+    Inline[wiki/inline_prompts.ex]
+    Vault[docs-vault-wiki]
+    Hub[ema-003-knowledge-graph-hub.md]
+    XPoll[ema-003-github-cross-pollination-map.md]
+
+    Wiki --> Nodes
+    Wiki --> Edges
+    Wiki --> Blueprint
+    Wiki --> Graph
+    Wiki --> Inline
+    Vault -.seeds.-> Wiki
+    Hub -.specifies.-> Wiki
+    XPoll -.maps.-> Wiki

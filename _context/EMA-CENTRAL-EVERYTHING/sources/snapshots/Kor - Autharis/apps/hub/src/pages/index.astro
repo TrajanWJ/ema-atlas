@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+import Card from '../components/Card.astro';
+import { deliverables } from '../deliverables';
+import { parseLaneStatuses, statusForLaneField } from '../lib/lanes';
+
+const statuses = parseLaneStatuses();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Autharis — monorepo hub</title>
+    <meta
+      name="description"
+      content="Navigator for every deliverable in the Autharis remote-talent ecosystem."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <p class="hero__eyebrow">Monorepo · Lane F1</p>
+        <h1 class="hero__wordmark">autharis<span class="dot">.</span></h1>
+        <p class="hero__pitch">
+          A remote hourly talent marketplace, shipped as a multi-stack ecosystem.
+          Every deliverable in the repo — surfaced, linked, statused.
+        </p>
+      </header>
+
+      <section class="grid" aria-label="Deliverables">
+        {deliverables.map((d) => (
+          <Card deliverable={d} status={statusForLaneField(d.lane, statuses)} />
+        ))}
+      </section>
+    </main>
+  </body>
+</html>

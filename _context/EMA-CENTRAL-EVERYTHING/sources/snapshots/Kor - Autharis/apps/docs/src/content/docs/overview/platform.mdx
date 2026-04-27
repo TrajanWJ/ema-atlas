@@ -1,0 +1,52 @@
+---
+title: What is Autharis
+description: A tour of the Autharis ecosystem — surfaces, services, and shared packages.
+---
+
+Autharis is a **remote hourly talent marketplace**. Clients post briefs, vetted
+talent opt in, admins keep the queue honest, and the platform handles
+matching, timesheets, invoicing, and payouts end-to-end.
+
+The product is intentionally multi-stack. Each deliverable lives in its own
+workspace so stacks can evolve independently while a shared design system and
+typed SDK keep the surfaces consistent.
+
+## The three product surfaces
+
+Every user experience in Autharis is one of three surfaces. Each is built in
+isolation under `autharis/app/(marketing|client|talent|admin)/` and then
+integrated in the app shell.
+
+- **Marketing** — the editorial front door at `/`, `/brief`, `/case-studies`,
+  `/faq`, `/join`.
+- **Client** — dashboard, requests, matches, engagements, timesheets, invoices.
+- **Talent** — profile, opportunities, engagements, timesheets, earnings.
+- **Admin** — queue, roster, matching runs, disputes, weekly reports.
+
+## The services
+
+Autharis runs on three long-lived services plus the Next.js app itself:
+
+- **`services/api`** — Fastify 5 + TypeScript HTTP API on `:4010`, emitting
+  OpenAPI 3.1 at `/openapi.json`. Distinct from the Next.js route handlers
+  under `autharis/app/api/`.
+- **`services/matching`** — Python 3.12 + FastAPI scorer that ranks talent
+  against a job request.
+- **`services/events`** — Bun WebSocket gateway with HMAC-signed `/publish`
+  and a per-channel ring buffer for replay.
+
+## The shared packages
+
+Cross-cutting concerns live in `packages/`:
+
+- **`@autharis/tokens`** — design tokens as CSS + a typed TS mirror.
+- **`@autharis/ui`** — shared UI primitives (Wordmark, Icon, Button, Badge,
+  Pill, SegmentedControl, Dialog, Tabs).
+- **`@autharis/sdk`** — dual ESM/CJS typed client for the HTTP API, consumable
+  from web, CLI, mobile, and desktop.
+
+## Where to go next
+
+- Understand [roles](/overview/roles/) — client, talent, admin.
+- Read the [matching model](/guides/matching/) to see how talent is scored.
+- Dive into [payments](/guides/payments/) to trace money flow end-to-end.

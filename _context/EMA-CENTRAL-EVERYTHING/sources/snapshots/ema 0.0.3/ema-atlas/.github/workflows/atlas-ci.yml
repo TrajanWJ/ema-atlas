@@ -1,0 +1,39 @@
+name: atlas-ci
+
+# CI for the EMA atlas. Runs the same regen chain + next build that
+# Vercel runs on deploy, so a green main means a green Vercel deploy.
+# We do NOT deploy from CI — Vercel's GitHub integration handles that.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: regen + next build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Make regen scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Regen graph artifacts (check-graph + manifest + graph-json + index)
+        run: ./scripts/regen-all.sh
+
+      - name: Next build
+        run: npx next build

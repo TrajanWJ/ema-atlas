@@ -1,0 +1,17 @@
+graph TD
+    Q1{Canonical first: workstream, task, execution, or artifact?}
+    Q1 -->|workstream| C1a[Cost: granular runs feel orphaned]
+    Q1 -->|task| C1b[Cost: long-arc plans get shredded]
+
+    Q2{Which actions require an EMA-owned record?}
+    Q2 -->|all consequential| C2a[Cost: friction, route-around risk]
+    Q2 -->|opt-in| C2b[Cost: lineage gaps, hidden state]
+
+    Q3{How much ceremony is acceptable?}
+    Q3 -->|high| C3a[Cost: bureaucratic feel]
+    Q3 -->|low| C3b[Cost: ambiguous accountability]
+
+    C1a --> Q2
+    C1b --> Q2
+    C2a --> Q3
+    C2b --> Q3

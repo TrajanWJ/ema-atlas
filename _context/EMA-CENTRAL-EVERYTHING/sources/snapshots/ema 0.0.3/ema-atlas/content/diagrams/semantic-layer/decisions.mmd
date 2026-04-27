@@ -1,0 +1,17 @@
+graph TD
+    Q1{Wiki node vs brief vs thread vs task?}
+    Q1 -->|sharp boundaries| C1a[Cost: classification overhead]
+    Q1 -->|fluid| C1b[Cost: meaning blurs]
+
+    Q2{Index execution or author it?}
+    Q2 -->|index| C2a[Cost: lags reality]
+    Q2 -->|author| C2b[Cost: drives execution from docs]
+
+    Q3{How much graph complexity to expose?}
+    Q3 -->|rich| C3a[Cost: ornamental, hard to read]
+    Q3 -->|spare| C3b[Cost: hides real structure]
+
+    C1a --> Q2
+    C1b --> Q2
+    C2a --> Q3
+    C2b --> Q3

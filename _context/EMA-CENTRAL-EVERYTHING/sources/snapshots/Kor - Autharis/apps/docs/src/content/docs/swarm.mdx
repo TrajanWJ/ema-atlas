@@ -1,0 +1,60 @@
+---
+title: Swarm process
+description: How the Autharis ecosystem is built by a coordinated multi-agent swarm.
+---
+
+Autharis is built by a **multi-agent swarm** rather than a single team. The
+control plane for that swarm lives at `autharis/_shared/` and is summarized
+here for outside readers.
+
+## The primitive: a lane
+
+A **lane** is a single coordination unit. Each lane has:
+
+- An **ID** (e.g. `F4`, `E3`, `G8`).
+- A **status** — one of `open`, `held`, `in-review`, `landed`, `blocked`.
+- A **holder** — the session ID that currently owns the lane.
+- A **file scope** — the only paths the lane is allowed to write.
+- A **done-when** checklist.
+
+One agent, one lane, one non-overlapping scope. Lanes whose scopes do not
+overlap can run in parallel safely.
+
+## Waves
+
+Lanes are grouped into execution waves:
+
+- **Wave 0** — bootstrap and protected-file reconciliation.
+- **Wave 1** — parallel isolated build lanes (A1, B1–B4).
+- **Wave 1.5** — derivative expansion lanes (D1–D14).
+- **Wave 2** — integration (C1) and verification (V1).
+- **Wave 3** — ecosystem engines inside the Next.js app (E1–E8).
+- **Wave 4** — monorepo deliverables (F1–F8).
+- **Wave 5** — deliverable breadth (G1–G8).
+
+Each wave's lane list lives in `autharis/_shared/lanes.md`.
+
+## Artifacts
+
+- **`lanes.md`** — the live lock sheet.
+- **`decisions.md`** — append-only decision log. Every landed lane writes
+  one short entry.
+- **`dispatch/`** — copy-paste prompts for launching a lane session.
+- **`handoffs/`** — cross-lane asks, blockers, and follow-ups.
+
+## Hard rules
+
+1. One agent per lane.
+2. Claim your lane in `lanes.md` before writing code.
+3. Stay inside your lane's file scope.
+4. Never rewrite protected files from a non-reconciliation lane.
+5. Every landed lane appends one entry to `decisions.md`.
+6. If a lane needs a broader scope, stop and decompose into smaller leaf
+   lanes rather than stretching the original.
+
+## Why this works
+
+Because scopes are explicit and non-overlapping, the swarm can fire six or
+more workers in parallel without merge conflicts. Because `decisions.md` is
+append-only, later agents can reconstruct *why* a given shape was chosen
+even after the original session has ended.

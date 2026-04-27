@@ -1,0 +1,147 @@
+.card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at top right, rgba(224, 87, 45, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 247, 242, 0.96));
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7c4a2d;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.1;
+  color: #101826;
+}
+
+.meta {
+  margin: 0.35rem 0 0;
+  color: #4e5b6f;
+  line-height: 1.5;
+}
+
+.scoreBlock {
+  display: grid;
+  justify-items: end;
+  gap: 0.45rem;
+}
+
+.scoreValue {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  font-weight: 700;
+  color: #101826;
+}
+
+.scoreNumber {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.scoreSuffix {
+  font-size: 0.95rem;
+  color: #5b6778;
+}
+
+.summary {
+  margin: 0;
+  color: #253041;
+  line-height: 1.6;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7c4a2d;
+}
+
+.breakdownList {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.breakdownItem {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.breakdownHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+  color: #101826;
+}
+
+.breakdownTrack {
+  height: 0.45rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.breakdownFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #e0572d, #f0b868);
+}
+
+.breakdownReason {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #586579;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.4rem;
+  color: #253041;
+}
+
+@media (max-width: 720px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .scoreBlock {
+    justify-items: start;
+  }
+}

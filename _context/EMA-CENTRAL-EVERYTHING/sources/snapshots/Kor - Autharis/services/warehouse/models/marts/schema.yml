@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: mart_engagements
+    description: Engagement fact table joined with talent + job dimensions, incl. GMV.
+    columns:
+      - name: engagement_id
+        tests: [not_null, unique]
+      - name: engagement_sk
+        tests: [not_null, unique]
+      - name: talent_id
+        tests: [not_null]
+      - name: job_id
+        tests: [not_null]
+      - name: engagement_gmv
+        tests: [not_null]
+
+  - name: mart_payouts
+    description: Per-engagement payout roll-up (invoices + timesheets), with platform fee and net payout.
+    columns:
+      - name: engagement_id
+        tests: [not_null, unique]
+      - name: talent_id
+        tests: [not_null]
+      - name: gross_revenue
+        tests: [not_null]
+      - name: platform_fee
+        tests: [not_null]
+      - name: net_payout
+        tests: [not_null]
+
+  - name: mart_match_funnel
+    description: Job status funnel — count, conversion rate, avg days to first match.
+    columns:
+      - name: status
+        tests: [not_null, unique]
+      - name: job_count
+        tests: [not_null]
+      - name: conversion_rate
+        tests: [not_null]

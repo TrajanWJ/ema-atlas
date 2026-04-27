@@ -1,0 +1,17 @@
+graph TD
+    Q1{CRDT convergence vs explicit sequencing?}
+    Q1 -->|CRDT| C1a[Cost: merge semantics surprise users]
+    Q1 -->|sequence| C1b[Cost: needs online arbitration]
+
+    Q2{First replication slice?}
+    Q2 -->|workspace artifacts| C2a[Cost: heavy churn first]
+    Q2 -->|event log only| C2b[Cost: feels inert to users]
+
+    Q3{Presence visibility?}
+    Q3 -->|rich| C3a[Cost: surveillance feel]
+    Q3 -->|hidden| C3b[Cost: collaboration feels cold]
+
+    C1a --> Q2
+    C1b --> Q2
+    C2a --> Q3
+    C2b --> Q3

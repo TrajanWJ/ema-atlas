@@ -1,0 +1,81 @@
+---
+title: TypeScript SDK
+description: Using @autharis/sdk — the typed client for the Autharis HTTP API.
+---
+
+`@autharis/sdk` (Lane G8) is the official TypeScript client for the
+Autharis HTTP API. It is a **dual ESM/CJS** package with zero runtime
+dependencies and hand-maintained types for every resource.
+
+It is consumable from:
+
+- The Next.js web app
+- The oclif CLI (Lane G2)
+- The Expo mobile app (Lane G1)
+- The Tauri desktop app (Lane G6)
+
+## Install
+
+```sh
+pnpm add @autharis/sdk
+```
+
+## Initialize
+
+```ts
+import { AutharisClient } from '@autharis/sdk';
+
+const client = new AutharisClient({
+  baseUrl: 'http://localhost:4010',
+  // Optional bearer token for authenticated environments.
+  token: process.env.AUTHARIS_TOKEN,
+});
+```
+
+`fetch` is read from `globalThis.fetch` by default, so the client works
+unchanged in Node 20+, Bun, Deno, browsers, and React Native. To inject a
+custom fetch (e.g. with retries or telemetry) pass `fetch: myFetch`.
+
+## Call an endpoint
+
+Each resource hangs off the client as a small object with the usual verbs:
+
+```ts
+// List talent
+const talent = await client.talent.list();
+
+// Get one job
+const job = await client.jobs.get('job-017');
+
+// Create a timesheet
+const ts = await client.timesheets.create({
+  engagementId: 'eng-004',
+  weekOf: '2026-04-20',
+  entries: [{ day: 'mon', hours: 6 }],
+});
+```
+
+Resources available: `client.talent`, `client.jobs`, `client.engagements`,
+`client.timesheets`, `client.invoices`, and `client.admin.queue`.
+
+## Error handling
+
+Errors surface as `AutharisError`, which extends `Error` with `status`,
+`code`, `requestId`, and `details`:
+
+```ts
+import { AutharisError } from '@autharis/sdk';
+
+try {
+  await client.jobs.get('missing');
+} catch (err) {
+  if (err instanceof AutharisError) {
+    console.error(err.status, err.code, err.requestId);
+  } else {
+    throw err;
+  }
+}
+```
+
+`AutharisError.fromResponse(res)` gracefully parses JSON problem-details
+bodies and falls back to `http_<status>` codes for non-JSON responses.

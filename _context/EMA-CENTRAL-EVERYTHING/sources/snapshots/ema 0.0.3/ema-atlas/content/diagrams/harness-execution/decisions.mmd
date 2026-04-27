@@ -1,0 +1,17 @@
+graph TD
+    Q1{Every run originates in EMA?}
+    Q1 -->|yes| C1a[Cost: cannot adopt CLI sessions]
+    Q1 -->|no| C1b[Cost: lineage import is messy]
+
+    Q2{Provider adapter becomes harness?}
+    Q2 -->|promote| C2a[Cost: more adapter surface to own]
+    Q2 -->|stay provider| C2b[Cost: leaky abstractions]
+
+    Q3{Delegation trees visible to humans?}
+    Q3 -->|fully visible| C3a[Cost: cognitive overload]
+    Q3 -->|collapsed| C3b[Cost: subagent work feels opaque]
+
+    C1a --> Q2
+    C1b --> Q2
+    C2a --> Q3
+    C2b --> Q3

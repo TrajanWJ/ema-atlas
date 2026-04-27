@@ -1,0 +1,56 @@
+---
+title: Glossary
+description: Canonical terms used across the Autharis ecosystem.
+---
+
+## Product terms
+
+**Brief** — a draft or shared job description, usually created in the
+marketing brief intake demo (`/brief`).
+
+**Job request** — the structured, persisted version of a brief. Carries
+title, category, client, description, hours-per-week, duration, timezone,
+budget band, skills, industry, and status.
+
+**Engagement** — an active agreement between a client and a specific
+talent, scoped to a job request.
+
+**Timesheet** — a weekly record of billable hours logged by talent against
+an engagement.
+
+**Invoice** — an immutable, printable record billed to the client against
+one or more approved timesheets.
+
+**Payout** — money moving from the Autharis ledger to talent, referencing
+one or more paid invoices.
+
+**Admin queue item** — an operator task awaiting review (activation
+requests, disputes, matching audits, payout holds).
+
+## Roles
+
+**Client** — the buyer. Posts job requests, approves timesheets, pays
+invoices.
+
+**Talent** — the seller. Maintains a profile, accepts engagements, submits
+timesheets, receives payouts.
+
+**Admin** — the operator. Runs the activation queue, audits matching
+runs, handles disputes, publishes weekly reports.
+
+## Technical terms
+
+**Surface** — one of the three top-level product UIs: marketing, client,
+talent, admin.
+
+**Lane** — a swarm coordination primitive. One agent, one holder, one
+non-overlapping write scope. See [swarm process](/swarm/).
+
+**Protected file** — a file inside the in-flight prototype lane that
+non-reconciliation lanes must not edit.
+
+**Deliverable** — a standalone workspace member (app, service, or
+package) that ships on its own release cadence.
+
+**Store** — the `services/api` data-access interface (`src/store/memory.ts`)
+that lets an in-memory impl and a future Postgres impl share callers.

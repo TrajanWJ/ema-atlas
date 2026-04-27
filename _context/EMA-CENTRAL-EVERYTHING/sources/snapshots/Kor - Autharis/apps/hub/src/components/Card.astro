@@ -1,0 +1,32 @@
+---
+import type { Deliverable } from '../deliverables';
+import type { LaneStatus } from '../lib/lanes';
+
+interface Props {
+  deliverable: Deliverable;
+  status: LaneStatus;
+}
+
+const { deliverable, status } = Astro.props;
+const { name, stack, dir, lane, devUrl } = deliverable;
+---
+
+<article class="card">
+  <div class="card__head">
+    <span class="card__lane">Lane {lane}</span>
+    <span class="chip" data-status={status}>
+      <span class="chip__dot" aria-hidden="true"></span>
+      <span>{status}</span>
+    </span>
+  </div>
+  <h3 class="card__name">{name}</h3>
+  <span class="card__stack">{stack}</span>
+  <p class="card__dir">{dir}/</p>
+  <div class="card__foot">
+    {devUrl ? (
+      <a class="card__link" href={devUrl} rel="noreferrer">{devUrl}</a>
+    ) : (
+      <span class="card__link card__link--muted">no dev URL</span>
+    )}
+  </div>
+</article>

@@ -1,0 +1,41 @@
+---
+id: docs-host-system-launchpad-hq
+type: docs
+era: hybrid
+status: active
+contributes: [ux-metaphor, surface]
+preserves_from: [codebase-place-org]
+inspires: []
+adjacent_to: [design-review-fresh-context, docs-frontend-interface-inspirations]
+referenced_in_docs: [05-fresh-context-project-app-model.md, SYSTEM_GRAPH.md]
+key_artifacts: [host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md, host/EMA-v1.1-Next-Steps/01-PLANS/OPENCLAW-DISCORD-VAULT-LOOP.qmd, host/EMA-v1.1-Next-Steps/00-INBOX/2026-04-14-ULTIMATE-WIKI-INBOX-CAPTURE.qmd]
+aliases: []
+load_priority: 3
+---
+# docs-host-system-launchpad-hq
+
+Notes on the Launchpad and HQ surfaces. Read alongside
+`05-fresh-context-project-app-model.md` for the top-level surface PRD.
+
+## Why this matters
+
+Surface-side planning for the Launchpad and HQ vApps. Read alongside `05-fresh-context-project-app-model.md` to understand the top-level shell that will host all other vApps.
+
+## What lives here
+
+- `host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md` — surface buildout plan
+- `host/EMA-v1.1-Next-Steps/01-PLANS/OPENCLAW-DISCORD-VAULT-LOOP.qmd` — operator-loop pattern that Launchpad/HQ should preserve
+- `host/EMA-v1.1-Next-Steps/00-INBOX/2026-04-14-ULTIMATE-WIKI-INBOX-CAPTURE.qmd` — inbox/capture surface ideas
+- (Significant overlap with `docs-host-vault-agent-modules-routing` — both pull from EMA-v1.1-Next-Steps)
+
+## Where it connects
+
+- Refines: `codebase-place-org` (UX metaphor donor)
+- Refined further by: `design-review-fresh-context`
+- Cross-cuts with: `docs-frontend-interface-inspirations`
+
+## How to load it efficiently
+
+```bash
+git show origin/docs-host-system-launchpad-hq:host/EMA-v1.1-Next-Steps/01-PLANS/2026-04-13-FRONTEND-BUILDOUT-PLAN.md
+```

@@ -1,0 +1,848 @@
+.surface {
+  --paper: #f7efe3;
+  --paper-strong: #ead8bc;
+  --paper-soft: rgba(255, 249, 240, 0.76);
+  --card: rgba(255, 251, 245, 0.88);
+  --ink: #17110d;
+  --ink-soft: rgba(23, 17, 13, 0.72);
+  --ink-faint: rgba(23, 17, 13, 0.52);
+  --line: rgba(23, 17, 13, 0.12);
+  --line-strong: rgba(23, 17, 13, 0.22);
+  --accent: #b66432;
+  --accent-deep: #7f3418;
+  --accent-soft: rgba(182, 100, 50, 0.14);
+  --gold: #ddb962;
+  --pine: #173128;
+  --pine-soft: rgba(23, 49, 40, 0.9);
+  --white: #fffdf9;
+  --shadow-lg: 0 30px 90px rgba(76, 44, 18, 0.16);
+  --shadow-md: 0 18px 48px rgba(76, 44, 18, 0.1);
+  --radius-xl: 34px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: var(--font-marketing-body), sans-serif;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(221, 185, 98, 0.28), transparent 24%),
+    radial-gradient(circle at 88% 12%, rgba(182, 100, 50, 0.16), transparent 22%),
+    linear-gradient(180deg, #fbf7ef 0%, #f7efe3 36%, #ebdcc6 100%);
+}
+
+.heroSection {
+  position: relative;
+  overflow: clip;
+  padding: 28px clamp(1.2rem, 2.2vw, 2.1rem) 4rem;
+}
+
+.heroSection::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.86), transparent 34%),
+    url("/marketing/ledger-grid.svg");
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.heroGlow {
+  position: absolute;
+  inset: auto auto 8% 58%;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(23, 49, 40, 0.22) 0%, rgba(23, 49, 40, 0.06) 38%, transparent 72%);
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.1rem;
+  max-width: 1360px;
+  margin: 0 auto 2.3rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.44);
+  border-radius: 999px;
+  background: rgba(255, 249, 241, 0.74);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 40px rgba(68, 42, 16, 0.08);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: fit-content;
+}
+
+.wordmarkGlyph {
+  display: inline-flex;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 0.85rem;
+  background: var(--pine);
+  color: var(--white);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.wordmarkGlyph svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wordmarkRing,
+.wordmarkHandPrimary,
+.wordmarkHandSecondary {
+  fill: none;
+  stroke: var(--white);
+}
+
+.wordmarkRing {
+  stroke-width: 1.35;
+}
+
+.wordmarkHandPrimary {
+  stroke: var(--gold);
+  stroke-width: 2.3;
+}
+
+.wordmarkHandSecondary {
+  stroke-width: 1.7;
+}
+
+.wordmarkPin {
+  fill: var(--white);
+}
+
+.wordmarkText {
+  font-family: var(--font-marketing-display), serif;
+  font-size: 1.7rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-inline: auto;
+}
+
+.nav a,
+.secondaryAction {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.nav a {
+  padding-bottom: 0.18rem;
+  border-bottom: 1px solid transparent;
+  font-size: 0.92rem;
+}
+
+.nav a:hover,
+.nav a:focus-visible,
+.secondaryAction:hover,
+.secondaryAction:focus-visible {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.headerActions,
+.heroActions,
+.finalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.primaryAction {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+  color: var(--white);
+  text-decoration: none;
+  box-shadow: 0 16px 28px rgba(127, 52, 24, 0.2);
+}
+
+.primaryAction:hover,
+.primaryAction:focus-visible {
+  transform: translateY(-1px);
+}
+
+.secondaryAction {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.44);
+}
+
+.heroGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 3rem 0 0;
+}
+
+.heroCopy {
+  padding-top: 2rem;
+}
+
+.heroEyebrow,
+.sectionIndex,
+.cardEyebrow,
+.stepKicker,
+.panelKicker,
+.rhythmRow span:first-child {
+  font-family: var(--font-marketing-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.heroEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0 0 1.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(23, 49, 40, 0.1);
+  background: rgba(255, 250, 243, 0.8);
+  color: var(--pine);
+}
+
+.heroEyebrow::before {
+  content: "";
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 0.3rem rgba(182, 100, 50, 0.11);
+}
+
+.heroCopy h1,
+.sectionHeading h2,
+.finalCard h2 {
+  margin: 0;
+  font-family: var(--font-marketing-display), serif;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.heroCopy h1 {
+  max-width: 12ch;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+}
+
+.heroCopy h1 em,
+.sectionHeading h2 em,
+.finalCard h2 em {
+  font-style: italic;
+  color: var(--accent-deep);
+}
+
+.heroLead,
+.heroSupport,
+.sectionHeading p,
+.storySummary,
+.trackSummary,
+.stepCard p,
+.expectationCard p,
+.faqCard p,
+.finalCard p,
+.profileSummary,
+.rhythmHeader p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+
+.heroLead {
+  max-width: 62ch;
+  margin-top: 1.5rem;
+  font-size: 1.08rem;
+}
+
+.heroSupport {
+  max-width: 56ch;
+  margin-top: 1rem;
+}
+
+.heroActions {
+  margin-top: 1.8rem;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2rem 0 0;
+}
+
+.metricCard {
+  padding: 1.2rem 1.1rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: var(--radius-md);
+  background: rgba(255, 249, 241, 0.78);
+  box-shadow: 0 18px 36px rgba(76, 44, 18, 0.08);
+}
+
+.metricCard dt {
+  color: var(--ink-faint);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.metricCard dd {
+  margin: 0.5rem 0 0.3rem;
+  font-family: var(--font-marketing-display), serif;
+  font-size: 2rem;
+  letter-spacing: -0.05em;
+}
+
+.metricCard p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.profilePanel {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.96) 0%, rgba(246, 235, 216, 0.92) 100%);
+  box-shadow: var(--shadow-lg);
+}
+
+.profilePanel::before {
+  content: "";
+  position: absolute;
+  inset: 1rem 1rem auto auto;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(23, 49, 40, 0.16), transparent 72%);
+  pointer-events: none;
+}
+
+.panelKicker {
+  margin: 0 0 0.9rem;
+  color: var(--pine);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profileHeader h2,
+.storyCard h3,
+.trackCard h3,
+.stepCard h3,
+.expectationCard h3,
+.faqCard h3,
+.evidenceCard h3,
+.rhythmHeader h3 {
+  margin: 0;
+  font-family: var(--font-marketing-display), serif;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.profileHeader h2 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.profileHeader p {
+  margin: 0.45rem 0 0;
+  color: var(--ink-soft);
+}
+
+.profileBadge {
+  display: inline-flex;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(23, 49, 40, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  color: var(--pine);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.profileSummary {
+  margin-top: 1.1rem;
+}
+
+.profileBlock,
+.profileProof {
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+
+.profileBlock strong,
+.profileProof strong {
+  display: block;
+  margin-bottom: 0.8rem;
+  font-size: 0.92rem;
+}
+
+.profileBlock ul,
+.profileProof ul,
+.evidenceList,
+.storyList,
+.trackList {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profileBlock li,
+.profileProof li,
+.evidenceList li,
+.storyList li,
+.trackList li {
+  position: relative;
+  padding-left: 1rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.profileBlock li::before,
+.profileProof li::before,
+.evidenceList li::before,
+.storyList li::before,
+.trackList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.68rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.profileStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.2rem;
+}
+
+.profileStack span {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(23, 17, 13, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+
+.ticker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 1.2rem;
+  justify-content: center;
+  padding: 1rem clamp(1.2rem, 4vw, 3rem) 1.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 1px solid rgba(23, 17, 13, 0.08);
+  background: rgba(255, 250, 244, 0.62);
+}
+
+.tickerItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.tickerDot {
+  width: 0.44rem;
+  height: 0.44rem;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 0.28rem rgba(182, 100, 50, 0.1);
+}
+
+.section,
+.faqSection,
+.finalSection {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 4.5rem clamp(1.2rem, 2vw, 2rem) 0;
+}
+
+.trackSection,
+.pathSection,
+.standardsSection {
+}
+
+.sectionHeading {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 1.4rem 2rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
+.sectionIndex {
+  margin: 0;
+  color: var(--pine);
+}
+
+.sectionHeading h2 {
+  max-width: 12ch;
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+}
+
+.sectionHeading p {
+  max-width: 60ch;
+  margin-top: 0.9rem;
+}
+
+.pillarGrid,
+.trackGrid,
+.expectationGrid,
+.faqGrid {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.pillarGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.trackGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.expectationGrid,
+.faqGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.storyCard,
+.trackCard,
+.expectationCard,
+.faqCard,
+.evidenceCard,
+.rhythmCard {
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
+}
+
+.storyCard,
+.trackCard,
+.expectationCard,
+.faqCard,
+.evidenceCard {
+  padding: 1.5rem;
+}
+
+.cardEyebrow {
+  margin: 0 0 0.8rem;
+  color: var(--pine);
+}
+
+.storyCard h3,
+.trackCard h3,
+.expectationCard h3,
+.faqCard h3,
+.evidenceCard h3,
+.rhythmHeader h3 {
+  font-size: 1.7rem;
+}
+
+.storySummary,
+.trackSummary {
+  margin-top: 0.85rem;
+}
+
+.storyList,
+.trackList {
+  margin-top: 1rem;
+}
+
+.pathGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+
+.stepGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+.stepCard {
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 251, 246, 0.84);
+  box-shadow: var(--shadow-md);
+}
+
+.stepKicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin: 0 0 1rem;
+  border-radius: 999px;
+  background: rgba(23, 49, 40, 0.08);
+  color: var(--pine);
+}
+
+.stepCard h3 {
+  font-size: 1.55rem;
+}
+
+.stepCard p {
+  margin-top: 0.8rem;
+}
+
+.stepCard span {
+  display: block;
+  margin-top: 1rem;
+  color: var(--accent-deep);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.evidenceCard {
+  position: sticky;
+  top: 6rem;
+}
+
+.evidenceList {
+  margin-top: 1rem;
+}
+
+.watchoutBlock {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.watchoutBlock strong {
+  color: var(--pine);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.watchoutBlock span {
+  color: var(--ink-faint);
+  line-height: 1.55;
+}
+
+.rhythmCard {
+  margin-top: 1.2rem;
+  padding: 1.5rem;
+  background:
+    linear-gradient(180deg, rgba(24, 49, 41, 0.95) 0%, rgba(19, 38, 31, 0.96) 100%);
+  color: var(--white);
+}
+
+.rhythmHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+
+.rhythmHeader p,
+.rhythmRows,
+.rhythmRow span:last-child {
+  color: rgba(255, 253, 249, 0.82);
+}
+
+.rhythmRows {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.3rem;
+}
+
+.rhythmRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.rhythmRow span:first-child {
+  color: rgba(221, 185, 98, 0.94);
+}
+
+.faqCard {
+  min-height: 100%;
+}
+
+.faqCard p {
+  margin-top: 0.8rem;
+}
+
+.finalSection {
+  padding-bottom: 4.5rem;
+}
+
+.finalCard {
+  padding: clamp(2rem, 4vw, 3rem);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 82% 24%, rgba(221, 185, 98, 0.2), transparent 22%),
+    linear-gradient(180deg, rgba(255, 251, 246, 0.94) 0%, rgba(243, 230, 209, 0.94) 100%);
+  box-shadow: var(--shadow-lg);
+}
+
+.finalCard h2 {
+  max-width: 12ch;
+  margin-top: 0.85rem;
+  font-size: clamp(2.5rem, 5vw, 4.8rem);
+}
+
+.finalCard p {
+  max-width: 58ch;
+  margin-top: 1rem;
+}
+
+.finalActions {
+  margin-top: 1.6rem;
+}
+
+@media (max-width: 1120px) {
+  .heroGrid,
+  .pathGrid,
+  .rhythmHeader,
+  .sectionHeading {
+    grid-template-columns: 1fr;
+  }
+
+  .pillarGrid,
+  .trackGrid,
+  .expectationGrid,
+  .faqGrid,
+  .stepGrid,
+  .metricGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profilePanel,
+  .evidenceCard {
+    position: static;
+  }
+
+  .sectionHeading h2,
+  .finalCard h2 {
+    max-width: 16ch;
+  }
+}
+
+@media (max-width: 840px) {
+  .masthead {
+    position: relative;
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 28px;
+  }
+
+  .nav,
+  .headerActions {
+    margin-inline: 0;
+  }
+
+  .nav {
+    gap: 0.9rem 1rem;
+  }
+
+  .heroSection {
+    padding-inline: 1rem;
+  }
+
+  .section,
+  .faqSection,
+  .finalSection {
+    padding-inline: 1rem;
+  }
+
+  .pillarGrid,
+  .trackGrid,
+  .expectationGrid,
+  .faqGrid,
+  .stepGrid,
+  .metricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy h1 {
+    font-size: clamp(3rem, 15vw, 5.2rem);
+  }
+
+  .sectionHeading h2,
+  .finalCard h2 {
+    font-size: clamp(2.2rem, 10vw, 3.7rem);
+  }
+
+  .profileHeader {
+    flex-direction: column;
+  }
+
+  .rhythmRow {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+}

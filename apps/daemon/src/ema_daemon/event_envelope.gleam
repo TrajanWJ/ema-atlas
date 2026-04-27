@@ -94,6 +94,9 @@ pub fn kind_in_catalog(kind: String) -> Bool {
   case kind {
     "actor.created" -> True
     "actor.assigned_to_project" -> True
+    "identity.user_upserted" -> True
+    "identity.google_linked" -> True
+    "identity.authenticator_enabled" -> True
     "org.created" -> True
     "org.renamed" -> True
     "org.settings_updated" -> True
@@ -115,12 +118,18 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "invite.accepted" -> True
     "invite.revoked" -> True
     "invite.expired" -> True
+    "access_session.challenge_created" -> True
+    "access_session.approved" -> True
+    "access_session.revoked" -> True
+    "access_session.expired" -> True
     "device.registered" -> True
     "device.renamed" -> True
     "device.revoked" -> True
     "device.key_rotated" -> True
     "peer.seen" -> True
     "peer.unreachable" -> True
+    "peer.trust_established" -> True
+    "peer.trust_revoked" -> True
     "lease.issued" -> True
     "lease.renewed" -> True
     "lease.released" -> True
@@ -175,6 +184,12 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "connector.connected" -> True
     "connector.disconnected" -> True
     "connector.linked_resource_imported" -> True
+    "vcalendar.created" -> True
+    "vcalendar.phase_set" -> True
+    "calendar_block.added" -> True
+    "calendar_block.moved" -> True
+    "checkup.scheduled" -> True
+    "checkup.completed" -> True
     _ -> False
   }
 }

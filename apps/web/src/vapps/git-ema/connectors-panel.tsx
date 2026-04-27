@@ -19,11 +19,10 @@ const PROVIDERS: Array<{ id: "google_drive" | "github"; label: string }> = [
 ];
 
 /**
- * Demo OAuth buttons + connected-state management.
+ * Staged OAuth buttons + connected-state management.
  *
- * Everything here is stubbed. `connector.connect` appends a
- * `connector.connected` event in the daemon with `fake: true`.
- * Nothing talks to the real Google or GitHub.
+ * The local projection shows the intended connector contract while the real
+ * Google/GitHub OAuth path remains disabled until the daemon writer lands.
  */
 export function ConnectorsPanel() {
   const p = useProjection("git_ema.user_connectors");
@@ -58,15 +57,20 @@ export function ConnectorsPanel() {
         )}
       </div>
       <p className="ema-connectors-panel__note">
-        Demo mode — clicking connects a fake account. Real OAuth lands in
-        a later wave.
+        Staged mode — connector actions stay disabled until the daemon OAuth
+        writer is present.
       </p>
       <ul className="ema-connectors-panel__list">
         {PROVIDERS.map(({ id, label }) => {
           const c = byProvider(id);
           const connected = c?.status === "connected";
           return (
-            <li key={id} className="ema-connector-row">
+            <li
+              key={id}
+              className="ema-connector-row"
+              data-connected={connected ? "true" : "false"}
+              data-provider={id}
+            >
               <span className="ema-connector-row__label">{label}</span>
               <span className="ema-connector-row__state">
                 {connected ? c?.display_label : "not connected"}

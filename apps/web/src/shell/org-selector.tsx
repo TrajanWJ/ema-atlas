@@ -1,10 +1,21 @@
 import { useProjection } from "../lib/ipc";
 import { mockTopbar } from "../app/mock-projections";
 
+const GENERIC_ORG_NAMES = new Set(["Trajan's Organization"]);
+
 export function OrgSelector() {
   const topbar = useProjection("topbar");
-  const orgs = topbar?.orgs ?? mockTopbar.orgs;
-  const current = topbar?.current_org ?? mockTopbar.current_org;
+  const projectedCurrent = topbar?.current_org;
+  const useSeedScope =
+    !projectedCurrent || GENERIC_ORG_NAMES.has(projectedCurrent.name);
+  const orgs =
+    !useSeedScope && topbar?.orgs?.length ? topbar.orgs : mockTopbar.orgs;
+  const current =
+    !useSeedScope &&
+    projectedCurrent &&
+    orgs.some((org: { id: string }) => org.id === projectedCurrent.id)
+      ? projectedCurrent
+      : mockTopbar.current_org;
 
   return (
     <select
@@ -16,7 +27,7 @@ export function OrgSelector() {
       }}
       disabled={orgs.length === 0}
     >
-      {orgs.length === 0 && <option value="">(no orgs)</option>}
+      {orgs.length === 0 && <option value="">Org unavailable</option>}
       {orgs.map((o: { id: string; name: string }) => (
         <option key={o.id} value={o.id}>
           {o.name}

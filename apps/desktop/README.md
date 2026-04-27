@@ -40,9 +40,9 @@ To place that built app where a human expects the 0.0.5 desktop app:
 scripts/install-macos-tauri-app.sh
 ```
 
-The AppleScript helper created by `scripts/create-macos-launcher.sh` is
-only a web/dev launcher. It is named `EMA 0.0.5 Web Dev Launcher.app`,
-starts the daemon and Vite web surface, then opens `http://localhost:5173`.
+Do not replace this with an AppleScript web/dev launcher. The human-facing
+Desktop icon for EMA 0.0.5 is the Tauri bundle installed as
+`~/Desktop/EMA 0.0.5.app`.
 
 ## Tauri capability matrix
 

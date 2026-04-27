@@ -12,6 +12,8 @@ import { runEvents } from "./commands/events.js";
 import { runSwarm } from "./commands/swarm.js";
 import { runOrg } from "./commands/org.js";
 import { runProject } from "./commands/project.js";
+import { runVcalendar } from "./commands/vcalendar.js";
+import { runCheckup } from "./commands/checkup.js";
 
 async function main(): Promise<number> {
   const [, , cmd, ...rest] = process.argv;
@@ -35,6 +37,10 @@ async function main(): Promise<number> {
       return runProject(args);
     case "swarm":
       return runSwarm(args);
+    case "vcalendar":
+      return runVcalendar(args);
+    case "checkup":
+      return runCheckup(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

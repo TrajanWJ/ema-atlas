@@ -30,7 +30,7 @@ This wave is not trying to complete:
 
 - full `intent -> proposal -> plan -> spec -> execution -> canon`;
 - real OAuth;
-- real Yjs/Hocuspocus collaboration;
+- multi-machine live collaboration;
 - full Hermes dispatch;
 - multi-peer failover;
 - autonomous business campaign loops;
@@ -104,7 +104,7 @@ surface in wave 1.
 The vanilla workspace follows the six-plane data treatment:
 
 - Canonical truth lives in `canonical.db` and daemon event logs.
-- Collaboration prose is future Yjs/Hocuspocus state mediated by the daemon.
+- Collaboration prose lives in BEAM-owned document rooms mediated by the daemon.
 - Runtime state is observable but not long-term canon.
 - Surface projections are disposable.
 - Imported source material lives through attachment records and external
@@ -174,10 +174,13 @@ The current v0 catalog already contains the families needed for the vanilla
 workspace:
 
 - `org`
+- `actor`
+- `identity`
 - `space`
 - `project`
 - `membership`
 - `invite`
+- `access_session`
 - `device`
 - `peer`
 - `lease`
@@ -190,6 +193,7 @@ workspace:
 - `execution`
 - `tool`
 - `blueprint`
+- `collab`
 - `attachment`
 - `connector`
 
@@ -209,7 +213,8 @@ workflow stages.
 6. Add See Agent Work with lanes, missions, campaigns, vCalendar, mocked
    controls, and CLI equivalents.
 7. Add thin lane/handoff/proposal views after Blueprint and git-ema work.
-8. Add Yjs collaboration after structural Blueprint writes are stable.
+8. Add the BEAM-owned `collab.document` live document loop after structural
+   Blueprint writes are stable.
 9. Add real Hermes dispatch after the workspace can show what was requested,
    linked, and approved.
 

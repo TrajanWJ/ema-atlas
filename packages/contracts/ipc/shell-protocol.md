@@ -49,15 +49,23 @@ accepts any hello and assigns a dev device id on the fly.
 ```
 
 Server responds with one message. Fields MUST appear in this exact order:
-`v`, `type`, `in_reply_to`, `ok`, then either `events` (on success) or
-`error` (on failure). Clients MAY rely on field order to short-circuit
-parsing.
+`v`, `type`, `in_reply_to`, `ok`, then success data (`events`, `projection`,
+or another command-specific field) or `error` on failure. Clients MAY rely on
+field order to short-circuit parsing.
 
 ```
 { "v": 0, "type": "command_result",
   "in_reply_to": "msg-...",
   "ok": true,
   "events": [ "event:<ulid>", ... ]      // ids of events appended, in order
+}
+```
+or
+```
+{ "v": 0, "type": "command_result",
+  "in_reply_to": "msg-...",
+  "ok": true,
+  "projection": { "name": "<projection-name>", "data": { ... } }
 }
 ```
 or
@@ -80,6 +88,24 @@ new class MUST add it here first.
 | `org.create`                  | `{ name }`                                                   |
 | `space.create`                | `{ org_id, name }`                                           |
 | `project.create`              | `{ space_id, name }`                                         |
+| `collab.document.open`        | `{ target: CollabDocumentTarget }` → `command_result.projection` |
+| `collab.document.replace`     | `{ target: CollabDocumentTarget, revision, text }`           |
+| `identity.google_upsert`      | `{ user_id, google_sub, email, display_name, email_verified }` |
+| `identity.authenticator_enable` | `{ user_id, secret_ref }`                                  |
+| `device.register`             | `{ org_id, device_id, user_id, name, pubkey, bootstrap: "genesis" \| "paired" }` |
+| `device.local_register`       | `{ org_id, user_id, name, bootstrap?: "genesis" \| "paired" }` |
+| `peer.trust_establish`        | `{ org_id, peer_device, peer_pubkey, local_pubkey, ceremony_kind, ceremony_id, lineage_proof? \| device_id? }` |
+| `replication.collab.frames_since` | `{ org_id, peer_device, document_id, after_revision }` → `command_result.data` |
+| `replication.collab.apply_frame` | `{ org_id, peer_device, document_id, frame_id, revision, text, created_at }` → `command_result.data` |
+| `membership.role_grant`       | `{ org_id, user_id, role }`                                  |
+| `invite.create`               | `{ org_id, target_kind, target_value, role, expires_at }`    |
+| `invite.accept`               | `{ org_id, invite_id, accepted_by, accepted_device, role }`  |
+| `invite.revoke`               | `{ org_id, invite_id, reason? }`                             |
+| `invite.expire`               | `{ org_id, invite_id }`                                      |
+| `access_session.challenge`    | `{ org_id, access_point, scopes, expires_at }`               |
+| `access_session.approve`      | `{ org_id, challenge_id, user_id, approved_by_device, scopes, expires_at }` |
+| `access_session.revoke`       | `{ org_id, session_id, reason? }`                            |
+| `access_session.expire`       | `{ org_id, session_id }`                                     |
 | `connector.connect`           | `{ provider: "google_drive" \| "github" }`                   |
 | `connector.disconnect`        | `{ connector_id }`                                           |
 | `connector.import_resource`   | `{ connector_id, picker_item_id }`                           |
@@ -89,8 +115,17 @@ new class MUST add it here first.
 | `attachment.unlink`           | `{ attachment_id, object_kind, object_id }`                  |
 | `connector.list_picker_items` | `{ connector_id }` → `command_result.picker_items`           |
 
-The last one is a **query** that returns inline data on `command_result`
-rather than emitting events (read path, not write path).
+`collab.document.open` is a **room open/query**: it starts or attaches to the
+BEAM room and immediately pushes the current `collab.document` projection over
+the same connection. It does not append a canonical event.
+
+`collab.document.replace` writes a whole-body replacement frame to the BEAM
+collab store. The daemon may emit `collab.document.checkpointed` when the
+replace advances the durable checkpoint; no per-keystroke document updates are
+canonical events.
+
+`connector.list_picker_items` is a **query** that returns inline data on
+`command_result` rather than emitting events (read path, not write path).
 
 ## Events (daemon → surface)
 
@@ -121,6 +156,7 @@ channel.
 | `project.<project_id>.all`           | every event scoped to this project                        |
 | `project.<project_id>.attachments`   | attachment + link events for this project                 |
 | `user.<user_id>.connectors`          | connector events for this user                            |
+| `collab.document`                     | BEAM collab projection replacements after document open   |
 
 ## Projections (daemon → surface)
 
@@ -139,10 +175,14 @@ daemon recomputes:
 | Name                            | Shape (see below)             |
 | ------------------------------- | ----------------------------- |
 | `topbar`                        | `TopbarProjection`            |
+| `access_session.current`        | `AccessSessionProjection`     |
+| `device.registry`               | `DeviceRegistryProjection`    |
+| `peer.trust`                    | `PeerTrustProjection`         |
 | `git_ema.user_connectors`       | `UserConnectorsProjection`    |
 | `git_ema.user_attachments`      | `UserAttachmentsProjection`   |
 | `git_ema.project_attachments`   | `ProjectAttachmentsProjection`|
 | `blueprint.sections`            | `BlueprintSectionsProjection` |
+| `collab.document`               | `CollabDocumentProjection`    |
 | `see_agent_work.project_pulse`  | `SeeAgentWorkProjection`      |
 
 ```
@@ -154,7 +194,68 @@ TopbarProjection {
   current_space?:   { id: space:<ulid>, org_id: org:<ulid>, name: string }
   projects:         [ { id: project:<ulid>, space_id: space:<ulid>, name: string } ]
   current_project?: { id: project:<ulid>, space_id: space:<ulid>, name: string }
-  node_state:       "home" | "replica_current" | "replica_provisional" | "replica_stale"
+  memberships:      [ { user_id: user:<ulid>, role: string, status: string } ]
+  node_state:       "home_current" | "replica_current" | "replica_provisional" | "replica_stale"
+}
+
+AccessSessionProjection {
+  challenges: [
+    {
+      challenge_id: access_challenge:<ulid>
+      org_id: org:<ulid>
+      access_point: string
+      user_code: string
+      scopes: string[]
+      status: "open" | "approved" | "expired" | "revoked"
+      expires_at: ISO-8601 UTC
+    }
+  ]
+  sessions: [
+    {
+      session_id: access_session:<ulid>
+      challenge_id: access_challenge:<ulid>
+      org_id: org:<ulid>
+      user_id: user:<ulid>
+      approved_by_device: device:<ulid>
+      scopes: string[]
+      status: "active" | "revoked" | "expired"
+      expires_at: ISO-8601 UTC
+    }
+  ]
+}
+
+DeviceRegistryProjection {
+  devices: [
+    {
+      device_id: device:<ulid>
+      org_id: org:<ulid>
+      user_id: user:<ulid>
+      name: string
+      pubkey: string
+      bootstrap: "genesis" | "paired"
+      status: "trusted" | "revoked"
+      updated_at: ISO-8601 UTC
+    }
+  ]
+  machine_peer_ready: false
+  transport: "disabled"
+}
+
+PeerTrustProjection {
+  peers: [
+    {
+      org_id: org:<ulid>
+      peer_device: device:<ulid>
+      peer_pubkey: string
+      local_pubkey: string
+      ceremony_kind: "qr_ble_hybrid" | "recovery_packet" | "genesis"
+      ceremony_id: string
+      status: "trusted" | "revoked"
+      established_at: ISO-8601 UTC
+    }
+  ]
+  replication_enabled: false
+  transport: "disabled"
 }
 
 UserConnectorsProjection {
@@ -176,6 +277,31 @@ BlueprintSectionsProjection {
       id: blueprint_doc:<ulid>
       title: string
       sections: Section[]          // Section has id, title, children[], attachments[]
+    }
+  ]
+}
+
+CollabDocumentTarget =
+  | { kind: "blueprint_section", id: blueprint_sec:<ulid> }
+
+CollabDocumentProjection {
+  target:       CollabDocumentTarget
+  title?:       string
+  text:         string
+  revision:     int
+  status:       "opening" | "live" | "saving" | "offline"
+  authority:    "beam"
+  updated_at?:  ISO-8601 UTC
+  presence: [
+    {
+      session_id: access_session:<ulid>
+      user_id?: user:<ulid>
+      display_name?: string
+      color?: string
+      cursor?: int
+      selection_start?: int
+      selection_end?: int
+      last_seen_at: ISO-8601 UTC
     }
   ]
 }

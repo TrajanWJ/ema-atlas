@@ -42,6 +42,14 @@ pub type Msg {
 
   EventTrailProjection(reply: Subject(String))
 
+  AccessSessionProjection(reply: Subject(String))
+
+  DeviceProjection(reply: Subject(String))
+
+  PeerTrustProjection(reply: Subject(String))
+
+  PeerIsTrusted(org_id: String, peer_device: String, reply: Subject(Bool))
+
   EventExists(kind: String, org_id: String, reply: Subject(Bool))
 }
 
@@ -135,6 +143,94 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
           name TEXT NOT NULL,
           created_at TEXT NOT NULL,
           created_by TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS memberships (
+          org_id TEXT NOT NULL,
+          user_id TEXT NOT NULL,
+          role TEXT NOT NULL,
+          status TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          updated_by TEXT NOT NULL,
+          PRIMARY KEY (org_id, user_id, role)
+        );
+        CREATE TABLE IF NOT EXISTS users (
+          id TEXT PRIMARY KEY,
+          display_name TEXT NOT NULL,
+          email TEXT NOT NULL,
+          email_verified TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS google_identities (
+          google_sub TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          email TEXT NOT NULL,
+          email_verified TEXT NOT NULL,
+          linked_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS authenticator_enrollments (
+          user_id TEXT PRIMARY KEY,
+          method TEXT NOT NULL,
+          secret_ref TEXT NOT NULL,
+          status TEXT NOT NULL,
+          verified_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS devices (
+          id TEXT PRIMARY KEY,
+          org_id TEXT NOT NULL,
+          user_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          pubkey TEXT NOT NULL,
+          bootstrap TEXT NOT NULL,
+          status TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          updated_by TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS peer_trust (
+          org_id TEXT NOT NULL,
+          peer_device TEXT NOT NULL,
+          peer_pubkey TEXT NOT NULL,
+          local_pubkey TEXT NOT NULL,
+          ceremony_kind TEXT NOT NULL,
+          ceremony_id TEXT NOT NULL,
+          lineage_proof TEXT NOT NULL,
+          status TEXT NOT NULL,
+          established_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          updated_by TEXT NOT NULL,
+          PRIMARY KEY (org_id, peer_device)
+        );
+        CREATE TABLE IF NOT EXISTS invites (
+          id TEXT PRIMARY KEY,
+          org_id TEXT NOT NULL,
+          target_kind TEXT NOT NULL,
+          target_value TEXT NOT NULL,
+          role TEXT NOT NULL,
+          status TEXT NOT NULL,
+          expires_at TEXT,
+          updated_at TEXT NOT NULL,
+          updated_by TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS access_session_challenges (
+          id TEXT PRIMARY KEY,
+          org_id TEXT NOT NULL,
+          access_point TEXT NOT NULL,
+          user_code TEXT NOT NULL,
+          scopes_json TEXT NOT NULL,
+          status TEXT NOT NULL,
+          expires_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS access_sessions (
+          id TEXT PRIMARY KEY,
+          challenge_id TEXT NOT NULL,
+          org_id TEXT NOT NULL,
+          user_id TEXT NOT NULL,
+          approved_by_device TEXT NOT NULL,
+          scopes_json TEXT NOT NULL,
+          token_hash_ref TEXT NOT NULL,
+          status TEXT NOT NULL,
+          expires_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
         );"
       case sqlite_ffi.exec(db, ddl) {
         Ok(Nil) -> Ok(db)
@@ -191,6 +287,29 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
 
     EventTrailProjection(reply) -> {
       process.send(reply, sqlite_ffi.event_trail_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    AccessSessionProjection(reply) -> {
+      process.send(reply, sqlite_ffi.access_session_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    DeviceProjection(reply) -> {
+      process.send(reply, sqlite_ffi.device_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    PeerTrustProjection(reply) -> {
+      process.send(reply, sqlite_ffi.peer_trust_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    PeerIsTrusted(org_id, peer_device, reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.peer_is_trusted(state.db, org_id, peer_device),
+      )
       actor.continue(state)
     }
 
@@ -277,6 +396,106 @@ fn persist_compact_object(
   env: Envelope,
 ) -> Result(Nil, AppendError) {
   case env.kind {
+    "identity.user_upserted" ->
+      case
+        sqlite_ffi.persist_identity_user_upserted(db, env.payload_json, env.ts)
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "identity.google_linked" ->
+      case
+        sqlite_ffi.persist_identity_google_linked(db, env.payload_json, env.ts)
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "identity.authenticator_enabled" ->
+      case
+        sqlite_ffi.persist_identity_authenticator_enabled(
+          db,
+          env.payload_json,
+          env.ts,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "device.registered" ->
+      case
+        sqlite_ffi.persist_device_registered(
+          db,
+          env.org_id,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "device.renamed" ->
+      case
+        sqlite_ffi.persist_device_renamed(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "device.revoked" ->
+      case
+        sqlite_ffi.persist_device_revoked(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "device.key_rotated" ->
+      case
+        sqlite_ffi.persist_device_key_rotated(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "peer.trust_established" ->
+      case
+        sqlite_ffi.persist_peer_trust_established(
+          db,
+          env.org_id,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "peer.trust_revoked" ->
+      case
+        sqlite_ffi.persist_peer_trust_revoked(
+          db,
+          env.org_id,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
     "org.created" ->
       case
         sqlite_ffi.persist_org_created(
@@ -314,6 +533,139 @@ fn persist_compact_object(
           env.payload_json,
           env.ts,
           env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "membership.role_granted" ->
+      case
+        sqlite_ffi.persist_membership_role_granted(
+          db,
+          env.org_id,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "membership.role_revoked" ->
+      case
+        sqlite_ffi.persist_membership_role_revoked(
+          db,
+          env.org_id,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "membership.removed" ->
+      case
+        sqlite_ffi.persist_membership_removed(
+          db,
+          env.org_id,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "invite.created" ->
+      case
+        sqlite_ffi.persist_invite_created(
+          db,
+          env.org_id,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "invite.accepted" ->
+      case
+        sqlite_ffi.persist_invite_status(
+          db,
+          env.payload_json,
+          "accepted",
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "invite.revoked" ->
+      case
+        sqlite_ffi.persist_invite_status(
+          db,
+          env.payload_json,
+          "revoked",
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "invite.expired" ->
+      case
+        sqlite_ffi.persist_invite_status(
+          db,
+          env.payload_json,
+          "expired",
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "access_session.challenge_created" ->
+      case
+        sqlite_ffi.persist_access_session_challenge_created(
+          db,
+          env.payload_json,
+          env.ts,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "access_session.approved" ->
+      case
+        sqlite_ffi.persist_access_session_approved(db, env.payload_json, env.ts)
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "access_session.revoked" ->
+      case
+        sqlite_ffi.persist_access_session_status(
+          db,
+          env.payload_json,
+          "revoked",
+          env.ts,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "access_session.expired" ->
+      case
+        sqlite_ffi.persist_access_session_status(
+          db,
+          env.payload_json,
+          "expired",
+          env.ts,
         )
       {
         Ok(Nil) -> Ok(Nil)
@@ -394,6 +746,28 @@ pub fn topbar_projection_json(bus: Subject(Msg)) -> String {
 
 pub fn event_trail_projection_json(bus: Subject(Msg)) -> String {
   process.call(bus, 5000, fn(reply) { EventTrailProjection(reply) })
+}
+
+pub fn access_session_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { AccessSessionProjection(reply) })
+}
+
+pub fn device_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { DeviceProjection(reply) })
+}
+
+pub fn peer_trust_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { PeerTrustProjection(reply) })
+}
+
+pub fn peer_is_trusted(
+  bus: Subject(Msg),
+  org_id: String,
+  peer_device: String,
+) -> Bool {
+  process.call(bus, 5000, fn(reply) {
+    PeerIsTrusted(org_id, peer_device, reply)
+  })
 }
 
 pub fn event_exists(bus: Subject(Msg), kind: String, org_id: String) -> Bool {

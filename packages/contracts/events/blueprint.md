@@ -2,8 +2,8 @@
 
 Owner: `ema_blueprint`.
 
-Structural events only — prose lives in Yjs and does not emit canonical
-events except at promotion boundaries.
+Structural events only — prose lives in the BEAM-owned collab document room
+and emits canonical events only at checkpoint or promotion boundaries.
 
 See `docs/architecture/06-blueprint-boundaries.md`.
 

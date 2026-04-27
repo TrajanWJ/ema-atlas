@@ -32,6 +32,7 @@ events/
 types/
   ids.md                 ULID + typed prefix + registry key conventions
   attachment.md          attachment record schema
+  collab.md              BEAM live document projection/frame schema
   connector.md           connector record schema
 ipc/
   shell-protocol.md      daemon↔surface websocket protocol
@@ -69,8 +70,8 @@ actor =
 ```
 Where `<component>` is one of the enumerated daemon sub-systems:
 `ema_orgs`, `ema_spaces`, `ema_projects`, `ema_memberships`,
-`ema_invites`, `ema_identity`, `ema_blueprint`, `ema_attachments`,
-`ema_replication`, `ema_control`, `ema_exec`.
+`ema_invites`, `ema_identity`, `ema_blueprint`, `ema_collab`,
+`ema_attachments`, `ema_replication`, `ema_control`, `ema_exec`.
 
 New components require a PR to this list. Typos in `<component>` are
 caught by `contract-check.sh`.
@@ -91,6 +92,9 @@ caught by `contract-check.sh`.
 - Queries (no side-effect) use an imperative verb with a clear read
   connotation (`connector.list_picker_items`) and return data inline on
   `command_result` rather than appending events.
+- Live collaboration commands use the same imperative form:
+  `collab.document.open` opens/subscribes to a BEAM-owned room, and
+  `collab.document.replace` writes a whole-body replacement frame.
 
 ### Error classes
 See `ipc/shell-protocol.md` (**Error classes** section). That table is

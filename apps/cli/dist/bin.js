@@ -54,6 +54,13 @@ var COMMANDS = [
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
   { name: "swarm list", summary: "List swarms for a project. (wave 1: stubbed)" },
   { name: "swarm show", summary: "Show a single swarm. (wave 1: stubbed)" },
+  { name: "vcalendar show", summary: "Show an actor's calendar (filtered from the recent event_trail)." },
+  { name: "vcalendar week", summary: "Show this week's vcalendar events (filtered from the recent event_trail)." },
+  { name: "vcalendar block add", summary: "Append a calendar_block for an actor (kind + label, optional start/end)." },
+  { name: "vcalendar block move", summary: "Move a calendar_block to a new start (optional end)." },
+  { name: "vcalendar phase set", summary: "Set the current weekly phase label for an actor." },
+  { name: "checkup schedule", summary: "Schedule a cadence-based checkup on a lane." },
+  { name: "checkup complete", summary: "Mark a checkup complete with a result." },
   { name: "help", summary: "Show this help." }
 ];
 var GLOBAL_FLAGS = [
@@ -554,6 +561,288 @@ async function runProject(args) {
   }
 }
 
+// src/commands/vcalendar.ts
+var DEFAULT_ORG = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR = "actor:dev-console";
+async function runVcalendar(args) {
+  const sub = args.positional[0];
+  switch (sub) {
+    case "show":
+      return runShow(args);
+    case "week":
+      return runWeek(args);
+    case "block":
+      return runBlock(args);
+    case "phase":
+      return runPhase(args);
+    default:
+      emitError(
+        `ema vcalendar: unknown subcommand "${sub ?? ""}" (expected: show | week | block | phase)`
+      );
+      emitError(`See docs/cli/see-agent-work.md \xA7vCalendar for grammar.`);
+      return 64;
+  }
+}
+async function runBlock(args) {
+  const verb = args.positional[1];
+  const json = flagBool(args, "json");
+  const org = flagString(args, "org") ?? DEFAULT_ORG;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
+  if (verb === "add") {
+    const kind = flagString(args, "kind");
+    const label = flagString(args, "label");
+    const startAt = flagString(args, "start-at") ?? flagString(args, "start");
+    const endAt = flagString(args, "end-at") ?? flagString(args, "end");
+    if (!kind || !label) {
+      emitError(`ema vcalendar block add: --kind and --label are required`);
+      emitError(
+        `Usage: ema vcalendar block add --actor actor:<id> --kind focus --label "..."`
+      );
+      return 64;
+    }
+    return await send("vcalendar.block.add", {
+      org_id: org,
+      actor_id: actor,
+      block_kind: kind,
+      label,
+      start_at: startAt ?? null,
+      end_at: endAt ?? null
+    }, {
+      json,
+      human: `added ${kind} block "${label}" for ${actor}`,
+      resourceLabel: "block"
+    });
+  }
+  if (verb === "move") {
+    const blockId = flagString(args, "block");
+    const startAt = flagString(args, "start-at") ?? flagString(args, "start");
+    const endAt = flagString(args, "end-at") ?? flagString(args, "end");
+    if (!blockId || !startAt) {
+      emitError(`ema vcalendar block move: --block and --start (or --start-at) are required`);
+      emitError(
+        `Usage: ema vcalendar block move --block calendar_block:<id> --start "2026-04-24T15:00:00-04:00"`
+      );
+      return 64;
+    }
+    return await send("vcalendar.block.move", {
+      org_id: org,
+      actor_id: actor,
+      block_id: blockId,
+      start_at: startAt,
+      end_at: endAt ?? null
+    }, { json, human: `moved ${blockId} \u2192 ${startAt}` });
+  }
+  emitError(
+    `ema vcalendar block: unknown verb "${verb ?? ""}" (expected: add | move)`
+  );
+  return 64;
+}
+async function runPhase(args) {
+  const verb = args.positional[1];
+  const json = flagBool(args, "json");
+  const org = flagString(args, "org") ?? DEFAULT_ORG;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
+  if (verb === "set") {
+    const label = flagString(args, "label");
+    if (!label) {
+      emitError(`ema vcalendar phase set: --label is required`);
+      emitError(
+        `Usage: ema vcalendar phase set --actor actor:<id> --label "Implementation Week"`
+      );
+      return 64;
+    }
+    return await send("vcalendar.phase.set", {
+      org_id: org,
+      actor_id: actor,
+      label
+    }, { json, human: `set phase "${label}" for ${actor}` });
+  }
+  emitError(
+    `ema vcalendar phase: unknown verb "${verb ?? ""}" (expected: set)`
+  );
+  return 64;
+}
+async function runShow(args) {
+  const json = flagBool(args, "json");
+  const actor = flagString(args, "actor");
+  return await runReadQuery(args, json, {
+    header: actor ? `vcalendar for ${actor}` : `vcalendar (all actors)`,
+    actor
+  });
+}
+async function runWeek(args) {
+  const json = flagBool(args, "json");
+  const project = flagString(args, "project");
+  return await runReadQuery(args, json, {
+    header: project ? `vcalendar week for project ${project}` : `vcalendar week`
+  });
+}
+async function runReadQuery(_args, json, opts) {
+  try {
+    const c = await connect({ surface: "desktop" });
+    const eventTrailRows = await new Promise((resolve) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          resolve([]);
+        }
+      }, 1200);
+      c.onMessage((msg) => {
+        if (msg.type === "projection" && msg.name === "event_trail") {
+          const data = msg.data;
+          if (!settled) {
+            settled = true;
+            clearTimeout(timer);
+            resolve(data.events ?? []);
+          }
+        }
+      });
+      c.subscribe("event_trail");
+    });
+    c.close();
+    const relevant = eventTrailRows.filter(
+      (row) => row.kind.startsWith("vcalendar.") || row.kind.startsWith("calendar_block.") || row.kind.startsWith("checkup.")
+    );
+    if (json) {
+      emitJson({
+        ok: true,
+        header: opts.header,
+        events: relevant,
+        note: "event_trail projection returns up to 8 recent events; a dedicated vcalendar projection is pending."
+      });
+    } else {
+      emitPretty(`# ${opts.header}`);
+      if (relevant.length === 0) {
+        emitPretty(`  (no vcalendar events in the last 8-event window)`);
+        emitPretty(
+          `  Tip: run \`ema events tail --family calendar_block\` or \`ema events tail --family checkup\` for a live stream.`
+        );
+      } else {
+        for (const row of relevant) {
+          emitPretty(`  ${row.ts}  ${row.kind.padEnd(24)}  ${row.label}`);
+        }
+        emitPretty(
+          `  (last-8 window from event_trail projection; richer vcalendar projection is pending)`
+        );
+      }
+    }
+    return 0;
+  } catch (err) {
+    return reportError(err, json);
+  }
+}
+async function send(op, argsObj, out) {
+  try {
+    const c = await connect({ surface: "desktop" });
+    const result = await c.command(op, argsObj);
+    c.close();
+    if (result.ok !== true) {
+      if (out.json) emitJson({ ok: false, error: result.error });
+      else emitError(`ema ${op}: ${result.error.class}: ${result.error.message}`);
+      return 1;
+    }
+    const events = result.events ?? [];
+    const resource = typeof result.resource === "string" ? result.resource : null;
+    if (out.json) {
+      emitJson({ ok: true, op, args: argsObj, events, resource });
+    } else {
+      emitPretty(out.human);
+      if (resource) emitPretty(`${out.resourceLabel ?? "created"}: ${resource}`);
+      emitPretty(`events: ${events.join(", ") || "(none returned)"}`);
+    }
+    return 0;
+  } catch (err) {
+    return reportError(err, out.json);
+  }
+}
+
+// src/commands/checkup.ts
+var DEFAULT_ORG2 = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR2 = "actor:dev-console";
+async function runCheckup(args) {
+  const sub = args.positional[0];
+  switch (sub) {
+    case "schedule":
+      return runSchedule(args);
+    case "complete":
+      return runComplete(args);
+    default:
+      emitError(
+        `ema checkup: unknown subcommand "${sub ?? ""}" (expected: schedule | complete)`
+      );
+      emitError(`See docs/cli/see-agent-work.md \xA7vCalendar for grammar.`);
+      return 64;
+  }
+}
+async function runSchedule(args) {
+  const json = flagBool(args, "json");
+  const org = flagString(args, "org") ?? DEFAULT_ORG2;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR2;
+  const lane = flagString(args, "lane");
+  const cadence = flagString(args, "cadence");
+  if (!lane || !cadence) {
+    emitError(`ema checkup schedule: --lane and --cadence are required`);
+    emitError(
+      `Usage: ema checkup schedule --lane lane:<id> --cadence daily`
+    );
+    return 64;
+  }
+  return await send2("checkup.schedule", {
+    org_id: org,
+    actor_id: actor,
+    lane_id: lane,
+    cadence
+  }, {
+    json,
+    human: `scheduled ${cadence} checkup on ${lane}`,
+    resourceLabel: "checkup"
+  });
+}
+async function runComplete(args) {
+  const json = flagBool(args, "json");
+  const org = flagString(args, "org") ?? DEFAULT_ORG2;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR2;
+  const checkupId = flagString(args, "checkup");
+  const result = flagString(args, "result");
+  if (!checkupId || !result) {
+    emitError(`ema checkup complete: --checkup and --result are required`);
+    emitError(
+      `Usage: ema checkup complete --checkup checkup:<id> --result "Ready for review"`
+    );
+    return 64;
+  }
+  return await send2("checkup.complete", {
+    org_id: org,
+    actor_id: actor,
+    checkup_id: checkupId,
+    result
+  }, { json, human: `completed ${checkupId}: ${result}` });
+}
+async function send2(op, argsObj, out) {
+  try {
+    const c = await connect({ surface: "desktop" });
+    const res = await c.command(op, argsObj);
+    c.close();
+    if (res.ok !== true) {
+      if (out.json) emitJson({ ok: false, error: res.error });
+      else emitError(`ema ${op}: ${res.error.class}: ${res.error.message}`);
+      return 1;
+    }
+    const events = res.events ?? [];
+    const resource = typeof res.resource === "string" ? res.resource : null;
+    if (out.json) emitJson({ ok: true, op, args: argsObj, events, resource });
+    else {
+      emitPretty(out.human);
+      if (resource) emitPretty(`${out.resourceLabel ?? "created"}: ${resource}`);
+      emitPretty(`events: ${events.join(", ") || "(none returned)"}`);
+    }
+    return 0;
+  } catch (err) {
+    return reportError(err, out.json);
+  }
+}
+
 // src/bin.ts
 async function main() {
   const [, , cmd, ...rest] = process.argv;
@@ -576,6 +865,10 @@ async function main() {
       return runProject(args);
     case "swarm":
       return runSwarm(args);
+    case "vcalendar":
+      return runVcalendar(args);
+    case "checkup":
+      return runCheckup(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

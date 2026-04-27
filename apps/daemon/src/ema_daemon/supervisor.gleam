@@ -13,6 +13,7 @@
 //// record. A real `gleam/otp/static_supervisor` wrapper lands in M2
 //// once there are more children to manage.
 
+import ema_collab/ema_collab
 import ema_daemon/bus
 import ema_daemon/ema_env
 import ema_daemon/registry
@@ -24,7 +25,11 @@ import gleam/otp/actor
 import gleam/result
 
 pub type StartedTree {
-  StartedTree(bus: Subject(bus.Msg), registry: Subject(registry.Msg))
+  StartedTree(
+    bus: Subject(bus.Msg),
+    collab: Subject(ema_collab.Msg),
+    registry: Subject(registry.Msg),
+  )
 }
 
 pub type SupervisorError {
@@ -48,15 +53,34 @@ pub fn start() -> Result(StartedTree, SupervisorError) {
         Error(first_boot.AppendFailed(reason)) ->
           Error(ChildFailedToStart("first_boot", reason))
         Ok(_) ->
-          case registry.start() {
+          case ema_collab.start(db_path) {
             Error(e) ->
-              Error(ChildFailedToStart("registry", describe_start_error(e)))
-            Ok(registry_started) -> {
-              let registry_subject = registry_started.data
-              case ema_shell_ipc.start(bus_subject, bind_addr, port) {
-                Error(reason) -> Error(ChildFailedToStart("shell_ipc", reason))
-                Ok(_ipc) ->
-                  Ok(StartedTree(bus: bus_subject, registry: registry_subject))
+              Error(ChildFailedToStart("collab", describe_start_error(e)))
+            Ok(collab_started) -> {
+              let collab_subject = collab_started.data
+              case registry.start() {
+                Error(e) ->
+                  Error(ChildFailedToStart("registry", describe_start_error(e)))
+                Ok(registry_started) -> {
+                  let registry_subject = registry_started.data
+                  case
+                    ema_shell_ipc.start(
+                      bus_subject,
+                      collab_subject,
+                      bind_addr,
+                      port,
+                    )
+                  {
+                    Error(reason) ->
+                      Error(ChildFailedToStart("shell_ipc", reason))
+                    Ok(_ipc) ->
+                      Ok(StartedTree(
+                        bus: bus_subject,
+                        collab: collab_subject,
+                        registry: registry_subject,
+                      ))
+                  }
+                }
               }
             }
           }
@@ -74,5 +98,5 @@ fn describe_start_error(e: actor.StartError) -> String {
 }
 
 pub fn children() -> List(String) {
-  ["bus", "registry", "shell_ipc"]
+  ["bus", "collab", "registry", "shell_ipc"]
 }

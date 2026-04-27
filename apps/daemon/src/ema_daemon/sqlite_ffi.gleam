@@ -155,12 +155,269 @@ pub fn persist_project_created(
   }
 }
 
+pub fn persist_membership_role_granted(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_membership_role_granted_raw(
+      db,
+      org_id,
+      payload_json,
+      updated_at,
+      actor,
+    )
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_identity_user_upserted(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Nil, Error) {
+  case persist_identity_user_upserted_raw(db, payload_json, updated_at) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_identity_google_linked(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Nil, Error) {
+  case persist_identity_google_linked_raw(db, payload_json, updated_at) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_identity_authenticator_enabled(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Nil, Error) {
+  case
+    persist_identity_authenticator_enabled_raw(db, payload_json, updated_at)
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_device_registered(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_device_registered_raw(db, org_id, payload_json, updated_at, actor)
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_device_renamed(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_device_renamed_raw(db, payload_json, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_device_revoked(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_device_revoked_raw(db, payload_json, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_device_key_rotated(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_device_key_rotated_raw(db, payload_json, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_peer_trust_established(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_peer_trust_established_raw(
+      db,
+      org_id,
+      payload_json,
+      updated_at,
+      actor,
+    )
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_peer_trust_revoked(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_peer_trust_revoked_raw(db, org_id, payload_json, updated_at, actor)
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_membership_role_revoked(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_membership_role_revoked_raw(
+      db,
+      org_id,
+      payload_json,
+      updated_at,
+      actor,
+    )
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_membership_removed(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_membership_removed_raw(db, org_id, payload_json, updated_at, actor)
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_invite_created(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_invite_created_raw(db, org_id, payload_json, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_invite_status(
+  db: Db,
+  payload_json: String,
+  status: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_invite_status_raw(db, payload_json, status, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_access_session_challenge_created(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Nil, Error) {
+  case
+    persist_access_session_challenge_created_raw(db, payload_json, updated_at)
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_access_session_approved(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Nil, Error) {
+  case persist_access_session_approved_raw(db, payload_json, updated_at) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_access_session_status(
+  db: Db,
+  payload_json: String,
+  status: String,
+  updated_at: String,
+) -> Result(Nil, Error) {
+  case persist_access_session_status_raw(db, payload_json, status, updated_at) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
 pub fn topbar_projection_json(db: Db) -> String {
   topbar_projection_json_raw(db)
 }
 
 pub fn event_trail_projection_json(db: Db) -> String {
   event_trail_projection_json_raw(db)
+}
+
+pub fn access_session_projection_json(db: Db) -> String {
+  access_session_projection_json_raw(db)
+}
+
+pub fn device_projection_json(db: Db) -> String {
+  device_projection_json_raw(db)
+}
+
+pub fn peer_trust_projection_json(db: Db) -> String {
+  peer_trust_projection_json_raw(db)
+}
+
+pub fn peer_is_trusted(db: Db, org_id: String, peer_device: String) -> Bool {
+  peer_is_trusted_raw(db, org_id, peer_device)
 }
 
 pub fn event_exists(db: Db, kind: String, org_id: String) -> Bool {
@@ -224,11 +481,162 @@ fn persist_project_created_raw(
   actor: String,
 ) -> Result(Dynamic, Dynamic)
 
+@external(erlang, "ema_sqlite_helpers", "persist_identity_user_upserted")
+fn persist_identity_user_upserted_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_identity_google_linked")
+fn persist_identity_google_linked_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_identity_authenticator_enabled")
+fn persist_identity_authenticator_enabled_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_device_registered")
+fn persist_device_registered_raw(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_device_renamed")
+fn persist_device_renamed_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_device_revoked")
+fn persist_device_revoked_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_device_key_rotated")
+fn persist_device_key_rotated_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_peer_trust_established")
+fn persist_peer_trust_established_raw(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_peer_trust_revoked")
+fn persist_peer_trust_revoked_raw(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_membership_role_granted")
+fn persist_membership_role_granted_raw(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_membership_role_revoked")
+fn persist_membership_role_revoked_raw(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_membership_removed")
+fn persist_membership_removed_raw(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_invite_created")
+fn persist_invite_created_raw(
+  db: Db,
+  org_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_invite_status")
+fn persist_invite_status_raw(
+  db: Db,
+  payload_json: String,
+  status: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_access_session_challenge_created")
+fn persist_access_session_challenge_created_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_access_session_approved")
+fn persist_access_session_approved_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_access_session_status")
+fn persist_access_session_status_raw(
+  db: Db,
+  payload_json: String,
+  status: String,
+  updated_at: String,
+) -> Result(Dynamic, Dynamic)
+
 @external(erlang, "ema_sqlite_helpers", "topbar_projection_json")
 fn topbar_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "event_trail_projection_json")
 fn event_trail_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "access_session_projection_json")
+fn access_session_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "device_projection_json")
+fn device_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "peer_trust_projection_json")
+fn peer_trust_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "peer_is_trusted")
+fn peer_is_trusted_raw(db: Db, org_id: String, peer_device: String) -> Bool
 
 @external(erlang, "ema_sqlite_helpers", "event_exists")
 fn event_exists_raw(db: Db, kind: String, org_id: String) -> Bool

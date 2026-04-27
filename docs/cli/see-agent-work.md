@@ -102,6 +102,12 @@ Handoffs are explicit transfer contracts, not chat paragraphs.
 
 ## vCalendar Commands
 
+> **Implemented 2026-04-24.** The write path is real: each command appends a
+> canonical event through the daemon bus (`calendar_block.added`,
+> `calendar_block.moved`, `vcalendar.phase_set`, `checkup.scheduled`,
+> `checkup.completed`). Reads use the `event_trail` last-8 projection with
+> client-side filtering until a dedicated vcalendar projection actor lands.
+
 ```text
 ema vcalendar show --actor actor:<id>
 ema vcalendar week --project "EMA 0.0.5"
@@ -112,8 +118,23 @@ ema checkup schedule --lane lane:<id> --cadence daily
 ema checkup complete --checkup checkup:<id> --result "Ready for review"
 ```
 
+Defaults when flags are omitted: `--org` falls back to
+`org:01J00000000000000000000001` (the first-boot Founding-Fathers-EMA seed);
+`--actor` falls back to `actor:dev-console`. Pass `--json` for a structured
+response. Creates (`block add`, `checkup schedule`) return the generated
+resource id on the `resource` field so the next `move` / `complete` call can
+use it directly.
+
 The vCalendar supports real time and self-paced agent time. Agent weeks and
 weekly phases are product concepts even before scheduling automation is real.
+
+For live event tailing of calendar state:
+
+```text
+ema events tail --family calendar_block
+ema events tail --family checkup
+ema events tail --family vcalendar
+```
 
 ## Agent Work Commands
 

@@ -17,9 +17,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.tsbuildinfo
 
 # Web build output
 dist/
+.next/
+**/.next/
+out/
+**/out/
 coverage/
 .vite/
 

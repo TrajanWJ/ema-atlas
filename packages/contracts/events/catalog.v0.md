@@ -18,6 +18,12 @@ or surface code must appear in this list.
 - `actor.created`
 - `actor.assigned_to_project`
 
+## identity
+
+- `identity.user_upserted`
+- `identity.google_linked`
+- `identity.authenticator_enabled`
+
 ## space
 
 - `space.created`
@@ -46,6 +52,13 @@ or surface code must appear in this list.
 - `invite.accepted`
 - `invite.revoked`
 - `invite.expired`
+
+## access_session
+
+- `access_session.challenge_created`
+- `access_session.approved`
+- `access_session.revoked`
+- `access_session.expired`
 
 ## device
 
@@ -137,6 +150,10 @@ or surface code must appear in this list.
 - `blueprint.attachment.linked`
 - `blueprint.attachment.unlinked`
 
+## collab
+
+- `collab.document.checkpointed`
+
 ## attachment
 
 - `attachment.created`
@@ -150,3 +167,15 @@ or surface code must appear in this list.
 - `connector.connected`
 - `connector.disconnected`
 - `connector.linked_resource_imported`
+
+## vcalendar
+
+- `vcalendar.created`
+- `vcalendar.phase_set`
+- `calendar_block.added`
+- `calendar_block.moved`
+
+## checkup
+
+- `checkup.scheduled`
+- `checkup.completed`

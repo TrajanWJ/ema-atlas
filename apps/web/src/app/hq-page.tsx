@@ -1,5 +1,5 @@
 // RIP: codebase-frontend-layer read-only observer posture
-//      (adopt — HQ never writes canon; mocks carry visible tags)
+//      (adopt — HQ never writes canon; staged controls carry visible tags)
 import {
   MOCK_PROJECTION_LABEL,
   agentWorkLaneSummary,
@@ -7,8 +7,9 @@ import {
   hqProjection,
   surfaceLinks,
 } from "./mock-projections";
-import { Link } from "react-router-dom";
 import { useProjection } from "../lib/ipc";
+import { useHqPulse } from "../place-reflection";
+import { useShell } from "../shell/virtual-desktop-shell";
 
 type EventTrailProjection = {
   events: Array<{ id: string; kind: string; label: string; ts: string }>;
@@ -23,6 +24,17 @@ export function HqPage() {
       action: event.label,
     })) ?? eventTrail;
   const trailIsReal = realEventTrail != null;
+
+  // `hq.pulse` is pending a daemon writer — the Surface→Runtime
+  // handoff doc names this projection and its channel. Until it
+  // ships, `useHqPulse()` returns `{ data: null, offline: true }`
+  // and the page falls back to the staged `hqProjection` mock with a
+  // visible `staged projection` badge.
+  const hqPulse = useHqPulse();
+  const pulse = hqPulse.data?.pulse ?? hqProjection.pulse;
+  const controls = hqPulse.data?.controls ?? hqProjection.controls;
+
+  const { openSurface } = useShell();
 
   return (
     <section className="ema-hq">
@@ -40,14 +52,14 @@ export function HqPage() {
           <span className="ema-pill ema-pill--hot">{MOCK_PROJECTION_LABEL}</span>
           <strong>Projection mode is visible by design.</strong>
           <p>
-            Controls below are mocked affordances. Canonical changes still
+            Controls below are staged affordances. Canonical changes still
             require daemon-owned commands and review.
           </p>
         </aside>
       </header>
 
       <section className="ema-pulse-grid" aria-label="HQ pulse">
-        {hqProjection.pulse.map((item) => (
+        {pulse.map((item) => (
           <article key={item.label} className="ema-pulse-card">
             <span>{item.label}</span>
             <strong>{item.value}</strong>
@@ -67,16 +79,17 @@ export function HqPage() {
           </div>
           <div className="ema-surface-board">
             {surfaceLinks.map((surface) => (
-              <Link
+              <button
                 key={surface.id}
-                to={surface.path}
+                type="button"
+                onClick={() => openSurface(surface.id)}
                 className="ema-surface-card"
                 data-status={surface.status}
               >
                 <span>{surface.eyebrow}</span>
                 <strong>{surface.label}</strong>
                 <small>{surface.status}</small>
-              </Link>
+              </button>
             ))}
           </div>
         </section>
@@ -84,12 +97,12 @@ export function HqPage() {
         <section className="ema-panel">
           <div className="ema-panel__heading">
             <div>
-              <p className="ema-kicker">mocked controls</p>
+              <p className="ema-kicker">queued controls</p>
               <h2>Operator console</h2>
             </div>
           </div>
           <div className="ema-control-stack">
-            {hqProjection.controls.map((control) => (
+            {controls.map((control) => (
               <button key={control.label} className="ema-control-button">
                 <span>{control.label}</span>
                 <strong>{control.state}</strong>
@@ -123,9 +136,13 @@ export function HqPage() {
               <p className="ema-kicker">see agent work</p>
               <h2>Lane status</h2>
             </div>
-            <Link to="/agent-work" className="ema-text-link">
+            <button
+              type="button"
+              onClick={() => openSurface("agent-work")}
+              className="ema-text-link"
+            >
               open lane
-            </Link>
+            </button>
           </div>
           <div className="ema-lane-list">
             {agentWorkLaneSummary.map((lane) => (

@@ -20,9 +20,10 @@ script under `tooling/` enforces this.
 
 ## Families (v0)
 
-`org`, `space`, `project`, `membership`, `invite`, `device`, `peer`,
-`lease`, `replication`, `lane`, `handoff`, `proposal`, `incident`,
-`dispatch`, `execution`, `tool`, `blueprint`, `attachment`, `connector`.
+`org`, `actor`, `identity`, `space`, `project`, `membership`, `invite`,
+`access_session`, `device`, `peer`, `lease`, `replication`, `lane`,
+`handoff`, `proposal`, `incident`, `dispatch`, `execution`, `tool`,
+`blueprint`, `collab`, `attachment`, `connector`.
 
 See `catalog.v0.md` for the full kind list; each family has its own
 file with kinds, payload shapes, and intended consumers.

@@ -255,8 +255,8 @@ Scope:
 
 - `tooling/` CI: on PR, run `gleam test`, `gleam build`, `pnpm
   -r typecheck`, `pnpm check:contracts`.
-- Fill out placeholder `Placeholder` types in stub bounded-contexts so
-  they compile clean and clearly show "not yet used."
+- Fill out remaining placeholder `Placeholder` types in stub bounded-contexts
+  so they compile clean and clearly show "not yet used."
 - Design-system tokens applied across shell + vApps.
 - Empty-state copy across shell, git-ema, blueprint.
 - Error classes: every failing command returns a typed `error.class`
@@ -308,7 +308,7 @@ These belong to 0.0.6 or later. Do not let scope creep sneak them in.
 
 - Real OAuth (Google Drive, GitHub).
 - Real file byte transfer or local blob storage.
-- Yjs / Hocuspocus for prose editing in Blueprint.
+- Multi-machine BEAM collab replication for Blueprint prose.
 - Device pairing ceremony (QR + BLE).
 - Recovery packet generation.
 - Replication transport between daemons.

@@ -1,27 +1,31 @@
-import { useProjection } from "../lib/ipc";
-
-export type WallpaperProjection = {
-  project_id: string;
-  wallpaper_key: string;
-};
+import { useWallpaper } from "../place-reflection/projections/use-wallpaper";
+import { DotsBg } from "../place-reflection/components/desktop/DotsBg";
+import { ParticlesBg } from "../place-reflection/components/desktop/ParticlesBg";
 
 /**
  * Wallpaper layer — per-project scene.
  *
- * In wave 1 the scene is chosen from a small fixed palette keyed by
- * `wallpaper_key`. The projection name `desktop.wallpaper` is reserved
- * for the daemon to deliver the real key when the workspace-plane
- * artifact is wired.
+ * Subscribes via `useWallpaper(projectId)` (place-reflection projection
+ * hook, Wave 6). Falls back to a stable per-project scene key when the
+ * daemon writer hasn't shipped.
+ *
+ * Mounts donor chrome behind the scene:
+ *   - DotsBg (subtle connected particle field) — always on.
+ *   - ParticlesBg (upward-drifting embers) — on for ember/dusk scenes.
+ *
+ * RIP: place.org ambient breathing (`--ema-wallpaper-breath-rate`) +
+ *      place.org `DotsBg.tsx` + `ParticlesBg.tsx` as pure chrome.
  */
 export function Wallpaper({ projectId }: { projectId: string }) {
-  const wallpaper = useProjection<WallpaperProjection>("desktop.wallpaper");
-  const key = wallpaper?.wallpaper_key ?? defaultSceneKey(projectId);
-  return <div className="ema-wallpaper" data-scene={key} aria-hidden="true" />;
-}
+  const { key } = useWallpaper(projectId);
+  const showParticles = key === "scene-ember" || key === "scene-dusk";
 
-function defaultSceneKey(projectId: string): string {
-  // Stable per-project default until the daemon delivers a real wallpaper.
-  const hash = Array.from(projectId).reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const scenes = ["scene-forest", "scene-ember", "scene-dusk", "scene-slate"];
-  return scenes[hash % scenes.length];
+  return (
+    <div className="ema-wallpaper" data-scene={key} aria-hidden="true">
+      <div className="ema-wallpaper__breath" />
+      <div className="ema-wallpaper__grain" />
+      <DotsBg speed={0.6} interactive opacity={0.55} />
+      {showParticles ? <ParticlesBg /> : null}
+    </div>
+  );
 }

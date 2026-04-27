@@ -94,6 +94,12 @@ Three distinct concerns, frequently conflated:
   pubkey is the cryptographic one.
 - First-boot ceremony emits `device.registered` with the pubkey; no
   further device auth is needed for local IPC.
+- Current daemon status: `device.registered` is compacted into the local
+  `devices` registry and exposed as `device.registry`; `device.register`
+  can write a paired-machine record; `device.local_register` generates a
+  real Ed25519 keypair and stores the private key in macOS Keychain before
+  registering the public key. The pairing challenge and transport streams
+  are still separate slices before friend-MacBook p2p testing is honest.
 - Pairing: QR+BLE hybrid inspired by WebAuthn hybrid transport (already
   the noted wave-open question in `WORKSPACE-ENTRYPOINT.md`). Ceremony
   emits `device.paired` on both sides; each device signs a lineage proof
@@ -101,8 +107,12 @@ Three distinct concerns, frequently conflated:
 
 ### User identity
 
-- **Primary: passkeys (WebAuthn / FIDO2).** Platform passkeys on macOS /
-  iOS / Windows give us per-user, per-device credentials with built-in
+- **Immediate browser base: Google Identity Services / OpenID Connect.**
+  Browser access uses a real Google authorization-code flow and verified ID
+  tokens to prove the human. Google Authenticator/TOTP may harden that browser
+  session, but neither Google OAuth nor TOTP creates an EMA machine peer.
+- **Local/native primary: passkeys (WebAuthn / FIDO2).** Platform passkeys on
+  macOS / iOS / Windows give us per-user, per-device credentials with built-in
   biometric gating. The daemon validates passkey assertions locally.
 - **Recovery: signed recovery packet.** Either BIP-39 seed words or
   Shamir-split words. Format is the wave-open question from
@@ -123,8 +133,13 @@ Three distinct concerns, frequently conflated:
 ### Peer pairing / trust
 
 - Two paired devices share an org-scoped trust root. Both sign a peering
-  event (`peer.trust_established`, new — to be added to `events/peer.md`
-  when replication wave starts). Until then, no peer auth exists.
+  event (`peer.trust_established`, registered in `events/peer.md` and the
+  daemon catalog). Current daemon status: `peer.trust_establish` writes this
+  trust root into the compact `peer_trust` registry and exposes
+  `peer.trust`; when given `device_id` instead of a supplied
+  `lineage_proof`, the daemon signs the lineage proof from that local device's
+  macOS Keychain private key. The ceremony still needs the QR exchange and
+  signature verification UI before it is a friendly two-Mac pairing flow.
 - Cross-org trust is deliberately not a thing in wave 1: each org is its
   own trust domain.
 

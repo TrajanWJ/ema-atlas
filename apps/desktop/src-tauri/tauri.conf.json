@@ -4,12 +4,13 @@
   "version": "0.0.5",
   "identifier": "org.ema.desktop",
   "build": {
-    "beforeDevCommand": "bash -lc 'lsof -nP -iTCP:5173 -sTCP:LISTEN >/dev/null 2>&1 || pnpm --filter @ema/web dev -- --host localhost --port 5173'",
+    "beforeDevCommand": "bash -lc 'lsof -nP -iTCP:5173 -sTCP:LISTEN >/dev/null 2>&1 || pnpm --filter @ema/web dev'",
     "beforeBuildCommand": "pnpm --filter @ema/web build",
     "devUrl": "http://localhost:5173",
-    "frontendDist": "../../web/dist"
+    "frontendDist": "../../web/out"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "EMA",
@@ -17,7 +18,11 @@
         "width": 1280,
         "height": 800,
         "minWidth": 960,
-        "minHeight": 600
+        "minHeight": 600,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "backgroundColor": "#00000000"
       }
     ],
     "security": {

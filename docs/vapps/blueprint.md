@@ -9,7 +9,7 @@ proposals.
 - `blueprint_document` (canonical)
 - `blueprint_section` (canonical — structural node)
 - `blueprint_comment` (canonical)
-- prose body per section (Yjs)
+- prose body per section (BEAM-owned live collaboration document)
 
 ## Exposed truths
 
@@ -20,16 +20,20 @@ proposals.
 ## Human actions (wave 1)
 
 - Open the blueprint page for the current project.
-- See a fake section tree (projection-populated, no editing yet).
-- Click **Attach…** on a section → attach dialog from git-ema opens.
+- Open a BEAM-owned live document room for the root Blueprint section.
+- Edit the shared prose body through the browser access point.
+- Publish a whole-body replacement frame to the daemon collab store and watch
+  other subscribed browser tabs receive the `collab.document` projection.
 
-Prose editing, real-time collab, comments, and promotion are later
-waves.
+Comments, promotion, and multi-machine p2p frame replication follow after the
+single-daemon live document loop is stable.
 
 ## Runtime context
 
-Blueprint will eventually host a Hocuspocus server actor under
-`ema_blueprint`. This wave ships the context folder stub only.
+Blueprint hosts live document rooms under the BEAM daemon. The document room
+actor owns prose state, presence fan-out, durable update persistence, and the
+future peer-replication stream. Hocuspocus/Yjs is historical lineage, not the
+current plan.
 
 ## Chronicle links
 

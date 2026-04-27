@@ -1,0 +1,2787 @@
+/*
+ * apps/web/app/globals.css — Next.js page.tsx shell chrome.
+ *
+ * Covers the class names consumed by `app/page.tsx`:
+ *   .place-desktop .desktop-surface .wallpaper .window-layer
+ *   .ambient-bar .place-window .dock .launchpad-pane .launch-tile
+ *   .access-card .qr-card .settings-pane .companion-card
+ *   .context-menu .app-pane .activity-pulse and friends.
+ *
+ * The desktop-icons / kickoff launcher / finder-pane / terminal-pane /
+ * monitor-pane / life-pane rules were removed on 2026-04-24 when the
+ * shell narrowed to the 8 canonical EMA surfaces and consolidated to
+ * a single launcher (dock + Launchpad window).
+ *
+ * The design-system palette, scrollbars, and glass tiers live in
+ * `../src/app/styles.css` (imported BEFORE this file by `layout.tsx`).
+ * That file owns `--place-*`, `--glass-*`, and every `ema-*` class.
+ *
+ * This file is additive: it consumes those tokens and exposes only a
+ * single local token (`--ema-accent-violet`) that the place.org
+ * palette does not define natively.
+ *
+ * Provenance:
+ *   RIP: place.org code/place.org/app/globals.css (dock, windows,
+ *        launcher, wallpaper, desktop chrome)
+ *   RIP: place.org code/place.org/src/components/desktop/* (patterns)
+ *   Adapted: bulletproof dock centering via `inset-inline:0 + margin-inline:auto`
+ *            phone variant <540px with safe-area-inset-bottom
+ *            all colors resolved through `--place-*` tokens where the
+ *            place.org palette expresses them; `--ema-accent-violet` is
+ *            the one local token for the place.org violet accent which
+ *            styles.css does not tier out.
+ */
+
+:root {
+  /* The one local accent styles.css doesn't tier out.
+     RIP: place.org accent-violet color #b99cff. */
+  --ema-accent-violet: #b99cff;
+}
+
+/* ============================================================ */
+/* Desktop frame                                                  */
+/* ============================================================ */
+
+.place-desktop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.desktop-surface,
+.wallpaper,
+.window-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.window-layer {
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* RIP: place.org wallpaper variants — aurora / grid / midnight.
+ * The Zustand `cycleWallpaper` action toggles between these three. */
+.wallpaper--aurora {
+  background:
+    radial-gradient(900px 620px at 22% 18%, var(--place-primary-glow), transparent 62%),
+    radial-gradient(780px 640px at 86% 82%, var(--place-secondary-glow), transparent 62%),
+    radial-gradient(800px 560px at 50% 100%, var(--place-tertiary-glow), transparent 70%),
+    linear-gradient(135deg, var(--place-void), #0b1626 42%, #16080f 72%, var(--place-void));
+  background-size: 100% 100%, 100% 100%, 100% 100%, 420% 420%;
+  animation: place-gradient-shift 34s ease infinite;
+}
+
+.wallpaper--grid {
+  background:
+    radial-gradient(900px 620px at 20% 30%, rgba(91, 156, 245, 0.10), transparent 70%),
+    radial-gradient(900px 620px at 80% 70%, rgba(45, 212, 168, 0.08), transparent 70%),
+    linear-gradient(var(--place-border-default) 1px, transparent 1px) 0 0 / 42px 42px,
+    linear-gradient(90deg, var(--place-border-default) 1px, transparent 1px) 0 0 / 42px 42px,
+    linear-gradient(135deg, #0A0D18, var(--place-void) 58%, #05070D, #0A0D18);
+  background-size: 100% 100%, 100% 100%, 42px 42px, 42px 42px, 100% 400%;
+  animation: place-gradient-shift 80s ease infinite;
+}
+
+.wallpaper--midnight {
+  background:
+    radial-gradient(1200px 720px at 50% -10%, rgba(91, 156, 245, 0.12), transparent 60%),
+    radial-gradient(800px 600px at 50% 120%, rgba(45, 212, 168, 0.10), transparent 65%),
+    linear-gradient(180deg, #05070D, var(--place-void), #070a13, var(--place-void));
+  background-size: 100% 100%, 100% 100%, 100% 400%;
+  animation: place-gradient-shift 60s ease infinite;
+}
+
+.wallpaper--dots {
+  opacity: 0.7;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px);
+  background-size: 30px 30px, 60px 60px, 60px 60px;
+  mask-image: radial-gradient(circle at center, black, transparent 78%);
+}
+
+/* RIP: place-org-era-research aesthetic manifesto — "time-of-day
+ * breathing, bioluminescent, calm-tech". Ambient pulsing glow above
+ * the scene gradients; opacity + scale breathe at
+ * `--ema-wallpaper-breath-rate` so Settings can tune pace without
+ * remounting.
+ *
+ * Structural note: this is a dedicated layer because every wallpaper
+ * variant ships without breathing by default; this is the one rule
+ * that makes the surface feel alive regardless of which scene the
+ * Zustand cycleWallpaper action points at. */
+.wallpaper__breath {
+  z-index: 1;
+  background:
+    radial-gradient(42% 42% at 28% 28%, rgba(138, 180, 255, 0.10), transparent 70%),
+    radial-gradient(46% 46% at 76% 72%, rgba(45, 212, 168, 0.08), transparent 70%);
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  animation: ema-wallpaper-breath var(--ema-wallpaper-breath-rate, 24s) ease-in-out infinite;
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
+@keyframes ema-wallpaper-breath {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.04) translate3d(1%, -1%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallpaper__breath { animation: none; opacity: 0.7; }
+  .wallpaper--aurora,
+  .wallpaper--grid,
+  .wallpaper--midnight { animation: none; }
+}
+
+.cursor-light {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background: radial-gradient(circle at 62% 42%, rgba(255, 255, 255, 0.075), transparent 28%);
+  mix-blend-mode: screen;
+}
+
+/* RIP: place.org glass utility — one elevated tier for windows/launcher.
+ * Reuses the `--glass-*` tiers defined in styles.css. */
+.glass {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.035)),
+    rgba(11, 14, 23, 0.88);
+  border: 1px solid var(--place-border-default);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================ */
+/* Ambient (top) bar                                              */
+/* ============================================================ */
+
+.ambient-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  background: rgba(7, 8, 14, 0.64);
+  border-bottom: 1px solid var(--place-border-subtle);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  color: var(--place-text-secondary);
+  font-size: 0.74rem;
+}
+
+.ambient-bar__left,
+.ambient-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.ambient-bar__left button {
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+.ambient-bar__left button:hover { background: rgba(255, 255, 255, 0.05); }
+
+.ambient-bar__left strong {
+  color: var(--place-text-primary);
+  font-weight: 700;
+}
+
+/* RIP: place.org brand mark — teal gradient wordmark at the ambient
+ * bar's leading edge. Subtle so it reads as a logo, not a headline. */
+.ambient-bar__brand {
+  padding: 0 2px;
+  background: linear-gradient(135deg, var(--place-primary-400), var(--place-secondary-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  font-family: var(--place-font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.ambient-bar__center {
+  display: inline-flex;
+  gap: 8px;
+  align-items: baseline;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ambient-bar__org {
+  color: var(--place-text-primary);
+  font-weight: 600;
+}
+.ambient-bar__user {
+  color: var(--place-secondary-400);
+}
+.ambient-bar__access {
+  color: var(--place-text-muted);
+}
+.ambient-bar__sep {
+  color: var(--place-text-ghost);
+  opacity: 0.5;
+}
+
+.ambient-bar__right {
+  gap: 6px !important;
+  justify-content: end;
+}
+
+/* RIP: place.org status chips — compact pill with dot. Auth/daemon
+ * state becomes a scannable left-to-right readout. */
+.ambient-bar__chip {
+  display: inline-flex !important;
+  gap: 5px;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--place-text-secondary) !important;
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.8;
+  white-space: nowrap;
+}
+.ambient-bar__chip--muted {
+  opacity: 0.6;
+}
+.ambient-bar__chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--place-text-muted);
+  flex-shrink: 0;
+}
+.ambient-bar__chip[data-daemon="connected"],
+.ambient-bar__chip[data-daemon="live"] {
+  border-color: var(--place-primary-border);
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400) !important;
+}
+.ambient-bar__chip[data-daemon="connected"] .ambient-bar__chip-dot,
+.ambient-bar__chip[data-daemon="live"] .ambient-bar__chip-dot {
+  background: var(--place-primary-400);
+  box-shadow: 0 0 6px var(--place-primary-glow);
+  animation: ema-activity-pulse 2.4s ease-in-out infinite;
+}
+.ambient-bar__chip[data-daemon="connecting"] {
+  border-color: var(--place-secondary-border);
+  color: var(--place-secondary-400) !important;
+}
+.ambient-bar__chip[data-daemon="connecting"] .ambient-bar__chip-dot {
+  background: var(--place-secondary-400);
+}
+.ambient-bar__chip[data-daemon="disconnected"],
+.ambient-bar__chip[data-daemon="offline"] {
+  border-color: var(--place-tertiary-border);
+  color: var(--place-tertiary-400) !important;
+}
+.ambient-bar__chip[data-daemon="disconnected"] .ambient-bar__chip-dot,
+.ambient-bar__chip[data-daemon="offline"] .ambient-bar__chip-dot {
+  background: var(--place-tertiary-400);
+}
+.ambient-bar__chip[data-auth="authenticated"] {
+  border-color: var(--place-primary-border);
+  color: var(--place-primary-400) !important;
+}
+.ambient-bar__chip[data-auth="google-verified"] {
+  border-color: var(--place-secondary-border);
+  color: var(--place-secondary-400) !important;
+}
+.ambient-bar__chip[data-peers="any"] {
+  color: var(--place-text-primary) !important;
+}
+
+/* ============================================================ */
+/* Windows                                                        */
+/* ============================================================ */
+
+.place-window {
+  position: absolute;
+  display: grid;
+  grid-template-rows: 42px 1fr;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 118px);
+  min-width: 360px;
+  min-height: 300px;
+  overflow: hidden;
+  border-radius: 16px;
+  pointer-events: auto;
+}
+
+.place-window::before {
+  content: "";
+  position: absolute;
+  inset: 42px 0 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(13, 17, 28, 0.96), rgba(6, 8, 13, 0.94)),
+    rgba(6, 8, 13, 0.94);
+}
+
+.place-window.is-maximized {
+  border-radius: 10px;
+}
+
+/* Focus affordance — deeper shadow + tinted border when a descendant
+ * has focus or when the window is hovered. The CSS uses :focus-within
+ * (activated by clicking any button/textarea/input) to surface which
+ * window the operator is interacting with; hover gives a softer
+ * always-on preview. */
+.place-window {
+  transition:
+    opacity 180ms ease,
+    transform 180ms var(--place-ease-smooth),
+    box-shadow 240ms var(--place-ease-smooth),
+    border-color 240ms ease;
+}
+.place-window.is-inactive {
+  opacity: 0.62;
+}
+.place-window.is-active {
+  opacity: 1;
+  border-color: rgba(91, 156, 245, 0.28);
+  box-shadow:
+    0 38px 120px rgba(0, 0, 0, 0.64),
+    0 0 20px rgba(75, 123, 229, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
+}
+.place-window:hover {
+  box-shadow:
+    0 34px 110px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+.place-window:focus-within {
+  border-color: var(--place-secondary-border);
+  box-shadow:
+    0 42px 140px rgba(0, 0, 0, 0.66),
+    0 0 22px rgba(75, 123, 229, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.place-window.is-active .place-window__titlebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.026)),
+    rgba(8, 10, 16, 0.94);
+}
+
+.place-window.is-active .place-window__body {
+  background:
+    radial-gradient(700px 420px at 10% 0%, rgba(91, 156, 245, 0.062), transparent 60%),
+    rgba(5, 7, 12, 0.88);
+}
+
+.place-window__titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 12px 0 14px;
+  border-bottom: 1px solid var(--place-border-subtle);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+    rgba(8, 10, 16, 0.76);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  user-select: none;
+}
+
+.place-window__titlebar div:first-child {
+  display: grid;
+  gap: 1px;
+}
+
+.place-window__titlebar span,
+.eyebrow {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.61rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.place-window__titlebar strong { font-size: 0.9rem; }
+
+/* Window chrome traffic lights — macOS-style colored circles. Colors
+ * default to muted so the chrome stays calm; hovering the control group
+ * reveals the semantic color (yellow/blue/violet/red), matching
+ * traffic-light conventions while preserving EMA's detach affordance. */
+.place-window__controls { display: flex; gap: 6px; align-items: center; }
+
+.place-window__controls button {
+  display: grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 999px;
+  background: var(--place-border-default);
+  color: transparent;
+  font-size: 0.7rem;
+  line-height: 1;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+.place-window__controls:hover button {
+  color: rgba(0, 0, 0, 0.55);
+}
+.place-window__controls button:hover {
+  transform: scale(1.12);
+}
+.place-window__controls button[aria-label="Minimize"] { background: #f1bd50; border-color: rgba(241, 189, 80, 0.55); }
+.place-window__controls button[aria-label="Minimize"]:hover { background: #ffd76b; }
+.place-window__controls button[aria-label="Maximize"] { background: var(--place-secondary-400); border-color: var(--place-secondary-border); }
+.place-window__controls button[aria-label="Maximize"]:hover { background: var(--place-secondary-300); }
+.place-window__controls button[aria-label="Detach"] {
+  background: var(--ema-accent-violet);
+  border-color: rgba(185, 156, 255, 0.55);
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.place-window__controls button[aria-label="Detach"]:hover { background: #cbb3ff; }
+.place-window__controls button[aria-label="Close"] { background: #e24b4a; border-color: rgba(226, 75, 74, 0.55); }
+.place-window__controls button[aria-label="Close"]:hover { background: #ff6c6b; }
+.place-window__controls button:focus-visible {
+  outline: 2px solid var(--place-secondary-400);
+  outline-offset: 2px;
+}
+
+.place-window__body {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  background:
+    radial-gradient(700px 420px at 10% 0%, rgba(91, 156, 245, 0.055), transparent 60%),
+    rgba(5, 7, 12, 0.68);
+}
+
+.resize-grip {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background:
+    linear-gradient(135deg, transparent 46%, var(--place-border-default) 46% 54%, transparent 54%),
+    linear-gradient(135deg, transparent 70%, var(--place-border-default) 70% 78%, transparent 78%);
+  cursor: nwse-resize;
+}
+
+/* ============================================================ */
+/* Dock                                                           */
+/* RIP: place.org bottom dock — bulletproof centering + phone var */
+/* ============================================================ */
+
+.dock {
+  position: absolute;
+  bottom: 12px;
+  inset-inline: 0;
+  margin-inline: auto;
+  width: fit-content;
+  max-width: calc(100% - 48px);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  overflow: visible;
+  border-radius: 20px;
+}
+
+.dock__divider {
+  width: 1px;
+  height: 34px;
+  background: var(--place-border-default);
+  opacity: 0.55;
+}
+
+.dock-icon {
+  position: relative;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid var(--place-border-default);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--place-text-secondary);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.25);
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.dock-icon:hover,
+.dock-icon.is-active {
+  color: var(--place-secondary-400);
+  background: var(--place-secondary-subtle);
+  border-color: var(--place-secondary-border);
+}
+
+.dock-icon__dot {
+  position: absolute;
+  bottom: -5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--place-secondary-400);
+}
+
+.dock-icon__badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--place-tertiary-400);
+  color: var(--place-void);
+  font-family: var(--place-font-mono);
+  font-size: 0.58rem;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ============================================================ */
+/* Launchpad window content                                       */
+/* RIP: place.org launcher hero + tile grid, re-tokenized         */
+/* ============================================================ */
+
+.launchpad-pane,
+.app-pane {
+  display: grid;
+  gap: 16px;
+}
+
+.launchpad-pane__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  min-height: 210px;
+  padding: 26px 28px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 16px;
+  background:
+    linear-gradient(115deg, var(--place-primary-subtle), transparent 48%),
+    linear-gradient(280deg, var(--place-secondary-subtle), transparent 54%),
+    rgba(255, 255, 255, 0.025);
+}
+
+.launchpad-pane h1,
+.app-pane h1 {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 3rem;
+  letter-spacing: 0.005em;
+  line-height: 0.95;
+}
+
+.daemon-card {
+  display: grid;
+  gap: 5px;
+  width: min(560px, 100%);
+  padding: 14px 16px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 12px;
+  background: rgba(3, 11, 12, 0.58);
+}
+.daemon-card span,
+.daemon-card small {
+  color: var(--place-text-secondary);
+  font-size: 0.75rem;
+}
+.daemon-card strong {
+  color: var(--place-text-primary);
+  font-family: var(--place-font-mono);
+  font-size: 1rem;
+}
+
+.launchpad-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.launch-tile {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 8px;
+  min-height: 160px;
+  padding: 16px 16px 14px;
+  overflow: hidden;
+  border: 1px solid var(--place-border-default);
+  border-radius: 14px;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.06), transparent 64%),
+    rgba(255, 255, 255, 0.032);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+  color: var(--place-text-primary);
+  text-align: left;
+  transition:
+    transform 180ms var(--place-ease-smooth),
+    border-color 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.launch-tile__accent-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.55;
+  transition: opacity 220ms ease, height 220ms ease;
+}
+.launch-tile:hover .launch-tile__accent-bar {
+  opacity: 1;
+  height: 3px;
+}
+
+.launch-tile__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.06), transparent 60%),
+    rgba(0, 0, 0, 0.28);
+  color: currentColor;
+  transition: transform 220ms var(--place-ease-smooth), background 220ms ease;
+}
+.launch-tile:hover .launch-tile__icon {
+  transform: scale(1.05);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.12), transparent 60%),
+    rgba(0, 0, 0, 0.42);
+}
+
+.launch-tile__status {
+  position: absolute !important;
+  top: 12px;
+  right: 12px;
+  padding: 2px 8px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--place-text-secondary) !important;
+  font-family: var(--place-font-mono);
+  font-size: 0.56rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+.launch-tile[data-status="live"] .launch-tile__status {
+  border-color: var(--place-primary-border);
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400) !important;
+}
+.launch-tile[data-status="projection"] .launch-tile__status {
+  border-color: var(--place-tertiary-border);
+  background: var(--place-tertiary-subtle);
+  color: var(--place-tertiary-400) !important;
+}
+.launch-tile[data-status="staged"] .launch-tile__status {
+  color: var(--place-text-muted) !important;
+}
+
+.launch-tile:hover {
+  transform: translateY(-3px);
+  border-color: currentColor;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.08), transparent 60%),
+    rgba(255, 255, 255, 0.045);
+  box-shadow:
+    0 0 16px 2px rgba(91, 156, 245, 0.18),
+    0 18px 40px rgba(0, 0, 0, 0.36);
+}
+
+.launch-tile__kind {
+  color: var(--place-text-tertiary) !important;
+  font-family: var(--place-font-mono);
+  font-size: 0.58rem !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+}
+
+.launch-tile strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--place-text-primary);
+  font-size: 1.02rem;
+  letter-spacing: 0;
+}
+
+.launch-tile small,
+.app-pane p {
+  color: var(--place-text-secondary);
+  line-height: 1.45;
+}
+
+.app-pane {
+  align-content: start;
+  max-width: 760px;
+}
+
+.app-pane__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.app-pane__grid span {
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.75rem;
+}
+
+/* ============================================================ */
+/* HQ and See Agent Work command surfaces                         */
+/* ============================================================ */
+
+.hq-console,
+.agent-ops {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.hq-console__hero,
+.agent-ops__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.36fr);
+  gap: 16px;
+  align-items: stretch;
+  padding: 22px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 14px;
+  background:
+    linear-gradient(120deg, rgba(45, 212, 168, 0.12), transparent 42%),
+    linear-gradient(280deg, rgba(245, 158, 11, 0.12), transparent 64%),
+    rgba(255, 255, 255, 0.026);
+}
+
+.hq-console__hero h1,
+.agent-ops__hero h1 {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 3rem;
+  line-height: 0.92;
+}
+
+.hq-console__hero p,
+.agent-ops__hero p {
+  max-width: 760px;
+  margin: 10px 0 0;
+  color: var(--place-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.hq-console__readout,
+.agent-ops__meter {
+  display: grid;
+  align-content: space-between;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 12px;
+  background:
+    linear-gradient(160deg, var(--place-primary-subtle), transparent 58%),
+    rgba(0, 0, 0, 0.28);
+}
+
+.hq-console__readout span,
+.agent-ops__meter span,
+.hq-panel__heading > span,
+.agent-command-band span,
+.hq-control-stack span,
+.hq-lane-stack span,
+.agent-roster-wall span,
+.agent-handoff-list span,
+.agent-timebar__blocks span,
+.agent-lane-card span {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hq-console__readout strong,
+.agent-ops__meter strong {
+  color: var(--place-text-primary);
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.hq-console__readout small,
+.agent-ops__meter small {
+  color: var(--place-text-secondary);
+  line-height: 1.4;
+}
+
+.hq-pulse-strip,
+.agent-command-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hq-pulse-strip article,
+.agent-command-band button,
+.hq-panel,
+.agent-board,
+.agent-roster-wall,
+.agent-timebar,
+.agent-handoff-panel,
+.agent-chronicle {
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), transparent 68%),
+    rgba(255, 255, 255, 0.024);
+}
+
+.hq-pulse-strip article {
+  display: grid;
+  gap: 5px;
+  padding: 13px 14px;
+}
+
+.hq-pulse-strip span,
+.canon-rail span,
+.hq-event-table time,
+.agent-chronicle time {
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+}
+
+.hq-pulse-strip strong {
+  color: var(--place-primary-400);
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.hq-pulse-strip small {
+  color: var(--place-text-secondary);
+  line-height: 1.35;
+}
+
+.canon-rail {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background: var(--place-border-default);
+}
+
+.canon-rail article {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  min-height: 112px;
+  padding: 13px;
+  background:
+    linear-gradient(160deg, rgba(91, 156, 245, 0.08), transparent 58%),
+    rgba(8, 10, 18, 0.92);
+}
+
+.canon-rail article[data-active="true"] {
+  background:
+    linear-gradient(160deg, rgba(45, 212, 168, 0.15), transparent 58%),
+    rgba(8, 10, 18, 0.92);
+}
+
+.canon-rail strong {
+  color: var(--place-text-primary);
+  font-size: 0.98rem;
+}
+
+.canon-rail small {
+  color: var(--place-text-secondary);
+  line-height: 1.35;
+}
+
+.canon-rail em {
+  align-self: end;
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.hq-console__grid,
+.agent-ops__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+  gap: 12px;
+}
+
+.hq-panel,
+.agent-board,
+.agent-roster-wall,
+.agent-timebar,
+.agent-handoff-panel,
+.agent-chronicle {
+  min-width: 0;
+  padding: 14px;
+}
+
+.hq-panel--wide,
+.agent-board,
+.agent-timebar,
+.agent-handoff-panel,
+.agent-chronicle {
+  grid-column: span 1;
+}
+
+.hq-panel__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.hq-panel__heading h2 {
+  margin: 2px 0 0;
+  color: var(--place-text-primary);
+  font-size: 1.05rem;
+}
+
+.hq-panel__heading button {
+  padding: 6px 10px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 8px;
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+}
+
+.hq-surface-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 9px;
+}
+
+.hq-surface-card,
+.hq-control-stack button,
+.agent-command-band button {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--place-text-primary);
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.hq-surface-card:hover,
+.hq-control-stack button:hover,
+.agent-command-band button:hover {
+  transform: translateY(-1px);
+  border-color: var(--place-primary-border);
+  background: var(--place-primary-subtle);
+}
+
+/* HQ surface-card upgrade — accent stripe (left edge) + colored icon pod
+ * so the "Command map" reads as a chart of colored surfaces instead of a
+ * grid of undifferentiated text buttons. */
+.hq-surface-card {
+  position: relative;
+  padding-left: 14px !important;
+  overflow: hidden;
+  transition:
+    transform 180ms var(--place-ease-smooth),
+    border-color 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease !important;
+}
+.hq-surface-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: currentColor;
+  opacity: 0.55;
+  transition: opacity 220ms ease, width 220ms ease;
+}
+.hq-surface-card:hover {
+  border-color: currentColor !important;
+  box-shadow: 0 0 12px 1px rgba(91, 156, 245, 0.2), 0 12px 26px rgba(0, 0, 0, 0.32);
+}
+.hq-surface-card:hover::before {
+  opacity: 1;
+  width: 4px;
+}
+.hq-surface-card > svg {
+  color: currentColor;
+  opacity: 0.9;
+}
+.hq-surface-card > span {
+  color: var(--place-text-tertiary) !important;
+}
+.hq-surface-card > strong {
+  color: var(--place-text-primary) !important;
+  font-size: 0.95rem;
+}
+.hq-surface-card > small {
+  color: var(--place-text-secondary) !important;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+/* HQ pulse-strip value treatment — give each metric a subtle bottom
+ * accent underline based on accent class, and make "strong" numbers
+ * pulse softly when they're live. */
+.hq-pulse-strip article {
+  position: relative;
+  overflow: hidden;
+}
+.hq-pulse-strip article::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 8px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--place-primary-400), transparent 70%);
+  opacity: 0.35;
+}
+
+/* HQ control-stack — each ready control gets a lighter feel, and state
+ * is conveyed via tinted background. */
+.hq-control-stack button {
+  position: relative;
+  padding-left: 14px !important;
+}
+.hq-control-stack button::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--place-border-default);
+  transition: background 220ms ease;
+}
+.hq-control-stack button:hover::before {
+  background: var(--place-primary-400);
+}
+.hq-control-stack button > span {
+  display: inline-flex;
+  width: fit-content;
+  padding: 1px 7px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary) !important;
+  font-size: 0.58rem !important;
+}
+
+/* Agent command-band buttons — staged vs draft state chips */
+.agent-command-band button {
+  position: relative;
+  padding-left: 14px !important;
+}
+.agent-command-band button::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--place-border-default);
+  transition: background 220ms ease;
+}
+.agent-command-band button[data-state="staged"]::before {
+  background: var(--place-tertiary-400);
+}
+.agent-command-band button[data-state="draft"]::before {
+  background: var(--place-text-muted);
+}
+.agent-command-band button > span {
+  display: inline-flex;
+  width: fit-content;
+  padding: 1px 7px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary) !important;
+  font-size: 0.58rem !important;
+}
+.agent-command-band button[data-state="staged"] > span {
+  color: var(--place-tertiary-400) !important;
+  border-color: var(--place-tertiary-border);
+  background: var(--place-tertiary-subtle);
+}
+
+.hq-surface-card strong,
+.hq-control-stack strong,
+.agent-command-band strong,
+.hq-lane-stack strong,
+.agent-lane-card strong,
+.agent-roster-wall strong,
+.agent-timebar__blocks strong,
+.agent-handoff-list strong {
+  overflow-wrap: anywhere;
+  color: var(--place-text-primary);
+  font-size: 0.93rem;
+  line-height: 1.2;
+}
+
+.hq-surface-card small,
+.hq-control-stack small,
+.hq-lane-stack small,
+.agent-roster-wall small,
+.agent-timebar__blocks small,
+.agent-handoff-list small {
+  color: var(--place-text-secondary);
+  line-height: 1.35;
+}
+
+.hq-lane-stack,
+.hq-control-stack,
+.agent-handoff-list {
+  display: grid;
+  gap: 8px;
+}
+
+.hq-lane-stack article,
+.agent-roster-wall article,
+.agent-handoff-list article {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.026);
+}
+
+.hq-lane-stack article[data-lane-status="active"] {
+  border-color: var(--place-primary-border);
+}
+
+.hq-lane-stack article[data-lane-status="blocked"] {
+  border-color: var(--place-tertiary-border);
+}
+
+.hq-event-table,
+.agent-chronicle ol {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 9px;
+  background: var(--place-border-subtle);
+}
+
+.hq-event-table li,
+.agent-chronicle li {
+  display: grid;
+  grid-template-columns: 58px 132px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 7px 9px;
+  background: rgba(8, 10, 18, 0.9);
+}
+
+.agent-chronicle li {
+  grid-template-columns: 54px 118px 92px minmax(0, 1fr);
+}
+
+.hq-event-table strong,
+.agent-chronicle strong {
+  color: var(--place-text-primary);
+  font-size: 0.76rem;
+}
+
+.hq-event-table span,
+.agent-chronicle small {
+  color: var(--place-text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.agent-command-band {
+  grid-template-columns: repeat(6, minmax(130px, 1fr));
+}
+
+.agent-command-band code,
+.agent-lane-card code {
+  overflow: hidden;
+  padding: 6px 7px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agent-lane-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.agent-lane-column {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 260px;
+  padding: 9px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.agent-lane-column[data-column="active"] {
+  border-color: var(--place-primary-border);
+  background: linear-gradient(180deg, var(--place-primary-subtle), transparent 58%);
+}
+
+.agent-lane-column[data-column="blocked"] {
+  border-color: var(--place-tertiary-border);
+}
+
+.agent-lane-column header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 4px 8px;
+  border-bottom: 1px solid var(--place-border-subtle);
+  color: var(--place-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.agent-lane-column header strong {
+  flex: 1;
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
+}
+.agent-lane-column__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--place-text-muted);
+  flex-shrink: 0;
+}
+.agent-lane-column[data-column="active"] .agent-lane-column__dot {
+  background: var(--place-primary-400);
+  box-shadow: 0 0 8px var(--place-primary-glow);
+  animation: ema-activity-pulse 2.4s ease-in-out infinite;
+}
+.agent-lane-column[data-column="review"] .agent-lane-column__dot {
+  background: var(--place-secondary-400);
+}
+.agent-lane-column[data-column="blocked"] .agent-lane-column__dot {
+  background: var(--place-tertiary-400);
+}
+.agent-lane-column__count {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 22px;
+  padding: 1px 6px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.agent-lane-column__empty {
+  padding: 16px 8px;
+  color: var(--place-text-muted);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  text-align: center;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.agent-lane-card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 11px 12px 11px 14px;
+  border: 1px solid var(--place-border-default);
+  border-left: 3px solid var(--place-border-default);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), transparent 64%),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+  cursor: grab;
+  transition:
+    transform 160ms var(--place-ease-smooth),
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+.agent-lane-card:active { cursor: grabbing; }
+.agent-lane-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+}
+.agent-lane-card:focus-visible {
+  outline: none;
+  border-color: var(--place-secondary-border);
+  box-shadow: 0 0 0 2px var(--place-secondary-400), 0 16px 32px rgba(0, 0, 0, 0.32);
+}
+.agent-lane-card[data-kind="agent"]   { border-left-color: var(--place-secondary-400); }
+.agent-lane-card[data-kind="human"]   { border-left-color: var(--place-primary-400); }
+.agent-lane-card[data-status="blocked"] { border-left-color: var(--place-tertiary-400); }
+.agent-lane-card[data-status="done"] {
+  opacity: 0.72;
+  border-left-color: var(--place-text-muted);
+}
+.agent-lane-card[data-status="active"]::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--place-primary-400);
+  box-shadow: 0 0 0 0 var(--place-primary-glow);
+  animation: ema-activity-pulse 2.4s ease-in-out infinite;
+}
+.agent-lane-card__head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+.agent-lane-card__owner {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+.agent-lane-card__name {
+  color: var(--place-text-primary) !important;
+  font-family: var(--place-font-sans) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+.agent-lane-card__role {
+  color: var(--place-text-tertiary) !important;
+  font-family: var(--place-font-mono) !important;
+  font-size: 0.6rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+.agent-lane-card__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--place-text-muted);
+  opacity: 0.6;
+}
+
+/* RIP: agent-os-bridge owner-avatar pattern (circular initial badge).
+ * Adapted with place.org kind-tinted ring. */
+.agent-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+.agent-avatar[data-kind="agent"] {
+  border-color: var(--place-secondary-border);
+  color: var(--place-secondary-400);
+  background: rgba(91, 156, 245, 0.14);
+}
+.agent-avatar[data-kind="human"] {
+  border-color: var(--place-primary-border);
+  color: var(--place-primary-400);
+  background: rgba(45, 212, 168, 0.14);
+}
+.agent-avatar[data-kind="unassigned"] {
+  color: var(--place-text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.agent-roster-entry {
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 10px !important;
+}
+.agent-roster-entry__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.agent-roster-wall article[data-kind="agent"] {
+  border-color: var(--place-secondary-border);
+}
+
+.agent-roster-wall article[data-kind="human"] {
+  border-color: var(--place-primary-border);
+}
+
+.agent-roster-wall em {
+  color: var(--place-text-tertiary);
+  font-size: 0.78rem;
+  font-style: normal;
+}
+
+.agent-timebar__blocks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.agent-timebar__blocks article {
+  display: grid;
+  gap: 5px;
+  padding: 11px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.agent-timebar__blocks article[data-kind="focus"] {
+  border-color: var(--place-primary-border);
+}
+
+.agent-handoff-panel pre {
+  overflow: auto;
+  margin: 10px 0 0;
+  padding: 11px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Frontend correction pass — closer to place.org's calm desktop shape.
+ * This intentionally overrides the first HQ/Agent pass above: less hero
+ * inflation, smaller cards, responsive tracks, and window-native density. */
+.launchpad-pane,
+.hq-console,
+.agent-ops {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.launchpad-pane {
+  gap: 12px;
+}
+
+.place-window[data-app="launchpad"] .place-window__body {
+  overflow: hidden;
+}
+
+.place-window[data-app="launchpad"] {
+  grid-template-rows: 38px 1fr;
+}
+
+.place-window[data-app="launchpad"]::before {
+  inset: 38px 0 0;
+}
+
+.place-window[data-app="launchpad"] .place-window__titlebar {
+  min-height: 38px;
+}
+
+.launchpad-pane {
+  grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr);
+  align-items: stretch;
+  height: 100%;
+  min-height: 0;
+}
+
+.launchpad-pane__hero,
+.hq-console__hero,
+.agent-ops__hero {
+  position: relative;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.42fr);
+  gap: 16px;
+  min-height: 0;
+  padding: 20px;
+  border-color: var(--place-border-default);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.07), transparent 42%),
+    linear-gradient(180deg, rgba(5, 7, 13, 0.08), rgba(5, 7, 13, 0.36)),
+    rgba(255, 255, 255, 0.028);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.launchpad-pane__hero::after,
+.hq-console__hero::after,
+.agent-ops__hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(90deg, black, transparent 78%);
+  pointer-events: none;
+}
+
+.launchpad-pane__hero > *,
+.hq-console__hero > *,
+.agent-ops__hero > * {
+  position: relative;
+}
+
+.launchpad-pane__hero {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 12px;
+  overflow: auto;
+  padding: 16px;
+}
+
+.launchpad-pane__intro {
+  display: grid;
+  gap: 8px;
+}
+
+.launchpad-pane__intro p:not(.eyebrow) {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.launchpad-pane h1,
+.app-pane h1,
+.hq-console__hero h1,
+.agent-ops__hero h1 {
+  font-size: 2.55rem;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.hq-console__hero p,
+.agent-ops__hero p {
+  max-width: 660px;
+  font-size: 0.9rem;
+}
+
+.daemon-card,
+.hq-console__readout,
+.agent-ops__meter {
+  gap: 8px;
+  padding: 13px;
+  border-color: var(--place-border-default);
+  border-radius: 8px;
+  background:
+    linear-gradient(155deg, rgba(45, 212, 168, 0.08), transparent 58%),
+    rgba(0, 0, 0, 0.28);
+}
+
+.hq-console__readout strong,
+.agent-ops__meter strong {
+  font-size: 1.04rem;
+}
+
+.launchpad-tiles,
+.hq-pulse-strip,
+.agent-command-band,
+.hq-surface-grid {
+  gap: 8px;
+}
+
+.launchpad-tiles {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  align-content: start;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.launch-tile,
+.hq-pulse-strip article,
+.agent-command-band button,
+.hq-panel,
+.agent-board,
+.agent-roster-wall,
+.agent-timebar,
+.agent-handoff-panel,
+.agent-chronicle,
+.hq-surface-card,
+.hq-control-stack button,
+.hq-lane-stack article,
+.agent-roster-wall article,
+.agent-handoff-list article,
+.agent-lane-column,
+.agent-lane-card,
+.agent-timebar__blocks article {
+  border-radius: 8px;
+}
+
+.launch-tile {
+  min-height: 108px;
+  padding: 11px;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.06), transparent 62%),
+    rgba(255, 255, 255, 0.03);
+}
+
+.place-window[data-app="launchpad"] .launch-tile {
+  min-height: 96px;
+}
+
+.place-window[data-app="launchpad"] .launch-tile__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+}
+
+.launch-tile:hover,
+.hq-surface-card:hover,
+.hq-control-stack button:hover,
+.agent-command-band button:hover {
+  transform: translateY(-2px);
+  background:
+    linear-gradient(150deg, var(--place-secondary-subtle), transparent 62%),
+    rgba(255, 255, 255, 0.038);
+}
+
+.hq-pulse-strip,
+.agent-command-band {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.hq-pulse-strip article,
+.hq-panel,
+.agent-board,
+.agent-roster-wall,
+.agent-timebar,
+.agent-handoff-panel,
+.agent-chronicle {
+  padding: 12px;
+}
+
+.hq-pulse-strip strong {
+  font-size: 1.28rem;
+}
+
+.canon-rail {
+  grid-template-columns: repeat(6, minmax(116px, 1fr));
+  border-radius: 8px;
+}
+
+.canon-rail article {
+  min-height: 88px;
+  padding: 10px;
+}
+
+.canon-rail strong,
+.hq-surface-card strong,
+.hq-control-stack strong,
+.agent-command-band strong,
+.hq-lane-stack strong,
+.agent-lane-card strong,
+.agent-roster-wall strong,
+.agent-timebar__blocks strong,
+.agent-handoff-list strong {
+  font-size: 0.88rem;
+}
+
+.hq-console__grid,
+.agent-ops__grid {
+  grid-template-columns: minmax(0, 1.12fr) minmax(260px, 0.88fr);
+  gap: 10px;
+}
+
+.agent-board,
+.agent-chronicle {
+  grid-column: 1 / -1;
+}
+
+.hq-panel__heading {
+  margin-bottom: 10px;
+}
+
+.hq-panel__heading h2 {
+  font-size: 0.98rem;
+}
+
+.hq-panel__heading button {
+  border-radius: 6px;
+}
+
+.hq-surface-grid {
+  grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+}
+
+.hq-surface-card,
+.hq-control-stack button,
+.agent-command-band button,
+.hq-lane-stack article,
+.agent-roster-wall article,
+.agent-handoff-list article,
+.agent-lane-card,
+.agent-timebar__blocks article {
+  padding: 9px 10px;
+}
+
+.agent-lane-columns {
+  grid-template-columns: repeat(auto-fit, minmax(188px, 1fr));
+}
+
+.agent-lane-column {
+  min-height: 210px;
+}
+
+.agent-timebar__blocks {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.agent-handoff-panel pre {
+  border-radius: 8px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 860px) {
+  .launchpad-pane,
+  .launchpad-pane__hero,
+  .hq-console__hero,
+  .agent-ops__hero,
+  .hq-console__grid,
+  .agent-ops__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .place-window[data-app="launchpad"] .place-window__body {
+    overflow: auto;
+  }
+
+  .place-window[data-app="launchpad"] .launchpad-pane {
+    height: auto;
+  }
+
+  .place-window[data-app="launchpad"] .launchpad-pane__hero {
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .place-window[data-app="launchpad"] .launchpad-pane h1 {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .place-window[data-app="launchpad"] .daemon-card {
+    padding: 10px 12px;
+  }
+
+  .place-window[data-app="launchpad"] .daemon-card small,
+  .place-window[data-app="launchpad"] .access-card {
+    display: none;
+  }
+
+  .canon-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .launchpad-pane h1,
+  .app-pane h1,
+  .hq-console__hero h1,
+  .agent-ops__hero h1 {
+    font-size: 2.25rem;
+  }
+}
+
+/* Accent color utilities — used across launch-tiles, icons, glyphs. */
+.accent-green  { color: var(--place-primary-400); }
+.accent-blue   { color: var(--place-secondary-400); }
+.accent-amber  { color: var(--place-tertiary-400); }
+.accent-violet { color: var(--ema-accent-violet); }
+
+/* ============================================================ */
+/* Access card + QR                                               */
+/* ============================================================ */
+
+.access-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 126px;
+  gap: 14px;
+  align-items: start;
+  padding: 13px;
+  border: 1px solid var(--place-secondary-border);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, var(--place-secondary-subtle), transparent 62%),
+    rgba(255, 255, 255, 0.03);
+}
+
+.access-card__copy {
+  display: grid;
+  gap: 6px;
+}
+.access-card__copy h2 {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 1rem;
+}
+.access-card__copy p {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.access-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 6px;
+  color: var(--place-text-muted);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+}
+.access-card__facts span {
+  padding: 3px 8px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.qr-card {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 2px;
+  width: 126px;
+  height: 126px;
+  padding: 8px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), transparent 62%),
+    rgba(0, 0, 0, 0.45);
+}
+.qr-card span {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.qr-card span[data-on="true"] {
+  background: var(--place-primary-400);
+  box-shadow: 0 0 6px var(--place-primary-glow);
+}
+
+.launchpad-pane .daemon-card {
+  width: 100%;
+}
+
+.launchpad-pane .access-card {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 11px;
+  border-radius: 8px;
+}
+
+.launchpad-pane .access-card__copy {
+  gap: 5px;
+}
+
+.launchpad-pane .access-card__copy h2 {
+  font-size: 0.92rem;
+}
+
+.launchpad-pane .access-card__copy p {
+  font-size: 0.74rem;
+  line-height: 1.38;
+}
+
+.launchpad-pane .access-card__facts {
+  max-height: 76px;
+  overflow: auto;
+  gap: 5px;
+  font-size: 0.6rem;
+}
+
+.launchpad-pane .access-card__facts span {
+  padding: 2px 6px;
+}
+
+.launchpad-pane .qr-card {
+  width: min(168px, 100%);
+  height: 92px;
+  justify-self: start;
+  grid-template-rows: repeat(4, 1fr);
+  border-radius: 8px;
+}
+
+/* ============================================================ */
+/* Blueprint live collab proof                                   */
+/* ============================================================ */
+
+.blueprint-live {
+  display: grid;
+  gap: 14px;
+  min-height: 100%;
+  color: var(--place-text-primary);
+}
+
+.blueprint-live__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, auto);
+  gap: 16px;
+  align-items: end;
+  padding: 18px 20px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 14px;
+  background:
+    linear-gradient(112deg, rgba(45, 212, 168, 0.13), transparent 42%),
+    linear-gradient(284deg, rgba(245, 158, 11, 0.08), transparent 48%),
+    rgba(255, 255, 255, 0.026);
+}
+
+.blueprint-live__hero h1 {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 2.55rem;
+  line-height: 0.98;
+}
+
+.blueprint-live__hero p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--place-text-secondary);
+  line-height: 1.45;
+}
+
+.blueprint-live__badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 7px;
+}
+
+.blueprint-live__badges span,
+.blueprint-editor__footer span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.blueprint-live__badges span:first-child {
+  border-color: var(--place-primary-border);
+  color: var(--place-primary-400);
+  box-shadow: 0 0 12px var(--place-primary-glow);
+}
+
+.blueprint-live__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 310px);
+  gap: 14px;
+  min-height: 430px;
+}
+
+.blueprint-editor,
+.blueprint-room section {
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.014)),
+    rgba(5, 7, 13, 0.62);
+}
+
+.blueprint-editor {
+  display: grid;
+  grid-template-rows: auto minmax(260px, 1fr) auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.blueprint-editor__bar,
+.blueprint-editor__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--place-border-subtle);
+  background: rgba(255, 255, 255, 0.026);
+}
+
+.blueprint-editor__bar div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.blueprint-editor__bar span {
+  overflow: hidden;
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.blueprint-editor__bar strong {
+  overflow: hidden;
+  color: var(--place-text-primary);
+  font-size: 0.98rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blueprint-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 8px;
+}
+
+.blueprint-editor__actions button {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 8px;
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.72rem;
+}
+
+.blueprint-editor__actions button:first-child {
+  border-color: var(--place-secondary-border);
+  background: var(--place-secondary-subtle);
+  color: var(--place-secondary-400);
+}
+
+.blueprint-editor__actions button:hover {
+  border-color: var(--place-primary-400);
+  background: rgba(45, 212, 168, 0.15);
+}
+
+.blueprint-editor textarea {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  resize: none;
+  padding: 22px 26px;
+  border: 0;
+  outline: 0;
+  background:
+    linear-gradient(90deg, rgba(245, 158, 11, 0.11) 1px, transparent 1px) 0 0 / 36px 36px,
+    linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px) 0 0 / 36px 36px,
+    rgba(2, 4, 8, 0.42);
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 860px) {
+  .blueprint-live__hero,
+  .blueprint-live__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blueprint-live__hero h1 {
+    font-size: 2.1rem;
+  }
+
+  .blueprint-editor textarea {
+    padding: 18px;
+  }
+}
+
+.blueprint-editor textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--place-primary-border);
+}
+
+.blueprint-editor__footer {
+  justify-content: start;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--place-border-subtle);
+  border-bottom: 0;
+}
+
+.blueprint-room {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.blueprint-room section {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.blueprint-room h2 {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 1rem;
+}
+
+.blueprint-room dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.blueprint-room dl div {
+  display: grid;
+  gap: 3px;
+  padding: 8px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.blueprint-room dt {
+  color: var(--place-text-muted);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.blueprint-room dd {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.72rem;
+}
+
+.blueprint-presence {
+  display: grid;
+  gap: 8px;
+}
+
+.blueprint-presence__row {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 4px 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.028);
+}
+
+.blueprint-presence__row > span {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--presence-color);
+  box-shadow: 0 0 12px var(--presence-color);
+}
+
+.blueprint-presence__row strong {
+  overflow: hidden;
+  color: var(--place-text-primary);
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blueprint-presence__row small {
+  grid-column: 2;
+  color: var(--place-text-muted);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+}
+
+.blueprint-room__note p,
+.blueprint-room__note strong {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.48;
+}
+
+.blueprint-room__note strong {
+  color: var(--place-tertiary-400);
+  overflow-wrap: anywhere;
+}
+
+/* ============================================================ */
+/* Settings pane                                                  */
+/* ============================================================ */
+
+.settings-pane {
+  display: grid;
+  gap: 16px;
+}
+.settings-pane section {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.settings-pane h2 {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 1rem;
+}
+.settings-pane p {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.settings-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.settings-grid button,
+.settings-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 8px;
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.76rem;
+  text-decoration: none;
+}
+.settings-grid button:hover,
+.settings-link:hover {
+  border-color: var(--place-primary-400);
+  background: rgba(45, 212, 168, 0.15);
+}
+
+/* Preferences section — segmented controls + real consumers of the
+ * RIPped range sliders from styles.css. Shares the section frame from
+ * `.settings-pane section`; adds only the elements specific to the
+ * preferences panel. */
+.settings-section__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+}
+.settings-preferences {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+.settings-field {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.settings-field__head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+}
+.settings-field__label {
+  color: var(--place-text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.settings-field__value {
+  color: var(--place-secondary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+.settings-segmented {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  text-transform: capitalize;
+}
+.settings-segmented__option {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+.settings-segmented__option:hover {
+  color: var(--place-text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+.settings-segmented__option.is-active {
+  color: var(--place-secondary-400);
+  background: rgba(91, 156, 245, 0.14);
+}
+.settings-segmented__option:focus-visible {
+  outline: 2px solid var(--place-secondary-400);
+  outline-offset: 2px;
+}
+
+.companion-card {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--place-tertiary-border);
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.05);
+}
+.companion-card span {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.companion-card strong { color: var(--place-text-primary); }
+.companion-card small {
+  color: var(--place-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+.companion-card--authenticator input {
+  min-height: 38px;
+  max-width: 180px;
+  padding: 8px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(5, 7, 13, 0.76);
+  color: var(--place-text-primary);
+  font-family: var(--place-font-mono);
+}
+.companion-card--authenticator button {
+  justify-self: start;
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid var(--place-tertiary-border);
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--place-tertiary-400);
+}
+
+/* ============================================================ */
+/* Context menus                                                  */
+/* ============================================================ */
+
+.context-menu {
+  position: fixed;
+  z-index: 95;
+  display: grid;
+  gap: 2px;
+  min-width: 180px;
+  padding: 6px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: var(--glass-bg-elevated);
+  backdrop-filter: blur(var(--glass-blur-elevated)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-elevated)) saturate(160%);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+.context-menu button {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--place-text-primary);
+  text-align: left;
+  font-size: 0.84rem;
+}
+.context-menu button:hover { background: rgba(255, 255, 255, 0.06); }
+
+/* ============================================================ */
+/* Activity pulse (bottom-right projection indicator)             */
+/* ============================================================ */
+
+.activity-pulse {
+  position: absolute;
+  right: 16px;
+  bottom: 18px;
+  z-index: 91;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--place-text-muted);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.activity-pulse span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--place-primary-400);
+  box-shadow: 0 0 18px var(--place-primary-glow);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+/* ============================================================ */
+/* Animations                                                     */
+/* ============================================================ */
+
+@keyframes place-gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* ============================================================ */
+/* Responsive                                                     */
+/* ============================================================ */
+
+@media (max-width: 860px) {
+  .ambient-bar {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 6px 10px;
+  }
+  .ambient-bar__center,
+  .ambient-bar__right { display: none; }
+
+  .place-window {
+    left: 10px !important;
+    top: 58px !important;
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - 154px) !important;
+  }
+
+  .app-pane__grid,
+  .blueprint-live__hero,
+  .blueprint-live__grid { grid-template-columns: 1fr; }
+
+  .blueprint-live__badges,
+  .blueprint-editor__actions {
+    justify-content: start;
+  }
+
+  .blueprint-live__grid {
+    min-height: 0;
+  }
+
+  .blueprint-editor {
+    grid-template-rows: auto minmax(320px, 52vh) auto;
+  }
+}
+
+/* RIP: adapted from place.org dock; phone variant <540px.
+ * Compact icons, tighter geometry, honors iOS safe-area-inset-bottom
+ * so the dock never collides with the system home gesture strip. */
+@media (max-width: 540px) {
+  .dock {
+    bottom: max(env(safe-area-inset-bottom), 10px);
+    gap: 4px;
+    padding: 5px 8px;
+    border-radius: 14px;
+    max-width: calc(100% - 16px);
+    overflow-x: auto;
+  }
+  .dock-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+  .dock__divider { height: 26px; }
+  .launchpad-tiles { grid-template-columns: 1fr; }
+  .launch-tile { min-height: 0; padding: 12px; }
+  .qr-card { width: 132px; height: 132px; }
+  .access-card { grid-template-columns: 1fr; }
+}
+
+/* ============================================================ */
+/* EMA zen polish — current donor window chrome overrides         */
+/* ============================================================ */
+
+.place-window {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.018)),
+    #06080e !important;
+}
+
+.place-window::before {
+  background:
+    radial-gradient(720px 420px at 12% 0%, rgba(91, 156, 245, 0.055), transparent 62%),
+    #05070c !important;
+}
+
+.place-window.is-inactive {
+  opacity: 1;
+  filter: saturate(0.7) brightness(0.68);
+}
+
+.place-window.is-active {
+  filter: none;
+}
+
+.place-window__body {
+  background:
+    radial-gradient(720px 420px at 14% 0%, rgba(91, 156, 245, 0.052), transparent 62%),
+    #05070c !important;
+}
+
+.place-window.is-active .place-window__body {
+  background:
+    radial-gradient(720px 420px at 14% 0%, rgba(91, 156, 245, 0.068), transparent 62%),
+    #05070c !important;
+}
+
+.place-window[data-app="launchpad"] { border-color: rgba(45, 212, 168, 0.16); }
+.place-window[data-app="blueprint"] { border-color: rgba(45, 212, 168, 0.14); }
+.place-window[data-app="git-ema"] { border-color: rgba(91, 156, 245, 0.16); }
+.place-window[data-app="agent-work"] { border-color: rgba(245, 158, 11, 0.15); }
+
+/* Current EMA shell windows are donor Rnd frames with `.ema-window`.
+ * These final overrides keep persisted desktop geometry sane in narrow
+ * browser previews and stop background windows from muddying active text. */
+.ema-desktop__stage > div {
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 84px) !important;
+}
+
+.ema-window {
+  min-width: min(320px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 84px) !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.014)),
+    #06080e !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.ema-window.is-inactive {
+  opacity: 0.28 !important;
+  filter: saturate(0.5) brightness(0.5);
+}
+
+.ema-window.is-active {
+  filter: none;
+  border-color: rgba(45, 212, 168, 0.34) !important;
+}
+
+.ema-window__body {
+  min-width: 0;
+  background:
+    radial-gradient(700px 420px at 14% 0%, rgba(91, 156, 245, 0.06), transparent 62%),
+    #05070c !important;
+}
+
+.ema-window__body > .ema-vapp,
+.ema-window__body > .ema-hq,
+.ema-window__body > .ema-settings {
+  min-height: 100%;
+  border-radius: 8px;
+  background: #05070c;
+}
+
+.ema-window__body .ema-vapp__header,
+.ema-window__body .ema-hero,
+.ema-window__body .ema-panel,
+.ema-window__body .ema-bp-doc,
+.ema-window__body .ema-lp-hero,
+.ema-window__body .ema-lp-tile,
+.ema-window__body .ema-pulse-card {
+  background-color: #0b0e15 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.ema-window[data-vapp="launchpad"] { border-color: rgba(45, 212, 168, 0.24) !important; }
+.ema-window[data-vapp="blueprint"] { border-color: rgba(45, 212, 168, 0.28) !important; }
+.ema-window[data-vapp="git-ema"] { border-color: rgba(91, 156, 245, 0.28) !important; }
+.ema-window[data-vapp="agent-work"] { border-color: rgba(245, 158, 11, 0.26) !important; }
+.ema-window[data-vapp="braindump"] { border-color: rgba(185, 156, 255, 0.26) !important; }
+
+.ema-vapp__header--split,
+.ema-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(180px, auto);
+}
+
+.ema-vapp__header h1,
+.ema-hero h1 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.ema-vapp__tagline,
+.ema-hero__copy,
+.ema-bp-section__prose,
+.ema-lane-row code,
+.ema-saw-header__meta,
+.ema-saw-cli,
+.ema-saw-prompt__block {
+  overflow-wrap: anywhere;
+}
+
+.ema-saw-root {
+  padding: 0 !important;
+}
+
+.ema-saw-header__notice {
+  min-width: 0 !important;
+}
+
+.ema-saw-root *,
+.ema-vapp * {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .ema-desktop__stage {
+    inset: 58px 0 86px !important;
+  }
+
+  .ema-desktop__stage > div {
+    max-height: calc(100dvh - 92px) !important;
+  }
+
+  .ema-window {
+    max-height: calc(100dvh - 92px) !important;
+  }
+
+  .ema-window__body {
+    padding: 14px 14px 96px !important;
+  }
+
+  .ema-vapp__header--split,
+  .ema-hero {
+    grid-template-columns: 1fr !important;
+  }
+
+  .ema-vapp__header,
+  .ema-hero,
+  .ema-bp-doc,
+  .ema-panel {
+    padding: 14px !important;
+  }
+
+  .ema-vapp__header h1,
+  .ema-hero h1 {
+    font-size: 2rem !important;
+    line-height: 1.02 !important;
+  }
+
+  .ema-bp-command-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .ema-bp-spine {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dock {
+    max-width: calc(100vw - 24px);
+  }
+}

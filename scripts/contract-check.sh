@@ -135,7 +135,7 @@ if [[ ${#existing_source_dirs[@]} -eq 0 ]]; then
 fi
 
 # Event kinds referenced in code.
-FAMILY_REGEX='^(actor|agent|org|space|project|membership|invite|device|peer|lease|replication|lane|handoff|proposal|incident|dispatch|execution|tool|blueprint|attachment|connector|swarm|mission|campaign|vcalendar|calendar_block|checkup|queue_item|artifact|source_ref|codebase|user|personal_ai|event|debug)\.'
+FAMILY_REGEX='^(actor|agent|org|space|project|membership|invite|access_session|device|peer|lease|replication|lane|handoff|proposal|incident|dispatch|execution|tool|blueprint|collab|attachment|connector|swarm|mission|campaign|vcalendar|calendar_block|checkup|queue_item|artifact|source_ref|codebase|user|personal_ai|event|debug)\.'
 
 FOUND_KINDS=$(grep -rhoE '(kind|event_kind)[[:space:]]*[:=][[:space:]]*"[a-z_]+\.[a-z_]+(\.[a-z_]+)?"' \
   "${existing_source_dirs[@]}" 2>/dev/null \

@@ -2,6 +2,7 @@
 //      (adapt — idea→ready→active→review→blocked→done columns, donor vocab)
 // Region 3 of See Agent Work first screen per SURFACE-SLICE-A.md §"Region 3".
 import { MOCK_PROJECTION_LABEL, seeAgentWorkProjection } from "../mock-projections";
+import { ActorAvatar } from "./actor-avatar";
 
 const COLUMNS = ["idea", "ready", "active", "review", "blocked", "done"] as const;
 type ColumnStatus = (typeof COLUMNS)[number];
@@ -51,10 +52,24 @@ export function LaneBoard() {
               {bucketed[col].map((lane) => {
                 const owner = ownerOf(lane.owner_actor_id);
                 return (
-                  <li key={lane.id} className="ema-saw-lane-card">
-                    <p className="ema-kicker">
-                      {owner ? `${owner.kind} · ${owner.display_name}` : "unassigned"}
-                    </p>
+                  <li
+                    key={lane.id}
+                    className="ema-saw-lane-card"
+                    data-owner-kind={owner?.kind ?? "unassigned"}
+                    data-status={lane.status}
+                    tabIndex={0}
+                  >
+                    <header className="ema-saw-lane-card__head">
+                      <ActorAvatar actor={owner} size={26} />
+                      <div className="ema-saw-lane-card__owner">
+                        <span className="ema-saw-lane-card__name">
+                          {owner?.display_name ?? "unassigned"}
+                        </span>
+                        <span className="ema-kicker">
+                          {owner ? owner.role : "awaiting owner"}
+                        </span>
+                      </div>
+                    </header>
                     <strong>{lane.title}</strong>
                     <code className="ema-saw-cli">{lane.cli}</code>
                     <footer>

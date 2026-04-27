@@ -9,7 +9,30 @@ import type { SelectorState } from "../selectors";
 
 export type TopbarProjection = SelectorState & {
   user: { id: string; display_name: string };
-  node_state: "home" | "replica_current" | "replica_provisional" | "replica_stale";
+  memberships?: Array<{ user_id: string; role: string; status: string }>;
+  node_state: "home_current" | "replica_current" | "replica_provisional" | "replica_stale";
+};
+
+export type AccessSessionProjection = {
+  challenges: Array<{
+    challenge_id: string;
+    org_id: string;
+    access_point: string;
+    user_code: string;
+    scopes: string[];
+    status: "open" | "approved" | "expired" | "revoked";
+    expires_at: string;
+  }>;
+  sessions: Array<{
+    session_id: string;
+    challenge_id: string;
+    org_id: string;
+    user_id: string;
+    approved_by_device: string;
+    scopes: string[];
+    status: "active" | "revoked" | "expired";
+    expires_at: string;
+  }>;
 };
 
 export type GitEmaUserConnectorsProjection = {
@@ -47,6 +70,28 @@ export type BlueprintSectionNode = {
   children?: BlueprintSectionNode[];
 };
 
+export type CollabDocumentTarget = { kind: "blueprint_section"; id: string };
+
+export type CollabDocumentProjection = {
+  target: CollabDocumentTarget;
+  title?: string;
+  text: string;
+  revision: number;
+  status: "opening" | "live" | "saving" | "offline";
+  authority: "beam";
+  updated_at?: string;
+  presence: Array<{
+    session_id: string;
+    user_id?: string;
+    display_name?: string;
+    color?: string;
+    cursor?: number;
+    selection_start?: number;
+    selection_end?: number;
+    last_seen_at?: string;
+  }>;
+};
+
 export type SeeAgentWorkProjection = {
   project_id: string;
   mocked: boolean;
@@ -79,9 +124,11 @@ export type SeeAgentWorkProjection = {
 
 export const PROJECTION_NAMES = {
   topbar: "topbar",
+  accessSessionCurrent: "access_session.current",
   gitEmaUserConnectors: "git_ema.user_connectors",
   gitEmaUserAttachments: "git_ema.user_attachments",
   gitEmaProjectAttachments: "git_ema.project_attachments",
   blueprintSections: "blueprint.sections",
+  collabDocument: "collab.document",
   seeAgentWorkProjectPulse: "see_agent_work.project_pulse",
 } as const;

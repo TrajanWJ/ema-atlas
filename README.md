@@ -48,16 +48,12 @@ EMA-0.0.5--4-24/
 - `apps/web/`
   - browser-hosted shell for parity, access, and development
 
-## macOS launchers
+## macOS launcher
 
 - `scripts/install-macos-tauri-app.sh` installs the built Tauri bundle
   (`apps/desktop/src-tauri/target/release/bundle/macos/EMA.app`) as the
   human-facing `~/Desktop/EMA 0.0.5.app`. Existing target apps are moved to a
   timestamped backup path; EMA user data under `~/Library` is not deleted.
-- `scripts/create-macos-launcher.sh` creates
-  `~/Desktop/EMA 0.0.5 Web Dev Launcher.app`.
-  That helper is intentionally a web dev launcher: it starts the daemon and
-  Vite web surface, then opens `http://localhost:5173`.
 
 ## What should be built first
 

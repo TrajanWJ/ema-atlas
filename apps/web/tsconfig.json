@@ -13,7 +13,59 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"],
+      "@/src/stores/window-store": ["./src/place-reflection/shell-state/window-store-bridge"],
+      "@/src/stores/dock-store": ["./src/place-reflection/shell-state/dock-store-bridge"],
+      "@/src/stores/launcher-store": ["./src/place-reflection/shell-state/launcher-store-bridge"],
+      "@/src/stores/virtual-desktop-store": ["./src/place-reflection/shell-state/virtual-desktop-store-bridge"],
+      "@/src/stores/desktop-store": ["./src/place-reflection/shell-state/desktop-store-bridge"],
+      "@/src/stores/settings-store": ["./src/place-reflection/shell-state/settings-store-bridge"],
+      "@/src/stores/widget-store": ["./src/place-reflection/shell-state/widget-store-bridge"],
+      "@/src/stores/notification-store": ["./src/place-reflection/shell-state/notification-store-bridge"],
+      "@/src/hooks/use-command-palette": ["./src/place-reflection/commands/use-command-palette"],
+      "@/src/hooks/*": ["./src/place-donor/place-org/hooks/*"],
+      "@/src/lib/id": ["./src/place-reflection/lib/id"],
+      "@/src/lib/user-storage": ["./src/place-reflection/lib/user-storage"],
+      "@/src/lib/constants": ["./src/place-reflection/lib/constants"],
+      "@/src/lib/app-registry": ["./src/place-reflection/lib/app-registry"],
+      "@/src/lib/springs": ["./src/place-reflection/lib/springs"],
+      "@/src/lib/place-events": ["./src/place-reflection/lib/place-events"],
+      "@/src/lib/companion-bridge": ["./src/place-reflection/lib/companion-bridge"],
+      "@/src/types/window": ["./src/place-reflection/types/window"],
+      "@/src/types/settings": ["./src/place-reflection/types/settings"],
+      "@/src/components/icons": ["./src/place-reflection/icons"]
+    },
+    "allowJs": true
   },
-  "include": ["src"]
+  "include": [
+    "next-env.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "src/app/**/*.ts",
+    "src/app/**/*.tsx",
+    "src/shell/**/*.ts",
+    "src/shell/**/*.tsx",
+    "src/lib/**/*.ts",
+    "src/lib/**/*.tsx",
+    "src/vapps/**/*.ts",
+    "src/vapps/**/*.tsx",
+    "src/place-reflection/**/*.ts",
+    "src/place-reflection/**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/place-donor",
+    "dist"
+  ]
 }

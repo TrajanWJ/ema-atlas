@@ -1,26 +1,34 @@
-import { useProjection } from "../lib/ipc";
 import { OrgSelector } from "./org-selector";
 import { SpaceSelector } from "./space-selector";
 import { ProjectSelector } from "./project-selector";
 import { ConnectorsIndicator } from "./connectors-indicator";
 import { MOCK_PROJECTION_LABEL, mockTopbar } from "../app/mock-projections";
+import { useTopbar } from "../place-reflection";
 
 /**
  * Topbar — always renders three selectors (org / space / project),
  * plus the connectors indicator (lit when any connector is connected).
  *
- * Selectors prefer daemon projections. When the daemon has not provided
- * data, the shell renders a visibly labeled mock local projection.
+ * Consumes the daemon's `topbar` projection via `useTopbar` (see
+ * `place-reflection/projections/use-topbar.ts`). When the daemon has
+ * not delivered a snapshot, falls back to `mockTopbar` and surfaces
+ * a visible `staged projection` badge per honest-mocks doctrine.
  */
 export function Topbar() {
-  const topbar = useProjection("topbar");
-  const current = topbar?.current_project ?? mockTopbar.current_project;
+  const topbar = useTopbar();
+  const rawProjects = topbar.raw?.projects ?? [];
+  const projects = rawProjects.length ? rawProjects : mockTopbar.projects;
+  const projectedCurrent = topbar.scope.project;
+  const current =
+    projectedCurrent && projects.some((project) => project.id === projectedCurrent.id)
+      ? projectedCurrent
+      : mockTopbar.current_project;
 
-  const offline = topbar == null;
+  const offline = topbar.offline;
 
   return (
     <header className="ema-topbar" data-offline={offline ? "true" : "false"}>
-      <div className="ema-topbar__brand" aria-label="EMA home">
+      <div className="ema-topbar__brand" aria-label="EMA HQ">
         <span>EMA</span>
         <small>0.0.5</small>
       </div>

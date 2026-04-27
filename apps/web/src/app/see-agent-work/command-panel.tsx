@@ -1,5 +1,5 @@
 // Region 6 of See Agent Work first screen per SURFACE-SLICE-A.md §"Region 6".
-// Six mocked buttons from seeAgentWorkProjection.controls. Each: label +
+// Six staged controls from seeAgentWorkProjection.controls. Each: label +
 // state pill + CLI string + copy-CLI affordance. Clicking the button itself
 // is a no-op with a `pending daemon writer` tooltip.
 import { useCallback, useState } from "react";
@@ -22,7 +22,7 @@ export function CommandPanel() {
       <div className="ema-panel__heading">
         <div>
           <p className="ema-kicker">command panel</p>
-          <h2>Mocked controls · CLI parity</h2>
+          <h2>Queued controls · CLI parity</h2>
         </div>
         <span className="ema-pill ema-pill--hot">{MOCK_PROJECTION_LABEL}</span>
       </div>

@@ -15,6 +15,13 @@ export const COMMANDS: CommandInfo[] = [
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
   { name: "swarm list", summary: "List swarms for a project. (wave 1: stubbed)" },
   { name: "swarm show", summary: "Show a single swarm. (wave 1: stubbed)" },
+  { name: "vcalendar show", summary: "Show an actor's calendar (filtered from the recent event_trail)." },
+  { name: "vcalendar week", summary: "Show this week's vcalendar events (filtered from the recent event_trail)." },
+  { name: "vcalendar block add", summary: "Append a calendar_block for an actor (kind + label, optional start/end)." },
+  { name: "vcalendar block move", summary: "Move a calendar_block to a new start (optional end)." },
+  { name: "vcalendar phase set", summary: "Set the current weekly phase label for an actor." },
+  { name: "checkup schedule", summary: "Schedule a cadence-based checkup on a lane." },
+  { name: "checkup complete", summary: "Mark a checkup complete with a result." },
   { name: "help", summary: "Show this help." },
 ];
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the EMA web shell in dev (Vite).
+# Run the EMA web shell in dev (Next.js).
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"

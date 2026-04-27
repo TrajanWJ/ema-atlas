@@ -12,8 +12,18 @@
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod companion_bridge;
+mod native_transparency;
+
 fn main() {
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![
+            companion_bridge::companion_capabilities
+        ])
+        .setup(|app| {
+            native_transparency::apply(app);
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running EMA desktop");
 }

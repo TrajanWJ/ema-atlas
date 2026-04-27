@@ -73,6 +73,10 @@ event {
   something that isn't derivable from events (e.g. "last seen wall-clock
   time per device"), that's a bug — either add an event for it or drop
   the field.
+- **Collab exception.** The live `collab.document` projection is backed by
+  the BEAM collab room's durable frame store plus canonical checkpoint
+  metadata. High-frequency document frames are not stuffed into the coarse
+  event log; only `collab.document.checkpointed` crosses into canon.
 - **Idempotent on replay.** Writers MUST be deterministic given the same
   input commands. Re-running the log on a fresh SQLite MUST produce the
   same projection output, up to hash.
@@ -86,10 +90,12 @@ event {
 | ------------- | ------------------- | --------------------- |
 | actor         | `actor.md`          | ema_identity          |
 | org           | `org.md`            | ema_orgs              |
+| identity      | `identity.md`       | ema_identity          |
 | space         | `space.md`          | ema_spaces            |
 | project       | `project.md`        | ema_projects          |
 | membership    | `membership.md`     | ema_memberships       |
 | invite        | `invite.md`         | ema_invites           |
+| access_session | `access_session.md` | ema_access_sessions   |
 | device        | `device.md`         | ema_identity          |
 | peer          | `peer.md`           | ema_replication       |
 | lease         | `lease.md`          | ema_replication       |
@@ -102,5 +108,6 @@ event {
 | execution     | `execution.md`      | ema_exec seam         |
 | tool          | `tool.md`           | ema_exec seam         |
 | blueprint     | `blueprint.md`      | ema_blueprint         |
+| collab        | `collab.md`         | ema_collab            |
 | attachment    | `attachment.md`     | ema_attachments       |
 | connector     | `connector.md`      | ema_attachments       |

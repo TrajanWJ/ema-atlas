@@ -43,7 +43,12 @@ export function AttachmentList({ scope }: { scope: "user" | "project" }) {
       )}
       <ul className="ema-attachments__list">
         {attachments.map((a) => (
-          <li key={a.id} className="ema-attachment-row">
+          <li
+            key={a.id}
+            className="ema-attachment-row"
+            data-kind={a.kind}
+            data-state="attached"
+          >
             <span className="ema-attachment-row__kind" data-kind={a.kind}>
               {iconFor(a.kind)}
             </span>

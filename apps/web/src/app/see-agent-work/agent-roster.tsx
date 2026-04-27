@@ -2,6 +2,7 @@
 //      (inspire — display only; enforcement lands with ema_memberships writer)
 // Region 5 of See Agent Work first screen per SURFACE-SLICE-A.md §"Region 5".
 import { MOCK_PROJECTION_LABEL, seeAgentWorkProjection } from "../mock-projections";
+import { ActorAvatar } from "./actor-avatar";
 
 export function AgentRoster() {
   const { actors, lanes } = seeAgentWorkProjection;
@@ -23,8 +24,11 @@ export function AgentRoster() {
           return (
             <article key={actor.id} className="ema-saw-actor-card" data-actor-kind={actor.kind}>
               <header>
-                <p className="ema-kicker">{actor.kind}</p>
-                <strong>{actor.display_name}</strong>
+                <ActorAvatar actor={actor} size={38} />
+                <div>
+                  <p className="ema-kicker">{actor.kind}</p>
+                  <strong>{actor.display_name}</strong>
+                </div>
               </header>
               <dl className="ema-saw-actor-card__meta">
                 <div>

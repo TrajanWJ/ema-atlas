@@ -1,9 +1,9 @@
 // RIP: codebase-frontend-layer read-only observer posture
 //      (adopt — this file never writes canon; every data source is a
-//      projection or a mock, and every control is pending daemon writer)
+//      projection or a staged seed, and every control is pending daemon writer)
 //
 // See Agent Work first screen per docs/vapps/see-agent-work.md §"First Screen"
-// and SURFACE-SLICE-A.md §"Outcome". Eight regions, dense, honest mocks,
+// and SURFACE-SLICE-A.md §"Outcome". Eight regions, dense source labeling,
 // CLI-parity, no UI-local state treated as canon.
 import { MOCK_PROJECTION_LABEL, seeAgentWorkProjection } from "./mock-projections";
 import {
@@ -28,8 +28,8 @@ export function AgentWorkPage() {
           <p className="ema-vapp__tagline">
             Dense, operator-grade surface for coordinating external Codex,
             Claude CLI, and human founder work across missions, campaigns,
-            lanes, handoffs, and vCalendar time — without pretending mocked
-            controls executed real work.
+            lanes, handoffs, and vCalendar time — without implying staged
+            controls executed daemon work.
           </p>
           <p className="ema-saw-header__meta">
             <code>{swarmName}</code> · {seeAgentWorkProjection.missions.length}{" "}
@@ -41,7 +41,7 @@ export function AgentWorkPage() {
           <span className="ema-pill ema-pill--hot">{MOCK_PROJECTION_LABEL}</span>
           <strong>Every region is honest about its source.</strong>
           <p>
-            Live panels render from daemon projections. Mock panels carry a
+            Live panels render from daemon projections. Staged panels carry a
             visible tag. Controls are <code>pending daemon writer</code>.
           </p>
         </aside>

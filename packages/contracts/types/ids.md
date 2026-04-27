@@ -34,6 +34,7 @@ Example: `project:01JFYV6W2H7K9Z8XR3BDQG4T5P`.
 | `blueprint_doc`   | blueprint document                        |
 | `blueprint_sec`   | blueprint section                         |
 | `blueprint_cmt`   | blueprint comment                         |
+| `collab_frame`    | durable BEAM collab update/checkpoint frame |
 | `swarm`           | swarm control group                       |
 | `mission`         | mission inside a campaign or project      |
 | `campaign`        | long-running initiative                   |

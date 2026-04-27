@@ -1,41 +1,13 @@
-import { surfaceLinks, type SurfaceId } from "../app/mock-projections";
-import type { WindowStore } from "./window-store";
-
 /**
- * Dock — first-class launcher with Launchpad semantics, scoped to the
- * Desktop frame per `virtual-desktop-deep.md`.
+ * Shell dock — thin re-export over place-reflection.
  *
- * Clicking a tile opens or focuses that vApp's window. The dock lists
- * the same surfaces as `surfaceLinks` — that list is static UI
- * configuration (vApp registry), not canonical data.
+ * Wave 2 (2026-04-24): swapped from the old ema-dock tile strip to the
+ * donor-styled Dock from place-reflection. The Dock reads its state (open
+ * windows, pinned apps, settings, virtual desktops) from the zustand
+ * bridges in place-reflection/shell-state — no props needed here.
+ *
+ * RIP: place.org src/components/desktop/Dock.tsx (see
+ *      place-reflection/components/dock/Dock.tsx for the full provenance).
  */
-export function Dock({
-  store,
-  onOpen,
-}: {
-  store: WindowStore;
-  onOpen: (surfaceId: SurfaceId, route: string, label: string) => void;
-}) {
-  return (
-    <nav className="ema-dock" aria-label="EMA dock">
-      {surfaceLinks.map((surface) => {
-        const winId = `window:${surface.id}`;
-        const isOpen = store.windows.some((w) => w.id === winId);
-        return (
-          <button
-            key={surface.id}
-            type="button"
-            className={isOpen ? "ema-dock__tile is-open" : "ema-dock__tile"}
-            onClick={() => onOpen(surface.id, surface.path, surface.label)}
-            aria-pressed={isOpen}
-            title={`${surface.eyebrow} — ${surface.label}`}
-          >
-            <span className="ema-dock__tile-eyebrow">{surface.eyebrow}</span>
-            <strong className="ema-dock__tile-label">{surface.label}</strong>
-            <span className="ema-dock__tile-status" data-status={surface.status} />
-          </button>
-        );
-      })}
-    </nav>
-  );
-}
+
+export { Dock } from "../place-reflection";

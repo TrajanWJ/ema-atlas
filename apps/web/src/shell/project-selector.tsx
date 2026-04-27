@@ -3,8 +3,11 @@ import { mockTopbar } from "../app/mock-projections";
 
 export function ProjectSelector() {
   const topbar = useProjection("topbar");
-  const projects = topbar?.projects ?? mockTopbar.projects;
-  const current = topbar?.current_project ?? mockTopbar.current_project;
+  const projects = topbar?.projects?.length ? topbar.projects : mockTopbar.projects;
+  const projectedCurrent = topbar?.current_project;
+  const current = projectedCurrent && projects.some((project: { id: string }) => project.id === projectedCurrent.id)
+    ? projectedCurrent
+    : mockTopbar.current_project;
 
   return (
     <select
@@ -16,7 +19,7 @@ export function ProjectSelector() {
       }}
       disabled={projects.length === 0}
     >
-      {projects.length === 0 && <option value="">(no projects)</option>}
+      {projects.length === 0 && <option value="">Project unavailable</option>}
       {projects.map((p: { id: string; name: string }) => (
         <option key={p.id} value={p.id}>
           {p.name}

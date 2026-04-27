@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { createIpcClient, IpcClient } from "@ema/surface-core/ipc-client";
 
@@ -22,6 +24,6 @@ export function IpcProvider({ children }: { children: ReactNode }) {
 
 function inferDaemonUrl(): string {
   // In dev the daemon is on 127.0.0.1:49555. Surfaces never talk to a
-  // remote host; EMA's remote reach is daemon→daemon replication.
-  return import.meta.env.VITE_EMA_DAEMON_URL ?? "ws://127.0.0.1:49555";
+  // remote host; EMA's remote reach is daemon-to-daemon replication.
+  return process.env.NEXT_PUBLIC_EMA_DAEMON_URL ?? "ws://127.0.0.1:49555";
 }

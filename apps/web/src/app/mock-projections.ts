@@ -1,4 +1,4 @@
-export const MOCK_PROJECTION_LABEL = "mock local projection";
+export const MOCK_PROJECTION_LABEL = "staged projection";
 
 export const EMA_SCOPE = {
   orgId: "org:01J00000000000000000000001",
@@ -16,6 +16,8 @@ export const EMA_SCOPE = {
 export const PROJECT_ROOT_PATH = `/orgs/${EMA_SCOPE.orgId}/spaces/${EMA_SCOPE.spaceId}/projects/${EMA_SCOPE.projectId}`;
 
 export type SurfaceId =
+  | "launchpad"
+  | "braindump"
   | "hq"
   | "blueprint"
   | "git-ema"
@@ -39,7 +41,7 @@ export const mockTopbar = {
     space_id: EMA_SCOPE.spaceId,
     name: EMA_SCOPE.projectName,
   },
-  node_state: "home",
+  node_state: "home_current",
 };
 
 export const surfaceLinks: Array<{
@@ -47,8 +49,22 @@ export const surfaceLinks: Array<{
   label: string;
   path: string;
   eyebrow: string;
-  status: "live" | "projection" | "placeholder";
+  status: "live" | "projection" | "staged";
 }> = [
+  {
+    id: "launchpad",
+    label: "Launchpad",
+    path: "/launchpad",
+    eyebrow: "launcher",
+    status: "projection",
+  },
+  {
+    id: "braindump",
+    label: "Brain Dump",
+    path: "/braindump",
+    eyebrow: "intent capture",
+    status: "staged",
+  },
   {
     id: "hq",
     label: "HQ",
@@ -82,14 +98,14 @@ export const surfaceLinks: Array<{
     label: "Wiki / Doctrine",
     path: "/wiki",
     eyebrow: "memory",
-    status: "placeholder",
+    status: "staged",
   },
   {
     id: "threads",
     label: "Chat / Threads",
     path: "/threads",
     eyebrow: "coordination",
-    status: "placeholder",
+    status: "staged",
   },
 ];
 
@@ -97,28 +113,28 @@ export const hqProjection = {
   pulse: [
     { label: "org", value: "1", detail: "Founding-Fathers-EMA seeded" },
     { label: "surfaces", value: "6", detail: "HQ, Blueprint, git-ema, agent work, wiki, threads" },
-    { label: "mock controls", value: "12", detail: "visible affordances, no canonical writes" },
-    { label: "daemon", value: "stub", detail: "BEAM seed and contracts are source of truth" },
+    { label: "ready controls", value: "12", detail: "operator affordances queued for daemon writers" },
+    { label: "daemon", value: "seeded", detail: "BEAM seed and contracts are source of truth" },
   ],
   controls: [
     {
       label: "Promote projection",
-      state: "armed mock",
+      state: "staged",
       detail: "Would request daemon review before becoming canon.",
     },
     {
       label: "Freeze event trail",
       state: "local only",
-      detail: "Pins the visible mock timeline for a demo pass.",
+      detail: "Pins the current event trail for a demo pass.",
     },
     {
       label: "Invite surface owner",
-      state: "placeholder",
+      state: "staged",
       detail: "Future scoped handoff into org / space / project permissions.",
     },
     {
       label: "Run doctrine check",
-      state: "mock",
+      state: "staged",
       detail: "Checks page copy against the visible doctrine cards.",
     },
   ],
@@ -131,10 +147,10 @@ export const hqProjection = {
     "wiki/doctrine/no-hidden-canon",
     "threads/demo-room",
     "events/local-projection",
-    "settings/scaffold",
+    "settings/shell-preferences",
     "surface/desktop-embed",
     "surface/browser",
-    "mock-command-log",
+    "local-command-log",
   ],
 };
 
@@ -154,7 +170,7 @@ export const eventTrail = [
   {
     time: "13:42",
     actor: "git-ema",
-    action: "Connector panel exposed fake OAuth affordances",
+    action: "Connector panel exposed staged OAuth affordances",
     surface: "git-ema",
   },
   {
@@ -178,26 +194,26 @@ export const CHRONICLE_MAX = 200;
 
 // TODO(event-family: lane.*, handoff.*, proposal.*) replace with the live
 // See Agent Work projection sourced from daemon events. Until then this is
-// a placeholder. Worker status lives in docs/orchestration/STATUS.md, never
+// staged surface state. Worker status lives in docs/orchestration/STATUS.md, never
 // here. Kept as a pointer-row so HQ can fall back if the richer
 // `seeAgentWorkProjection.lanes` is unavailable.
 export const agentWork = [
   {
     lane: "see docs/orchestration/STATUS.md",
     owner: "coordinator ledger",
-    status: "mock",
+    status: "staged",
     output: "Lane state is tracked in the ledger, not in surface data.",
   },
 ];
 
 export const seeAgentWorkProjection = {
   project_id: EMA_SCOPE.projectId,
-  mocked: true,
+  staged: true,
   swarms: [
     {
       id: "swarm:01J00000000000000000000001",
       name: "EMA 0.0.5 buildout swarm",
-      status: "mocked",
+      status: "staged",
       purpose: "Coordinate Codex, Claude, and human founder work around the vanilla workspace.",
     },
   ],
@@ -205,7 +221,7 @@ export const seeAgentWorkProjection = {
     {
       id: "campaign:01J000000000000000000001",
       title: "0.0.5 Vanilla Workspace",
-      status: "active mock",
+      status: "active staged",
       signal: "Make the whole operating environment visible before real autonomy.",
     },
     {
@@ -280,7 +296,7 @@ export const seeAgentWorkProjection = {
       id: "handoff:01J000000000000000000002",
       from: "contracts",
       to: "UI lane",
-      needed: "Keep mock IDs aligned with first-boot daemon seed.",
+      needed: "Keep seed IDs aligned with first-boot daemon contracts.",
       status: "accepted",
     },
   ],
@@ -320,14 +336,14 @@ export const seeAgentWorkProjection = {
     },
   ],
   blocked_work: [
-    "Real BEAM WebSocket server is not wired yet.",
-    "SQLite append/replay is not implemented yet.",
-    "Start/pause/stop controls are explicitly mocked.",
+    "Daemon writer still needs the See Agent Work event family.",
+    "Lane replay needs promotion from staged projection to daemon projection.",
+    "Start/pause/stop controls are staged until supervision commands land.",
   ],
   controls: [
-    { label: "Start Swarm", state: "mocked", command: "ema swarm start --swarm buildout" },
-    { label: "Pause Swarm", state: "mocked", command: "ema swarm pause --swarm buildout" },
-    { label: "Stop Swarm", state: "mocked", command: "ema swarm stop --swarm buildout" },
+    { label: "Start Swarm", state: "staged", command: "ema swarm start --swarm buildout" },
+    { label: "Pause Swarm", state: "staged", command: "ema swarm pause --swarm buildout" },
+    { label: "Stop Swarm", state: "staged", command: "ema swarm stop --swarm buildout" },
     { label: "Open Mission", state: "draft", command: "ema mission create --title \"Build vanilla workspace\"" },
     { label: "Request Handoff", state: "draft", command: "ema handoff request --from lane:<id> --to actor:<id>" },
     { label: "Schedule Checkup", state: "draft", command: "ema checkup schedule --lane lane:<id> --cadence daily" },
@@ -339,7 +355,7 @@ export const seeAgentWorkProjection = {
     `ema agent prompt --actor actor:01J00000000000000000000003 --mission mission:01J000000000000000000002`,
   ],
   agent_instruction:
-    "Work inside Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5. Keep the lane scoped, report changed files, preserve intent vs canon, and do not imply mocked controls executed real work.",
+    "Work inside Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5. Keep the lane scoped, report changed files, preserve intent vs canon, and do not imply staged controls executed real work.",
   // Chronicle strip feed. Bounded by CHRONICLE_MAX. Wave 1: seeded from
   // eventTrail + synthesized lane/handoff entries. Wave 2+: daemon-sourced.
   recent_events: [
@@ -347,7 +363,7 @@ export const seeAgentWorkProjection = {
     { ts: "13:54", actor: "daemon projection", kind: "projection", summary: "topbar snapshot delivered on subscribe" },
     { ts: "13:49", actor: "daemon bus", kind: "event", summary: "Topbar subscription attempted on ws://127.0.0.1:49555" },
     { ts: "13:47", actor: "contracts", kind: "command_result", summary: "check:contracts OK — every referenced event kind is in catalog v0" },
-    { ts: "13:42", actor: "git-ema", kind: "event", summary: "Connector panel exposed fake OAuth affordances" },
+    { ts: "13:42", actor: "git-ema", kind: "event", summary: "Connector panel exposed staged OAuth affordances" },
     { ts: "13:39", actor: "agent-work", kind: "event", summary: "Lane lane:01J00000000000000000000002 entered review" },
     { ts: "13:31", actor: "blueprint", kind: "event", summary: "Section attachment targets prepared" },
     { ts: "13:28", actor: "coordinator ledger", kind: "event", summary: "Handoff accepted: contracts → UI lane" },
@@ -357,7 +373,7 @@ export const seeAgentWorkProjection = {
 };
 
 // HQ's Lane status panel reads this derived summary instead of the one-line
-// `agentWork` placeholder. Lane ownership is resolved through
+// `agentWork` staged pointer. Lane ownership is resolved through
 // `seeAgentWorkProjection.actors` so the panel speaks EMA object language.
 // Per SURFACE-SLICE-A.md §"Files touched" and `docs/vapps/see-agent-work.md`.
 export const agentWorkLaneSummary = seeAgentWorkProjection.lanes.map((lane) => {
@@ -377,7 +393,7 @@ export const agentWorkLaneSummary = seeAgentWorkProjection.lanes.map((lane) => {
 export const doctrineCards = [
   {
     title: "No Hidden Canon",
-    body: "Every datum on this localhost shell is either daemon projection or clearly labeled mock local projection.",
+    body: "Every datum on this localhost shell is either daemon projection or clearly labeled staged projection.",
   },
   {
     title: "Surfaces Coordinate, Daemon Decides",
@@ -392,17 +408,17 @@ export const doctrineCards = [
 export const threadCards = [
   {
     title: "Demo Room",
-    meta: "placeholder thread",
+    meta: "staged thread",
     body: "A future chat stream for walkthrough questions, decisions, and surface handoffs.",
   },
   {
     title: "Agent Dispatch",
-    meta: "placeholder thread",
+    meta: "staged thread",
     body: "A future coordination lane for reviewing agent outputs before promotion.",
   },
   {
     title: "Project Pulse",
-    meta: "placeholder thread",
+    meta: "staged thread",
     body: "A future low-noise digest of project events, alerts, and review requests.",
   },
 ];
@@ -417,7 +433,7 @@ export const blueprintProjection = {
           id: EMA_SCOPE.blueprintRootSectionId,
           title: "Executive Management Assistant",
           children: [
-            { id: "bp-hq", title: "HQ pulse and mocked controls" },
+            { id: "bp-hq", title: "HQ pulse and staged controls" },
             { id: "bp-agent-work", title: "See Agent Work lane visibility" },
           ],
         },
@@ -431,10 +447,10 @@ export const blueprintProjection = {
         },
         {
           id: "bp-doctrine",
-          title: "Doctrine and placeholders",
+          title: "Doctrine and staged surfaces",
           children: [
-            { id: "bp-wiki", title: "Wiki / Doctrine scaffold" },
-            { id: "bp-threads", title: "Chat / Threads scaffold" },
+            { id: "bp-wiki", title: "Wiki / Doctrine foundation" },
+            { id: "bp-threads", title: "Chat / Threads foundation" },
           ],
         },
       ],
@@ -445,16 +461,16 @@ export const blueprintProjection = {
 export const gitEmaUserConnectorsProjection = {
   connectors: [
     {
-      id: "mock-github",
+      id: "seed-github",
       provider: "github",
       status: "connected",
-      display_label: "mock: ema-central-runtime",
+      display_label: "seed: ema-central-runtime",
     },
     {
-      id: "mock-drive",
+      id: "seed-drive",
       provider: "google_drive",
       status: "disconnected",
-      display_label: "mock: drive unavailable",
+      display_label: "seed: drive unavailable",
     },
   ],
 };
@@ -464,19 +480,19 @@ export const gitEmaAttachmentsProjection = {
     {
       id: EMA_SCOPE.runtimeAttachmentId,
       kind: "folder",
-      source: "mock local projection",
+      source: "staged projection",
       display_name: "runtime/EMA-0.0.5--4-24",
     },
     {
-      id: "mock-web-src",
+      id: "seed-web-src",
       kind: "git_path",
-      source: "mock local projection",
+      source: "staged projection",
       display_name: "apps/web/src",
     },
     {
-      id: "mock-blueprint-doc",
+      id: "seed-blueprint-doc",
       kind: "drive_file",
-      source: "mock local projection",
+      source: "staged projection",
       display_name: "EMA 0.0.5 Control Room Blueprint",
     },
   ],

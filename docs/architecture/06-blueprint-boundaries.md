@@ -11,33 +11,39 @@ two planes and the boundary between them is load-bearing.
 | List of documents in blueprint  | canonical truth   | access control, linking, replication                          |
 | Section tree (headings)         | canonical truth   | structural ops should replay cleanly                          |
 | Section ordering                | canonical truth   | deterministic replay                                          |
-| Prose body of a section         | Yjs (per-doc)     | real-time collab, offline convergence                         |
-| Inline cursors / presence       | Yjs awareness     | ephemeral                                                     |
+| Prose body of a section         | BEAM collab doc   | real-time collab, offline convergence                         |
+| Inline cursors / presence       | BEAM room state   | ephemeral                                                     |
 | Comments on a section           | canonical truth   | need explicit promotion to proposal, audit trail              |
 | Section → proposal promotion    | canonical truth   | cross-system event                                            |
 | Attachments linked to a section | canonical truth   | pointer lives in `ema_attachments`, link is canonical         |
 
 ## Collaborative-prose shape
 
-The prose plane needs a CRDT for real-time, offline-tolerant collaboration.
-The structural plane (above) is canonical event-sourced and does not use a
-CRDT.
+The prose plane needs BEAM-owned real-time collaboration with
+offline-tolerant update replay. The structural plane (above) is canonical
+event-sourced and does not use a CRDT.
 
 **Wave-1 position:** no CRDT is wired. The Blueprint section tree renders
 from canonical projections; prose bodies are placeholder text fields that
 write to the canonical log (coarse-grained) until the CRDT lands.
 
-**Wave-7 direction:** Yjs is not the committed choice. The daemon is
-Gleam/BEAM; hosting a JS runtime inside it is undesirable. Preferred
-options in order:
+**Priority direction:** live collaboration is now the top product proof point
+per `17-live-collab-first.md`. The daemon is Gleam/BEAM; hosting a JS runtime
+inside it is no longer an acceptable default. Preferred options in order:
 
-1. A BEAM-native CRDT (`delta_crdt`, or an Automerge-compatible port) owned
-   by the daemon. One document ↔ one CRDT instance; auth boundary is
-   per-document; replication rides the existing event bus + peer
+1. A BEAM-native collaborative document process owned by `ema_blueprint` /
+   `ema_collab`. One document ↔ one supervised BEAM process; auth boundary is
+   per-document; updates persist in SQLite and later ride the p2p peer
    transport.
 2. An Automerge-over-BEAM adapter, same shape.
-3. Hocuspocus/Yjs sidecar as a last resort, behind a separate process and
-   its own WS endpoint — only if neither BEAM-native option is credible.
+3. A BEAM-native CRDT library such as `delta_crdt` if it fits the text model.
+
+Rejected as document authority:
+
+- Hocuspocus/Yjs sidecar;
+- Node collaboration server;
+- Google Docs/Drive as the storage substrate;
+- browser-local document truth.
 
 Whichever CRDT ships, the invariant is the same: **one document ↔ one
 collaborative object**, not one-per-project. This preserves:
@@ -46,8 +52,15 @@ collaborative object**, not one-per-project. This preserves:
 - load cost per-document;
 - replication shape simple (one doc ↔ one channel).
 
-References to "Yjs" elsewhere in the repo are lineage, not the locked
-choice. Update them as the CRDT decision firms up.
+References to "Yjs" elsewhere in the repo are lineage, not canon. The live
+document authority is BEAM-owned.
+
+Blueprint prose uses the shared collab contract names:
+
+- open command: `collab.document.open`
+- replace command: `collab.document.replace`
+- projection: `collab.document`
+- checkpoint event: `collab.document.checkpointed`
 
 ## Structural events (canonical-side)
 
@@ -93,9 +106,9 @@ already matches the requested intent, the writer MUST be idempotent
 
 - Canonical event stubs in the catalog.
 - `blueprint.md` vApp doc.
-- A placeholder vApp page in `apps/web/src/vapps/blueprint/` that renders
-  a fake section tree from a projection and demonstrates the **Attach…**
-  button handing off to git-ema's attach dialog.
-- **No CRDT wiring yet.** Real-time collab is wave 7; the specific CRDT
-  (BEAM-native preferred — see "Collaborative-prose shape" above) is
-  deferred.
+- A live Blueprint/Myro-style editor surface in `apps/web/app/page.tsx`.
+- A supervised `ema_collab` actor with SQLite-backed replacement frames,
+  `collab.document.open`, `collab.document.replace`, and live
+  `collab.document` projection fan-out over shell IPC.
+- Multi-machine p2p transport for collab frames remains the next layer; the
+  single-daemon BEAM room is the local authority proof.

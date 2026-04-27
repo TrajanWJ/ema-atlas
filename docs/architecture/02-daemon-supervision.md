@@ -20,16 +20,13 @@ the only writer to the canonical SQLite database.
 - **Canonical DB file:** one `canonical.db` per daemon instance, opened in
   WAL mode, single writer process. Projections live in a separate disposable
   `projections.db` (also SQLite, WAL, but re-buildable from the canonical
-  log at any time).
-- **Real-time collaboration (future wave):** Yjs is NOT the committed
-  choice. Yjs is JS-runtime-coupled; we do not want to host a JS runtime
-  inside the BEAM daemon. Wave-7 collaboration will pick either (a) a
-  BEAM-native CRDT (e.g. `delta_crdt` or an Automerge-compatible library
-  with an Erlang adapter) mediated by the daemon, or (b) a separate
-  Hocuspocus sidecar if Yjs is the only credible option. The
-  `06-blueprint-boundaries.md` doc describes the Blueprint structural vs
-  prose split in general terms; the specific CRDT is deferred and NOT
-  "Yjs" by default.
+  log at any time). Live collab projections are the exception: they are
+  rebuilt from the BEAM collab frame store plus canonical checkpoint metadata.
+- **Real-time collaboration:** live prose authority belongs to supervised
+  BEAM document rooms under `ema_collab`. The first slice uses
+  `collab.document.open`, `collab.document.replace`, and the
+  `collab.document` projection. No Node, Yjs, or Hocuspocus process may be
+  document authority.
 
 ## Top-level tree
 
@@ -46,6 +43,7 @@ ema_daemon_sup (one_for_one)
     ├── memberships_sup
     ├── invites_sup
     ├── blueprint_sup
+    ├── collab_sup       (BEAM-native live document rooms)
     ├── attachments_sup   (git-ema backend — attachments + connectors)
     ├── coordination_sup  (ema_swarm_coordination — lanes/handoffs/missions/
     │                      campaigns/swarms/vcalendar/checkups — mock
@@ -99,8 +97,8 @@ One folder per context under `apps/daemon/src/`:
 ```
 ema_identity/      ema_orgs/         ema_spaces/
 ema_projects/      ema_memberships/  ema_invites/
-ema_blueprint/     ema_attachments/  ema_swarm_coordination/
-ema_replication/   ema_shell_ipc/
+ema_blueprint/     ema_collab/       ema_attachments/
+ema_swarm_coordination/ ema_replication/ ema_shell_ipc/
 ```
 
 The canonical name is `ema_swarm_coordination`. Earlier doctrine drafts used

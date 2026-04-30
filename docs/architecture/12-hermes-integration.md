@@ -1,4 +1,4 @@
-# 12 — Hermes integration (stub)
+# 12 — Hermes integration (preparation stub)
 
 Stub doc. The Hermes seam is already named in
 `03-event-catalog-v0.md` as the contract boundary inside the daemon
@@ -7,18 +7,25 @@ between `ema_control` (owns `dispatch.*`) and `ema_exec` (owns
 a landing page and so other docs can `see 12-hermes-integration.md`
 instead of duplicating the seam definition.
 
-Status: **not implemented.** No Hermes binary is integrated in wave 1.
+Status: **not implemented.** No Hermes binary is integrated in wave 1,
+and normal Codex/Claude sessions are not Hermes. Current work prepares
+the runtime rails that Hermes will need later: Harness Glue for
+provider/session dispatch and Chronicle for activity ingestion/search.
 `dispatch.*`, `execution.*`, `tool.*` event families are declared and
-writers are stubbed but no real agent turn runs through them yet.
+writers are stubbed but no real Hermes turn runs through them yet.
+
+See `18-harness-glue.md` for the Chronicle + Duct Tape preparation
+layer. Hermes consumes that layer later; it does not replace it.
 
 ## What Hermes is, in EMA terms
 
-Hermes is an execution engine: it takes a dispatched agent turn
+Hermes will be an orchestration/execution engine: it takes a dispatched agent turn
 (system prompt + scoped capabilities + a tool catalog) and produces
 tool calls, tool results, and an ended-dispatch signal. EMA owns the
 *dispatch* half (who is asking, with what scope, under what policy);
-Hermes owns the *execution* half (the model turn, the tool protocol,
-the result stream).
+Harness Glue owns the provider/session bridge, and Chronicle owns
+activity indexing. Hermes coordinates those rails later; it is not the
+runtime substrate itself.
 
 The seam is event-sourced, not RPC. Neither half calls the other
 directly. Both read and write on the same canonical bus.
@@ -60,17 +67,21 @@ They see `dispatch_id` + `secret_ref:<ulid>` only.
 
 ## Wave-1 constraint
 
-No Hermes binary runs. No real agent turns. The catalog entries for
+No Hermes binary runs. No real Hermes agent turns. The catalog entries for
 `dispatch.*`, `execution.*`, `tool.*` exist only so:
 
 1. the See Agent Work vApp has a defined event shape to mock against,
-2. future CLI commands (`ema dispatch start …`) have a contract
-   pre-agreed, and
+2. `ema harness ...` can prove normalized Duct Tape/Chronicle event
+   rails before real providers are wired, and
 3. Biscuit/secret_ref integration has a named seam to attach to.
 
 A wave-1 daemon may accept a `debug.ping`-style command that emits a
 `dispatch.started` + `dispatch.ended` pair for end-to-end testing (per
 M1 in `plans/IMPLEMENTATION-ROADMAP.md`). That is not real execution.
+
+The CLI command `ema hermes ...` is therefore a projection seed and
+resume-packet preview only. The preparation command that should be used
+for provider/session work now is `ema harness ...`.
 
 ## Wave-N direction
 

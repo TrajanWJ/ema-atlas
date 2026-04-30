@@ -3,7 +3,7 @@
 Status: draft, awaiting operator approval
 Owner: EMA 0.0.5 Product Surface Donor Orchestrator
 Lane scope: apps/web only
-Donor matrix: [../../../../doctrine/research/EMA-0.0.5-SURFACE-DONOR-MATRIX.md](../../../../doctrine/research/EMA-0.0.5-SURFACE-DONOR-MATRIX.md)
+Donor context: [../../../Projects/EMA/atlas/_inventory/MATURE-ATLAS-TAKEAWAYS.md](../../../Projects/EMA/atlas/_inventory/MATURE-ATLAS-TAKEAWAYS.md)
 
 ## Problem
 

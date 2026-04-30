@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 PID_DIR="$ROOT/.ema-dev/pids"
 
 DAEMON_PORT=49555
@@ -44,6 +45,16 @@ EOF
 done
 
 stopped_any=0
+
+if [ "${EMA_USE_LAUNCHCTL:-0}" = "1" ] && [ "$(uname -s)" = "Darwin" ] && command -v launchctl >/dev/null 2>&1; then
+  for label in org.ema.dev.daemon org.ema.dev.web; do
+    if launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1; then
+      echo "$label: removing launchctl job..."
+      launchctl remove "$label" >/dev/null 2>&1 || true
+      stopped_any=1
+    fi
+  done
+fi
 
 stop_by_pidfile() {
   local name="$1"

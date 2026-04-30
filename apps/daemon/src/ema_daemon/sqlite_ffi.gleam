@@ -155,6 +155,48 @@ pub fn persist_project_created(
   }
 }
 
+pub fn persist_project_materialized(
+  db: Db,
+  org_id: String,
+  project_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case
+    persist_project_materialized_raw(
+      db,
+      org_id,
+      project_id,
+      payload_json,
+      updated_at,
+      actor,
+    )
+  {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_project_archived(
+  db: Db,
+  project_id: String,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Nil, Error) {
+  case persist_project_archived_raw(db, project_id, payload_json, updated_at) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn migrate_projects_unique_name(db: Db) -> Result(Nil, Error) {
+  case migrate_projects_unique_name_raw(db) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
 pub fn persist_membership_role_granted(
   db: Db,
   org_id: String,
@@ -416,12 +458,100 @@ pub fn peer_trust_projection_json(db: Db) -> String {
   peer_trust_projection_json_raw(db)
 }
 
+pub fn invite_projection_json(db: Db) -> String {
+  invite_projection_json_raw(db)
+}
+
+pub fn chronicle_activity_projection_json(db: Db) -> String {
+  chronicle_activity_projection_json_raw(db)
+}
+
+pub fn project_filesystem_projection_json(db: Db) -> String {
+  project_filesystem_projection_json_raw(db)
+}
+
+pub fn space_vapps_projection_json(db: Db) -> String {
+  space_vapps_projection_json_raw(db)
+}
+
+pub fn lane_registry_projection_json(db: Db) -> String {
+  lane_registry_projection_json_raw(db)
+}
+
+pub fn lane_registry_projection_json_scoped(db: Db, project_id: String) -> String {
+  lane_registry_projection_json_scoped_raw(db, project_id)
+}
+
+pub fn queue_registry_projection_json(db: Db) -> String {
+  queue_registry_projection_json_raw(db)
+}
+
+pub fn queue_registry_projection_json_scoped(db: Db, project_id: String) -> String {
+  queue_registry_projection_json_scoped_raw(db, project_id)
+}
+
+pub fn campaign_registry_projection_json(db: Db) -> String {
+  campaign_registry_projection_json_raw(db)
+}
+
+pub fn mission_registry_projection_json(db: Db) -> String {
+  mission_registry_projection_json_raw(db)
+}
+
+pub fn handoff_registry_projection_json(db: Db) -> String {
+  handoff_registry_projection_json_raw(db)
+}
+
+pub fn problem_graph_projection_json(db: Db) -> String {
+  problem_graph_projection_json_raw(db)
+}
+
+pub fn agent_reports_projection_json(db: Db) -> String {
+  agent_reports_projection_json_raw(db)
+}
+
+pub fn blueprint_projection_json(db: Db) -> String {
+  blueprint_projection_json_raw(db)
+}
+
+pub fn blueprint_planner_projection_json(db: Db) -> String {
+  blueprint_planner_projection_json_raw(db)
+}
+
+pub fn vcalendar_projection_json(db: Db) -> String {
+  vcalendar_projection_json_raw(db)
+}
+
+pub fn intent_graph_projection_json(db: Db) -> String {
+  intent_graph_projection_json_raw(db)
+}
+
+/// Returns the per-lane scope tuple `#(org_id, space_id, project_id,
+/// lane_id, cadence)` for every active/claimed lane that is due for an
+/// auto-checkup. Each lane's actual scope is captured from its own
+/// lane.opened envelope so `tick_auto_checkups` can emit
+/// `checkup.scheduled` events without hard-coding any org.
+pub fn auto_checkup_due_lanes(
+  db: Db,
+) -> List(#(String, String, String, String, String)) {
+  auto_checkup_due_lanes_raw(db)
+}
+
 pub fn peer_is_trusted(db: Db, org_id: String, peer_device: String) -> Bool {
   peer_is_trusted_raw(db, org_id, peer_device)
 }
 
 pub fn event_exists(db: Db, kind: String, org_id: String) -> Bool {
   event_exists_raw(db, kind, org_id)
+}
+
+pub fn workspace_resource_exists(
+  db: Db,
+  resource_kind: String,
+  resource_id: String,
+  org_id: String,
+) -> Bool {
+  workspace_resource_exists_raw(db, resource_kind, resource_id, org_id)
 }
 
 // --- FFI bindings to esqlite3 ------------------------------------------
@@ -480,6 +610,27 @@ fn persist_project_created_raw(
   created_at: String,
   actor: String,
 ) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_project_materialized")
+fn persist_project_materialized_raw(
+  db: Db,
+  org_id: String,
+  project_id: String,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_project_archived")
+fn persist_project_archived_raw(
+  db: Db,
+  project_id: String,
+  payload_json: String,
+  updated_at: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "migrate_projects_unique_name")
+fn migrate_projects_unique_name_raw(db: Db) -> Result(Dynamic, Dynamic)
 
 @external(erlang, "ema_sqlite_helpers", "persist_identity_user_upserted")
 fn persist_identity_user_upserted_raw(
@@ -635,11 +786,75 @@ fn device_projection_json_raw(db: Db) -> String
 @external(erlang, "ema_sqlite_helpers", "peer_trust_projection_json")
 fn peer_trust_projection_json_raw(db: Db) -> String
 
+@external(erlang, "ema_sqlite_helpers", "invite_projection_json")
+fn invite_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "chronicle_activity_projection_json")
+fn chronicle_activity_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "project_filesystem_projection_json")
+fn project_filesystem_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "space_vapps_projection_json")
+fn space_vapps_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "lane_registry_projection_json")
+fn lane_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "lane_registry_projection_json_scoped")
+fn lane_registry_projection_json_scoped_raw(db: Db, project_id: String) -> String
+
+@external(erlang, "ema_sqlite_helpers", "queue_registry_projection_json")
+fn queue_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "queue_registry_projection_json_scoped")
+fn queue_registry_projection_json_scoped_raw(db: Db, project_id: String) -> String
+
+@external(erlang, "ema_sqlite_helpers", "campaign_registry_projection_json")
+fn campaign_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "mission_registry_projection_json")
+fn mission_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "handoff_registry_projection_json")
+fn handoff_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "problem_graph_projection_json")
+fn problem_graph_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "agent_reports_projection_json")
+fn agent_reports_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "blueprint_projection_json")
+fn blueprint_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "blueprint_planner_projection_json")
+fn blueprint_planner_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "vcalendar_projection_json")
+fn vcalendar_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "intent_graph_projection_json")
+fn intent_graph_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "auto_checkup_due_lanes")
+fn auto_checkup_due_lanes_raw(
+  db: Db,
+) -> List(#(String, String, String, String, String))
+
 @external(erlang, "ema_sqlite_helpers", "peer_is_trusted")
 fn peer_is_trusted_raw(db: Db, org_id: String, peer_device: String) -> Bool
 
 @external(erlang, "ema_sqlite_helpers", "event_exists")
 fn event_exists_raw(db: Db, kind: String, org_id: String) -> Bool
+
+@external(erlang, "ema_sqlite_helpers", "workspace_resource_exists")
+fn workspace_resource_exists_raw(
+  db: Db,
+  resource_kind: String,
+  resource_id: String,
+  org_id: String,
+) -> Bool
 
 @external(erlang, "ema_sqlite_helpers", "classify_step")
 fn classify_step(raw: Dynamic) -> Result(StepResult, Error)

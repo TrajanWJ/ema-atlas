@@ -25,8 +25,8 @@ scope drift.
 
 Before editing, an external agent should read:
 
-1. `../../../../doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md`
-2. `../../../../doctrine/planning/EMA-0.0.5-LANGUAGE-LOCK.md`
+1. `../../../Projects/EMA/PROJECT-MAP.md`
+2. `../../../Projects/EMA/atlas/canon/current/ema-0-0-5-current-canon.md`
 3. `../architecture/08-vanilla-workspace.md`
 4. `../architecture/09-see-agent-work.md`
 5. `../vapps/see-agent-work.md`

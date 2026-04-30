@@ -1,0 +1,53 @@
+/* =============================================================================
+   place-glass-system — four glass tiers
+   Requires --place-* tokens from place-design-tokens to be in scope.
+   Source: place.org/app/globals.css (~lines 242–278)
+   ========================================================================== */
+
+.glass-ambient {
+	background: var(--glass-bg-ambient, rgba(14, 16, 23, 0.4));
+	backdrop-filter: blur(var(--glass-blur-ambient, 6px)) saturate(120%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-ambient, 6px)) saturate(120%);
+}
+
+.glass-surface {
+	background: var(--glass-bg-surface, rgba(14, 16, 23, 0.55));
+	backdrop-filter: blur(var(--glass-blur-surface, 20px)) saturate(150%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-surface, 20px)) saturate(150%);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-elevated {
+	background: var(--glass-bg-elevated, rgba(14, 16, 23, 0.65));
+	backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-accent {
+	background: var(--glass-bg-accent, rgba(10, 30, 25, 0.60));
+	backdrop-filter: blur(var(--glass-blur-accent, 32px)) saturate(180%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-accent, 32px)) saturate(180%);
+	border: 1px solid var(--place-primary-border);
+}
+
+/* alias — most common need */
+.glass {
+	background: var(--glass-bg-elevated, rgba(14, 16, 23, 0.65));
+	backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	-webkit-backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Reduced motion / low power — flatten glass */
+@media (prefers-reduced-motion: reduce) {
+	.glass-ambient,
+	.glass-surface,
+	.glass-elevated,
+	.glass-accent,
+	.glass {
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+		background: var(--place-surface-1);
+	}
+}

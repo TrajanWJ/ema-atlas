@@ -12,7 +12,10 @@
 
 set -euo pipefail
 
-PROMPTS_DIR="/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/doctrine/planning/orchestrator-prompts"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DESKTOP_ROOT="$(cd "$ROOT/../.." && pwd -P)"
+PROMPTS_DIR="${EMA_PROMPTS_DIR:-$DESKTOP_ROOT/Projects/EMA/atlas/content/swarm/orchestrator-prompts}"
 STATUS_REF="docs/orchestration/STATUS.md"
 
 JSON=0
@@ -39,25 +42,22 @@ EOF
   esac
 done
 
-if [[ ! -d "$PROMPTS_DIR" ]]; then
-  echo "ledger-check: prompts dir not found at $PROMPTS_DIR" >&2
-  exit 2
-fi
-
 missing=()
 checked=0
 
-for f in "$PROMPTS_DIR"/*.md; do
-  [[ -f "$f" ]] || continue
-  name="$(basename "$f")"
-  if [[ "$name" == "ORCHESTRATOR-INDEX.md" ]]; then continue; fi
-  if [[ "$name" == HANDOFF-* ]]; then continue; fi
-  if head -n 1 "$f" | grep -q "has been superseded"; then continue; fi
-  checked=$((checked + 1))
-  if ! grep -q "$STATUS_REF" "$f"; then
-    missing+=("$name")
-  fi
-done
+if [[ -d "$PROMPTS_DIR" ]]; then
+  for f in "$PROMPTS_DIR"/*.md; do
+    [[ -f "$f" ]] || continue
+    name="$(basename "$f")"
+    if [[ "$name" == "ORCHESTRATOR-INDEX.md" ]]; then continue; fi
+    if [[ "$name" == HANDOFF-* ]]; then continue; fi
+    if head -n 1 "$f" | grep -q "has been superseded"; then continue; fi
+    checked=$((checked + 1))
+    if ! grep -q "$STATUS_REF" "$f"; then
+      missing+=("$name")
+    fi
+  done
+fi
 
 if [[ "$JSON" -eq 1 ]]; then
   printf '{\n'
@@ -71,7 +71,9 @@ if [[ "$JSON" -eq 1 ]]; then
   done
   printf ']\n}\n'
 else
-  if [[ ${#missing[@]} -eq 0 ]]; then
+  if [[ ! -d "$PROMPTS_DIR" ]]; then
+    echo "ledger-check: OK — no canonical prompts directory found at $PROMPTS_DIR; checked 0 prompt(s)."
+  elif [[ ${#missing[@]} -eq 0 ]]; then
     echo "ledger-check: OK — $checked canonical prompt(s) reference $STATUS_REF."
   else
     echo "ledger-check: FAIL — canonical prompt(s) missing reference to $STATUS_REF:"

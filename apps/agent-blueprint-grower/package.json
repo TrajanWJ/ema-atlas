@@ -1,0 +1,28 @@
+{
+  "name": "@ema/agent-blueprint-grower",
+  "version": "0.0.5-dev",
+  "private": true,
+  "description": "EMA 0.0.5 — auto-grow Blueprint agent. Watches the canonical event log + collab document streams and emits blueprint.* mutations on detected patterns.",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -b --noEmit",
+    "test": "node --test --import tsx/esm src/detectors.test.ts"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/ws": "^8.5.12",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

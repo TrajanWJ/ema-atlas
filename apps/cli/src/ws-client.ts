@@ -230,9 +230,11 @@ export class Client {
     });
   }
 
-  subscribe(channel: string): void {
+  subscribe(channel: string, options?: { project_id?: string | null }): void {
     this.droppedChannels.delete(channel);
-    this.sendRaw({ v: 0, id: nextId(), type: "subscribe", channel });
+    const msg: Record<string, unknown> = { v: 0, id: nextId(), type: "subscribe", channel };
+    if (options?.project_id) msg.args = { project_id: options.project_id };
+    this.sendRaw(msg);
   }
 
   unsubscribe(channel: string): void {

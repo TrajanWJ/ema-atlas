@@ -122,9 +122,40 @@ export type SeeAgentWorkProjection = {
   cli_suggestions: string[];
 };
 
+export type ProjectFilesystemProjection = {
+  projects: Array<{
+    project_id: string;
+    space_id: string;
+    org_id: string;
+    name: string;
+    local_path: string;
+    status: "pending" | "materialized" | "materialization_failed" | string;
+    reason: string;
+  }>;
+};
+
+export type SpaceInstalledVAppsProjection = {
+  org_id: string;
+  space_id: string;
+  source: string;
+  apps: Array<{
+    installation_id: string;
+    vapp_id: string;
+    slug: string;
+    label: string;
+    status: "live" | "projection" | "staged" | string;
+    project_name: string;
+    enabled: boolean;
+    sort_order: number;
+    config: Record<string, unknown>;
+  }>;
+};
+
 export const PROJECTION_NAMES = {
   topbar: "topbar",
   accessSessionCurrent: "access_session.current",
+  projectFilesystemStatus: "project.filesystem_status",
+  spaceInstalledVApps: "space.installed_vapps",
   gitEmaUserConnectors: "git_ema.user_connectors",
   gitEmaUserAttachments: "git_ema.user_attachments",
   gitEmaProjectAttachments: "git_ema.project_attachments",

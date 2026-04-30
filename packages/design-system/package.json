@@ -2,11 +2,13 @@
   "name": "@ema/design-system",
   "version": "0.0.5-dev",
   "private": true,
-  "description": "EMA design-system primitives.",
+  "description": "EMA design system — canonical place-* tokens, glass tiers, theme presets.",
   "type": "module",
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./tokens.css": "./src/tokens.css"
+    "./tokens.css": "./src/tokens.css",
+    "./glass.css": "./src/glass.css",
+    "./themes": "./src/themes.ts"
   }
 }

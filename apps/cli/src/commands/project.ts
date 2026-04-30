@@ -3,9 +3,20 @@ import { emitError, emitJson, emitPretty } from "../output.js";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { reportError } from "./ping.js";
+import { runStubContract } from "./stub-contract.js";
 
 export async function runProject(args: ParsedArgs): Promise<number> {
   const sub = args.positional[0];
+  if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
+    return runStubContract(args, {
+      noun: "project",
+      status: "available",
+      docRef: "docs/cli/agent-workspace.md",
+      commands: [
+        { verb: "create", flags: ["org", "space", "name"], required: ["org", "space", "name"], summary: "Create a project inside an organization space." },
+      ],
+    });
+  }
   if (sub !== "create") {
     emitError(`ema project: unknown subcommand "${sub ?? ""}" (expected: create)`);
     return 64;

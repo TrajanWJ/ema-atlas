@@ -72,6 +72,14 @@ or
 ```
 { "v": 0, "type": "command_result",
   "in_reply_to": "msg-...",
+  "ok": true,
+  "data": { "name": "<projection-name>", "value": { ... } }
+}
+```
+or
+```
+{ "v": 0, "type": "command_result",
+  "in_reply_to": "msg-...",
   "ok": false,
   "error": { "class": "<error-class>", "message": "..." }
 }
@@ -87,7 +95,7 @@ new class MUST add it here first.
 | ----------------------------- | ------------------------------------------------------------ |
 | `org.create`                  | `{ name }`                                                   |
 | `space.create`                | `{ org_id, name }`                                           |
-| `project.create`              | `{ space_id, name }`                                         |
+| `project.create`              | `{ org_id, space_id, name }`                                 |
 | `collab.document.open`        | `{ target: CollabDocumentTarget }` → `command_result.projection` |
 | `collab.document.replace`     | `{ target: CollabDocumentTarget, revision, text }`           |
 | `identity.google_upsert`      | `{ user_id, google_sub, email, display_name, email_verified }` |
@@ -114,6 +122,11 @@ new class MUST add it here first.
 | `attachment.link`             | `{ attachment_id, object_kind, object_id }`                  |
 | `attachment.unlink`           | `{ attachment_id, object_kind, object_id }`                  |
 | `connector.list_picker_items` | `{ connector_id }` → `command_result.picker_items`           |
+| `companion.discover`          | `{}` → `command_result.data: CompanionStatusProjection`      |
+| `companion.window.open`       | `{ window_id, app_id, url, bounds, transparent }`            |
+| `companion.window.close`      | `{ window_id }`                                              |
+| `companion.window.focus`      | `{ window_id }`                                              |
+| `companion.window.reattach_ack` | `{ window_id }`                                            |
 
 `collab.document.open` is a **room open/query**: it starts or attaches to the
 BEAM room and immediately pushes the current `collab.document` projection over
@@ -126,6 +139,18 @@ canonical events.
 
 `connector.list_picker_items` is a **query** that returns inline data on
 `command_result` rather than emitting events (read path, not write path).
+
+`companion.*` commands are the daemon-brokered form of the place-companion
+protocol. Browser surfaces may use the direct localhost companion bridge during
+recovery, but the durable EMA shape is daemon-owned discovery + window events:
+the daemon validates localhost/origin policy, tracks native window state, and
+emits `companion.status` / `companion.windows` projections.
+
+The current 0.0.5 broker slice tracks requested native-window state in daemon
+memory and marks opened windows as `pending_native_attach`. It accepts `bounds`
+for projection parity, but it does not yet prove that a native companion process
+opened the window; browser surfaces must keep the direct companion and
+`window.open()` fallbacks until `companion.status.available` is true.
 
 ## Events (daemon → surface)
 
@@ -157,6 +182,8 @@ channel.
 | `project.<project_id>.attachments`   | attachment + link events for this project                 |
 | `user.<user_id>.connectors`          | connector events for this user                            |
 | `collab.document`                     | BEAM collab projection replacements after document open   |
+| `companion.status`                    | daemon-brokered companion availability snapshots          |
+| `companion.windows`                   | daemon-tracked companion window snapshots                 |
 
 ## Projections (daemon → surface)
 
@@ -178,12 +205,25 @@ daemon recomputes:
 | `access_session.current`        | `AccessSessionProjection`     |
 | `device.registry`               | `DeviceRegistryProjection`    |
 | `peer.trust`                    | `PeerTrustProjection`         |
+| `invite.registry`               | `InviteRegistryProjection`    |
+| `project.filesystem_status`     | `ProjectFilesystemProjection` |
+| `space.installed_vapps`         | `SpaceInstalledVAppsProjection` |
+| `lane.registry`                 | `LaneRegistryProjection`      |
+| `queue.registry`                | `QueueRegistryProjection`     |
+| `campaign.registry`             | `CampaignRegistryProjection`  |
+| `mission.registry`              | `MissionRegistryProjection`   |
+| `handoff.registry`              | `HandoffRegistryProjection`   |
+| `problem.graph`                 | `ProblemGraphProjection`      |
+| `agent.reports`                 | `AgentReportsProjection`      |
 | `git_ema.user_connectors`       | `UserConnectorsProjection`    |
 | `git_ema.user_attachments`      | `UserAttachmentsProjection`   |
 | `git_ema.project_attachments`   | `ProjectAttachmentsProjection`|
+| `chronicle.activity`            | `ChronicleActivityProjection` |
 | `blueprint.sections`            | `BlueprintSectionsProjection` |
 | `collab.document`               | `CollabDocumentProjection`    |
 | `see_agent_work.project_pulse`  | `SeeAgentWorkProjection`      |
+| `companion.status`             | `CompanionStatusProjection`   |
+| `companion.windows`            | `CompanionWindowsProjection`  |
 
 ```
 TopbarProjection {
@@ -241,6 +281,33 @@ DeviceRegistryProjection {
   transport: "disabled"
 }
 
+CompanionStatusProjection {
+  available: boolean
+  transport: "direct-websocket" | "daemon-brokered" | "unavailable"
+  protocol_version?: string
+  version?: string
+  port?: number
+  tracked_window_count?: number
+  focused_window_id?: string
+  last_error?: string
+}
+
+CompanionWindowsProjection {
+  focused_window_id?: string
+  windows: [
+    {
+      window_id: string
+      app_id: string
+      url: string
+      bounds?: { x: number, y: number, width: number, height: number }
+      transparent: boolean
+      state?: "opening" | "open" | "closed" | "error"
+      lifecycle?: "pending_native_attach" | "reattached"
+      error?: string
+    }
+  ]
+}
+
 PeerTrustProjection {
   peers: [
     {
@@ -256,6 +323,146 @@ PeerTrustProjection {
   ]
   replication_enabled: false
   transport: "disabled"
+}
+
+InviteRegistryProjection {
+  invites: [
+    {
+      invite_id: invite:<ulid>
+      org_id: org:<ulid>
+      target_kind: string
+      target_value: string
+      role: "owner" | "admin" | "member" | "guest"
+      status: "open" | "accepted" | "revoked" | "expired"
+      expires_at: ISO-8601 UTC
+      updated_at: ISO-8601 UTC
+    }
+  ]
+}
+
+ProjectFilesystemProjection {
+  projects: [
+    {
+      project_id: project:<ulid>
+      space_id: space:<ulid>
+      org_id: org:<ulid>
+      name: string
+      local_path: string
+      status: "pending" | "materialized" | "materialization_failed"
+      reason: string
+    }
+  ]
+}
+
+ChronicleActivityProjection {
+  source: "daemon_events"
+  host_id: string
+  events: [
+    {
+      id: string
+      txid: number
+      kind: string
+      source: string
+      session_id: string
+      actor: string
+      org_id: string
+      space_id?: string
+      project_id?: string
+      ts: ISO-8601 UTC
+      label: string
+    }
+  ]
+  sessions: [
+    {
+      id: string
+      actor: string
+      org_id: string
+      space_id?: string
+      project_id?: string
+      started_at: ISO-8601 UTC
+      last_event_at: ISO-8601 UTC
+      event_count: number
+      latest_kind: string
+    }
+  ]
+  sources: [
+    {
+      source: string
+      event_count: number
+      latest_at: ISO-8601 UTC
+    }
+  ]
+}
+
+SpaceInstalledVAppsProjection {
+  org_id: org:<ulid>
+  space_id: space:<ulid>
+  source: string
+  apps: [
+    {
+      installation_id: string
+      vapp_id: string
+      slug: string
+      label: string
+      status: "live" | "projection" | "staged"
+      project_name: string
+      enabled: bool
+      sort_order: int
+      config: object
+    }
+  ]
+}
+
+LaneRegistryProjection {
+  source: "daemon_events"
+  lanes: [
+    {
+      id: lane:<ulid>
+      lane_id: lane:<ulid>
+      title: string
+      name: string
+      status: "idea" | "ready" | "active" | "review" | "blocked" | "done"
+      project_id?: project:<ulid>
+      mission_id?: mission:<ulid>
+      scope?: string
+      claim_scope?: string
+      done_when?: string
+      depends_on?: string
+      opened_by?: actor:<ulid> | user:<ulid> | system:<component>
+      actor_id?: actor:<ulid>
+      goal?: string
+      next?: string
+      blocker?: string
+      blocked_reason?: string
+      opened_at?: ISO-8601 UTC
+      updated_at?: ISO-8601 UTC
+    }
+  ]
+}
+
+QueueRegistryProjection {
+  source: "daemon_events"
+  queue_items: [
+    {
+      id: queue_item:<ulid>
+      queue_item_id: queue_item:<ulid>
+      title: string
+      why: string
+      status: "ready" | "blocked" | "closed"
+      project_id?: project:<ulid>
+      mission_id?: mission:<ulid>
+      lane_id?: lane:<ulid>
+      done_when?: string
+      depends_on?: string
+      blocked_by?: string
+      source?: string
+      added_by?: actor:<ulid> | user:<ulid> | system:<component>
+      blocked_reason?: string
+      result?: string
+      added_at?: ISO-8601 UTC
+      updated_at?: ISO-8601 UTC
+    }
+  ]
 }
 
 UserConnectorsProjection {

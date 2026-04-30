@@ -89,6 +89,7 @@ event {
 | Family        | File                | Owner context         |
 | ------------- | ------------------- | --------------------- |
 | actor         | `actor.md`          | ema_identity          |
+| agent         | `agent.md`          | ema_swarm_coordination |
 | org           | `org.md`            | ema_orgs              |
 | identity      | `identity.md`       | ema_identity          |
 | space         | `space.md`          | ema_spaces            |
@@ -101,7 +102,11 @@ event {
 | lease         | `lease.md`          | ema_replication       |
 | replication   | `replication.md`    | ema_replication       |
 | lane          | `lane.md`           | (future) ema_swarm_coordination    |
-| handoff       | `handoff.md`        | (future) ema_swarm_coordination    |
+| queue_item    | `queue_item.md`     | ema_swarm_coordination |
+| campaign      | `campaign.md`       | ema_swarm_coordination |
+| mission       | `mission.md`        | ema_swarm_coordination |
+| handoff       | `handoff.md`        | ema_swarm_coordination |
+| problem       | `problem.md`        | ema_swarm_coordination |
 | proposal      | `proposal.md`       | (future) ema_swarm_coordination    |
 | incident      | `incident.md`       | (future) ema_swarm_coordination    |
 | dispatch      | `dispatch.md`       | ema_control seam      |

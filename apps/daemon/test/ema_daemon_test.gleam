@@ -2,6 +2,8 @@ import gleeunit
 import gleeunit/should
 
 import ema_access_sessions/ema_access_sessions
+import ema_blueprint/ema_blueprint
+import ema_blueprint/planner_nodes
 import ema_collab/ema_collab
 import ema_daemon/bus
 import ema_daemon/event_envelope.{Envelope}
@@ -12,9 +14,12 @@ import ema_orgs/ema_orgs
 import ema_replication/ema_collab_sync
 import ema_replication/ema_peers
 import ema_replication/ema_replication
+import ema_swarm_coordination/agent_workspace
 import ema_swarm_coordination/first_boot
+import ema_vcalendar/ema_vcalendar
 import gleam/erlang/process
 import gleam/list
+import gleam/option.{None, Some}
 import gleam/string
 
 pub fn main() {
@@ -811,6 +816,539 @@ pub fn collab_peer_cursor_rejects_mismatched_frame_id_test() {
   let _ = delete_file(path)
 }
 
+/// T1.2 planner lifecycle: GAC create → answer; decision lock; aspiration capture.
+/// Verifies events land and the planner projection includes the new nodes.
+pub fn planner_full_lifecycle_test() {
+  let path = tmp_path("ema-planner-lifecycle.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(planner_nodes.GacCreated(gac_id, _)) =
+    planner_nodes.gac_create(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "blueprint_doc:test",
+      None,
+      "gap",
+      "high",
+      "Should the planner do X?",
+      None,
+    )
+  let assert Ok(_) =
+    planner_nodes.gac_answer(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      gac_id,
+      Some("B"),
+      None,
+      "create_intent",
+      None,
+    )
+  let assert Ok(planner_nodes.DecisionLocked(decision_id, _)) =
+    planner_nodes.decision_lock(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "Soft phase enforcement",
+      "Log incident.noted; proceed.",
+      None,
+      None,
+    )
+  let assert Ok(_) =
+    planner_nodes.aspiration_capture(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "Eventually auto-import atlas decisions",
+      None,
+      "long_term",
+      "manual_tag",
+      None,
+      None,
+    )
+
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.gac.created", "org:test"),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.gac.answered", "org:test"),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.decision.locked", "org:test"),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.aspiration.captured", "org:test"),
+    True,
+  )
+
+  let projection = bus.blueprint_planner_projection_json(bus_subject)
+  should.equal(string.contains(projection, gac_id), True)
+  should.equal(string.contains(projection, decision_id), True)
+  should.equal(string.contains(projection, "auto-import atlas decisions"), True)
+  should.equal(string.contains(projection, "\"status\":\"answered\""), True)
+  should.equal(string.contains(projection, "\"status\":\"committed\""), True)
+
+  let _ = delete_file(path)
+}
+
+/// T1.2 validation: invalid category is rejected.
+pub fn planner_invalid_category_rejected_test() {
+  let path = tmp_path("ema-planner-validation.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Error(planner_nodes.InvalidCategory(value)) =
+    planner_nodes.gac_create(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "blueprint_doc:test",
+      None,
+      "not_a_category",
+      "high",
+      "question?",
+      None,
+    )
+  should.equal(value, "not_a_category")
+
+  let _ = delete_file(path)
+}
+
+/// T1.1 workspace lifecycle: open → claim → block → release → move → close.
+/// Verifies all six lane events land and the projection reflects the final
+/// status as `done`.
+pub fn lane_full_lifecycle_test() {
+  let path = tmp_path("ema-lane-lifecycle.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(agent_workspace.LaneOpened(lane_id, _)) =
+    agent_workspace.open_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "Lifecycle test lane",
+      None,
+      None,
+      None,
+      None,
+      None,
+    )
+
+  let assert Ok(_) =
+    agent_workspace.claim_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      lane_id,
+      "the scope",
+      "the goal",
+      "the next step",
+      None,
+      None,
+    )
+  let assert Ok(_) =
+    agent_workspace.block_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      lane_id,
+      "blocked for test",
+      None,
+    )
+  let assert Ok(_) =
+    agent_workspace.release_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      lane_id,
+      None,
+      Some("released for test"),
+    )
+  let assert Ok(_) =
+    agent_workspace.move_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      lane_id,
+      "review",
+    )
+  let assert Ok(_) =
+    agent_workspace.close_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      lane_id,
+      Some("done"),
+      Some("verified"),
+    )
+
+  should.equal(bus.event_exists(bus_subject, "lane.opened", "org:test"), True)
+  should.equal(bus.event_exists(bus_subject, "lane.claimed", "org:test"), True)
+  should.equal(bus.event_exists(bus_subject, "lane.blocked", "org:test"), True)
+  should.equal(bus.event_exists(bus_subject, "lane.released", "org:test"), True)
+  should.equal(bus.event_exists(bus_subject, "lane.moved", "org:test"), True)
+  should.equal(bus.event_exists(bus_subject, "lane.closed", "org:test"), True)
+
+  let projection = bus.lane_registry_projection_json(bus_subject)
+  should.equal(string.contains(projection, lane_id), True)
+  should.equal(string.contains(projection, "\"status\":\"done\""), True)
+
+  let _ = delete_file(path)
+}
+
+/// T1.1 queue lifecycle: add → block → ready → close.
+pub fn queue_full_lifecycle_test() {
+  let path = tmp_path("ema-queue-lifecycle.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(agent_workspace.QueueItemAdded(item_id, _)) =
+    agent_workspace.add_queue_item(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "Queue lifecycle test",
+      "demonstrates lifecycle",
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+    )
+
+  let assert Ok(_) =
+    agent_workspace.mark_queue_item_blocked(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      item_id,
+      "T1",
+      Some("waiting"),
+    )
+  let assert Ok(_) =
+    agent_workspace.mark_queue_item_ready(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      item_id,
+      Some("unblocked"),
+    )
+  let assert Ok(_) =
+    agent_workspace.close_queue_item(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      item_id,
+      Some("done"),
+      Some("checked"),
+    )
+
+  should.equal(
+    bus.event_exists(bus_subject, "queue_item.added", "org:test"),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "queue_item.blocked", "org:test"),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "queue_item.ready", "org:test"),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "queue_item.closed", "org:test"),
+    True,
+  )
+
+  let projection = bus.queue_registry_projection_json(bus_subject)
+  should.equal(string.contains(projection, item_id), True)
+  should.equal(string.contains(projection, "\"status\":\"closed\""), True)
+
+  let _ = delete_file(path)
+}
+
+/// T1.1 validation: invalid lane status is rejected without appending.
+pub fn lane_invalid_status_rejected_test() {
+  let path = tmp_path("ema-lane-invalid.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(agent_workspace.LaneOpened(lane_id, _)) =
+    agent_workspace.open_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "Invalid status test",
+      None,
+      None,
+      None,
+      None,
+      None,
+    )
+  let assert Error(agent_workspace.InvalidStatus(value)) =
+    agent_workspace.move_lane(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      lane_id,
+      "not_a_real_status",
+    )
+  should.equal(value, "not_a_real_status")
+
+  let _ = delete_file(path)
+}
+
+/// Slice-1 blueprint writer: create a doc + add two sections, then verify
+/// each event landed in the bus and the projection reflects the tree.
+pub fn blueprint_document_and_section_writer_test() {
+  let path = tmp_path("ema-blueprint-writer.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(ema_blueprint.DocumentCreated(document_id, _)) =
+    ema_blueprint.create_document(
+      bus_subject,
+      "org:test",
+      None,
+      "actor:test",
+      "project:test",
+      "Test Blueprint Doc",
+    )
+
+  let assert Ok(ema_blueprint.SectionAdded(s1, _)) =
+    ema_blueprint.add_section(
+      bus_subject,
+      "org:test",
+      None,
+      Some("project:test"),
+      "actor:test",
+      document_id,
+      None,
+      "First Section",
+      0,
+    )
+
+  let assert Ok(ema_blueprint.SectionAdded(s2, _)) =
+    ema_blueprint.add_section(
+      bus_subject,
+      "org:test",
+      None,
+      Some("project:test"),
+      "actor:test",
+      document_id,
+      Some(s1),
+      "Nested Section",
+      0,
+    )
+
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.document.created", "org:test"),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.section.added", "org:test"),
+    True,
+  )
+
+  let projection = bus.blueprint_projection_json(bus_subject)
+  should.equal(string.contains(projection, "Test Blueprint Doc"), True)
+  should.equal(string.contains(projection, "First Section"), True)
+  should.equal(string.contains(projection, "Nested Section"), True)
+  should.equal(string.contains(projection, document_id), True)
+  should.equal(string.contains(projection, s2), True)
+
+  let _ = delete_file(path)
+}
+
+/// Renaming a section emits the renamed event and the projection reflects
+/// the new title (and not the old).
+pub fn blueprint_section_rename_test() {
+  let path = tmp_path("ema-blueprint-rename.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(ema_blueprint.DocumentCreated(doc, _)) =
+    ema_blueprint.create_document(
+      bus_subject,
+      "org:test",
+      None,
+      "actor:test",
+      "project:test",
+      "Doc",
+    )
+  let assert Ok(ema_blueprint.SectionAdded(sec, _)) =
+    ema_blueprint.add_section(
+      bus_subject,
+      "org:test",
+      None,
+      Some("project:test"),
+      "actor:test",
+      doc,
+      None,
+      "Original Title",
+      0,
+    )
+  let assert Ok(_) =
+    ema_blueprint.rename_section(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      sec,
+      "New Title",
+    )
+
+  let projection = bus.blueprint_projection_json(bus_subject)
+  should.equal(string.contains(projection, "New Title"), True)
+}
+
+/// Move event updates the projection's `position` and `parent_section_id`.
+pub fn blueprint_section_move_test() {
+  let path = tmp_path("ema-blueprint-move.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(ema_blueprint.DocumentCreated(doc, _)) =
+    ema_blueprint.create_document(
+      bus_subject,
+      "org:test",
+      None,
+      "actor:test",
+      "project:test",
+      "Doc",
+    )
+  let assert Ok(ema_blueprint.SectionAdded(parent, _)) =
+    ema_blueprint.add_section(
+      bus_subject,
+      "org:test",
+      None,
+      Some("project:test"),
+      "actor:test",
+      doc,
+      None,
+      "Parent",
+      0,
+    )
+  let assert Ok(ema_blueprint.SectionAdded(child, _)) =
+    ema_blueprint.add_section(
+      bus_subject,
+      "org:test",
+      None,
+      Some("project:test"),
+      "actor:test",
+      doc,
+      None,
+      "Child",
+      1,
+    )
+  let assert Ok(_) =
+    ema_blueprint.move_section(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      child,
+      Some(parent),
+      5,
+    )
+
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.section.moved", "org:test"),
+    True,
+  )
+}
+
+/// Removed sections are filtered out of the projection's section list.
+pub fn blueprint_section_remove_filters_projection_test() {
+  let path = tmp_path("ema-blueprint-remove.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(ema_blueprint.DocumentCreated(doc, _)) =
+    ema_blueprint.create_document(
+      bus_subject,
+      "org:test",
+      None,
+      "actor:test",
+      "project:test",
+      "Doc",
+    )
+  let assert Ok(ema_blueprint.SectionAdded(sec, _)) =
+    ema_blueprint.add_section(
+      bus_subject,
+      "org:test",
+      None,
+      Some("project:test"),
+      "actor:test",
+      doc,
+      None,
+      "Will Be Removed",
+      0,
+    )
+  let assert Ok(_) =
+    ema_blueprint.remove_section(bus_subject, "org:test", "actor:test", sec)
+
+  let projection = bus.blueprint_projection_json(bus_subject)
+  should.equal(string.contains(projection, "Will Be Removed"), False)
+}
+
+/// Validation: empty title returns BlueprintError without appending events.
+pub fn blueprint_empty_title_rejected_test() {
+  let path = tmp_path("ema-blueprint-validation.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Error(ema_blueprint.EmptyTitle) =
+    ema_blueprint.create_document(
+      bus_subject,
+      "org:test",
+      None,
+      "actor:test",
+      "project:test",
+      "",
+    )
+  let assert Error(ema_blueprint.EmptyOrg) =
+    ema_blueprint.create_document(
+      bus_subject,
+      "",
+      None,
+      "actor:test",
+      "project:test",
+      "Doc",
+    )
+
+  should.equal(
+    bus.event_exists(bus_subject, "blueprint.document.created", "org:test"),
+    False,
+  )
+}
+
 fn sample_envelope(event_id: String) -> event_envelope.Envelope {
   Envelope(
     event_id: event_id,
@@ -840,6 +1378,122 @@ fn peer_envelope(event_id: String, kind: String) -> event_envelope.Envelope {
     payload_json: "{}",
   )
 }
+
+/// L2 (campaign:01KQE5GCV300F8V5MM5TFJNJNS, mission:01KQE5HQRR00NFJFTPEHH5EC06):
+/// tick_auto_checkups must emit each checkup.scheduled with the lane's
+/// own org (captured from the lane.opened envelope) — not a hard-coded
+/// org. This test opens lanes in two distinct orgs with daily cadence,
+/// runs the tick, and verifies:
+///   1. exactly two checkups are emitted (one per lane);
+///   2. one checkup.scheduled event exists in each org;
+///   3. no checkup.scheduled event lands in the legacy hard-coded
+///      `org:01J0…0001`.
+pub fn tick_auto_checkups_uses_per_lane_org_test() {
+  let path = tmp_path("ema-tick-auto-checkups-per-lane-org.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let org_a = "org:test-a"
+  let org_b = "org:test-b"
+  let legacy_hardcoded = "org:01J00000000000000000000001"
+
+  let assert Ok(agent_workspace.LaneOpened(lane_a_id, _)) =
+    agent_workspace.open_lane_linked(
+      bus_subject,
+      org_a,
+      "actor:test-a",
+      "Lane in org A",
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      Some("daily"),
+    )
+  let assert Ok(_) =
+    agent_workspace.claim_lane(
+      bus_subject,
+      org_a,
+      "actor:test-a",
+      lane_a_id,
+      "scope-a",
+      "goal-a",
+      "next-a",
+      None,
+      None,
+    )
+
+  let assert Ok(agent_workspace.LaneOpened(lane_b_id, _)) =
+    agent_workspace.open_lane_linked(
+      bus_subject,
+      org_b,
+      "actor:test-b",
+      "Lane in org B",
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      Some("daily"),
+    )
+  let assert Ok(_) =
+    agent_workspace.claim_lane(
+      bus_subject,
+      org_b,
+      "actor:test-b",
+      lane_b_id,
+      "scope-b",
+      "goal-b",
+      "next-b",
+      None,
+      None,
+    )
+
+  let result = ema_vcalendar.tick_auto_checkups(bus_subject)
+
+  // Both lanes are due (no prior checkup, cadence=daily, age≈0 < daily
+  // threshold but the projection treats absence of a prior checkup as
+  // due — see lane_due_for_checkup/3 in ema_sqlite_helpers.erl).
+  should.equal(result.emitted, 2)
+  should.equal(result.skipped_unscoped, 0)
+  should.equal(list.length(result.lane_ids), 2)
+
+  // Checkups landed in each lane's actual org.
+  should.equal(
+    bus.event_exists(bus_subject, "checkup.scheduled", org_a),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "checkup.scheduled", org_b),
+    True,
+  )
+  // Critically: no checkup leaked into the legacy hard-coded org.
+  should.equal(
+    bus.event_exists(bus_subject, "checkup.scheduled", legacy_hardcoded),
+    False,
+  )
+
+  let _ = delete_file(path)
+}
+
+/// Note on the `skipped_unscoped` field on AutoCheckupTick: it is a
+/// defensive tripwire for events that pre-date envelope-scope plumbing
+/// (M1). It cannot be exercised through the normal write path because
+/// `bus.append/2` rejects envelopes with an empty org_id
+/// (PersistenceFailed("empty org_id")) — which is the right behavior.
+/// The field is still kept on the return so the IPC handler can surface
+/// a real diagnostic if a migrated/corrupted DB ever does contain such
+/// an envelope. The richer silent-zero diagnostic ("no_due_lanes" vs
+/// "already_within_window") tracked in
+/// queue_item:01KQE5P02F015GF0KXM6KHZWWR will layer on top of this.
 
 @external(erlang, "ema_test_helpers", "tmp_path")
 fn tmp_path(suffix: String) -> String

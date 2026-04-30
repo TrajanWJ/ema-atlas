@@ -2,8 +2,20 @@ import { connect, DaemonUnreachableError } from "../ws-client.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
 import type { ParsedArgs } from "../args.js";
 import { flagBool } from "../args.js";
+import { runStubContract } from "./stub-contract.js";
 
 export async function runPing(args: ParsedArgs): Promise<number> {
+  if (flagBool(args, "help") || args.flags.h === true || args.positional[0] === "help") {
+    return runStubContract(args, {
+      noun: "ping",
+      status: "available",
+      usage: "Usage: ema ping [--json]",
+      docRef: "packages/contracts/ipc/shell-protocol.md",
+      commands: [
+        { verb: "run", flags: ["json"], summary: "Handshake with the daemon and print round-trip latency." },
+      ],
+    });
+  }
   const json = flagBool(args, "json");
   try {
     const c = await connect({ surface: "desktop" });

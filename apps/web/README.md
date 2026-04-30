@@ -1,98 +1,57 @@
-# apps/web
+# EMA Web
 
-Browser-hosted EMA vDesktop. Also embedded by `apps/desktop` via Tauri v2
-webview, so a single UI codebase runs in both.
+Browser-hosted shell for EMA `0.0.5`.
 
-## Canon Stack
+This app has two distinct verification modes:
 
-As of 2026-04-24, the canonical web surface stack is:
+- `next dev` on `http://127.0.0.1:5173` for fast local iteration.
+- static-export playback from `apps/web/out/` for Playwright coverage against the bytes that ship in the Tauri app.
 
-- Next.js app router in `app/`
-- React
-- Motion
-- Zustand
-- copied place.org donor source under `src/place-donor/place-org/`
+## Commands
 
-This is canon because the product target is the original place.org desktop
-system reflected into EMA, and that donor code assumes the Next/Motion/Zustand
-shape. Do not quietly revert `@ema/web` to a Vite SPA. The old `src/` tree may
-remain as reference material, but the runnable surface is `app/`.
+From `apps/web/`:
 
-## Place.org Reflection
-
-Wave 2 ports the donor desktop mechanics into the active shell:
-
-- right-click desktop, file, and window menus
-- simulated desktop filesystem plus Finder
-- expanded place.org app catalog in Launchpad
-- resizable, maximizable, snappable, detachable windows
-- companion-bridge intent documented in `docs/architecture/14-companion-bridge.md`
-
-## Organization Access Point
-
-The browser is not a machine peer and is not added to the user's machine
-network. It is a Google-authenticated, optionally Google-Authenticator-hardened
-access point into an EMA organization instance. QR approval is still available
-for trusted EMA machine surfaces and higher-risk ceremonies. Zustand stores in
-`app/page.tsx` are split by responsibility:
-
-- access session store: org id, Google user, Authenticator state, QR/session
-  state, visible peer machines
-- desktop store: UI-only windows, menus, wallpaper, and projected files
-
-Durable truth belongs to the organization and its p2p peer machines. Browser
-state is only the interactive desktop projection over that organization.
-
-## Auth Environment
-
-Google OAuth and Google Authenticator support are real routes, not stubs. Set:
-
-```
-EMA_GOOGLE_CLIENT_ID=...
-EMA_GOOGLE_CLIENT_SECRET=...
-EMA_SESSION_SECRET=at-least-32-random-bytes
-EMA_GOOGLE_REDIRECT_URI=http://localhost:5173/api/auth/google/callback
-EMA_AUTH_ISSUER_NAME=EMA
-EMA_AUTH_STORE_PATH=/absolute/path/to/.ema-dev/web-auth-store.json
-```
-
-`EMA_GOOGLE_REDIRECT_URI` is optional in local dev if the request origin is
-correct, but it should be explicit in deployed environments. Authenticator uses
-standard TOTP and emits an `otpauth://` URI that Google Authenticator can scan
-or import. `EMA_AUTH_STORE_PATH` is optional; by default the web server writes
-to the ignored local `apps/web/.ema-dev/web-auth-store.json` bridge until
-`ema_identity` owns durable daemon-side user records.
-
-## Run (dev)
-
-```
-cd apps/web
+```bash
 pnpm dev
+pnpm build
+pnpm test:unit
+pnpm test:e2e:static
+pnpm test:e2e:dev
 ```
 
-Dev runs Next on `http://localhost:5173`.
+From repo root:
 
-The local dev server is only an app host. Product semantics should treat the
-web desktop as connected to an EMA organization access session, not to a local
-server datastore.
-
-## Route
-
-| Path | Renders |
-| --- | --- |
-| `/` | Next-hosted place.org-style vDesktop with Launchpad as the first window |
-
-## Structure
-
-```
-app/                    Canonical Next app surface
-src/place-donor/        Copied place.org donor payload; excluded from build
-src/                    Vite-era reference tree; not the canonical runtime
+```bash
+pnpm --filter @ema/web dev
+pnpm --filter @ema/web test:unit
+pnpm --filter @ema/web test:e2e:static
 ```
 
-## Anti-drift rule
+## Agent Testing Loop
 
-Surfaces never write durable truth. Any mutation eventually flows as a command
-to the organization instance and then through its p2p machine network.
-Surface-local state is UI-only: windows, focus, menus, scroll, and optimistic
-desktop projection.
+1. Build or start the target surface.
+2. Drive state through the URL contract instead of UI clicking.
+3. Use `?test=1` on every E2E URL to suppress ambient motion.
+4. Prefer static-export Playwright for regressions that matter to the packaged app.
+5. Use dev-server Playwright only when debugging a local iteration issue.
+
+Primary references:
+
+- `../../docs/dev/url-test-api.md`
+- `./playwright.config.ts`
+- `./docs/testing/ui-test-prompt.md`
+- `../../tooling/workspace-e2e.mjs`
+
+## URL-Driven Navigation
+
+Examples:
+
+```text
+/?test=1
+/?vapp=blueprint&test=1
+/?windows=blueprint:120,80,860,540;hq:1020,80,500,540&test=1
+/?theme=dracula&titlebar=compact&contrast=high&test=1
+/?panel=wiki&test=1
+```
+
+This URL contract is the canonical agent/E2E control surface. If the shell stops honoring one of these parameters, update both the implementation and `docs/dev/url-test-api.md`.

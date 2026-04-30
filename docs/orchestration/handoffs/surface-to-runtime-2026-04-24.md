@@ -72,7 +72,7 @@ Event families already exist in the catalog; writers do not. Surface lane compos
 | `swarm.pause`             | Pause an active swarm                                         | `swarm.paused`                          |
 | `swarm.stop`              | Stop an active swarm                                          | `swarm.stopped`                         |
 | `mission.create`          | Create a mission under a campaign                             | `mission.created`                       |
-| `lane.item_add`           | Add an item to a lane backlog                                 | `lane.item_added`                       |
+| `queue.add`               | Add discovered follow-up work to the executable queue         | `queue_item.added`                      |
 | `handoff.request`         | Request a handoff from one lane to another                    | `handoff.requested`                     |
 | `checkup.schedule`        | Schedule a checkup for a lane/mission                         | `checkup.scheduled`                     |
 

@@ -5,10 +5,15 @@
   "type": "module",
   "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "cli": "pnpm --filter @ema/cli exec ema",
+    "cli": "bash scripts/run-cli.sh",
+    "build:cli": "pnpm --filter @ema/cli build",
+    "workspace:e2e": "node tooling/workspace-e2e.mjs",
+    "harness:smoke": "node tooling/harness-glue-cli-smoke.mjs",
+    "orchestrator:doctor": "node tooling/orchestrator-doctor.mjs",
     "dev:daemon": "bash scripts/dev-daemon.sh",
     "dev:web": "bash scripts/dev-web.sh",
     "dev:desktop": "bash scripts/dev-desktop.sh",
+    "build:web-static": "bash scripts/build-web-static-out.sh",
     "check:contracts": "bash scripts/contract-check.sh",
     "p2p:update:pack": "node tooling/p2p-dev-update.mjs pack",
     "p2p:update:serve": "node tooling/p2p-dev-update.mjs serve --pack",
@@ -16,6 +21,8 @@
     "p2p:update:apply": "node tooling/p2p-dev-update.mjs apply"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.2",
+    "@playwright/test": "^1.59.1",
     "ws": "^8.20.0"
   }
 }

@@ -1,20 +1,74 @@
 # lane
 
-Owner: (future) `ema_swarm_coordination`.
+Owner: `ema_swarm_coordination`.
 
 Lanes are first-class coordination objects: a named workstream inside
-a project that groups items (issues, tasks, proposals-in-flight). This
-wave ships the event family stubs only; implementation is a later wave.
+a project that groups ownership, queue, and handoff context for active work.
 
 ## Kinds
 
 ### `lane.opened`
 ```
 payload {
-  lane_id:    lane:<ulid>
-  project_id: project:<ulid>
-  name:       string
-  opened_by:  user:<ulid>
+  lane_id:                lane:<ulid>
+  project_id?:            project:<ulid>
+  mission_id?:            mission:<ulid>
+  title:                  string
+  name:                   string
+  scope?:                 string
+  done_when?:             string
+  depends_on?:            string
+  opened_by:              actor:<ulid> | user:<ulid> | system:<component>
+  status:                 "idea" | "ready" | "active" | "review" | "blocked" | "done"
+  blueprint_section_id?:  blueprint_sec:<ulid>
+  blueprint_gac_id?:      blueprint_gac:<ulid>
+  blueprint_decision_id?: blueprint_dec:<ulid>
+}
+```
+
+The three `blueprint_*_id` fields are workspace ↔ blueprint cross-references
+introduced in `docs/architecture/08-workspace-blueprint-cross-refs.md`.
+All three are optional and additive; old events remain valid.
+
+### `lane.claimed`
+```
+payload {
+  lane_id:     lane:<ulid>
+  actor_id:    actor:<ulid>
+  scope:       string
+  goal:        string
+  next:        string
+  refresh_by?: string
+  blocker?:    string
+}
+```
+
+### `lane.moved`
+```
+payload {
+  lane_id:   lane:<ulid>
+  to_status: "idea" | "ready" | "active" | "review" | "blocked" | "done"
+  moved_by:  actor:<ulid> | user:<ulid> | system:<component>
+}
+```
+
+### `lane.released`
+```
+payload {
+  lane_id:     lane:<ulid>
+  actor_id:    actor:<ulid>
+  handoff_id?: handoff:<ulid>
+  reason?:     string
+}
+```
+
+### `lane.blocked`
+```
+payload {
+  lane_id:     lane:<ulid>
+  reason:      string
+  depends_on?: string
+  blocked_by:  actor:<ulid> | user:<ulid> | system:<component>
 }
 ```
 
@@ -23,31 +77,11 @@ payload {
 payload {
   lane_id: lane:<ulid>
   reason?: string
+  verify?: string
+  closed_by?: actor:<ulid> | user:<ulid> | system:<component>
 }
 ```
 
-### `lane.item_added`
-```
-payload {
-  lane_id: lane:<ulid>
-  item:
-    | { kind: "proposal",          id: proposal:<ulid> }
-    | { kind: "incident",          id: incident:<ulid> }
-    | { kind: "blueprint_section", id: blueprint_sec:<ulid> }
-    | { kind: "attachment",        id: attachment:<ulid> }
-  position: int
-}
-```
-
-### `lane.item_moved`
-```
-payload {
-  lane_id:       lane:<ulid>
-  item_id:       string          // typed id matching the kind in lane.item_added
-  from_position: int
-  to_position:   int
-}
-```
-
-`item_id` MUST carry the typed prefix (`proposal:`, `incident:`,
-`blueprint_sec:`, `attachment:`) of the lane entry being moved.
+Historical note: earlier drafts used `lane.item_added` / `lane.item_moved`
+for a kanban-container object. EMA 0.0.5 now reserves `lane.*` for ownership
+tracks. Backlog work discovered during execution belongs in `queue_item.*`.

@@ -6,16 +6,36 @@ import { createIpcClient, IpcClient } from "@ema/surface-core/ipc-client";
 export const IpcContext = createContext<IpcClient | null>(null);
 
 export function IpcProvider({ children }: { children: ReactNode }) {
-  const [client] = useState<IpcClient>(() =>
-    createIpcClient({
-      url: inferDaemonUrl(),
-      surface: "web",
-    }),
-  );
+  // Lazy + crash-safe: createIpcClient could throw if the underlying
+  // transport rejects. Wrap so a failed IPC client never blocks render.
+  const [client] = useState<IpcClient | null>(() => {
+    try {
+      return createIpcClient({
+        url: inferDaemonUrl(),
+        surface: "web",
+      });
+    } catch (e) {
+      // Daemon unreachable / transport unavailable — surface still mounts
+      // with `null` client; useProjection() returns null gracefully.
+      console.warn("[ipc] createIpcClient failed:", e);
+      return null;
+    }
+  });
 
   useEffect(() => {
-    client.connect();
-    return () => client.disconnect();
+    if (!client) return;
+    try {
+      void client.connect();
+    } catch (e) {
+      console.warn("[ipc] connect failed:", e);
+    }
+    return () => {
+      try {
+        client.disconnect();
+      } catch {
+        /* swallow */
+      }
+    };
   }, [client]);
 
   const value = useMemo(() => client, [client]);

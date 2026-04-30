@@ -108,6 +108,8 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "space.member_added" -> True
     "space.member_removed" -> True
     "project.created" -> True
+    "project.materialized" -> True
+    "project.materialization_failed" -> True
     "project.renamed" -> True
     "project.archived" -> True
     "project.moved" -> True
@@ -140,13 +142,29 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "replication.diverged" -> True
     "replication.resynced" -> True
     "lane.opened" -> True
+    "lane.claimed" -> True
+    "lane.moved" -> True
+    "lane.released" -> True
+    "lane.blocked" -> True
     "lane.closed" -> True
-    "lane.item_added" -> True
-    "lane.item_moved" -> True
+    "queue_item.added" -> True
+    "queue_item.ready" -> True
+    "queue_item.blocked" -> True
+    "queue_item.closed" -> True
+    "campaign.created" -> True
+    "campaign.archived" -> True
+    "mission.created" -> True
+    "mission.started" -> True
+    "mission.paused" -> True
+    "mission.completed" -> True
     "handoff.requested" -> True
     "handoff.accepted" -> True
     "handoff.rejected" -> True
     "handoff.completed" -> True
+    "problem.logged" -> True
+    "problem.solution_added" -> True
+    "problem.linked" -> True
+    "agent.reported" -> True
     "proposal.drafted" -> True
     "proposal.submitted" -> True
     "proposal.accepted" -> True
@@ -176,6 +194,18 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "blueprint.comment.resolved" -> True
     "blueprint.attachment.linked" -> True
     "blueprint.attachment.unlinked" -> True
+    "blueprint.gac.created" -> True
+    "blueprint.gac.answered" -> True
+    "blueprint.gac.deferred" -> True
+    "blueprint.gac.promoted" -> True
+    "blueprint.blocker.opened" -> True
+    "blueprint.blocker.resolved" -> True
+    "blueprint.blocker.promoted" -> True
+    "blueprint.aspiration.captured" -> True
+    "blueprint.aspiration.promoted" -> True
+    "blueprint.aspiration.archived" -> True
+    "blueprint.decision.locked" -> True
+    "blueprint.decision.superseded" -> True
     "attachment.created" -> True
     "attachment.renamed" -> True
     "attachment.deleted" -> True

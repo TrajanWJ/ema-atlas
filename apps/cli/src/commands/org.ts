@@ -3,9 +3,20 @@ import { emitError, emitJson, emitPretty } from "../output.js";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { reportError } from "./ping.js";
+import { runStubContract } from "./stub-contract.js";
 
 export async function runOrg(args: ParsedArgs): Promise<number> {
   const sub = args.positional[0];
+  if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
+    return runStubContract(args, {
+      noun: "org",
+      status: "available",
+      docRef: "docs/cli/agent-workspace.md",
+      commands: [
+        { verb: "create", flags: ["name"], required: ["name"], summary: "Create an organization and its same-name default space." },
+      ],
+    });
+  }
   if (sub !== "create") {
     emitError(`ema org: unknown subcommand "${sub ?? ""}" (expected: create)`);
     return 64;

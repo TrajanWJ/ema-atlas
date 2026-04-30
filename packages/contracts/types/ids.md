@@ -24,6 +24,9 @@ Example: `project:01JFYV6W2H7K9Z8XR3BDQG4T5P`.
 | `lease`           | lease record                              |
 | `lane`            | coordination lane                         |
 | `handoff`         | handoff                                   |
+| `problem`         | recursive problem graph node              |
+| `solution`        | candidate solution node                   |
+| `agent_report`    | agent progress report                     |
 | `proposal`        | proposal                                  |
 | `incident`        | incident                                  |
 | `attachment`      | attachment                                |
@@ -34,6 +37,10 @@ Example: `project:01JFYV6W2H7K9Z8XR3BDQG4T5P`.
 | `blueprint_doc`   | blueprint document                        |
 | `blueprint_sec`   | blueprint section                         |
 | `blueprint_cmt`   | blueprint comment                         |
+| `blueprint_gac`   | blueprint GAC card (gap/assumption/clarification) |
+| `blueprint_blocker` | blueprint blocker card                  |
+| `blueprint_aspiration` | blueprint aspiration entry            |
+| `blueprint_dec`   | blueprint decision (canon-tier node)      |
 | `collab_frame`    | durable BEAM collab update/checkpoint frame |
 | `swarm`           | swarm control group                       |
 | `mission`         | mission inside a campaign or project      |

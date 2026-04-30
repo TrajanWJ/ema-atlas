@@ -5,7 +5,8 @@ into a running codebase.
 
 It is subordinate to:
 
-- `../../../../doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md`
+- `../../../Projects/EMA/PROJECT-MAP.md`
+- `../../../Projects/EMA/atlas/canon/current/ema-0-0-5-current-canon.md`
 - `../architecture/08-vanilla-workspace.md`
 - `../architecture/09-see-agent-work.md`
 - `../agents/see-agent-work-agent-usage.md`
@@ -17,9 +18,10 @@ If this file conflicts with the master plan, update this file.
 A user can, on a single machine:
 
 1. Install EMA (desktop or web).
-2. Boot the daemon; the shell topbar populates with
-   `Founding-Fathers-EMA`, its same-name default space, and the
-   `EMA 0.0.5` project.
+2. Boot the daemon; first-boot seeds two orgs:
+   - `Trajan's Organization` (personal, with default space `Personal Workspace`) — the **current** org by default,
+   - `Founding-Fathers-EMA` (project org, with same-name default space and the `EMA 0.0.5` project) — switched to via the topbar org selector when working on EMA itself.
+   The topbar shows the current org/space/project and a switcher.
 3. Create a new org; switch between orgs in the topbar.
 4. Create spaces and projects inside an org. Every new org auto-creates
    one same-name default space.

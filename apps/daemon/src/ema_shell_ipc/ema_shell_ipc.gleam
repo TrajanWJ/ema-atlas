@@ -17,7 +17,10 @@ import gleam/string
 import mist.{type Connection, type ResponseData}
 
 import ema_access_sessions/ema_access_sessions
+import ema_blueprint/ema_blueprint
+import ema_blueprint/planner_nodes
 import ema_collab/ema_collab
+import ema_companion/ema_companion
 import ema_daemon/bus
 import ema_daemon/event_envelope.{type Envelope, Envelope}
 import ema_identity/ema_device_keys
@@ -25,10 +28,12 @@ import ema_identity/ema_identity
 import ema_invites/ema_invites
 import ema_memberships/ema_memberships
 import ema_orgs/ema_orgs
+import ema_presence/ema_presence
 import ema_projects/ema_projects
 import ema_replication/ema_collab_sync
 import ema_replication/ema_peers
 import ema_spaces/ema_spaces
+import ema_swarm_coordination/agent_workspace
 import ema_vcalendar/ema_vcalendar
 
 pub const default_port: Int = 49_555
@@ -84,6 +89,7 @@ fn route(
           collab_subject: collab_subj,
           bus_subscribed: False,
           collab_subscribed: False,
+          subscribed_scope: None,
         ),
         Some(selector),
       )
@@ -113,6 +119,7 @@ type ConnState {
     collab_subject: Subject(ema_collab.Msg),
     bus_subscribed: Bool,
     collab_subscribed: Bool,
+    subscribed_scope: Option(String),
   )
 }
 
@@ -155,6 +162,12 @@ fn handle_bus_delivery(
           "event_trail",
           bus.event_trail_projection_json(state.bus_subject),
         )
+      let _ =
+        send_projection(
+          conn,
+          "chronicle.activity",
+          bus.chronicle_activity_projection_json(state.bus_subject),
+        )
       case env.kind {
         "org.created" ->
           send_projection(
@@ -173,6 +186,18 @@ fn handle_bus_delivery(
             conn,
             "topbar",
             bus.topbar_projection_json(state.bus_subject),
+          )
+        "project.materialized" ->
+          send_projection(
+            conn,
+            "project.filesystem_status",
+            bus.project_filesystem_projection_json(state.bus_subject),
+          )
+        "project.materialization_failed" ->
+          send_projection(
+            conn,
+            "project.filesystem_status",
+            bus.project_filesystem_projection_json(state.bus_subject),
           )
         "membership.role_granted" ->
           send_projection(
@@ -252,8 +277,233 @@ fn handle_bus_delivery(
             "peer.trust",
             bus.peer_trust_projection_json(state.bus_subject),
           )
+        "lane.opened" -> {
+          send_projection(
+            conn,
+            "lane.registry",
+            scoped_lane_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "lane.claimed" -> {
+          send_projection(
+            conn,
+            "lane.registry",
+            scoped_lane_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "lane.moved" -> {
+          send_projection(
+            conn,
+            "lane.registry",
+            scoped_lane_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "lane.released" -> {
+          send_projection(
+            conn,
+            "lane.registry",
+            scoped_lane_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "lane.blocked" -> {
+          send_projection(
+            conn,
+            "lane.registry",
+            scoped_lane_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "lane.closed" -> {
+          send_projection(
+            conn,
+            "lane.registry",
+            scoped_lane_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "queue_item.added" -> {
+          send_projection(
+            conn,
+            "queue.registry",
+            scoped_queue_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "queue_item.ready" -> {
+          send_projection(
+            conn,
+            "queue.registry",
+            scoped_queue_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "queue_item.blocked" -> {
+          send_projection(
+            conn,
+            "queue.registry",
+            scoped_queue_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "queue_item.closed" -> {
+          send_projection(
+            conn,
+            "queue.registry",
+            scoped_queue_registry(state.subscribed_scope, state.bus_subject),
+          )
+        }
+        "campaign.created" ->
+          send_projection(
+            conn,
+            "campaign.registry",
+            bus.campaign_registry_projection_json(state.bus_subject),
+          )
+        "campaign.archived" ->
+          send_projection(
+            conn,
+            "campaign.registry",
+            bus.campaign_registry_projection_json(state.bus_subject),
+          )
+        "mission.created" ->
+          send_projection(
+            conn,
+            "mission.registry",
+            bus.mission_registry_projection_json(state.bus_subject),
+          )
+        "mission.started" ->
+          send_projection(
+            conn,
+            "mission.registry",
+            bus.mission_registry_projection_json(state.bus_subject),
+          )
+        "mission.paused" ->
+          send_projection(
+            conn,
+            "mission.registry",
+            bus.mission_registry_projection_json(state.bus_subject),
+          )
+        "mission.completed" ->
+          send_projection(
+            conn,
+            "mission.registry",
+            bus.mission_registry_projection_json(state.bus_subject),
+          )
+        "handoff.requested" ->
+          send_projection(
+            conn,
+            "handoff.registry",
+            bus.handoff_registry_projection_json(state.bus_subject),
+          )
+        "handoff.accepted" ->
+          send_projection(
+            conn,
+            "handoff.registry",
+            bus.handoff_registry_projection_json(state.bus_subject),
+          )
+        "handoff.rejected" ->
+          send_projection(
+            conn,
+            "handoff.registry",
+            bus.handoff_registry_projection_json(state.bus_subject),
+          )
+        "handoff.completed" ->
+          send_projection(
+            conn,
+            "handoff.registry",
+            bus.handoff_registry_projection_json(state.bus_subject),
+          )
+        "problem.logged" ->
+          send_projection(
+            conn,
+            "problem.graph",
+            bus.problem_graph_projection_json(state.bus_subject),
+          )
+        "problem.solution_added" ->
+          send_projection(
+            conn,
+            "problem.graph",
+            bus.problem_graph_projection_json(state.bus_subject),
+          )
+        "problem.linked" ->
+          send_projection(
+            conn,
+            "problem.graph",
+            bus.problem_graph_projection_json(state.bus_subject),
+          )
+        "agent.reported" ->
+          send_projection(
+            conn,
+            "agent.reports",
+            bus.agent_reports_projection_json(state.bus_subject),
+          )
+        "blueprint.document.created" -> {
+          send_projection(
+            conn,
+            "blueprint.sections",
+            bus.blueprint_projection_json(state.bus_subject),
+          )
+        }
+        "blueprint.document.renamed" -> {
+          send_projection(
+            conn,
+            "blueprint.sections",
+            bus.blueprint_projection_json(state.bus_subject),
+          )
+        }
+        "blueprint.document.archived" -> {
+          send_projection(
+            conn,
+            "blueprint.sections",
+            bus.blueprint_projection_json(state.bus_subject),
+          )
+        }
+        "blueprint.section.added" -> {
+          send_projection(
+            conn,
+            "blueprint.sections",
+            bus.blueprint_projection_json(state.bus_subject),
+          )
+        }
+        "blueprint.section.renamed" -> {
+          send_projection(
+            conn,
+            "blueprint.sections",
+            bus.blueprint_projection_json(state.bus_subject),
+          )
+        }
+        "blueprint.section.moved" -> {
+          send_projection(
+            conn,
+            "blueprint.sections",
+            bus.blueprint_projection_json(state.bus_subject),
+          )
+        }
+        "blueprint.section.removed" -> {
+          send_projection(
+            conn,
+            "blueprint.sections",
+            bus.blueprint_projection_json(state.bus_subject),
+          )
+        }
+        "blueprint.gac.created"
+        | "blueprint.gac.answered"
+        | "blueprint.gac.deferred"
+        | "blueprint.gac.promoted"
+        | "blueprint.blocker.opened"
+        | "blueprint.blocker.resolved"
+        | "blueprint.blocker.promoted"
+        | "blueprint.aspiration.captured"
+        | "blueprint.aspiration.promoted"
+        | "blueprint.aspiration.archived"
+        | "blueprint.decision.locked"
+        | "blueprint.decision.superseded" -> {
+          send_projection(
+            conn,
+            "blueprint.planner",
+            bus.blueprint_planner_projection_json(state.bus_subject),
+          )
+        }
         _ -> Nil
       }
+      mist.continue(state)
+    }
+    bus.Projection(name, data_json) -> {
+      send_projection(conn, name, data_json)
       mist.continue(state)
     }
     bus.SubscriptionDropped(reason) -> {
@@ -338,15 +588,30 @@ fn handle_text(
               mist.continue(ConnState(..state, collab_subscribed: True))
             }
             _ -> {
+              let scope = case incoming.channel {
+                Some("lane.registry") -> incoming.project_id
+                Some("queue.registry") -> incoming.project_id
+                _ -> None
+              }
               let _ =
-                send_projection_snapshot(
+                send_projection_snapshot_scoped(
                   conn,
                   bus_subj,
                   collab_subj,
                   incoming.channel,
+                  scope,
                 )
               bus.subscribe(bus_subj, state.bus_delivery, None)
-              mist.continue(ConnState(..state, bus_subscribed: True))
+              mist.continue(
+                ConnState(
+                  ..state,
+                  bus_subscribed: True,
+                  subscribed_scope: case scope {
+                    Some(_) -> scope
+                    None -> state.subscribed_scope
+                  },
+                ),
+              )
             }
           }
         }
@@ -363,6 +628,138 @@ fn handle_text(
               let events = run_debug_ping(bus_subj)
               let _ =
                 mist.send_text_frame(conn, command_ok(incoming.id, events))
+              mist.continue(state)
+            }
+            Some("companion.discover") -> {
+              let status = bus.companion_status_projection_json(bus_subj)
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "companion.status", status),
+                )
+              send_projection(conn, "companion.status", status)
+              mist.continue(state)
+            }
+            Some("companion.window.open") -> {
+              let windows =
+                bus.companion_open_window(
+                  bus_subj,
+                  companion_window_request(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "companion.windows", windows),
+                )
+              send_projection(
+                conn,
+                "companion.status",
+                bus.companion_status_projection_json(bus_subj),
+              )
+              send_projection(conn, "companion.windows", windows)
+              mist.continue(state)
+            }
+            Some("companion.window.close") -> {
+              let windows =
+                bus.companion_close_window(
+                  bus_subj,
+                  companion_window_id_from(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "companion.windows", windows),
+                )
+              send_projection(
+                conn,
+                "companion.status",
+                bus.companion_status_projection_json(bus_subj),
+              )
+              send_projection(conn, "companion.windows", windows)
+              mist.continue(state)
+            }
+            Some("companion.window.focus") -> {
+              let windows =
+                bus.companion_focus_window(
+                  bus_subj,
+                  companion_window_id_from(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "companion.windows", windows),
+                )
+              send_projection(conn, "companion.windows", windows)
+              mist.continue(state)
+            }
+            Some("companion.window.reattach_ack") -> {
+              let windows =
+                bus.companion_reattach_ack(
+                  bus_subj,
+                  companion_window_id_from(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "companion.windows", windows),
+                )
+              send_projection(conn, "companion.windows", windows)
+              mist.continue(state)
+            }
+            Some("desktop.presence.join") -> {
+              let presence =
+                bus.desktop_presence_join(
+                  bus_subj,
+                  presence_join_request(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "desktop.presence", presence),
+                )
+              send_projection(conn, "desktop.presence", presence)
+              mist.continue(state)
+            }
+            Some("desktop.presence.leave") -> {
+              let presence =
+                bus.desktop_presence_leave(
+                  bus_subj,
+                  presence_session_id_from(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "desktop.presence", presence),
+                )
+              send_projection(conn, "desktop.presence", presence)
+              mist.continue(state)
+            }
+            Some("desktop.presence.cursor") -> {
+              let presence =
+                bus.desktop_presence_cursor(
+                  bus_subj,
+                  presence_cursor_request(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "desktop.presence", presence),
+                )
+              send_projection(conn, "desktop.presence", presence)
+              mist.continue(state)
+            }
+            Some("desktop.presence.location") -> {
+              let presence =
+                bus.desktop_presence_location(
+                  bus_subj,
+                  presence_location_request(incoming),
+                )
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "desktop.presence", presence),
+                )
+              send_projection(conn, "desktop.presence", presence)
               mist.continue(state)
             }
             Some("collab.document.open") -> {
@@ -449,6 +846,13 @@ fn handle_text(
                           bus_subj,
                           collab_subj,
                           Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("project.filesystem_status"),
                         )
                       mist.continue(state)
                     }
@@ -587,6 +991,13 @@ fn handle_text(
                           collab_subj,
                           Some("event_trail"),
                         )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("project.filesystem_status"),
+                        )
                       mist.continue(state)
                     }
                     Error(ema_projects.EmptyOrg) -> {
@@ -626,6 +1037,14 @@ fn handle_text(
                       mist.continue(state)
                     }
                     Error(ema_projects.AppendFailed(reason)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(incoming.id, "internal", reason),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(ema_projects.MaterializationFailed(reason)) -> {
                       let _ =
                         mist.send_text_frame(
                           conn,
@@ -1133,6 +1552,13 @@ fn handle_text(
                           conn,
                           command_ok(incoming.id, [event_id]),
                         )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("invite.registry"),
+                        )
                       mist.continue(state)
                     }
                     Error(e) -> {
@@ -1188,6 +1614,13 @@ fn handle_text(
                           collab_subj,
                           Some("topbar"),
                         )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("invite.registry"),
+                        )
                       mist.continue(state)
                     }
                     Error(e) -> {
@@ -1230,6 +1663,13 @@ fn handle_text(
                           conn,
                           command_ok(incoming.id, [event_id]),
                         )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("invite.registry"),
+                        )
                       mist.continue(state)
                     }
                     Error(e) -> {
@@ -1261,6 +1701,13 @@ fn handle_text(
                         mist.send_text_frame(
                           conn,
                           command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("invite.registry"),
                         )
                       mist.continue(state)
                     }
@@ -1479,6 +1926,1295 @@ fn handle_text(
                 }
               }
             }
+            Some("lane.open") -> {
+              case incoming.org_id, incoming.actor_id, incoming.name {
+                Some(org_id), Some(actor_id), Some(title) ->
+                  case
+                    agent_workspace.open_lane_linked(
+                      bus_subj,
+                      org_id,
+                      actor_id,
+                      title,
+                      incoming.project_id,
+                      incoming.mission_id,
+                      incoming.scope,
+                      incoming.done_when,
+                      incoming.depends_on,
+                      incoming.section_id,
+                      incoming.gac_id,
+                      incoming.decision_id,
+                      incoming.cadence,
+                    )
+                  {
+                    Ok(agent_workspace.LaneOpened(lane_id, event_id)) -> {
+                      let warning =
+                        emit_phase_warning_if_needed(bus_subj, "lane.open")
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_with_warning(
+                            incoming.id,
+                            lane_id,
+                            [event_id],
+                            warning,
+                          ),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("lane.registry"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          workspace_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.actor_id, or args.name",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("queue.add") -> {
+              case
+                incoming.org_id,
+                incoming.actor_id,
+                incoming.name,
+                incoming.reason
+              {
+                Some(org_id), Some(actor_id), Some(title), Some(why) ->
+                  case
+                    agent_workspace.add_queue_item_linked(
+                      bus_subj,
+                      org_id,
+                      actor_id,
+                      title,
+                      why,
+                      incoming.project_id,
+                      incoming.mission_id,
+                      incoming.lane_id,
+                      incoming.done_when,
+                      incoming.depends_on,
+                      incoming.blocked_by,
+                      incoming.source,
+                      incoming.section_id,
+                      incoming.gac_id,
+                      incoming.decision_id,
+                    )
+                  {
+                    Ok(agent_workspace.QueueItemAdded(queue_item_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, queue_item_id, [
+                            event_id,
+                          ]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("queue.registry"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          workspace_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.actor_id, args.name, or args.reason",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("lane.claim") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "lane.claimed",
+                "lane_id",
+                incoming.lane_id,
+                Some("lane.registry"),
+                [
+                  #("lane_id", required_json(incoming.lane_id)),
+                  #("actor_id", json.string(actor_or_default(incoming))),
+                  #("scope", agent_workspace.opt(incoming.scope)),
+                  #("goal", agent_workspace.opt(incoming.goal)),
+                  #("next", agent_workspace.opt(incoming.next)),
+                  #("refresh_by", agent_workspace.opt(incoming.refresh_by)),
+                  #("blocker", agent_workspace.opt(incoming.blocker)),
+                ],
+              )
+            Some("lane.move") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "lane.moved",
+                "lane_id",
+                incoming.lane_id,
+                Some("lane.registry"),
+                [
+                  #("lane_id", required_json(incoming.lane_id)),
+                  #("from_status", json.null()),
+                  #("to_status", agent_workspace.opt(incoming.status)),
+                  #("moved_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("lane.block") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "lane.blocked",
+                "lane_id",
+                incoming.lane_id,
+                Some("lane.registry"),
+                [
+                  #("lane_id", required_json(incoming.lane_id)),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                  #("depends_on", agent_workspace.opt(incoming.depends_on)),
+                  #("blocked_by", agent_workspace.opt(incoming.blocked_by)),
+                  #("marked_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("lane.release") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "lane.released",
+                "lane_id",
+                incoming.lane_id,
+                Some("lane.registry"),
+                [
+                  #("lane_id", required_json(incoming.lane_id)),
+                  #("released_by", json.string(actor_or_default(incoming))),
+                  #("handoff_id", agent_workspace.opt(incoming.handoff_id)),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                ],
+              )
+            Some("lane.close") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "lane.closed",
+                "lane_id",
+                incoming.lane_id,
+                Some("lane.registry"),
+                [
+                  #("lane_id", required_json(incoming.lane_id)),
+                  #("closed_by", json.string(actor_or_default(incoming))),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                  #("verify", agent_workspace.opt(incoming.verify)),
+                ],
+              )
+            Some("queue.ready") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "queue_item.ready",
+                "queue_item_id",
+                incoming.queue_item_id,
+                Some("queue.registry"),
+                [
+                  #("queue_item_id", required_json(incoming.queue_item_id)),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                  #("marked_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("queue.block") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "queue_item.blocked",
+                "queue_item_id",
+                incoming.queue_item_id,
+                Some("queue.registry"),
+                [
+                  #("queue_item_id", required_json(incoming.queue_item_id)),
+                  #("blocked_by", agent_workspace.opt(incoming.blocked_by)),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                  #("marked_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("queue.close") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "queue_item.closed",
+                "queue_item_id",
+                incoming.queue_item_id,
+                Some("queue.registry"),
+                [
+                  #("queue_item_id", required_json(incoming.queue_item_id)),
+                  #("result", agent_workspace.opt(incoming.result)),
+                  #("verify", agent_workspace.opt(incoming.verify)),
+                  #("closed_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("campaign.create") -> {
+              let campaign_id = agent_workspace.new_id("campaign")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "campaign.created",
+                "campaign_id",
+                Some(campaign_id),
+                Some("campaign.registry"),
+                [
+                  #("campaign_id", json.string(campaign_id)),
+                  #("title", title_json(incoming)),
+                  #("project_id", agent_workspace.opt(incoming.project_id)),
+                  #("depends_on", agent_workspace.opt(incoming.depends_on)),
+                  #("done_when", agent_workspace.opt(incoming.done_when)),
+                  #("created_by", json.string(actor_or_default(incoming))),
+                  #("status", json.string("active")),
+                ],
+              )
+            }
+            Some("campaign.archive") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "campaign.archived",
+                "campaign_id",
+                incoming.campaign_id,
+                Some("campaign.registry"),
+                [
+                  #("campaign_id", required_json(incoming.campaign_id)),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                  #("archived_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("mission.create") -> {
+              let mission_id = agent_workspace.new_id("mission")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "mission.created",
+                "mission_id",
+                Some(mission_id),
+                Some("mission.registry"),
+                [
+                  #("mission_id", json.string(mission_id)),
+                  #("campaign_id", agent_workspace.opt(incoming.campaign_id)),
+                  #("title", title_json(incoming)),
+                  #("project_id", agent_workspace.opt(incoming.project_id)),
+                  #("depends_on", agent_workspace.opt(incoming.depends_on)),
+                  #("done_when", agent_workspace.opt(incoming.done_when)),
+                  #("created_by", json.string(actor_or_default(incoming))),
+                  #("status", json.string("ready")),
+                ],
+              )
+            }
+            Some("mission.start") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "mission.started",
+                "mission_id",
+                incoming.mission_id,
+                Some("mission.registry"),
+                [
+                  #("mission_id", required_json(incoming.mission_id)),
+                  #("started_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("mission.pause") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "mission.paused",
+                "mission_id",
+                incoming.mission_id,
+                Some("mission.registry"),
+                [
+                  #("mission_id", required_json(incoming.mission_id)),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                  #("paused_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("mission.complete") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "mission.completed",
+                "mission_id",
+                incoming.mission_id,
+                Some("mission.registry"),
+                [
+                  #("mission_id", required_json(incoming.mission_id)),
+                  #("result", agent_workspace.opt(incoming.result)),
+                  #("verify", agent_workspace.opt(incoming.verify)),
+                  #("completed_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("handoff.request") -> {
+              let handoff_id = agent_workspace.new_id("handoff")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "handoff.requested",
+                "handoff_id",
+                Some(handoff_id),
+                Some("handoff.registry"),
+                [
+                  #("handoff_id", json.string(handoff_id)),
+                  #("from", agent_workspace.opt(incoming.from_actor)),
+                  #("to", agent_workspace.opt(incoming.to_actor)),
+                  #("needed", agent_workspace.opt(incoming.needed)),
+                  #("context", agent_workspace.opt(incoming.context)),
+                  #("source", agent_workspace.opt(incoming.source)),
+                  #("verify", agent_workspace.opt(incoming.verify)),
+                  #("depends_on", agent_workspace.opt(incoming.depends_on)),
+                  #("status", json.string("pending")),
+                ],
+              )
+            }
+            Some("handoff.accept") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "handoff.accepted",
+                "handoff_id",
+                incoming.handoff_id,
+                Some("handoff.registry"),
+                [
+                  #("handoff_id", required_json(incoming.handoff_id)),
+                  #("accepted_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("handoff.reject") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "handoff.rejected",
+                "handoff_id",
+                incoming.handoff_id,
+                Some("handoff.registry"),
+                [
+                  #("handoff_id", required_json(incoming.handoff_id)),
+                  #("rejected_by", json.string(actor_or_default(incoming))),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                ],
+              )
+            Some("handoff.complete") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "handoff.completed",
+                "handoff_id",
+                incoming.handoff_id,
+                Some("handoff.registry"),
+                [
+                  #("handoff_id", required_json(incoming.handoff_id)),
+                  #("completed_by", json.string(actor_or_default(incoming))),
+                  #("outcome", agent_workspace.opt(incoming.outcome)),
+                  #("verify", agent_workspace.opt(incoming.verify)),
+                ],
+              )
+            Some("problem.log") -> {
+              let problem_id = agent_workspace.new_id("problem")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "problem.logged",
+                "problem_id",
+                Some(problem_id),
+                Some("problem.graph"),
+                [
+                  #("problem_id", json.string(problem_id)),
+                  #("title", title_json(incoming)),
+                  #("project_id", agent_workspace.opt(incoming.project_id)),
+                  #("lane_id", agent_workspace.opt(incoming.lane_id)),
+                  #("depends_on", agent_workspace.opt(incoming.depends_on)),
+                  #("cause", agent_workspace.opt(incoming.cause)),
+                  #("solution", agent_workspace.opt(incoming.solution_id)),
+                  #("source", agent_workspace.opt(incoming.source)),
+                  #("recurs", agent_workspace.opt(incoming.recurs)),
+                  #("logged_by", json.string(actor_or_default(incoming))),
+                  #("status", json.string("open")),
+                ],
+              )
+            }
+            Some("problem.solution") -> {
+              let solution_id = agent_workspace.new_id("solution")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "problem.solution_added",
+                "solution_id",
+                Some(solution_id),
+                Some("problem.graph"),
+                [
+                  #("solution_id", json.string(solution_id)),
+                  #("problem_id", required_json(incoming.problem_id)),
+                  #("title", title_json(incoming)),
+                  #("depends_on", agent_workspace.opt(incoming.depends_on)),
+                  #("verify", agent_workspace.opt(incoming.verify)),
+                  #("source", agent_workspace.opt(incoming.source)),
+                  #("added_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            }
+            Some("problem.link") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "problem.linked",
+                "problem_id",
+                incoming.problem_id,
+                Some("problem.graph"),
+                [
+                  #("problem_id", required_json(incoming.problem_id)),
+                  #("from", agent_workspace.opt(incoming.target_kind)),
+                  #("to", agent_workspace.opt(incoming.target_value)),
+                  #("relation", agent_workspace.opt(incoming.relation)),
+                  #("linked_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("agent.report") -> {
+              let report_id = agent_workspace.new_id("agent_report")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "agent.reported",
+                "report_id",
+                Some(report_id),
+                Some("agent.reports"),
+                [
+                  #("report_id", json.string(report_id)),
+                  #("actor_id", json.string(actor_or_default(incoming))),
+                  #("lane_id", agent_workspace.opt(incoming.lane_id)),
+                  #("changed", agent_workspace.opt(incoming.changed)),
+                  #("verified", agent_workspace.opt(incoming.verified)),
+                  #("risks", agent_workspace.opt(incoming.risks)),
+                  #("next", agent_workspace.opt(incoming.next)),
+                ],
+              )
+            }
+            Some("blueprint.document.create") -> {
+              case
+                incoming.org_id,
+                incoming.project_id,
+                blueprint_title(incoming)
+              {
+                Some(org_id), Some(project_id), Some(title) ->
+                  case
+                    ema_blueprint.create_document(
+                      bus_subj,
+                      org_id,
+                      incoming.space_id,
+                      blueprint_actor_id(incoming),
+                      project_id,
+                      title,
+                    )
+                  {
+                    Ok(ema_blueprint.DocumentCreated(document_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, document_id, [
+                            event_id,
+                          ]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.project_id, or args.title (or args.name)",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.document.rename") -> {
+              case
+                incoming.org_id,
+                incoming.actor_id,
+                incoming.document_id,
+                blueprint_title(incoming)
+              {
+                Some(org_id), Some(actor_id), Some(document_id), Some(title) ->
+                  case
+                    ema_blueprint.rename_document(
+                      bus_subj,
+                      org_id,
+                      actor_id,
+                      document_id,
+                      title,
+                    )
+                  {
+                    Ok(ema_blueprint.DocumentRenamed(doc_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, doc_id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.actor_id, args.document_id, or args.title",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.document.archive") -> {
+              case incoming.org_id, incoming.actor_id, incoming.document_id {
+                Some(org_id), Some(actor_id), Some(document_id) ->
+                  case
+                    ema_blueprint.archive_document(
+                      bus_subj,
+                      org_id,
+                      actor_id,
+                      document_id,
+                      incoming.reason,
+                    )
+                  {
+                    Ok(ema_blueprint.DocumentArchived(doc_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, doc_id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.actor_id, or args.document_id",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.section.add") -> {
+              case
+                incoming.org_id,
+                incoming.document_id,
+                blueprint_title(incoming)
+              {
+                Some(org_id), Some(document_id), Some(title) ->
+                  case
+                    ema_blueprint.add_section(
+                      bus_subj,
+                      org_id,
+                      incoming.space_id,
+                      incoming.project_id,
+                      blueprint_actor_id(incoming),
+                      document_id,
+                      incoming.parent_section_id,
+                      title,
+                      blueprint_position(incoming),
+                    )
+                  {
+                    Ok(ema_blueprint.SectionAdded(section_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, section_id, [
+                            event_id,
+                          ]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.document_id, or args.title",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.section.rename") -> {
+              case
+                incoming.org_id,
+                incoming.actor_id,
+                incoming.section_id,
+                blueprint_title(incoming)
+              {
+                Some(org_id), Some(actor_id), Some(section_id), Some(title) ->
+                  case
+                    ema_blueprint.rename_section(
+                      bus_subj,
+                      org_id,
+                      actor_id,
+                      section_id,
+                      title,
+                    )
+                  {
+                    Ok(ema_blueprint.SectionRenamed(sec_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, sec_id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.actor_id, args.section_id, or args.title",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.section.move") -> {
+              case incoming.org_id, incoming.actor_id, incoming.section_id {
+                Some(org_id), Some(actor_id), Some(section_id) ->
+                  case
+                    ema_blueprint.move_section(
+                      bus_subj,
+                      org_id,
+                      actor_id,
+                      section_id,
+                      incoming.parent_section_id,
+                      blueprint_position(incoming),
+                    )
+                  {
+                    Ok(ema_blueprint.SectionMoved(sec_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, sec_id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.actor_id, or args.section_id",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.section.promote") -> {
+              case
+                incoming.org_id,
+                incoming.section_id,
+                blueprint_title(incoming),
+                incoming.body
+              {
+                Some(org_id), Some(section_id), Some(title), Some(body) ->
+                  case
+                    ema_blueprint.promote_section_to_proposal(
+                      bus_subj,
+                      org_id,
+                      blueprint_actor_id(incoming),
+                      section_id,
+                      title,
+                      body,
+                    )
+                  {
+                    Ok(ema_blueprint.SectionPromoted(
+                      _section_id,
+                      proposal_id,
+                      drafted_event_id,
+                      promoted_event_id,
+                    )) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, proposal_id, [
+                            drafted_event_id,
+                            promoted_event_id,
+                          ]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.section_id, args.title, or args.body",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.section.remove") -> {
+              case incoming.org_id, incoming.actor_id, incoming.section_id {
+                Some(org_id), Some(actor_id), Some(section_id) ->
+                  case
+                    ema_blueprint.remove_section(
+                      bus_subj,
+                      org_id,
+                      actor_id,
+                      section_id,
+                    )
+                  {
+                    Ok(ema_blueprint.SectionRemoved(sec_id, event_id)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, sec_id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("blueprint.sections"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          blueprint_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.actor_id, or args.section_id",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.gac.create") -> {
+              case
+                incoming.org_id,
+                incoming.document_id,
+                incoming.category,
+                incoming.priority,
+                incoming.question
+              {
+                Some(org_id), Some(doc), Some(cat), Some(pri), Some(q) ->
+                  handle_planner_result(
+                    state,
+                    conn,
+                    bus_subj,
+                    collab_subj,
+                    incoming.id,
+                    planner_nodes.gac_create(
+                      bus_subj,
+                      org_id,
+                      blueprint_actor_id(incoming),
+                      doc,
+                      incoming.section_id,
+                      cat,
+                      pri,
+                      q,
+                      None,
+                    ),
+                    fn(r) {
+                      case r {
+                        planner_nodes.GacCreated(id, ev) -> #(id, ev)
+                      }
+                    },
+                  )
+                  |> mist.continue
+                _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.document_id, args.category, args.priority, or args.question",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.gac.answer") -> {
+              case incoming.org_id, incoming.gac_id, incoming.result_action {
+                Some(org_id), Some(gac_id), Some(action) ->
+                  handle_planner_result(
+                    state,
+                    conn,
+                    bus_subj,
+                    collab_subj,
+                    incoming.id,
+                    planner_nodes.gac_answer(
+                      bus_subj,
+                      org_id,
+                      blueprint_actor_id(incoming),
+                      gac_id,
+                      incoming.selected,
+                      incoming.freeform,
+                      action,
+                      incoming.target,
+                    ),
+                    fn(r) {
+                      case r {
+                        planner_nodes.GacAnswered(id, ev) -> #(id, ev)
+                      }
+                    },
+                  )
+                  |> mist.continue
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.gac_id, or args.result_action",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.blocker.open") -> {
+              case
+                incoming.org_id,
+                incoming.category,
+                incoming.priority,
+                blueprint_title(incoming)
+              {
+                Some(org_id), Some(cat), Some(pri), Some(title) ->
+                  handle_planner_result(
+                    state,
+                    conn,
+                    bus_subj,
+                    collab_subj,
+                    incoming.id,
+                    planner_nodes.blocker_open(
+                      bus_subj,
+                      org_id,
+                      blueprint_actor_id(incoming),
+                      incoming.document_id,
+                      incoming.section_id,
+                      cat,
+                      pri,
+                      title,
+                      incoming.description,
+                      incoming.refresh_by,
+                      incoming.gac_id,
+                    ),
+                    fn(r) {
+                      case r {
+                        planner_nodes.BlockerOpened(id, ev) -> #(id, ev)
+                      }
+                    },
+                  )
+                  |> mist.continue
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.category, args.priority, or args.title",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.blocker.resolve") -> {
+              case incoming.org_id, incoming.blocker_id {
+                Some(org_id), Some(blocker_id) ->
+                  handle_planner_result(
+                    state,
+                    conn,
+                    bus_subj,
+                    collab_subj,
+                    incoming.id,
+                    planner_nodes.blocker_resolve(
+                      bus_subj,
+                      org_id,
+                      blueprint_actor_id(incoming),
+                      blocker_id,
+                      incoming.target,
+                      incoming.reason,
+                    ),
+                    fn(r) {
+                      case r {
+                        planner_nodes.BlockerResolved(id, ev) -> #(id, ev)
+                      }
+                    },
+                  )
+                  |> mist.continue
+                _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id or args.blocker_id",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.aspiration.capture") -> {
+              case
+                incoming.org_id,
+                blueprint_title(incoming),
+                incoming.timeframe
+              {
+                Some(org_id), Some(title), Some(timeframe) ->
+                  handle_planner_result(
+                    state,
+                    conn,
+                    bus_subj,
+                    collab_subj,
+                    incoming.id,
+                    planner_nodes.aspiration_capture(
+                      bus_subj,
+                      org_id,
+                      blueprint_actor_id(incoming),
+                      title,
+                      incoming.description,
+                      timeframe,
+                      case incoming.source_type {
+                        Some(s) -> s
+                        None -> "manual_tag"
+                      },
+                      incoming.origin_app,
+                      incoming.origin_text,
+                    ),
+                    fn(r) {
+                      case r {
+                        planner_nodes.AspirationCaptured(id, ev) -> #(id, ev)
+                      }
+                    },
+                  )
+                  |> mist.continue
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.title, or args.timeframe",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("blueprint.decision.lock") -> {
+              case incoming.org_id, blueprint_title(incoming), incoming.body {
+                Some(org_id), Some(title), Some(body) ->
+                  handle_planner_result(
+                    state,
+                    conn,
+                    bus_subj,
+                    collab_subj,
+                    incoming.id,
+                    planner_nodes.decision_lock(
+                      bus_subj,
+                      org_id,
+                      blueprint_actor_id(incoming),
+                      title,
+                      body,
+                      incoming.supersedes,
+                      incoming.source_node,
+                    ),
+                    fn(r) {
+                      case r {
+                        planner_nodes.DecisionLocked(id, ev) -> #(id, ev)
+                      }
+                    },
+                  )
+                  |> mist.continue
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.title, or args.body",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
             Some("vcalendar.block.add") -> {
               case
                 incoming.org_id,
@@ -1577,6 +3313,35 @@ fn handle_text(
                   mist.continue(state)
                 }
               }
+            }
+            Some("vcalendar.checkup.tick") -> {
+              let result = ema_vcalendar.tick_auto_checkups(bus_subj)
+              let ema_vcalendar.AutoCheckupTick(count, lane_ids, skipped) =
+                result
+              let body =
+                "{\"v\":0,\"type\":\"command_result\",\"in_reply_to\":\""
+                <> json_escape_inline(incoming.id)
+                <> "\",\"ok\":true,\"events\":[],\"data\":{\"emitted\":"
+                <> int.to_string(count)
+                <> ",\"skipped_unscoped\":"
+                <> int.to_string(skipped)
+                <> ",\"lane_ids\":["
+                <> string.join(
+                  list.map(lane_ids, fn(id) {
+                    "\"" <> json_escape_inline(id) <> "\""
+                  }),
+                  ",",
+                )
+                <> "]}}"
+              let _ = mist.send_text_frame(conn, body)
+              let _ =
+                send_projection_snapshot(
+                  conn,
+                  bus_subj,
+                  collab_subj,
+                  Some("vcalendar.state"),
+                )
+              mist.continue(state)
             }
             Some("vcalendar.phase.set") -> {
               case incoming.org_id, incoming.actor_id, incoming.label {
@@ -1762,6 +3527,8 @@ type Incoming {
     device_id: Option(String),
     org_id: Option(String),
     space_id: Option(String),
+    project_id: Option(String),
+    mission_id: Option(String),
     target_kind: Option(String),
     target_value: Option(String),
     role: Option(String),
@@ -1788,8 +3555,18 @@ type Incoming {
     approved_by_device: Option(String),
     session_id: Option(String),
     reason: Option(String),
+    scope: Option(String),
+    done_when: Option(String),
+    depends_on: Option(String),
+    blocked_by: Option(String),
+    source: Option(String),
     scopes: List(String),
     actor_id: Option(String),
+    room_id: Option(String),
+    color: Option(String),
+    surface: Option(String),
+    x: Option(Int),
+    y: Option(Int),
     block_id: Option(String),
     block_kind: Option(String),
     label: Option(String),
@@ -1799,6 +3576,55 @@ type Incoming {
     cadence: Option(String),
     checkup_id: Option(String),
     result: Option(String),
+    window_id: Option(String),
+    app_id: Option(String),
+    url: Option(String),
+    bounds: Option(ema_companion.Bounds),
+    transparent: Bool,
+    section_id: Option(String),
+    parent_section_id: Option(String),
+    position: Option(Int),
+    title: Option(String),
+    campaign_id: Option(String),
+    queue_item_id: Option(String),
+    handoff_id: Option(String),
+    problem_id: Option(String),
+    solution_id: Option(String),
+    status: Option(String),
+    goal: Option(String),
+    next: Option(String),
+    refresh_by: Option(String),
+    blocker: Option(String),
+    verify: Option(String),
+    outcome: Option(String),
+    from_actor: Option(String),
+    to_actor: Option(String),
+    needed: Option(String),
+    context: Option(String),
+    relation: Option(String),
+    cause: Option(String),
+    recurs: Option(String),
+    changed: Option(String),
+    verified: Option(String),
+    risks: Option(String),
+    category: Option(String),
+    priority: Option(String),
+    question: Option(String),
+    gac_id: Option(String),
+    result_action: Option(String),
+    selected: Option(String),
+    freeform: Option(String),
+    target: Option(String),
+    description: Option(String),
+    blocker_id: Option(String),
+    aspiration_id: Option(String),
+    decision_id: Option(String),
+    timeframe: Option(String),
+    source_type: Option(String),
+    origin_app: Option(String),
+    origin_text: Option(String),
+    supersedes: Option(String),
+    source_node: Option(String),
   )
 }
 
@@ -1814,6 +3640,8 @@ type IncomingArgs {
     device_id: Option(String),
     org_id: Option(String),
     space_id: Option(String),
+    project_id: Option(String),
+    mission_id: Option(String),
     target_kind: Option(String),
     target_value: Option(String),
     role: Option(String),
@@ -1840,8 +3668,18 @@ type IncomingArgs {
     approved_by_device: Option(String),
     session_id: Option(String),
     reason: Option(String),
+    scope: Option(String),
+    done_when: Option(String),
+    depends_on: Option(String),
+    blocked_by: Option(String),
+    source: Option(String),
     scopes: List(String),
     actor_id: Option(String),
+    room_id: Option(String),
+    color: Option(String),
+    surface: Option(String),
+    x: Option(Int),
+    y: Option(Int),
     block_id: Option(String),
     block_kind: Option(String),
     label: Option(String),
@@ -1851,10 +3689,67 @@ type IncomingArgs {
     cadence: Option(String),
     checkup_id: Option(String),
     result: Option(String),
+    window_id: Option(String),
+    app_id: Option(String),
+    url: Option(String),
+    bounds: Option(ema_companion.Bounds),
+    transparent: Bool,
+    section_id: Option(String),
+    parent_section_id: Option(String),
+    position: Option(Int),
+    title: Option(String),
+    campaign_id: Option(String),
+    queue_item_id: Option(String),
+    handoff_id: Option(String),
+    problem_id: Option(String),
+    solution_id: Option(String),
+    status: Option(String),
+    goal: Option(String),
+    next: Option(String),
+    refresh_by: Option(String),
+    blocker: Option(String),
+    verify: Option(String),
+    outcome: Option(String),
+    from_actor: Option(String),
+    to_actor: Option(String),
+    needed: Option(String),
+    context: Option(String),
+    relation: Option(String),
+    cause: Option(String),
+    recurs: Option(String),
+    changed: Option(String),
+    verified: Option(String),
+    risks: Option(String),
+    category: Option(String),
+    priority: Option(String),
+    question: Option(String),
+    gac_id: Option(String),
+    result_action: Option(String),
+    selected: Option(String),
+    freeform: Option(String),
+    target: Option(String),
+    description: Option(String),
+    blocker_id: Option(String),
+    aspiration_id: Option(String),
+    decision_id: Option(String),
+    timeframe: Option(String),
+    source_type: Option(String),
+    origin_app: Option(String),
+    origin_text: Option(String),
+    supersedes: Option(String),
+    source_node: Option(String),
   )
 }
 
 fn decode_envelope(raw: String) -> Result(Incoming, String) {
+  let bounds_decoder = {
+    use x <- decode.field("x", decode.int)
+    use y <- decode.field("y", decode.int)
+    use width <- decode.field("width", decode.int)
+    use height <- decode.field("height", decode.int)
+    decode.success(ema_companion.Bounds(x:, y:, width:, height:))
+  }
+
   let args_decoder = {
     use document_id <- decode.optional_field(
       "document_id",
@@ -1908,6 +3803,16 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
     )
     use space_id <- decode.optional_field(
       "space_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use project_id <- decode.optional_field(
+      "project_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use mission_id <- decode.optional_field(
+      "mission_id",
       None,
       decode.optional(decode.string),
     )
@@ -2041,6 +3946,31 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
+    use scope <- decode.optional_field(
+      "scope",
+      None,
+      decode.optional(decode.string),
+    )
+    use done_when <- decode.optional_field(
+      "done_when",
+      None,
+      decode.optional(decode.string),
+    )
+    use depends_on <- decode.optional_field(
+      "depends_on",
+      None,
+      decode.optional(decode.string),
+    )
+    use blocked_by <- decode.optional_field(
+      "blocked_by",
+      None,
+      decode.optional(decode.string),
+    )
+    use source <- decode.optional_field(
+      "source",
+      None,
+      decode.optional(decode.string),
+    )
     use scopes <- decode.optional_field(
       "scopes",
       [],
@@ -2096,6 +4026,247 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
+    use window_id <- decode.optional_field(
+      "window_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use app_id <- decode.optional_field(
+      "app_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use url <- decode.optional_field(
+      "url",
+      None,
+      decode.optional(decode.string),
+    )
+    use bounds <- decode.optional_field(
+      "bounds",
+      None,
+      decode.optional(bounds_decoder),
+    )
+    use transparent <- decode.optional_field("transparent", False, decode.bool)
+    use section_id <- decode.optional_field(
+      "section_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use parent_section_id <- decode.optional_field(
+      "parent_section_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use position <- decode.optional_field(
+      "position",
+      None,
+      decode.optional(decode.int),
+    )
+    use title <- decode.optional_field(
+      "title",
+      None,
+      decode.optional(decode.string),
+    )
+    use campaign_id <- decode.optional_field(
+      "campaign_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use queue_item_id <- decode.optional_field(
+      "queue_item_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use handoff_id <- decode.optional_field(
+      "handoff_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use problem_id <- decode.optional_field(
+      "problem_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use solution_id <- decode.optional_field(
+      "solution_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use status <- decode.optional_field(
+      "status",
+      None,
+      decode.optional(decode.string),
+    )
+    use goal <- decode.optional_field(
+      "goal",
+      None,
+      decode.optional(decode.string),
+    )
+    use next <- decode.optional_field(
+      "next",
+      None,
+      decode.optional(decode.string),
+    )
+    use refresh_by <- decode.optional_field(
+      "refresh_by",
+      None,
+      decode.optional(decode.string),
+    )
+    use blocker <- decode.optional_field(
+      "blocker",
+      None,
+      decode.optional(decode.string),
+    )
+    use verify <- decode.optional_field(
+      "verify",
+      None,
+      decode.optional(decode.string),
+    )
+    use outcome <- decode.optional_field(
+      "outcome",
+      None,
+      decode.optional(decode.string),
+    )
+    use from_actor <- decode.optional_field(
+      "from",
+      None,
+      decode.optional(decode.string),
+    )
+    use to_actor <- decode.optional_field(
+      "to",
+      None,
+      decode.optional(decode.string),
+    )
+    use needed <- decode.optional_field(
+      "needed",
+      None,
+      decode.optional(decode.string),
+    )
+    use context <- decode.optional_field(
+      "context",
+      None,
+      decode.optional(decode.string),
+    )
+    use relation <- decode.optional_field(
+      "relation",
+      None,
+      decode.optional(decode.string),
+    )
+    use cause <- decode.optional_field(
+      "cause",
+      None,
+      decode.optional(decode.string),
+    )
+    use recurs <- decode.optional_field(
+      "recurs",
+      None,
+      decode.optional(decode.string),
+    )
+    use changed <- decode.optional_field(
+      "changed",
+      None,
+      decode.optional(decode.string),
+    )
+    use verified <- decode.optional_field(
+      "verified",
+      None,
+      decode.optional(decode.string),
+    )
+    use risks <- decode.optional_field(
+      "risks",
+      None,
+      decode.optional(decode.string),
+    )
+    use category <- decode.optional_field(
+      "category",
+      None,
+      decode.optional(decode.string),
+    )
+    use priority <- decode.optional_field(
+      "priority",
+      None,
+      decode.optional(decode.string),
+    )
+    use question <- decode.optional_field(
+      "question",
+      None,
+      decode.optional(decode.string),
+    )
+    use gac_id <- decode.optional_field(
+      "gac_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use result_action <- decode.optional_field(
+      "result_action",
+      None,
+      decode.optional(decode.string),
+    )
+    use selected <- decode.optional_field(
+      "selected",
+      None,
+      decode.optional(decode.string),
+    )
+    use freeform <- decode.optional_field(
+      "freeform",
+      None,
+      decode.optional(decode.string),
+    )
+    use target <- decode.optional_field(
+      "target",
+      None,
+      decode.optional(decode.string),
+    )
+    use description <- decode.optional_field(
+      "description",
+      None,
+      decode.optional(decode.string),
+    )
+    use blocker_id <- decode.optional_field(
+      "blocker_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use aspiration_id <- decode.optional_field(
+      "aspiration_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use decision_id <- decode.optional_field(
+      "decision_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use timeframe <- decode.optional_field(
+      "timeframe",
+      None,
+      decode.optional(decode.string),
+    )
+    use source_type <- decode.optional_field(
+      "source_type",
+      None,
+      decode.optional(decode.string),
+    )
+    use origin_app <- decode.optional_field(
+      "origin_app",
+      None,
+      decode.optional(decode.string),
+    )
+    use origin_text <- decode.optional_field(
+      "origin_text",
+      None,
+      decode.optional(decode.string),
+    )
+    use supersedes <- decode.optional_field(
+      "supersedes",
+      None,
+      decode.optional(decode.string),
+    )
+    use source_node <- decode.optional_field(
+      "source_node",
+      None,
+      decode.optional(decode.string),
+    )
     decode.success(IncomingArgs(
       document_id: document_id,
       body: option_or(body, text),
@@ -2107,6 +4278,8 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       device_id: device_id,
       org_id: org_id,
       space_id: space_id,
+      project_id: project_id,
+      mission_id: mission_id,
       target_kind: target_kind,
       target_value: target_value,
       role: role,
@@ -2133,6 +4306,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       approved_by_device: approved_by_device,
       session_id: session_id,
       reason: reason,
+      scope: scope,
+      done_when: done_when,
+      depends_on: depends_on,
+      blocked_by: blocked_by,
+      source: source,
       scopes: scopes,
       actor_id: actor_id,
       block_id: block_id,
@@ -2144,6 +4322,55 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       cadence: cadence,
       checkup_id: checkup_id,
       result: result,
+      window_id: window_id,
+      app_id: app_id,
+      url: url,
+      bounds: bounds,
+      transparent: transparent,
+      section_id: section_id,
+      parent_section_id: parent_section_id,
+      position: position,
+      title: title,
+      campaign_id: campaign_id,
+      queue_item_id: queue_item_id,
+      handoff_id: handoff_id,
+      problem_id: problem_id,
+      solution_id: solution_id,
+      status: status,
+      goal: goal,
+      next: next,
+      refresh_by: refresh_by,
+      blocker: blocker,
+      verify: verify,
+      outcome: outcome,
+      from_actor: from_actor,
+      to_actor: to_actor,
+      needed: needed,
+      context: context,
+      relation: relation,
+      cause: cause,
+      recurs: recurs,
+      changed: changed,
+      verified: verified,
+      risks: risks,
+      category: category,
+      priority: priority,
+      question: question,
+      gac_id: gac_id,
+      result_action: result_action,
+      selected: selected,
+      freeform: freeform,
+      target: target,
+      description: description,
+      blocker_id: blocker_id,
+      aspiration_id: aspiration_id,
+      decision_id: decision_id,
+      timeframe: timeframe,
+      source_type: source_type,
+      origin_app: origin_app,
+      origin_text: origin_text,
+      supersedes: supersedes,
+      source_node: source_node,
     ))
   }
   let decoder = {
@@ -2168,6 +4395,8 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         device_id: None,
         org_id: None,
         space_id: None,
+        project_id: None,
+        mission_id: None,
         target_kind: None,
         target_value: None,
         role: None,
@@ -2194,6 +4423,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         approved_by_device: None,
         session_id: None,
         reason: None,
+        scope: None,
+        done_when: None,
+        depends_on: None,
+        blocked_by: None,
+        source: None,
         scopes: [],
         actor_id: None,
         block_id: None,
@@ -2205,6 +4439,55 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         cadence: None,
         checkup_id: None,
         result: None,
+        window_id: None,
+        app_id: None,
+        url: None,
+        bounds: None,
+        transparent: False,
+        section_id: None,
+        parent_section_id: None,
+        position: None,
+        title: None,
+        campaign_id: None,
+        queue_item_id: None,
+        handoff_id: None,
+        problem_id: None,
+        solution_id: None,
+        status: None,
+        goal: None,
+        next: None,
+        refresh_by: None,
+        blocker: None,
+        verify: None,
+        outcome: None,
+        from_actor: None,
+        to_actor: None,
+        needed: None,
+        context: None,
+        relation: None,
+        cause: None,
+        recurs: None,
+        changed: None,
+        verified: None,
+        risks: None,
+        category: None,
+        priority: None,
+        question: None,
+        gac_id: None,
+        result_action: None,
+        selected: None,
+        freeform: None,
+        target: None,
+        description: None,
+        blocker_id: None,
+        aspiration_id: None,
+        decision_id: None,
+        timeframe: None,
+        source_type: None,
+        origin_app: None,
+        origin_text: None,
+        supersedes: None,
+        source_node: None,
       ),
       args_decoder,
     )
@@ -2223,6 +4506,8 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       device_id: args.device_id,
       org_id: args.org_id,
       space_id: args.space_id,
+      project_id: args.project_id,
+      mission_id: args.mission_id,
       target_kind: args.target_kind,
       target_value: args.target_value,
       role: args.role,
@@ -2249,6 +4534,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       approved_by_device: args.approved_by_device,
       session_id: args.session_id,
       reason: args.reason,
+      scope: args.scope,
+      done_when: args.done_when,
+      depends_on: args.depends_on,
+      blocked_by: args.blocked_by,
+      source: args.source,
       scopes: args.scopes,
       actor_id: args.actor_id,
       block_id: args.block_id,
@@ -2260,6 +4550,55 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       cadence: args.cadence,
       checkup_id: args.checkup_id,
       result: args.result,
+      window_id: args.window_id,
+      app_id: args.app_id,
+      url: args.url,
+      bounds: args.bounds,
+      transparent: args.transparent,
+      section_id: args.section_id,
+      parent_section_id: args.parent_section_id,
+      position: args.position,
+      title: args.title,
+      campaign_id: args.campaign_id,
+      queue_item_id: args.queue_item_id,
+      handoff_id: args.handoff_id,
+      problem_id: args.problem_id,
+      solution_id: args.solution_id,
+      status: args.status,
+      goal: args.goal,
+      next: args.next,
+      refresh_by: args.refresh_by,
+      blocker: args.blocker,
+      verify: args.verify,
+      outcome: args.outcome,
+      from_actor: args.from_actor,
+      to_actor: args.to_actor,
+      needed: args.needed,
+      context: args.context,
+      relation: args.relation,
+      cause: args.cause,
+      recurs: args.recurs,
+      changed: args.changed,
+      verified: args.verified,
+      risks: args.risks,
+      category: args.category,
+      priority: args.priority,
+      question: args.question,
+      gac_id: args.gac_id,
+      result_action: args.result_action,
+      selected: args.selected,
+      freeform: args.freeform,
+      target: args.target,
+      description: args.description,
+      blocker_id: args.blocker_id,
+      aspiration_id: args.aspiration_id,
+      decision_id: args.decision_id,
+      timeframe: args.timeframe,
+      source_type: args.source_type,
+      origin_app: args.origin_app,
+      origin_text: args.origin_text,
+      supersedes: args.supersedes,
+      source_node: args.source_node,
     ))
   }
   case json.parse(raw, decoder) {
@@ -2325,6 +4664,131 @@ fn command_ok_resource(
   )
 }
 
+// Soft phase enforcement (T3.1): wraps command_ok_resource and attaches a
+// `warning` field when the current vcalendar phase is incompatible with
+// the op. The write itself always proceeds — this is observation-only.
+fn command_ok_with_warning(
+  in_reply_to: String,
+  resource_id: String,
+  event_ids: List(String),
+  warning: option.Option(String),
+) -> String {
+  case warning {
+    option.None -> command_ok_resource(in_reply_to, resource_id, event_ids)
+    option.Some(message) ->
+      json.to_string(
+        json.object([
+          #("v", json.int(0)),
+          #("type", json.string("command_result")),
+          #("in_reply_to", json.string(in_reply_to)),
+          #("ok", json.bool(True)),
+          #("events", json.preprocessed_array(list.map(event_ids, json.string))),
+          #("resource", json.string(resource_id)),
+          #(
+            "warning",
+            json.object([
+              #("class", json.string("phase_violation")),
+              #("message", json.string(message)),
+            ]),
+          ),
+        ]),
+      )
+  }
+}
+
+// Read the current canonical phase (best-effort, returns "" on failure).
+fn current_phase(bus_subj: Subject(bus.Msg)) -> String {
+  let raw = bus.vcalendar_projection_json(bus_subj)
+  extract_string_field(raw, "current_phase")
+}
+
+// Tiny string-field extractor for the projection JSON. We only need this
+// shape from the daemon — no full JSON parse needed.
+fn extract_string_field(json_str: String, key: String) -> String {
+  let pattern = "\"" <> key <> "\":\""
+  case string.split_once(json_str, pattern) {
+    Ok(#(_, after)) ->
+      case string.split_once(after, "\"") {
+        Ok(#(value, _)) -> value
+        Error(_) -> ""
+      }
+    Error(_) -> ""
+  }
+}
+
+// Returns Some(reason) if the op is incompatible with the phase, None otherwise.
+fn phase_violation_for(op: String, phase: String) -> option.Option(String) {
+  case phase {
+    "" -> option.None
+    "intake and orientation" -> option.None
+    "planning and lane claim" -> option.None
+    "execution block" -> option.None
+    "review and checkup" ->
+      case op {
+        "lane.close" -> option.None
+        "lane.move" -> option.None
+        "handoff.request"
+        | "handoff.accept"
+        | "handoff.reject"
+        | "handoff.complete" -> option.None
+        "checkup.schedule" | "checkup.complete" -> option.None
+        _ ->
+          option.Some(
+            "phase 'review and checkup' typically does not accept '"
+            <> op
+            <> "'; logged as incident.noted",
+          )
+      }
+    "handoff and next-day queue" ->
+      case op {
+        "handoff.request"
+        | "handoff.accept"
+        | "handoff.reject"
+        | "handoff.complete" -> option.None
+        "checkup.schedule" | "checkup.complete" -> option.None
+        "queue.add" | "queue.ready" | "queue.block" | "queue.close" ->
+          option.None
+        _ ->
+          option.Some(
+            "phase 'handoff and next-day queue' typically does not accept '"
+            <> op
+            <> "'; logged as incident.noted",
+          )
+      }
+    _ -> option.None
+  }
+}
+
+// Emit incident.noted when phase is violated. Returns the warning message
+// to attach to the response, or None when no warning is needed. Any error
+// in this path is swallowed — the canonical write has already succeeded.
+fn emit_phase_warning_if_needed(
+  bus_subj: Subject(bus.Msg),
+  op: String,
+) -> option.Option(String) {
+  let phase = current_phase(bus_subj)
+  case phase_violation_for(op, phase) {
+    option.None -> option.None
+    option.Some(message) -> {
+      let _ =
+        agent_workspace.append_event(
+          bus_subj,
+          "org:01J00000000000000000000001",
+          "actor:agent:phase-watch",
+          "incident.noted",
+          "incident:phase_violation",
+          option.None,
+          [
+            #("kind", json.string("phase_violation")),
+            #("phase", json.string(phase)),
+            #("op", json.string(op)),
+          ],
+        )
+      option.Some(message)
+    }
+  }
+}
+
 fn command_data(
   in_reply_to: String,
   name: String,
@@ -2337,6 +4801,179 @@ fn command_data(
   <> "\",\"value\":"
   <> data_json
   <> "}}"
+}
+
+fn handle_workspace_event(
+  conn: mist.WebsocketConnection,
+  state: ConnState,
+  incoming: Incoming,
+  kind: String,
+  resource_key: String,
+  resource_id: Option(String),
+  projection: Option(String),
+  fields: List(#(String, json.Json)),
+) -> mist.Next(ConnState, WsCustom) {
+  case incoming.org_id, resource_id {
+    Some(org_id), Some(id) -> {
+      let resource_kind = case resource_key {
+        "lane_id" -> "lane"
+        "queue_item_id" -> "queue_item"
+        _ -> ""
+      }
+      case
+        resource_kind == ""
+        || bus.workspace_resource_exists(
+          state.bus_subject,
+          resource_kind,
+          id,
+          org_id,
+        )
+      {
+        False -> {
+          let _ =
+            mist.send_text_frame(
+              conn,
+              err(
+                incoming.id,
+                "not_found",
+                resource_kind <> " not found: " <> id,
+              ),
+            )
+          mist.continue(state)
+        }
+        True -> {
+          case
+            agent_workspace.append_event(
+              state.bus_subject,
+              org_id,
+              actor_or_default(incoming),
+              kind,
+              id,
+              incoming.project_id,
+              fields,
+            )
+          {
+            Ok(agent_workspace.WorkspaceEvent(resource_id, event_id)) -> {
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_ok_resource(incoming.id, resource_id, [event_id]),
+                )
+              let _ =
+                send_projection_snapshot(
+                  conn,
+                  state.bus_subject,
+                  state.collab_subject,
+                  Some("event_trail"),
+                )
+              let _ =
+                send_projection_snapshot(
+                  conn,
+                  state.bus_subject,
+                  state.collab_subject,
+                  projection,
+                )
+              mist.continue(state)
+            }
+            Error(e) -> {
+              let _ =
+                mist.send_text_frame(conn, workspace_error(incoming.id, e))
+              mist.continue(state)
+            }
+          }
+        }
+      }
+    }
+    _, _ -> {
+      let _ =
+        mist.send_text_frame(
+          conn,
+          err(incoming.id, "invalid_args", "missing org_id or resource id"),
+        )
+      mist.continue(state)
+    }
+  }
+}
+
+fn handle_planner_result(
+  state: ConnState,
+  conn: mist.WebsocketConnection,
+  bus_subj: Subject(bus.Msg),
+  collab_subj: Subject(ema_collab.Msg),
+  in_reply_to: String,
+  result: Result(a, planner_nodes.PlannerError),
+  unpack: fn(a) -> #(String, String),
+) -> ConnState {
+  case result {
+    Ok(value) -> {
+      let #(resource_id, event_id) = unpack(value)
+      let _ =
+        mist.send_text_frame(
+          conn,
+          command_ok_resource(in_reply_to, resource_id, [event_id]),
+        )
+      let _ =
+        send_projection_snapshot(
+          conn,
+          bus_subj,
+          collab_subj,
+          Some("event_trail"),
+        )
+      let _ =
+        send_projection_snapshot(
+          conn,
+          bus_subj,
+          collab_subj,
+          Some("blueprint.planner"),
+        )
+      state
+    }
+    Error(e) -> {
+      let _ = mist.send_text_frame(conn, planner_error(in_reply_to, e))
+      state
+    }
+  }
+}
+
+fn actor_or_default(incoming: Incoming) -> String {
+  case incoming.actor_id {
+    Some(actor_id) -> actor_id
+    None -> "actor:dev-console"
+  }
+}
+
+fn required_json(value: Option(String)) -> json.Json {
+  case value {
+    Some(s) -> json.string(s)
+    None -> json.null()
+  }
+}
+
+fn title_json(incoming: Incoming) -> json.Json {
+  case incoming.title {
+    Some(title) -> json.string(title)
+    None ->
+      case incoming.name {
+        Some(name) -> json.string(name)
+        None -> json.null()
+      }
+  }
+}
+
+fn companion_window_request(incoming: Incoming) -> ema_companion.WindowRequest {
+  let app_id = ema_companion.normalize_app_id(incoming.app_id)
+
+  ema_companion.WindowRequest(
+    window_id: companion_window_id_from(incoming),
+    app_id: app_id,
+    url: ema_companion.normalize_url(incoming.url, app_id),
+    bounds: incoming.bounds,
+    transparent: incoming.transparent,
+  )
+}
+
+fn companion_window_id_from(incoming: Incoming) -> String {
+  ema_companion.normalize_window_id(incoming.window_id, incoming.id)
 }
 
 fn err(in_reply_to: String, class: String, message: String) -> String {
@@ -2355,6 +4992,47 @@ fn err(in_reply_to: String, class: String, message: String) -> String {
       ),
     ]),
   )
+}
+
+fn blueprint_title(incoming: Incoming) -> Option(String) {
+  case incoming.title {
+    Some(t) -> Some(t)
+    None -> incoming.name
+  }
+}
+
+fn blueprint_position(incoming: Incoming) -> Int {
+  case incoming.position {
+    Some(p) -> p
+    None -> 0
+  }
+}
+
+fn blueprint_actor_id(incoming: Incoming) -> String {
+  case incoming.actor_id {
+    Some(actor_id) -> actor_id
+    None -> "actor:dev-console"
+  }
+}
+
+fn blueprint_error(
+  in_reply_to: String,
+  error: ema_blueprint.BlueprintError,
+) -> String {
+  case error {
+    ema_blueprint.AppendFailed(reason) -> err(in_reply_to, "internal", reason)
+    _ -> err(in_reply_to, "invalid_args", ema_blueprint.describe_error(error))
+  }
+}
+
+fn planner_error(
+  in_reply_to: String,
+  error: planner_nodes.PlannerError,
+) -> String {
+  case error {
+    planner_nodes.AppendFailed(reason) -> err(in_reply_to, "internal", reason)
+    _ -> err(in_reply_to, "invalid_args", planner_nodes.describe_error(error))
+  }
 }
 
 fn membership_error(
@@ -2420,6 +5098,43 @@ fn vcalendar_error(
     ema_vcalendar.EmptyResult ->
       err(in_reply_to, "invalid_args", "result is required")
     ema_vcalendar.AppendFailed(reason) -> err(in_reply_to, "internal", reason)
+  }
+}
+
+fn workspace_error(
+  in_reply_to: String,
+  error: agent_workspace.WorkspaceError,
+) -> String {
+  case error {
+    agent_workspace.EmptyOrg ->
+      err(in_reply_to, "invalid_args", "org_id is required")
+    agent_workspace.EmptyActor ->
+      err(in_reply_to, "invalid_args", "actor_id is required")
+    agent_workspace.EmptyTitle ->
+      err(in_reply_to, "invalid_args", "title/name is required")
+    agent_workspace.EmptyWhy ->
+      err(in_reply_to, "invalid_args", "why/reason is required")
+    agent_workspace.EmptyLaneId ->
+      err(in_reply_to, "invalid_args", "lane_id is required")
+    agent_workspace.EmptyQueueItemId ->
+      err(in_reply_to, "invalid_args", "queue_item_id is required")
+    agent_workspace.EmptyScope ->
+      err(in_reply_to, "invalid_args", "scope is required")
+    agent_workspace.EmptyGoal ->
+      err(in_reply_to, "invalid_args", "goal is required")
+    agent_workspace.EmptyNext ->
+      err(in_reply_to, "invalid_args", "next is required")
+    agent_workspace.EmptyReason ->
+      err(in_reply_to, "invalid_args", "reason is required")
+    agent_workspace.EmptyStatus ->
+      err(in_reply_to, "invalid_args", "status is required")
+    agent_workspace.EmptyBlockedBy ->
+      err(in_reply_to, "invalid_args", "blocked_by is required")
+    agent_workspace.InvalidStatus(value) ->
+      err(in_reply_to, "invalid_args", "invalid status " <> value)
+    agent_workspace.InvalidCadence(value) ->
+      err(in_reply_to, "invalid_args", "invalid cadence " <> value)
+    agent_workspace.AppendFailed(reason) -> err(in_reply_to, "internal", reason)
   }
 }
 
@@ -2640,11 +5355,43 @@ fn send_projection(
   Nil
 }
 
+fn scoped_lane_registry(
+  scope: Option(String),
+  bus_subj: Subject(bus.Msg),
+) -> String {
+  case scope {
+    Some(project_id) ->
+      bus.lane_registry_projection_json_scoped(bus_subj, project_id)
+    None -> bus.lane_registry_projection_json(bus_subj)
+  }
+}
+
+fn scoped_queue_registry(
+  scope: Option(String),
+  bus_subj: Subject(bus.Msg),
+) -> String {
+  case scope {
+    Some(project_id) ->
+      bus.queue_registry_projection_json_scoped(bus_subj, project_id)
+    None -> bus.queue_registry_projection_json(bus_subj)
+  }
+}
+
 fn send_projection_snapshot(
   conn: mist.WebsocketConnection,
   bus_subj: Subject(bus.Msg),
   collab_subj: Subject(ema_collab.Msg),
   channel: Option(String),
+) -> Nil {
+  send_projection_snapshot_scoped(conn, bus_subj, collab_subj, channel, None)
+}
+
+fn send_projection_snapshot_scoped(
+  conn: mist.WebsocketConnection,
+  bus_subj: Subject(bus.Msg),
+  collab_subj: Subject(ema_collab.Msg),
+  channel: Option(String),
+  scope: Option(String),
 ) -> Nil {
   case channel {
     Some("topbar") ->
@@ -2672,6 +5419,132 @@ fn send_projection_snapshot(
         conn,
         "peer.trust",
         bus.peer_trust_projection_json(bus_subj),
+      )
+    Some("invite.registry") ->
+      send_projection(
+        conn,
+        "invite.registry",
+        bus.invite_projection_json(bus_subj),
+      )
+    Some("chronicle.activity") ->
+      send_projection(
+        conn,
+        "chronicle.activity",
+        bus.chronicle_activity_projection_json(bus_subj),
+      )
+    Some("project.filesystem_status") ->
+      send_projection(
+        conn,
+        "project.filesystem_status",
+        bus.project_filesystem_projection_json(bus_subj),
+      )
+    Some("space.installed_vapps") ->
+      send_projection(
+        conn,
+        "space.installed_vapps",
+        bus.space_vapps_projection_json(bus_subj),
+      )
+    Some("lane.registry") ->
+      case scope {
+        Some(project_id) ->
+          send_projection(
+            conn,
+            "lane.registry",
+            bus.lane_registry_projection_json_scoped(bus_subj, project_id),
+          )
+        None ->
+          send_projection(
+            conn,
+            "lane.registry",
+            bus.lane_registry_projection_json(bus_subj),
+          )
+      }
+    Some("queue.registry") ->
+      case scope {
+        Some(project_id) ->
+          send_projection(
+            conn,
+            "queue.registry",
+            bus.queue_registry_projection_json_scoped(bus_subj, project_id),
+          )
+        None ->
+          send_projection(
+            conn,
+            "queue.registry",
+            bus.queue_registry_projection_json(bus_subj),
+          )
+      }
+    Some("campaign.registry") ->
+      send_projection(
+        conn,
+        "campaign.registry",
+        bus.campaign_registry_projection_json(bus_subj),
+      )
+    Some("mission.registry") ->
+      send_projection(
+        conn,
+        "mission.registry",
+        bus.mission_registry_projection_json(bus_subj),
+      )
+    Some("handoff.registry") ->
+      send_projection(
+        conn,
+        "handoff.registry",
+        bus.handoff_registry_projection_json(bus_subj),
+      )
+    Some("problem.graph") ->
+      send_projection(
+        conn,
+        "problem.graph",
+        bus.problem_graph_projection_json(bus_subj),
+      )
+    Some("agent.reports") ->
+      send_projection(
+        conn,
+        "agent.reports",
+        bus.agent_reports_projection_json(bus_subj),
+      )
+    Some("blueprint.sections") ->
+      send_projection(
+        conn,
+        "blueprint.sections",
+        bus.blueprint_projection_json(bus_subj),
+      )
+    Some("blueprint.planner") ->
+      send_projection(
+        conn,
+        "blueprint.planner",
+        bus.blueprint_planner_projection_json(bus_subj),
+      )
+    Some("vcalendar.state") ->
+      send_projection(
+        conn,
+        "vcalendar.state",
+        bus.vcalendar_projection_json(bus_subj),
+      )
+    Some("intent_graph") ->
+      send_projection(
+        conn,
+        "intent_graph",
+        bus.intent_graph_projection_json(bus_subj),
+      )
+    Some("companion.status") ->
+      send_projection(
+        conn,
+        "companion.status",
+        bus.companion_status_projection_json(bus_subj),
+      )
+    Some("companion.windows") ->
+      send_projection(
+        conn,
+        "companion.windows",
+        bus.companion_windows_projection_json(bus_subj),
+      )
+    Some("desktop.presence") ->
+      send_projection(
+        conn,
+        "desktop.presence",
+        bus.desktop_presence_projection_json(bus_subj),
       )
     Some("collab.document") ->
       case ema_collab.projection(collab_subj, ema_collab.default_document_id) {

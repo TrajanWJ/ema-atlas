@@ -1,0 +1,112 @@
+/* =============================================================================
+   tauri-frame.css — outer Tauri-window chrome.
+   Scoped under [data-runtime="tauri"] so browser users don't get it.
+   The Tauri window is configured with decorations:false / transparent:true /
+   shadow:false — we own the entire visual frame from inside the webview.
+   The matching NSWindow.isOpaque=false code lives in
+   apps/desktop/src-tauri/src/native_transparency.rs.
+   ========================================================================== */
+
+/* Outer rounded glass hull. Body stays transparent (so the OS desktop
+   shows through behind whatever we don't draw); the desktop frame becomes
+   the rounded outer container. */
+[data-runtime="tauri"] body {
+	background-color: transparent;
+}
+
+[data-runtime="tauri"] .place-desktop,
+[data-runtime="tauri"] .ema-desktop {
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow:
+		0 30px 90px rgba(0, 0, 0, 0.45),
+		0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+/* Reserve traffic-light gutter on the topbar's left edge. The lights are
+   12px circles with 8px gaps; total reserved gutter ~84px. */
+[data-runtime="tauri"] .ema-topbar,
+[data-runtime="tauri"] .ambient-bar {
+	padding-left: 84px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Outer-frame traffic lights — donor-style filled circles.
+   Positioned absolute at top-left of the topbar.
+   --------------------------------------------------------------------------- */
+
+[data-runtime="tauri"] .ema-traffic-lights {
+	position: absolute;
+	top: 50%;
+	left: 14px;
+	transform: translateY(-50%);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	z-index: 60;
+	-webkit-app-region: no-drag;
+	app-region: no-drag;
+}
+
+html:not([data-runtime="tauri"]) .ema-traffic-lights {
+	display: none;
+}
+
+[data-runtime="tauri"] .ema-traffic-lights__btn {
+	width: 12px;
+	height: 12px;
+	border-radius: 9999px;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: filter 0.12s ease;
+}
+[data-runtime="tauri"] .ema-traffic-lights__btn:hover {
+	filter: brightness(1.05);
+}
+[data-runtime="tauri"] .ema-traffic-lights__btn--close {
+	background: var(--place-error, #E24B4A);
+}
+[data-runtime="tauri"] .ema-traffic-lights__btn--min {
+	background: var(--place-tertiary-400, #F59E0B);
+}
+[data-runtime="tauri"] .ema-traffic-lights__btn--max {
+	background: var(--place-success, #22C55E);
+}
+[data-runtime="tauri"] .ema-traffic-lights__btn svg {
+	width: 8px;
+	height: 8px;
+}
+
+/* ---------------------------------------------------------------------------
+   Bottom-right corner resize grip — Tauri only (no native grip with
+   decorations:false).
+   --------------------------------------------------------------------------- */
+
+[data-runtime="tauri"] .ema-tauri-resize-grip {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	width: 18px;
+	height: 18px;
+	z-index: 9999;
+	cursor: nwse-resize;
+	background:
+		linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.10) 50% 60%, transparent 60%),
+		linear-gradient(135deg, transparent 72%, rgba(255, 255, 255, 0.16) 72% 82%, transparent 82%);
+	border-bottom-right-radius: 12px;
+	transition: background 0.15s ease;
+	-webkit-app-region: no-drag;
+	app-region: no-drag;
+}
+[data-runtime="tauri"] .ema-tauri-resize-grip:hover {
+	background:
+		linear-gradient(135deg, transparent 50%, rgba(45, 212, 168, 0.28) 50% 60%, transparent 60%),
+		linear-gradient(135deg, transparent 72%, rgba(45, 212, 168, 0.42) 72% 82%, transparent 82%);
+}
+html:not([data-runtime="tauri"]) .ema-tauri-resize-grip {
+	display: none;
+}

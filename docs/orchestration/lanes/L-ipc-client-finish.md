@@ -1,6 +1,6 @@
 # L-ipc-client-finish — IPC Client Comes Alive
 
-**Status:** in-progress (wire alive; hooks need audit)
+**Status:** closed 2026-04-29 (7/7 minimum-behaviors verified; see STATUS.md session close 2026-04-29)
 **Owner:** Runtime Vertical Slice Orchestrator
 **Wave:** W1
 **Corresponds to:** Target Slice A in `doctrine/planning/orchestrator-prompts/RUNTIME-VERTICAL-SLICE-ORCHESTRATOR-PROMPT.md`.

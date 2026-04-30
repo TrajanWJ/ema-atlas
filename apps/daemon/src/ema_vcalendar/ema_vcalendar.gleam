@@ -17,6 +17,7 @@ import ema_daemon/bus
 import ema_daemon/event_envelope.{type Envelope, Envelope}
 import gleam/erlang/process.{type Subject}
 import gleam/json
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/string
 
@@ -212,6 +213,65 @@ pub fn set_phase(
 // ---------------------------------------------------------------------------
 // checkup.schedule
 // ---------------------------------------------------------------------------
+
+pub type AutoCheckupTick {
+  AutoCheckupTick(
+    emitted: Int,
+    lane_ids: List(String),
+    /// Count of due lanes that were skipped because their lane.opened
+    /// envelope had an empty `org_id`. This happens for legacy events
+    /// written before envelope-scope plumbing landed (M1). Kept on the
+    /// return so the IPC handler can surface a real diagnostic instead
+    /// of silently emitting zero — see queue_item:01KQE5P02F015GF0KXM6KHZWWR.
+    skipped_unscoped: Int,
+  )
+}
+
+/// Scan all active/claimed lanes across every (org, space, project)
+/// the daemon knows about; for each whose cadence threshold has elapsed
+/// since the last `checkup.scheduled` event, emit a fresh
+/// `checkup.scheduled` via `schedule_checkup`. Idempotent across ticks
+/// because the canonical record advances `last_checkup_ts` each emit.
+///
+/// Each emitted `checkup.scheduled` carries the *lane's own* org_id
+/// (captured from the lane.opened envelope by
+/// `apply_lane_event_with_scope/2`), not a hard-coded one — so this
+/// path correctly serves every org the daemon hosts, not just the
+/// Founding-Fathers seed. SpaceId / ProjectId are threaded through to
+/// `schedule_checkup_scoped/7`, which forwards them onto the envelope
+/// once L1 (campaign:01KQE5GCV300F8V5MM5TFJNJNS, M1) plumbs them
+/// through every vcalendar writer; for now `schedule_checkup/5` keeps
+/// the legacy contract.
+///
+/// Defensive: if a lane's envelope `org_id` is empty (legacy event
+/// before envelope-scope existed), we skip it rather than fall back to
+/// a hard-coded org. The skip is observable via `skipped_unscoped` on
+/// the return so the silent-zero case (queue_item:01KQE5P02F015GF0KXM6KHZWWR)
+/// has a real diagnostic.
+pub fn tick_auto_checkups(
+  bus_subject: Subject(bus.Msg),
+) -> AutoCheckupTick {
+  let due = bus.auto_checkup_due_lanes(bus_subject)
+  let actor = "actor:agent:checkup-scheduler"
+  let #(emitted_ids, skipped) =
+    list.fold(due, #([], 0), fn(acc, row) {
+      let #(emitted, skipped_count) = acc
+      let #(org_id, _space_id, _project_id, lane_id, cadence) = row
+      case org_id {
+        "" -> #(emitted, skipped_count + 1)
+        _ ->
+          case schedule_checkup(bus_subject, org_id, actor, lane_id, cadence) {
+            Ok(_) -> #([lane_id, ..emitted], skipped_count)
+            Error(_) -> #(emitted, skipped_count)
+          }
+      }
+    })
+  AutoCheckupTick(
+    emitted: list.length(emitted_ids),
+    lane_ids: list.reverse(emitted_ids),
+    skipped_unscoped: skipped,
+  )
+}
 
 pub fn schedule_checkup(
   bus_subject: Subject(bus.Msg),

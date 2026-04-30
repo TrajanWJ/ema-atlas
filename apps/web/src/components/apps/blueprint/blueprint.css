@@ -1,0 +1,361 @@
+/* =============================================================================
+   Blueprint vApp — canonical "deep project-thinking" surface.
+   All colors via --place-* tokens. White-at-opacity text. Glass via design-system.
+   Spacing rhythm: 16 / 24 / 32 px.
+   ========================================================================== */
+
+[data-app="blueprint"] {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--place-surface-1);
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  overflow: hidden;
+}
+
+/* --- Header ---------------------------------------------------------------- */
+
+.bp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 32px 16px;
+  border-bottom: 1px solid var(--place-border-default);
+}
+
+.bp-header__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bp-header__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--place-text-tertiary);
+}
+
+.bp-header__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--place-text-primary);
+}
+
+.bp-header__intent {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--place-text-secondary);
+  line-height: 1.5;
+}
+
+/* --- Body grid: spine + section ------------------------------------------- */
+
+.bp-body {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* --- Spine ---------------------------------------------------------------- */
+
+.bp-spine {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 24px 0;
+  background: var(--place-surface-2);
+  border-right: 1px solid var(--place-border-default);
+  overflow-y: auto;
+}
+
+.bp-spine__tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-left: 2px solid transparent;
+  padding: 10px 24px;
+  margin: 0;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--place-text-secondary);
+  cursor: pointer;
+  transition: color 200ms var(--place-ease-smooth),
+    border-color 200ms var(--place-ease-smooth),
+    background 200ms var(--place-ease-smooth);
+}
+
+.bp-spine__tab:hover {
+  color: var(--place-text-primary);
+}
+
+.bp-spine__tab[aria-current="true"] {
+  color: var(--place-primary-400);
+  border-left-color: var(--place-primary-400);
+  background: var(--place-primary-glow);
+}
+
+/* --- Section pane --------------------------------------------------------- */
+
+.bp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 32px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.bp-section__title {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--place-secondary-400);
+}
+
+.bp-section__lede {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--place-text-tertiary);
+  line-height: 1.5;
+  max-width: 60ch;
+}
+
+/* --- Intent --------------------------------------------------------------- */
+
+.bp-intent__field {
+  width: 100%;
+  min-height: 160px;
+  padding: 16px;
+  background: var(--place-surface-2);
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  transition: border-color 200ms var(--place-ease-smooth);
+}
+
+.bp-intent__field:focus,
+.bp-intent__field:hover {
+  border-color: var(--place-primary-border);
+}
+
+/* --- Map ------------------------------------------------------------------ */
+
+.bp-map {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bp-map__row {
+  display: grid;
+  grid-template-columns: 16px minmax(120px, 200px) minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--place-border-subtle);
+}
+
+.bp-map__row:last-child {
+  border-bottom: 0;
+}
+
+.bp-map__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--place-primary-400);
+  box-shadow: 0 0 0 3px var(--place-primary-subtle);
+}
+
+.bp-map__name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--place-text-primary);
+}
+
+.bp-map__role {
+  font-size: 0.8rem;
+  color: var(--place-text-secondary);
+}
+
+/* --- Attachments ---------------------------------------------------------- */
+
+.bp-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bp-attachments__row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+}
+
+.bp-attachments__icon {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--place-secondary-400);
+  justify-self: center;
+}
+
+.bp-attachments__name {
+  font-size: 0.9rem;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-mono);
+}
+
+.bp-attachments__status {
+  font-size: 0.75rem;
+  color: var(--place-text-tertiary);
+}
+
+/* --- Decisions ------------------------------------------------------------ */
+
+.bp-decisions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bp-decision {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+}
+
+.bp-decision__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bp-decision__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--place-text-primary);
+}
+
+.bp-decision__rationale {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--place-text-secondary);
+  line-height: 1.5;
+}
+
+.bp-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bp-pill[data-state="active"] {
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-300);
+}
+
+.bp-pill[data-state="superseded"] {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-tertiary);
+}
+
+.bp-pill[data-state="staged"] {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--place-text-secondary);
+  border: 1px solid var(--place-border-default);
+}
+
+/* --- Canon (long-text reading view) -------------------------------------- */
+
+.bp-canon {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 60ch;
+}
+
+.bp-canon__para {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--place-text-primary);
+  line-height: 1.7;
+  font-family: var(--place-font-sans);
+}
+
+/* --- Structural metadata -------------------------------------------------- */
+
+.bp-structural {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.bp-structural > div {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: var(--place-surface-2);
+}
+
+.bp-structural dt {
+  margin: 0 0 6px;
+  font-size: 0.68rem;
+  color: var(--place-text-tertiary);
+  text-transform: uppercase;
+}
+
+.bp-structural dd {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-mono);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+/* --- Footer --------------------------------------------------------------- */
+
+.bp-footer {
+  flex: 0 0 auto;
+  padding: 8px 32px;
+  border-top: 1px solid var(--place-border-default);
+  font-size: 0.7rem;
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  letter-spacing: 0.02em;
+}

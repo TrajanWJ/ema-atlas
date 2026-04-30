@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 SOURCE_APP="$ROOT/apps/desktop/src-tauri/target/release/bundle/macos/EMA.app"
 TARGET_APP="${EMA_TAURI_DESKTOP_APP_PATH:-$HOME/Desktop/EMA 0.0.5.app}"
 

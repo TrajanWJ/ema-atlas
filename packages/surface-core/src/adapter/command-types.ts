@@ -14,28 +14,71 @@
 
 export type OrgCreateArgs = { name: string };
 export type SpaceCreateArgs = { org_id: string; name: string };
-export type ProjectCreateArgs = { space_id: string; name: string };
+export type ProjectCreateArgs = { org_id: string; space_id: string; name: string };
 
 export type IdentityUpsertArgs = {
+  user_id?: string;
+  google_sub?: string;
   display_name: string;
   email: string | null;
+  email_verified?: boolean;
 };
 
 export type MembershipGrantArgs = {
-  identity_id: string;
-  scope: "org" | "space" | "project";
-  scope_id: string;
-  role: "viewer" | "member" | "owner";
+  org_id: string;
+  user_id: string;
+  role: "owner" | "admin" | "member" | "guest";
 };
 
 export type InviteCreateArgs = {
-  scope: "org" | "space" | "project";
-  scope_id: string;
-  email: string;
-  role: "viewer" | "member" | "owner";
+  org_id: string;
+  target_kind: string;
+  target_value: string;
+  role: "owner" | "admin" | "member" | "guest";
+  expires_at: string;
 };
 
-export type AccessSessionStartArgs = { identity_id: string };
+export type InviteAcceptArgs = {
+  org_id: string;
+  invite_id: string;
+  accepted_by: string;
+  accepted_device: string;
+  role: "owner" | "admin" | "member" | "guest";
+};
+
+export type DeviceLocalRegisterArgs = {
+  org_id: string;
+  user_id: string;
+  name: string;
+  bootstrap?: "genesis" | "paired";
+};
+
+export type PeerTrustEstablishArgs = {
+  org_id: string;
+  peer_device: string;
+  peer_pubkey: string;
+  local_pubkey: string;
+  ceremony_kind: "qr_ble_hybrid" | "recovery_packet" | "genesis";
+  ceremony_id: string;
+  lineage_proof?: string;
+  device_id?: string;
+};
+
+export type AccessSessionChallengeArgs = {
+  org_id: string;
+  access_point: string;
+  scopes: string[];
+  expires_at: string;
+};
+
+export type AccessSessionApproveArgs = {
+  org_id: string;
+  challenge_id: string;
+  user_id: string;
+  approved_by_device: string;
+  scopes: string[];
+  expires_at: string;
+};
 
 export type ConnectorConnectArgs = {
   kind: string;
@@ -62,9 +105,6 @@ export type SwarmLifecycleArgs = { swarm_id: string };
 // pending daemon writer: mission.create
 export type MissionCreateArgs = { project_id: string; title: string; body_md?: string };
 
-// pending daemon writer: lane.item_add
-export type LaneItemAddArgs = { lane_id: string; title: string; kind?: string };
-
 // pending daemon writer: handoff.request
 export type HandoffRequestArgs = {
   from_lane: string;
@@ -89,10 +129,14 @@ export type CommandMap = {
   "org.create": OrgCreateArgs;
   "space.create": SpaceCreateArgs;
   "project.create": ProjectCreateArgs;
-  "identity.upsert": IdentityUpsertArgs;
-  "membership.grant": MembershipGrantArgs;
+  "identity.google_upsert": IdentityUpsertArgs;
+  "membership.role_grant": MembershipGrantArgs;
   "invite.create": InviteCreateArgs;
-  "access_session.start": AccessSessionStartArgs;
+  "invite.accept": InviteAcceptArgs;
+  "device.local_register": DeviceLocalRegisterArgs;
+  "peer.trust_establish": PeerTrustEstablishArgs;
+  "access_session.challenge": AccessSessionChallengeArgs;
+  "access_session.approve": AccessSessionApproveArgs;
   "connector.connect": ConnectorConnectArgs;
   "connector.disconnect": ConnectorDisconnectArgs;
   "attachment.create": AttachmentCreateArgs;
@@ -101,7 +145,6 @@ export type CommandMap = {
   "swarm.pause": SwarmLifecycleArgs;
   "swarm.stop": SwarmLifecycleArgs;
   "mission.create": MissionCreateArgs;
-  "lane.item_add": LaneItemAddArgs;
   "handoff.request": HandoffRequestArgs;
   "checkup.schedule": CheckupScheduleArgs;
 };
@@ -117,10 +160,14 @@ export const SHIPPED_COMMAND_OPS: ReadonlySet<CommandOp> = new Set<CommandOp>([
   "org.create",
   "space.create",
   "project.create",
-  "identity.upsert",
-  "membership.grant",
+  "identity.google_upsert",
+  "membership.role_grant",
   "invite.create",
-  "access_session.start",
+  "invite.accept",
+  "device.local_register",
+  "peer.trust_establish",
+  "access_session.challenge",
+  "access_session.approve",
   "connector.connect",
   "connector.disconnect",
   "attachment.create",

@@ -1,16 +1,20 @@
 # See Agent Work CLI Equivalent
 
-> **Wave 1: documentation-only.** No `ema` binary ships in wave 1. This doc
-> locks the command grammar so external Codex / Claude sessions can narrate
-> their work in EMA's language, and so the wave-N CLI has a pre-agreed
-> surface to implement. Do not build a CLI in wave 1 — the daemon, IPC, and
-> Blueprint/git-ema surfaces come first.
+For the broader agent-facing project-management and executive-function CLI
+contract, read `docs/cli/agent-workspace.md` first. This file remains the
+See Agent Work vApp-specific grammar.
+
+> **Current state:** an `ema` CLI exists in the active build. This document is
+> now the See Agent Work grammar reference for vApp-facing commands; use
+> `ema <group> --help` for the current implemented flags and status.
 
 This document defines the CLI language for the See Agent Work vApp.
 
-The commands here are product-contract commands — documentation-only in
-wave 1, implemented later. External Codex and Claude sessions should use
-this language when operating against EMA work.
+The commands here are product-contract commands. Some are live daemon-backed
+workspace operations, some are file-backed Harness Glue rails, and `swarm`
+remains a projection seed until the See Agent Work projection is promoted.
+External Codex and Claude sessions should use this language when operating
+against EMA work.
 
 For agent behavior, lane discipline, handoffs, mocked-control rules, and
 reporting format, see:
@@ -143,12 +147,17 @@ ema actor list --project "EMA 0.0.5"
 ema agent list --project "EMA 0.0.5"
 ema agent show --actor actor:<id>
 ema agent assign --actor actor:<id> --lane lane:<id>
-ema agent prompt --actor actor:<id> --mission mission:<id>
+ema agent prompt --actor actor:<id> --mission mission:<id> --lane lane:<id>
+ema agent prompt --lane lane:<id> --mode handoff --provider simulated
+ema agent prompt --lane lane:<id> --mode delegate --provider codex
 ema agent report --actor actor:<id> --lane lane:<id>
 ```
 
-`ema agent prompt` should generate a copyable prompt for external Codex,
-Claude CLI, or another agent runner.
+`ema agent prompt` generates a copyable prompt for external Codex, Claude CLI,
+or another agent runner. The JSON form also returns a Harness Glue command:
+`ema harness dispatch` for the simulated backend, or `ema harness start` for
+tmux-backed `codex` / `claude-code` workers. It also emits handoff, context,
+and report commands tied to the resolved lane.
 
 ## Source and Artifact Commands
 
@@ -181,15 +190,22 @@ them.
 
 ## Agent Prompt Template
 
-When See Agent Work generates an external-agent prompt, it should include:
+When See Agent Work generates an external-agent prompt, it includes:
 
 ```text
-You are working inside EMA 0.0.5.
+You are working inside EMA via a delegated Harness Glue execution or handoff.
 
 Scope:
-- Organization: Founding-Fathers-EMA
-- Space: Founding-Fathers-EMA
-- Project: EMA 0.0.5
+- Organization: <resolved org id>
+- Space: <resolved space id>
+- Project: <resolved project name/id>
+- Active build: <resolved active build>
+
+Actor Contract:
+- From: <requesting actor>
+- To: <target actor>
+- Mode: delegate | handoff | continue
+- Provider: simulated | codex | claude-code
 
 Mission:
 <mission title and purpose>
@@ -197,15 +213,15 @@ Mission:
 Lane:
 <lane id, title, status, owner, expected output>
 
-Sources:
-<git-ema attachment/source refs>
+Queue Context:
+<ready and blocked queue items for the lane>
 
 Rules:
-- Keep work lane-scoped.
-- Do not mutate canon outside the assigned lane.
-- Report files touched.
-- Preserve open questions.
-- Use handoff language if blocked.
+- Run `pnpm cli tl about --json` and `pnpm cli vcalendar tick --json` first.
+- Keep work lane-scoped and claim/refresh ownership before edits.
+- Log later work with `pnpm cli queue add`.
+- Report changed, verified, risks, and next with `pnpm cli agent report`.
+- Use handoff language if blocked or transferring ownership.
 ```
 
 ## First CLI Acceptance Criteria

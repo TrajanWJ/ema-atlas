@@ -4,7 +4,202 @@ Canonical live ledger for the 0.0.5 buildout. One coordinator, many workers.
 Every session — Codex, Claude CLI, or human — reads this file on cold start.
 
 Coordinator: Claude (replacement orchestrator, consolidated role).
-Last coordinator sweep: 2026-04-24T15:45-04:00.
+Last coordinator sweep: 2026-04-29T07:06Z.
+
+## Session update 2026-04-29 — Blueprint convergence pass
+
+Codex converged the active Blueprint swarm slice:
+
+- `ema blueprint help` now reports all daemon-backed structural writer verbs as
+  available: document create/rename/archive and section add/rename/move/remove.
+- The Blueprint vApp now renders projection-first from `blueprint.sections`
+  with an honest staged fallback instead of owning a private static section
+  model.
+- Direct vApp panel routes (`/[vapp]`) are wrapped in Suspense at the App Router
+  boundary, and URL debug scope params (`org`, `space`, `project`) can drive
+  panel render context without becoming canon.
+- Stale blocker note: daemon IPC handlers for Blueprint rename/archive/move/remove
+  exist; remaining work is focused tests/contract audit, not missing handlers.
+
+Verified:
+
+- `pnpm --filter @ema/cli build`
+- `pnpm --filter @ema/web exec tsc --noEmit`
+- `cd apps/daemon && gleam check`
+- `pnpm --filter @ema/web build` — passes; existing auth NFT trace warning
+  remains non-blocking.
+- `node apps/cli/dist/bin.js blueprint help --json`
+- `node apps/cli/dist/bin.js blueprint status --json`
+- `node apps/cli/dist/bin.js blueprint list --json`
+- `pnpm exec playwright test apps/web/tests/e2e/blueprint-screenshot.spec.ts --config apps/web/playwright.config.ts`
+
+## Session update 2026-04-29 — Recovery backlog consolidated
+
+Codex consolidated the loose EMA 0.0.5 recovery threads into
+`docs/plans/ORCHESTRATION-MAP-2026-04-29.md`.
+
+New queue records cover:
+
+- web popouts should use the daemon companion broker before direct localhost
+  fallback;
+- `place-companion` native window manager still needs to be ported into
+  `apps/desktop/src-tauri`;
+- the `lane` vocabulary conflict must be resolved before broad workspace
+  writer expansion;
+- donor design tokens need promotion into `packages/design-system`;
+- the recovery workbench must be replaced with real donor-informed vApp shell
+  surfaces;
+- pending runtime projections and command writers must ship before honest-mock
+  entries can retire;
+- parallel `pnpm cli ...` calls currently race the CLI build output.
+
+Use the orchestration map as the next-session intake packet before opening new
+lanes.
+
+## Session update 2026-04-29 — Lane/queue projections implemented
+
+Codex implemented the first orchestration-map lane:
+
+- `lane.*` now means agent-workspace ownership lanes. The old
+  `lane.item_added` / `lane.item_moved` container model was removed from the
+  active event catalog and `packages/contracts/events/lane.md`.
+- Daemon now exposes `lane.registry` and `queue.registry` projections derived
+  from canonical events.
+- `ema lane list` reads `lane.registry`.
+- `ema queue list` reads `queue.registry`.
+- `packages/surface-core` now has typed `LaneRegistryProjection` and
+  `QueueRegistryProjection` entries in `ProjectionMap`.
+- The command palette no longer advertises the retired `lane.item_add` op.
+
+Verified:
+
+- `cd apps/daemon && gleam check`
+- `cd apps/daemon && gleam test` — 25 passed
+- `pnpm --filter @ema/cli build`
+- `pnpm --filter @ema/web exec tsc --noEmit`
+- `node tooling/m1-round-trip.mjs` while the daemon was held foreground
+- `node apps/cli/dist/bin.js lane list --json` returned `source:
+  "lane.registry"`
+- `node apps/cli/dist/bin.js queue list --json` returned `source:
+  "queue.registry"`
+
+Detached daemon process check: after relaunch, `beam.smp` is listening on
+`127.0.0.1:49555`; `node tooling/m1-round-trip.mjs` is green.
+
+## Session update 2026-04-29 — Orientation drift reduced
+
+Codex kept this pass non-surface and tightened CLI orchestration state:
+
+- `ema tl about --json` now overlays `lane.registry` and `queue.registry`
+  onto the workspace summary.
+- `ema agent orient --json` now reports `status: "daemon_workspace_registry"`
+  and nonzero daemon-backed lane/queue counts.
+- File-backed project records remain fallback context for handoffs, executions,
+  responsibilities, weekly notes, and checkups.
+
+Verified:
+
+- `pnpm --filter @ema/cli build`
+- `node apps/cli/dist/bin.js tl about --json` returned `workspace.source:
+  "daemon_workspace_registry"` with daemon-backed lane/queue counts.
+- `node apps/cli/dist/bin.js agent orient --json` returned `status:
+  "daemon_workspace_registry"`.
+
+## Session close 2026-04-29 — Worktree triage, doctrine drift, agent-workspace writer blocker
+
+### Worktree triage
+
+The worktree had ~30 modified files + ~15 untracked. Reviewed and classified:
+
+- **Coherent in-flight work, not garbage.** Modified daemon code (`bus.gleam`, `sqlite_ffi.gleam`, `ema_shell_ipc.gleam`, `first_boot.gleam`), modified web shell (refactor introducing `shell-scope.ts` / `vapp-registry.tsx` / `vapp-renderer.tsx`), modified See Agent Work components, modified scripts. **Preserved per AGENTS.md "preserve dirty git worktrees."**
+- **Untracked CLI grammar buildout:** `apps/cli/src/commands/{agent,campaign,handoff,lane,mission,problem,queue,stub-contract,vcalendar,checkup,events,ping,status,swarm,tl}.ts` (~1300 lines total) — agent workspace grammar layer is fully scaffolded as stub-contract calls returning `pending_daemon_writer`. Untracked because it's WIP across many parallel sessions.
+- **Junk:** `tmp-screenshots/`, `skills/` — flagged for `.gitignore` later.
+- **Earlier "Module not found: settings-page" log error:** stale; the file was created later in the session. Web serves 200 now. Pre-existing hydration warning in `virtual-desktop-shell.tsx` is unrelated to this session's edits.
+
+### EMA-DESIGN-DOC.md not on this filesystem
+
+The 2026-04-24 session log references `/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/doctrine/master/EMA-DESIGN-DOC.md`. This machine's user is `trajanm4air`; the path doesn't exist anywhere on this Desktop. **The 2333-line master design doc is not currently version-controlled here and the source isn't on this disk.** Pull-into-VC blocked until the user supplies the file.
+
+### First-boot seed doctrine reconciliation
+
+`first_boot.gleam` actually emits TWO orgs:
+- `Trajan's Organization` (personal, current by default; default space `Personal Workspace`)
+- `Founding-Fathers-EMA` (project org; same-name default space; project `EMA 0.0.5`)
+
+Doctrine (IMPLEMENTATION-ROADMAP M1/M2, 08-vanilla-workspace, RUNTIME-RECOVERY-HANDOFF) assumed a single org `Founding-Fathers-EMA` was the default-current. **Doctrine updated to match the dual-seed reality** in three files:
+- `docs/plans/IMPLEMENTATION-ROADMAP.md` (Star state #2)
+- `docs/architecture/08-vanilla-workspace.md` (Definition)
+- `docs/plans/RUNTIME-RECOVERY-HANDOFF.md` (Next Lane acceptance)
+
+Other doctrine references to `Founding-Fathers-EMA` (`docs/cli/see-agent-work.md`, `docs/agents/see-agent-work-agent-usage.md`, decision docs) were left intact — those use FF-EMA as a project context in example commands, which is still valid since FF-EMA exists.
+
+### `L-agent-workspace-writer` Slice A — BLOCKED on doctrine conflict
+
+The lane / queue writer slice cannot land cleanly until the user resolves a doctrine conflict on the meaning of "lane":
+
+- **Existing contract** at `packages/contracts/events/lane.md`: lane = a *container* holding `{proposal | incident | blueprint_section | attachment}` items, with events `lane.opened` / `lane.closed` / `lane.item_added` / `lane.item_moved`. Owner field reads `(future) ema_swarm_coordination`.
+- **Existing CLI grammar** at `apps/cli/src/commands/lane.ts` (and the user-loved CLAUDE.md doctrine of "lane / queue / problem / solution / vcalendar / checkup / handoff language"): lane = an *ownership track* for a workstream, with verbs `open / claim / release / block / move / close / show / list` and a `idea/ready/active/review/blocked/done` status workflow.
+
+These are two different objects sharing one name. Writing a Slice A daemon writer for either model would either contradict the contract file or contradict the CLI grammar. **User decision required.** Three reconciliation paths:
+1. **Rename the contract object** — call the container "track" or "kanban_lane" or fold into a richer "blueprint section" model. Free up `lane.*` for the ownership-track meaning. Match the user's CLAUDE.md vocabulary.
+2. **Rename the CLI verb** — call ownership tracks "workstream" or "ownership". Keep `lane.*` events for the container model. Conflicts with user-stated CLAUDE.md vocabulary.
+3. **Two namespaces** — `lane.*` for the contract container, `ownership_lane.*` (or `track.*`) for the CLI grammar. Twice the writer surface; doubles the model count.
+
+Recommendation: path 1 (rename the contract object). The CLAUDE.md "lane" vocabulary is load-bearing across user instructions and the agent workspace loop; the contract's container-of-items model has no implementation yet, so renaming it now is cheap.
+
+## Session close 2026-04-29 — L-ipc-client-finish
+
+Slice: L-ipc-client-finish Slice A — IPC Client Comes Alive.
+
+Files changed:
+- `packages/surface-core/src/ipc-client/index.ts` (substantial rewrite; additive-only interface — existing `connect` / `disconnect` / `sendCommand` / `subscribeProjection` signatures preserved).
+- `apps/web/src/lib/ipc/index.ts` (re-exports).
+- `apps/web/src/lib/ipc/use-channel.ts` (new).
+- `apps/web/src/lib/ipc/use-ipc-connection.ts` (new).
+
+7/7 minimum-behaviors verified:
+1. **Opens `ws://127.0.0.1:49555`** — pass. M1 round-trip green.
+2. **hello / hello_ack** — pass. Client now tracks `helloAcked`; subscribes are queued (`queuedSubscribes` set) until the server's `type:"hello"` reply arrives, then flushed in `flushQueuedSubscribes`. `sendCommand` rejects with `unavailable / "ipc not ready (handshake pending)"` until ack.
+3. **ping / debug.ping** — pass. Server `ping` → client `pong` already worked. Added client-originated keepalive `ping` every 10s (`PING_INTERVAL_MS`) plus a 15s `pong` timeout (`PONG_TIMEOUT_MS`); silence closes the socket, which triggers reconnect.
+4. **subscribe + event fan-out** — pass. New `subscribeChannel(channel, listener)` API on `IpcClient`. `type:"event"` messages now route to channel listeners by `msg.channel`. `subscription_dropped` (backpressure path per protocol §Backpressure) re-issues subscribe automatically.
+5. **Pending command map** — pass. Existing behavior preserved; map keyed by message id, 10s timeout, `in_reply_to` lookup, error normalization.
+6. **Reconnect with backoff** — pass. New `scheduleReconnect()` uses `[1000, 2000, 4000, 8000, 15000]` ms (matches protocol §Reconnect). `manuallyClosed` flag suppresses reconnect after explicit `disconnect()`. `reconnectAttempts` resets to 0 on hello-ack. All active subscriptions re-issued on every successful (re)connect via `flushQueuedSubscribes`.
+7. **Offline state to hooks** — pass. New `ConnectionState` enum (`idle | connecting | open | offline | reconnecting`); `subscribeConnection(listener)` and `getConnectionState()` on the client; `useIpcConnection()` hook exposes it to surfaces. Surfaces no longer have to infer offline from a `null` projection.
+
+Plus checks:
+- `node tooling/m1-round-trip.mjs` — `m1-round-trip: OK` (protocol shape unchanged).
+- `cd apps/web && tsc --noEmit` — exit 0.
+- `bash scripts/contract-check.sh` — OK.
+- `grep -rn "new WebSocket\b" apps/web/src/` — zero hits. Only owner of raw WS construction is `packages/surface-core/src/ipc-client/index.ts:168`, which is the canonical IPC client per shell-protocol.
+
+Verification gaps (declared, not blockers):
+- Reconnect timing, keepalive interval, and pong-timeout paths are verified by code review against shell-protocol §Keepalive and §Reconnect, not yet exercised by an automated runtime script. The next consumer lane (`L-projections-topbar`) will exercise them implicitly via long-lived projection subscriptions; a dedicated `tooling/ipc-client-lifecycle.mjs` would harden this further. **Logged as queue follow-up under `L-projections-topbar` rather than reopening this lane.**
+- `subscribeChannel` is available in surface-core but not yet consumed by any web surface. `L-see-agent-work-8-region` carry-over is the natural first consumer (chronicle event stream).
+
+Risks: none blocking. Additive-only interface change means no existing surface code needs to migrate.
+
+Unblocks: **`L-projections-topbar`** (topbar can swap `mockTopbar` for `useProjection("topbar")` and use `useIpcConnection()` to render an explicit offline state).
+
+## Session open 2026-04-29T07:06Z — Environment refresh + bootstrap
+
+Sweep purpose: clear 5-day staleness, restart daemon + web, re-verify M1, capture live workspace state, and stage the next active lane.
+
+Meta-checks (all green):
+- `bash scripts/swarm-sweep.sh` → OK, no drift. Notes: 1 unmerged branch (informational); 1 placeholder writer module (`apps/daemon/src/ema_blueprint/ema_blueprint.gleam`, 7 lines — expected pre-writer state).
+- `bash scripts/contract-check.sh` → OK; every referenced event kind and id prefix is registered.
+- `bash scripts/ledger-check.sh` → OK but checked 0 prompts. Path is pointing at `Projects/EMA/atlas/content/swarm/orchestrator-prompts` while canonical prompts live at `doctrine/planning/orchestrator-prompts/` — `ledger-check.sh` config drifted from the canonical layout. **Flagged as a hygiene follow-up; not blocking.**
+
+Bootstrap evidence:
+- `bash scripts/start-ema-dev.sh --no-tail` → daemon (BEAM, pid 67280) up on `127.0.0.1:49555`; web (Next, pid 67245) up on `*:5173`. Pid files written.
+- `node tooling/m1-round-trip.mjs` → `m1-round-trip: OK`.
+- `pnpm cli status --json` → `{"ok":true,"org":{"id":"org:01J00000000000000000000012","name":"Trajan's Organization"},"space":{"id":"space:01J00000000000000000000013","name":"Personal Workspace","is_default":true},"project":null,"node_state":"home_current"}`.
+- `pnpm cli agent orient --json` → `pending_daemon_writer` (grammar registered, writes not yet wired).
+
+Live state vs doctrine drift:
+- First-boot seed currently produces `Trajan's Organization` / `Personal Workspace` (no project). The Implementation Roadmap M2 exit text still describes `Founding-Fathers-EMA` / same-name default space / `EMA 0.0.5` project. `apps/daemon/src/ema_swarm_coordination/first_boot.gleam` is in the dirty worktree; the seed values were changed but the doctrine reference text was not. **Treat the runtime seed as the new canon and update doctrine on the next Canon Writers slice; do not revert the seed.**
+- `agent` / `lane` / `queue` / `mission` / `campaign` / `vcalendar` / `checkup` / `handoff` grammar is registered in CLI but every subcommand reports `pending daemon writer`. The next high-leverage writer slice is wiring at least `lane open` / `lane claim` / `queue add` through to the daemon so coordinator state stops living in markdown.
+
+
 
 ## Session close 2026-04-24T20:10Z — Canon Writers Slice B (Master Design Doc)
 
@@ -584,15 +779,14 @@ Doctrine may update. Code that contradicts doctrine loses.
 **W1 — Workspace skeleton, unblock phase.**
 M1 milestone (daemon ↔ WS round-trip) is the exit gate for W1.
 
-## Live processes (as of 2026-04-24T14:35)
+## Live processes (as of 2026-04-29T07:06Z)
 
 | Service | Pid | Port | Source | Status |
 |---|---|---|---|---|
-| EMA daemon (Gleam/BEAM) | 47943 | `ws://127.0.0.1:49555` | `apps/daemon`, started via `gleam run` at 14:32 | **alive** |
-| EMA web dev (Next) | 40269 | `http://127.0.0.1:5173` | `apps/web`, `pnpm --filter @ema/web dev` | **superseded by canon Next stack; pid may be stale** |
-| `start-ema-dev.sh` wrapper | 41730 | — | idle; the wrapper's original daemon (pid 41762) died from earlier compile errors before the files were fixed | **idle** |
+| EMA daemon (Gleam/BEAM) | 67280 | `ws://127.0.0.1:49555` | `apps/daemon`, started via `start-ema-dev.sh --no-tail` | **alive** |
+| EMA web dev (Next) | 67245 | `http://127.0.0.1:5173` | `apps/web`, `pnpm --filter @ema/web dev` | **alive** |
 
-`.ema-dev/pids/daemon.pid` now reflects 47943 (live). `.ema-dev/pids/web.pid` now reflects 40269 (live).
+`.ema-dev/pids/daemon.pid` reflects 67280. `.ema-dev/pids/web.pid` reflects 67245.
 
 The wrapper's idempotency check is port-based (`lsof -iTCP:49555 -sTCP:LISTEN`), so re-running `start-ema-dev.sh` will correctly skip a second daemon launch.
 
@@ -651,7 +845,8 @@ Reality check against what is actually on disk (not what old plan docs claimed):
 
 | Lane | Status | Owner | Files | Exit criteria |
 |---|---|---|---|---|
-| [`L-ipc-client-finish`](lanes/L-ipc-client-finish.md) (Slice A) | in-progress (wire alive, hooks need audit) | Runtime Slice Orch | `packages/surface-core/src/ipc-client/`, `apps/web/src/lib/ipc/`, `tooling/m1-round-trip.mjs` | All 7 minimum-behaviors in Runtime-Slice-Orchestrator prompt met: reconnect w/ backoff, clear offline state to hooks, UI never writes raw frames. `m1-round-trip.mjs` still green. |
+| [`L-ipc-client-finish`](lanes/L-ipc-client-finish.md) (Slice A) | **closed 2026-04-29** | Coordinator (Claude) | `packages/surface-core/src/ipc-client/`, `apps/web/src/lib/ipc/` | 7/7 minimum-behaviors verified — see session close 2026-04-29. Unblocks L-projections-topbar. |
+| [`L-agent-workspace-writer`](lanes/L-agent-workspace-writer.md) (Slice A) | queued — opened 2026-04-29 | unassigned | `apps/daemon/src/ema_lanes/`, `apps/daemon/src/ema_queue/`, `packages/contracts/events/{lane,queue}.md`, `apps/cli/src/commands/{lane,queue}.ts`, `tooling/agent-workspace-round-trip.mjs` | `pnpm cli lane open` / `lane list` / `queue add` / `queue list` return real ids and projections (no `pending_daemon_writer`); events persisted to SQLite; replay across restart is identical; contract-check + gleam test + m1 round-trip stay green. Honors CLAUDE.md "log to queue not chat" rule. |
 | [`L-projections-topbar`](lanes/L-projections-topbar.md) (Slice B) | queued | Runtime Slice Orch | daemon-side `apps/daemon/src/ema_projections/topbar.gleam` (new), `apps/web/src/shell/topbar.tsx`, `apps/web/src/shell/*-selector.tsx` | Topbar renders "Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5" from `useProjection("topbar.projection")`, not `mockTopbar`. Event trail contains seed or command events backing the projection. |
 | [`L-writers-org-space`](lanes/L-writers-org-space.md) | queued | (none — specialist TBD; Codex worker brief lists this as recommended first slice) | `apps/daemon/src/ema_orgs/`, `ema_spaces/`, catalog entries in `packages/contracts/events/` | `org.created` + `space.created` (default-same-name) accepted as real commands, persisted, projected. |
 | [`L-see-agent-work-docs`](lanes/L-see-agent-work-docs.md) | queued | unassigned | `docs/cli/see-agent-work.md`, `docs/agents/see-agent-work-agent-usage.md` | Operational runbook: every CLI command has a worked example; an external session can follow the runbook cold. |

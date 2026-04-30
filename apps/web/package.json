@@ -2,28 +2,51 @@
   "name": "@ema/web",
   "version": "0.0.5-dev",
   "private": true,
-  "description": "EMA 0.0.5 — browser-hosted shell. Also embedded by apps/desktop.",
+  "description": "EMA 0.0.5 — browser-hosted shell. Forked wholesale from place.org (TrajanWJ/place.org @ c81fe8b).",
   "type": "module",
   "scripts": {
     "dev": "next dev -p 5173",
     "build": "next build",
-    "preview": "next start -p 5173"
+    "preview": "next start -p 5173",
+    "lint": "biome check .",
+    "test": "vitest",
+    "test:unit": "vitest --run",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:dev": "EMA_E2E_BASE_URL=http://127.0.0.1:5173 playwright test",
+    "test:e2e:static": "bash ../../scripts/build-web-static-out.sh && playwright test"
   },
   "dependencies": {
     "@ema/contracts": "workspace:*",
     "@ema/design-system": "workspace:*",
     "@ema/surface-core": "workspace:*",
+    "@tauri-apps/api": "^2.10.1",
+    "@types/matter-js": "^0.20.2",
+    "better-sqlite3": "^12.8.0",
+    "matter-js": "^0.20.0",
     "motion": "^12.38.0",
     "next": "16.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-rnd": "^10.5.3",
+    "wa-sqlite": "^1.0.0",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@biomejs/biome": "^2.4.8",
+    "@playwright/test": "^1.56.1",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.19.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "typescript": "^5.5.0"
+    "@vitejs/plugin-react": "^6.0.1",
+    "jsdom": "^29.0.1",
+    "tailwindcss": "^4",
+    "typescript": "^5.5.0",
+    "vitest": "^4.1.0"
   }
 }

@@ -7,11 +7,11 @@ Use this repo as the implementation root for EMA `0.0.5`.
 Read:
 
 1. `orchestration/STATUS.md`
-2. `../../doctrine/planning/EMA-0.0.5-LANGUAGE-LOCK.md`
-3. `../../doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md`
-4. `../../doctrine/planning/EMA-0.0.5-PASSOVER-AND-PREP.md`
-5. `../../doctrine/planning/lane3-domain-model-and-system-design.md`
-6. `../../data-model/EMA-DATA-TREATMENT-AND-SOURCE-OF-TRUTH.md`
+2. `../../Projects/EMA/project.md`
+3. `../../Projects/EMA/PROJECT-MAP.md`
+4. `../../Projects/EMA/builds/BUILD-MANIFEST.md`
+5. `../../Projects/EMA/atlas/README.md`
+6. `../../Projects/EMA/atlas/canon/current/ema-0-0-5-current-canon.md`
 7. `architecture/08-vanilla-workspace.md`
 8. `architecture/09-see-agent-work.md`
 9. `agents/see-agent-work-agent-usage.md`

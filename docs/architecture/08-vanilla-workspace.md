@@ -10,9 +10,9 @@ intent-to-canon workflow is implemented.
 
 A vanilla workspace is the smallest believable EMA project environment:
 
-- one visible organization, initially `Founding-Fathers-EMA`;
-- one visible default space with the same name as the organization;
-- one visible project;
+- two seeded organizations: `Trajan's Organization` (personal, current by default) with `Personal Workspace` as its default space, and `Founding-Fathers-EMA` (the EMA project org) with a same-name default space and the `EMA 0.0.5` project;
+- one visible default space per org;
+- one visible project under `Founding-Fathers-EMA` (`EMA 0.0.5`);
 - a daemon-owned canonical event log;
 - a shell that shows current org, space, project, and node state;
 - Blueprint as the project-thinking surface;

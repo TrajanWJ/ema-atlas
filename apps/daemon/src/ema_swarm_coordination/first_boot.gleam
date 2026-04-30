@@ -41,6 +41,8 @@ pub const runtime_attachment_id: String = "attachment:01J00000000000000000000010
 
 pub const runtime_codebase_id: String = "codebase:01J00000000000000000000011"
 
+pub const runtime_local_path: String = "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5"
+
 pub type ActorKind {
   Human
   Agent
@@ -211,7 +213,7 @@ pub fn workspace() -> FirstBootWorkspace {
       id: runtime_codebase_id,
       project_id: project_id,
       display_name: "EMA 0.0.5 runtime",
-      local_path: "/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24",
+      local_path: runtime_local_path,
       attachment_id: runtime_attachment_id,
     ),
   )
@@ -376,7 +378,7 @@ pub fn first_boot_events() -> List(Envelope) {
       kind: "attachment.created",
       space_id: event_envelope.some(default_space_id),
       project_id: event_envelope.some(project_id),
-      payload_json: "{\"attachment_id\":\"attachment:01J00000000000000000000010\",\"kind\":\"git_repo\",\"source\":\"local\",\"display_name\":\"EMA 0.0.5 runtime\",\"source_ref\":{\"kind\":\"local_path\",\"path\":\"/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24\"},\"codebase_id\":\"codebase:01J00000000000000000000011\"}",
+      payload_json: "{\"attachment_id\":\"attachment:01J00000000000000000000010\",\"kind\":\"git_repo\",\"source\":\"local\",\"display_name\":\"EMA 0.0.5 runtime\",\"source_ref\":{\"kind\":\"local_path\",\"path\":\"/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5\"},\"codebase_id\":\"codebase:01J00000000000000000000011\"}",
     ),
     envelope(
       event_id: "event:01J00000000000000000000115",

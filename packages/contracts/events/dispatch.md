@@ -1,10 +1,12 @@
 # dispatch
 
-The Hermes seam — dispatches are named runs that travel with every
+The future Hermes/Harness Glue seam — dispatches are named runs that travel with every
 emitted event inside a bounded execution. A `dispatch_id` in the envelope
 ties a run's events together.
 
-Owner: `ema_control` seam (daemon-internal).
+Owner: `ema_control` seam (daemon-internal). Harness Glue may prepare
+or mirror provider/session records, but canonical dispatch writes remain
+daemon-owned.
 
 ## Kinds
 
@@ -17,6 +19,8 @@ payload {
   workspace_ref: {                 // snapshot pointer at dispatch time
     org_id, space_id?, project_id?
   }
+  provider?:    "simulated" | "codex" | "claude-code" | "hermes" | string
+  lane_id?:     lane:<ulid>
 }
 ```
 
@@ -38,5 +42,5 @@ also flow here.
 
 ### `dispatch.ended`
 ```
-payload { dispatch_id, outcome: "ok" | "failed" | "cancelled" }
+payload { dispatch_id, outcome: "ok" | "failed" | "cancelled", provider?: string }
 ```

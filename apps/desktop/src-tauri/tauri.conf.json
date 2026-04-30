@@ -5,7 +5,7 @@
   "identifier": "org.ema.desktop",
   "build": {
     "beforeDevCommand": "bash -lc 'lsof -nP -iTCP:5173 -sTCP:LISTEN >/dev/null 2>&1 || pnpm --filter @ema/web dev'",
-    "beforeBuildCommand": "pnpm --filter @ema/web build",
+    "beforeBuildCommand": "pnpm --filter ema-runtime build:web-static",
     "devUrl": "http://localhost:5173",
     "frontendDist": "../../web/out"
   },
@@ -26,7 +26,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' ws://127.0.0.1:49555; style-src 'self' 'unsafe-inline'"
+      "csp": null
     }
   },
   "bundle": {

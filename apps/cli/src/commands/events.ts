@@ -3,9 +3,20 @@ import { emitJson, emitPretty, emitError } from "../output.js";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { reportError } from "./ping.js";
+import { runStubContract } from "./stub-contract.js";
 
 export async function runEvents(args: ParsedArgs): Promise<number> {
   const sub = args.positional[0];
+  if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
+    return runStubContract(args, {
+      noun: "events",
+      status: "available",
+      docRef: "packages/contracts/ipc/shell-protocol.md",
+      commands: [
+        { verb: "tail", flags: ["family", "kind", "since", "json"], summary: "Stream daemon events line-by-line until interrupted." },
+      ],
+    });
+  }
   if (sub !== "tail") {
     emitError(`ema events: unknown subcommand "${sub ?? ""}" (expected: tail)`);
     return 64;
@@ -13,6 +24,10 @@ export async function runEvents(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
   const family = flagString(args, "family");
   const since = flagString(args, "since");
+  const kindArg = flagString(args, "kind");
+  // --kind accepts a comma-separated list and/or a trailing `.*` glob.
+  // Examples: --kind blueprint.* / --kind lane.opened,queue_item.added
+  const kindPatterns: string[] = kindArg ? kindArg.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
   try {
     const c = await connect({ surface: "desktop" });
@@ -27,11 +42,21 @@ export async function runEvents(args: ParsedArgs): Promise<number> {
       emitPretty(`# filtering to family: ${family}`);
     }
 
+    function matchesKind(kind: string): boolean {
+      if (kindPatterns.length === 0) return true;
+      return kindPatterns.some((pat) => {
+        if (pat.endsWith(".*")) return kind.startsWith(pat.slice(0, -1));
+        if (pat.endsWith("*")) return kind.startsWith(pat.slice(0, -1));
+        return kind === pat;
+      });
+    }
+
     c.onMessage((msg) => {
       if (msg.type === "event") {
         const env = msg as EventEnvelope;
         const kind = (env.event as { kind?: string }).kind ?? "";
         if (family && !kind.startsWith(family + ".") && kind !== family) return;
+        if (!matchesKind(kind)) return;
         if (json) {
           emitJson(env.event);
         } else {

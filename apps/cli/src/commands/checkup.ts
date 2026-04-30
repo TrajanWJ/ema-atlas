@@ -3,12 +3,24 @@ import { emitError, emitJson, emitPretty } from "../output.js";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { reportError } from "./ping.js";
+import { runStubContract } from "./stub-contract.js";
 
 const DEFAULT_ORG = "org:01J00000000000000000000001";
 const DEFAULT_ACTOR = "actor:dev-console";
 
 export async function runCheckup(args: ParsedArgs): Promise<number> {
   const sub = args.positional[0];
+  if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
+    return runStubContract(args, {
+      noun: "checkup",
+      status: "available",
+      docRef: "docs/cli/see-agent-work.md",
+      commands: [
+        { verb: "schedule", flags: ["lane", "cadence", "actor"], required: ["lane", "cadence"], summary: "Schedule a cadence-based lane checkup." },
+        { verb: "complete", flags: ["checkup", "result", "actor"], required: ["checkup", "result"], summary: "Mark a scheduled checkup complete." },
+      ],
+    });
+  }
   switch (sub) {
     case "schedule":
       return runSchedule(args);

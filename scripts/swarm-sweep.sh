@@ -19,13 +19,15 @@
 
 set -euo pipefail
 
-ROOT="/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24"
-WORKSPACE="/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
+DESKTOP_ROOT="$(cd "$ROOT/../.." && pwd -P)"
+WORKSPACE="${EMA_WORKSPACE_ROOT:-$DESKTOP_ROOT/Projects/EMA}"
 PID_DIR="$ROOT/.ema-dev/pids"
 DAEMON_PORT=49555
 WEB_PORT=5173
 STALE_BRANCH_DAYS=7
-PROMPTS_DIR="$WORKSPACE/doctrine/planning/orchestrator-prompts"
+PROMPTS_DIR="${EMA_PROMPTS_DIR:-$WORKSPACE/atlas/content/swarm/orchestrator-prompts}"
 INDEX_FILE="$PROMPTS_DIR/ORCHESTRATOR-INDEX.md"
 LEDGER_CHECK="$ROOT/scripts/ledger-check.sh"
 
@@ -100,7 +102,7 @@ fi
 
 # --- 2. ports -----------------------------------------------------------
 for port in "$DAEMON_PORT" "$WEB_PORT"; do
-  pids_on_port="$(lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | tr '\n' ',' | sed 's/,$//')"
+  pids_on_port="$(lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | tr '\n' ',' | sed 's/,$//' || true)"
   if [[ -n "$pids_on_port" ]]; then
     port_listeners+=("$port:$pids_on_port")
   else

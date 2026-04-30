@@ -40,6 +40,8 @@ target/
 # EMA local dev state
 .ema-dev/
 .ema-dev-updates/
+.claude/
+tmp-screenshots/
 
 # Local databases and runtime artifacts
 *.sqlite
@@ -48,6 +50,11 @@ target/
 *.db-*
 *.pid
 *.log
+
+# Test/browser artifacts
+**/test-results/
+playwright-report/
+**/playwright-report/
 
 # Archives and generated snapshots
 *.tar

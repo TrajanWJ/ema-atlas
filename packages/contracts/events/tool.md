@@ -1,8 +1,10 @@
 # tool
 
-The Hermes seam. Tool-call events.
+The future Hermes/Harness Glue seam. Tool-call events from provider
+sessions and model/tool runtimes.
 
-Owner: `ema_exec` seam.
+Owner: `ema_exec` seam. Harness Glue may mirror provider events into the
+same shape while daemon-owned writers are being built.
 
 ## Kinds
 
@@ -12,6 +14,7 @@ payload {
   execution_id: execution:<ulid>
   tool_name:    string                    // e.g. "fs.read", "http.get"
   args:         <json>                    // redacted if carrying secrets
+  provider?:    "simulated" | "codex" | "claude-code" | "hermes" | string
 }
 ```
 

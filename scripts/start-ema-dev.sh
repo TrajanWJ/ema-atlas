@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 LOG_DIR="$ROOT/.ema-dev/logs"
 PID_DIR="$ROOT/.ema-dev/pids"
 WEB_URL="http://localhost:5173/"
 TAIL_LOGS=1
+WAIT_SECONDS=20
+USE_LAUNCHCTL="${EMA_USE_LAUNCHCTL:-0}"
 
 for arg in "$@"; do
   case "$arg" in
@@ -50,37 +53,73 @@ if ! command -v gleam >/dev/null 2>&1; then
   exit 1
 fi
 
+wait_for_port() {
+  local name="$1"
+  local port="$2"
+  local waited=0
+  while ! lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; do
+    if [ "$waited" -ge "$WAIT_SECONDS" ]; then
+      echo "$name did not open port $port within ${WAIT_SECONDS}s." >&2
+      return 1
+    fi
+    sleep 1
+    waited=$((waited + 1))
+  done
+  return 0
+}
+
+write_pid_for_port() {
+  local name="$1"
+  local port="$2"
+  local pid
+  pid="$(lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | head -n 1 || true)"
+  if [ -n "$pid" ]; then
+    echo "$pid" >"$PID_DIR/$name.pid"
+  fi
+}
+
+start_service() {
+  local name="$1"
+  local label="$2"
+  local command="$3"
+  local log_file="$4"
+  if [ "$USE_LAUNCHCTL" -eq 1 ]; then
+    launchctl remove "$label" >/dev/null 2>&1 || true
+    launchctl submit -l "$label" -- /bin/bash -lc "export PATH='/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'; export npm_config_manage_package_manager_versions=false; $command >>'$log_file' 2>&1"
+  else
+    nohup bash -lc "$command" </dev/null >"$log_file" 2>&1 &
+    echo "$!" >"$PID_DIR/$name.pid"
+    disown "$!" 2>/dev/null || true
+  fi
+}
+
 if ! lsof -nP -iTCP:49555 -sTCP:LISTEN >/dev/null 2>&1; then
   echo "starting EMA daemon stub..."
-  nohup bash -c '
-    set -euo pipefail
-    trap "" INT
-    cd "$1/apps/daemon"
-    exec gleam run
-  ' bash "$ROOT" >"$LOG_DIR/daemon.log" 2>&1 &
-  daemon_pid="$!"
-  echo "$daemon_pid" >"$PID_DIR/daemon.pid"
-  disown "$daemon_pid" 2>/dev/null || true
+  start_service \
+    daemon \
+    org.ema.dev.daemon \
+    "cd '$ROOT/apps/daemon' && exec gleam run" \
+    "$LOG_DIR/daemon.log"
 else
   echo "daemon port 49555 already has a listener."
 fi
 
 if ! lsof -nP -iTCP:5173 -sTCP:LISTEN >/dev/null 2>&1; then
   echo "starting EMA web surface..."
-  nohup bash -c '
-    set -euo pipefail
-    trap "" INT
-    cd "$1"
-    exec pnpm --filter @ema/web dev
-  ' bash "$ROOT" >"$LOG_DIR/web.log" 2>&1 &
-  web_pid="$!"
-  echo "$web_pid" >"$PID_DIR/web.pid"
-  disown "$web_pid" 2>/dev/null || true
+  start_service \
+    web \
+    org.ema.dev.web \
+    "cd '$ROOT' && exec pnpm --filter @ema/web dev" \
+    "$LOG_DIR/web.log"
 else
   echo "web port 5173 already has a listener."
 fi
 
 echo "opening $WEB_URL"
+wait_for_port daemon 49555
+wait_for_port web 5173
+write_pid_for_port daemon 49555
+write_pid_for_port web 5173
 open "$WEB_URL"
 
 echo ""

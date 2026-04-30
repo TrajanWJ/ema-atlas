@@ -4,7 +4,7 @@ Date: 2026-04-24
 
 ## Current Facts
 
-- Active code root: `/Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24`.
+- Active code root: `/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5`.
 - Canon topology: `Organization -> Space -> Project`.
 - Canon rule: daemon owns truth; surfaces dispatch commands and render projections.
 - The real desktop app is the Tauri bundle from `apps/desktop`.
@@ -20,23 +20,24 @@ Date: 2026-04-24
 You are recovering the current EMA 0.0.5 runtime state.
 
 Workspace:
-- Central root: /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING
-- Active code root: /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24
-- Doctrine root: /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/doctrine
-- Do not build inside sources/snapshots, archive, atlas, or donors.
+- Desktop root: /Users/trajanm4air/Desktop
+- Active code root: /Users/trajanm4air/Desktop/Active builds/EMA-0.0.5
+- Project record root: /Users/trajanm4air/Desktop/Projects/EMA
+- Atlas root: /Users/trajanm4air/Desktop/Projects/EMA/atlas
+- Do not build inside archive, atlas, packed folders, or donor/reference folders.
 
 Goal:
 Produce a precise runtime recovery report and the next executable lane.
 
 Read first:
 1. README.md
-2. doctrine/planning/EMA-0.0.5-LANGUAGE-LOCK.md
-3. doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md
-4. runtime/EMA-0.0.5--4-24/README.md
-5. runtime/EMA-0.0.5--4-24/docs/WORKSPACE-ENTRYPOINT.md
-6. runtime/EMA-0.0.5--4-24/docs/architecture/05-writer-topology.md
-7. runtime/EMA-0.0.5--4-24/docs/plans/IMPLEMENTATION-ROADMAP.md
-8. runtime/EMA-0.0.5--4-24/docs/plans/RUNTIME-RECOVERY-HANDOFF.md
+2. Projects/EMA/project.md
+3. Projects/EMA/PROJECT-MAP.md
+4. Active builds/EMA-0.0.5/README.md
+5. Active builds/EMA-0.0.5/docs/WORKSPACE-ENTRYPOINT.md
+6. Active builds/EMA-0.0.5/docs/architecture/05-writer-topology.md
+7. Active builds/EMA-0.0.5/docs/plans/IMPLEMENTATION-ROADMAP.md
+8. Active builds/EMA-0.0.5/docs/plans/RUNTIME-RECOVERY-HANDOFF.md
 
 Rules:
 - EMA means Executive Management Assistant.
@@ -45,7 +46,7 @@ Rules:
 - Hermes/runtime owns execution; do not blur execution state into canon.
 - The first milestone is a vanilla workspace, not full autonomous workflow.
 - `EMA 0.0.5.app` is the real Tauri desktop app.
-- `EMA 0.0.5 Web Dev Launcher.app` is only a dev helper for daemon + Vite web.
+- `EMA 0.0.5 Web Dev Launcher.app` is only a dev helper for daemon + Next.js web.
 - Verify reality from files and commands before claiming behavior works.
 
 Deliver:
@@ -61,10 +62,10 @@ Deliver:
 You are mining donor material for EMA 0.0.5 without contaminating the active build.
 
 Workspace:
-- Active EMA code: /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/runtime/EMA-0.0.5--4-24
-- Canon doctrine: /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/doctrine
-- Curated donors: /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/donors
-- Preserved history: /Users/tawj/Desktop/EMA-CENTRAL-EVERYTHING/sources/snapshots
+- Active EMA code: /Users/trajanm4air/Desktop/Active builds/EMA-0.0.5
+- Canon/project record: /Users/trajanm4air/Desktop/Projects/EMA
+- Atlas and donor/reference material: /Users/trajanm4air/Desktop/Projects/EMA/atlas
+- Preserved history: /Users/trajanm4air/Desktop/Projects/EMA/atlas/archive
 
 Goal:
 Find reusable patterns, contracts, interface ideas, lane discipline, launcher concepts, and source/workspace models. Do not copy donor code blindly.
@@ -72,7 +73,7 @@ Find reusable patterns, contracts, interface ideas, lane discipline, launcher co
 Canonical filters:
 - EMA = Executive Management Assistant.
 - Current topology: Organization -> Space -> Project.
-- Current implementation root: runtime/EMA-0.0.5--4-24.
+- Current implementation root: Active builds/EMA-0.0.5.
 - Daemon-first, native-first, Gleam/BEAM daemon, Tauri desktop, web shell parity.
 - Blueprint is the first deep project-thinking vApp.
 - git-ema is the source/attachment vApp, not the whole shared workspace.
@@ -100,4 +101,4 @@ Implement M2 topbar projection from daemon-owned events:
 - Daemon: add first real `topbar` projection actor and seed snapshot.
 - IPC: emit `projection` frames with `name: "topbar"`.
 - Web: keep existing `useProjection("topbar")` path; remove local fallback only after daemon projection is reliable.
-- Acceptance: fresh boot shows `Founding-Fathers-EMA -> Founding-Fathers-EMA -> EMA 0.0.5` from daemon projection, not mock data.
+- Acceptance: fresh boot's topbar shows `Trajan's Organization -> Personal Workspace -> (no project)` as the default current scope from the daemon projection (not mock data); switching to the `Founding-Fathers-EMA` org via the org selector reveals its same-name default space and the `EMA 0.0.5` project.

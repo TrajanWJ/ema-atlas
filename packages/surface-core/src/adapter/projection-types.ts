@@ -123,6 +123,188 @@ export type AttachmentsProjection = {
   attachments: Attachment[];
 };
 
+export type ChronicleEvent = {
+  id: string;
+  txid: number;
+  kind: string;
+  source: string;
+  session_id: string;
+  actor: string;
+  org_id: string;
+  space_id: string | null;
+  project_id: string | null;
+  ts: string;
+  label: string;
+};
+
+export type ChronicleSession = {
+  id: string;
+  actor: string;
+  org_id: string;
+  space_id: string | null;
+  project_id: string | null;
+  started_at: string;
+  last_event_at: string;
+  event_count: number;
+  latest_kind: string;
+};
+
+export type ChronicleSource = {
+  source: string;
+  event_count: number;
+  latest_at: string;
+};
+
+export type ChronicleActivityProjection = {
+  source: "daemon_events" | string;
+  host_id: string;
+  events: ChronicleEvent[];
+  sessions: ChronicleSession[];
+  sources: ChronicleSource[];
+};
+
+export type AccessSessionProjection = {
+  challenges: Array<{
+    challenge_id: string;
+    org_id: string;
+    access_point: string;
+    user_code: string;
+    scopes: string[];
+    status: "open" | "approved" | "expired" | "revoked";
+    expires_at: string;
+  }>;
+  sessions: Array<{
+    session_id: string;
+    challenge_id: string;
+    org_id: string;
+    user_id: string;
+    approved_by_device: string;
+    scopes: string[];
+    status: "active" | "revoked" | "expired";
+    expires_at: string;
+  }>;
+};
+
+export type DeviceRegistryProjection = {
+  devices: Array<{
+    device_id: string;
+    org_id: string;
+    user_id: string;
+    name: string;
+    pubkey: string;
+    bootstrap: "genesis" | "paired" | string;
+    status: "trusted" | "revoked" | string;
+    updated_at: string;
+  }>;
+  machine_peer_ready: boolean;
+  transport: "disabled" | "iroh" | "ssh" | string;
+};
+
+export type PeerTrustProjection = {
+  peers: Array<{
+    org_id: string;
+    peer_device: string;
+    peer_pubkey: string;
+    local_pubkey: string;
+    ceremony_kind: "qr_ble_hybrid" | "recovery_packet" | "genesis" | string;
+    ceremony_id: string;
+    status: "trusted" | "revoked" | string;
+    established_at: string;
+  }>;
+  replication_enabled: boolean;
+  transport: "disabled" | "iroh" | "ssh" | string;
+};
+
+export type InviteRegistryProjection = {
+  invites: Array<{
+    invite_id: string;
+    org_id: string;
+    target_kind: string;
+    target_value: string;
+    role: "owner" | "admin" | "member" | "guest" | string;
+    status: "open" | "accepted" | "revoked" | "expired" | string;
+    expires_at: string;
+    updated_at: string;
+  }>;
+};
+
+export type ProjectFilesystemProjection = {
+  projects: Array<{
+    project_id: string;
+    space_id: string;
+    org_id: string;
+    name: string;
+    local_path: string;
+    status: "pending" | "materialized" | "materialization_failed" | string;
+    reason: string;
+  }>;
+};
+
+export type SpaceInstalledVAppsProjection = {
+  org_id: string;
+  space_id: string;
+  source: string;
+  apps: Array<{
+    installation_id: string;
+    vapp_id: string;
+    slug: string;
+    label: string;
+    status: "live" | "projection" | "staged" | string;
+    project_name: string;
+    enabled: boolean;
+    sort_order: number;
+    config: Record<string, unknown>;
+  }>;
+};
+
+export type LaneRegistryProjection = {
+  source: "daemon_events" | string;
+  lanes: Array<{
+    id: string;
+    lane_id: string;
+    title: string;
+    name: string;
+    status: "idea" | "ready" | "active" | "review" | "blocked" | "done" | string;
+    project_id: string | null;
+    mission_id: string | null;
+    scope: string | null;
+    claim_scope: string | null;
+    done_when: string | null;
+    depends_on: string | null;
+    opened_by: string | null;
+    actor_id: string | null;
+    goal: string | null;
+    next: string | null;
+    blocker: string | null;
+    blocked_reason: string | null;
+    opened_at: string | null;
+    updated_at: string | null;
+  }>;
+};
+
+export type QueueRegistryProjection = {
+  source: "daemon_events" | string;
+  queue_items: Array<{
+    id: string;
+    queue_item_id: string;
+    title: string;
+    why: string;
+    status: "ready" | "blocked" | "closed" | string;
+    project_id: string | null;
+    mission_id: string | null;
+    lane_id: string | null;
+    done_when: string | null;
+    depends_on: string | null;
+    blocked_by: string | null;
+    source: string | null;
+    added_by: string | null;
+    blocked_reason: string | null;
+    result: string | null;
+    added_at: string | null;
+    updated_at: string | null;
+  }>;
+};
+
 // ----------------------------------------------------------------------------
 // pending daemon writer — shapes referenced by the shell but not yet
 // delivered by the daemon. Naming them here makes the Runtime handoff
@@ -162,11 +344,20 @@ export type PresenceProjection = {
 
 export type ProjectionMap = {
   topbar: TopbarProjection;
+  "access_session.current": AccessSessionProjection;
+  "device.registry": DeviceRegistryProjection;
+  "peer.trust": PeerTrustProjection;
+  "invite.registry": InviteRegistryProjection;
+  "project.filesystem_status": ProjectFilesystemProjection;
+  "space.installed_vapps": SpaceInstalledVAppsProjection;
+  "lane.registry": LaneRegistryProjection;
+  "queue.registry": QueueRegistryProjection;
   "blueprint.sections": BlueprintSectionsProjection;
   "see_agent_work.project_pulse": SeeAgentWorkProjection;
   "git_ema.user_connectors": UserConnectorsProjection;
   "git_ema.user_attachments": AttachmentsProjection;
   "git_ema.project_attachments": AttachmentsProjection;
+  "chronicle.activity": ChronicleActivityProjection;
   "hq.pulse": HqPulseProjection;
   "desktop.wallpaper": WallpaperProjection;
   "desktop.presence": PresenceProjection;

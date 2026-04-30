@@ -1,19 +1,119 @@
-/* EMA 0.0.5 — design tokens (wave 1, minimal). */
+/* =============================================================================
+   place-design-tokens — canonical CSS custom properties
+   Copy or @import into your app's root stylesheet.
+   Source: place.org/app/globals.css
+   ========================================================================== */
 
 :root {
-  --ema-bg:           #0b0d10;
-  --ema-surface:      #15181d;
-  --ema-surface-2:    #1b1f26;
-  --ema-border:       #2a2f38;
-  --ema-text:         #e6e9ef;
-  --ema-text-muted:   #9aa3b2;
-  --ema-accent:       #7aa2ff;
-  --ema-accent-hot:   #ffb86b;
-  --ema-danger:       #ff6b6b;
+	/* ===== Surfaces ===== */
+	--place-void: #060610;
+	--place-base: #08090E;
+	--place-surface-1: #0E1017;
+	--place-surface-2: #141620;
+	--place-surface-3: #1A1D2A;
 
-  --ema-radius-sm:    4px;
-  --ema-radius-md:    8px;
+	/* ===== Text — white at opacity, never gray hex ===== */
+	--place-text-primary:   rgba(255,255,255, 0.87);
+	--place-text-secondary: rgba(255,255,255, 0.60);
+	--place-text-tertiary:  rgba(255,255,255, 0.40);
+	--place-text-muted:     rgba(255,255,255, 0.25);
+	--place-text-ghost:     rgba(255,255,255, 0.12);
 
-  --ema-font-sans:    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --ema-font-mono:    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+	/* ===== Primary (Teal) ===== */
+	--place-primary-900: #064E3B;
+	--place-primary-700: #0A7558;
+	--place-primary-500: #0D9373;
+	--place-primary-400: #2DD4A8;
+	--place-primary-300: #5EEAD4;
+	--place-primary-200: #99F6E4;
+	--place-primary-50:  #CCFBF1;
+	--place-primary-glow:    rgba(13,147,115, 0.25);
+	--place-primary-subtle:  rgba(13,147,115, 0.10);
+	--place-primary-border:  rgba(45,212,168, 0.20);
+
+	/* ===== Secondary (Slate Blue) ===== */
+	--place-secondary-900: #1E3A6E;
+	--place-secondary-700: #2B5298;
+	--place-secondary-500: #4B7BE5;
+	--place-secondary-400: #6B95F0;
+	--place-secondary-300: #93B4F6;
+	--place-secondary-200: #BDD1FA;
+	--place-secondary-50:  #E0ECFD;
+	--place-secondary-glow:    rgba(75,123,229, 0.25);
+	--place-secondary-subtle:  rgba(75,123,229, 0.10);
+	--place-secondary-border:  rgba(107,149,240, 0.20);
+
+	/* ===== Tertiary (Amber) ===== */
+	--place-tertiary-900: #78350F;
+	--place-tertiary-700: #92400E;
+	--place-tertiary-500: #D97706;
+	--place-tertiary-400: #F59E0B;
+	--place-tertiary-300: #FBBF24;
+	--place-tertiary-200: #FDE68A;
+	--place-tertiary-50:  #FEF3C7;
+	--place-tertiary-glow:   rgba(217,119,6, 0.25);
+	--place-tertiary-subtle: rgba(217,119,6, 0.10);
+	--place-tertiary-border: rgba(245,158,11, 0.20);
+
+	/* ===== Semantic — NEVER themed ===== */
+	--place-error:   #E24B4A;
+	--place-success: #22C55E;
+	--place-warning: #EAB308;
+
+	/* ===== Borders — white at opacity ===== */
+	--place-border-subtle:  rgba(255,255,255, 0.04);
+	--place-border-default: rgba(255,255,255, 0.08);
+	--place-border-strong:  rgba(255,255,255, 0.15);
+
+	/* ===== Typography ===== */
+	--place-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+	--place-font-mono: "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
+	--place-font-weight-base: 400;
+	--place-font-weight-heading: 600;
+	--place-line-height: 1.5;
+
+	/* ===== Easing — fast start, smooth land ===== */
+	--place-ease-smooth: cubic-bezier(0.65, 0.05, 0, 1);
+}
+
+/* ===== Light mode ===== */
+[data-theme="light"] {
+	--place-void: #f5f5f7;
+	--place-base: #ececee;
+	--place-surface-1: #e2e2e6;
+	--place-surface-2: #d8d8dc;
+	--place-surface-3: #ccccd0;
+	--place-text-primary:   rgba(0,0,0,0.87);
+	--place-text-secondary: rgba(0,0,0,0.60);
+	--place-text-tertiary:  rgba(0,0,0,0.40);
+	--place-text-muted:     rgba(0,0,0,0.25);
+	--place-border-default: rgba(0,0,0,0.10);
+	--place-border-subtle:  rgba(0,0,0,0.05);
+	--place-border-strong:  rgba(0,0,0,0.18);
+}
+
+/* ===== Contrast modes (dark) ===== */
+[data-contrast="increased"] {
+	--place-text-primary:   rgba(255,255,255,0.95);
+	--place-text-secondary: rgba(255,255,255,0.75);
+	--place-border-default: rgba(255,255,255,0.15);
+}
+[data-contrast="high"] {
+	--place-text-primary:   #ffffff;
+	--place-text-secondary: rgba(255,255,255,0.85);
+	--place-text-tertiary:  rgba(255,255,255,0.65);
+	--place-border-default: rgba(255,255,255,0.25);
+	--place-border-strong:  rgba(255,255,255,0.35);
+}
+
+/* ===== Light + contrast combos ===== */
+[data-theme="light"][data-contrast="increased"] {
+	--place-text-primary:   rgba(0,0,0,0.95);
+	--place-text-secondary: rgba(0,0,0,0.75);
+	--place-border-default: rgba(0,0,0,0.18);
+}
+[data-theme="light"][data-contrast="high"] {
+	--place-text-primary:   #000000;
+	--place-text-secondary: rgba(0,0,0,0.85);
+	--place-border-default: rgba(0,0,0,0.30);
 }

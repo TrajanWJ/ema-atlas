@@ -11,9 +11,26 @@ import { runStatus } from "./commands/status.js";
 import { runEvents } from "./commands/events.js";
 import { runSwarm } from "./commands/swarm.js";
 import { runOrg } from "./commands/org.js";
+import { runSpace } from "./commands/space.js";
 import { runProject } from "./commands/project.js";
 import { runVcalendar } from "./commands/vcalendar.js";
 import { runCheckup } from "./commands/checkup.js";
+import { runCampaign } from "./commands/campaign.js";
+import { runMission } from "./commands/mission.js";
+import { runLane } from "./commands/lane.js";
+import { runQueue } from "./commands/queue.js";
+import { runHandoff } from "./commands/handoff.js";
+import { runProblem } from "./commands/problem.js";
+import { runAgent } from "./commands/agent.js";
+import { runNext } from "./commands/next.js";
+import { runTl } from "./commands/tl.js";
+import { runBlueprint } from "./commands/blueprint.js";
+import { runWiki } from "./commands/wiki.js";
+import { runHermes } from "./commands/hermes.js";
+import { runHarness } from "./commands/harness.js";
+import { runPeer } from "./commands/peer.js";
+import { runGap } from "./commands/gap.js";
+import { runDoctor } from "./commands/doctor.js";
 
 async function main(): Promise<number> {
   const [, , cmd, ...rest] = process.argv;
@@ -33,6 +50,8 @@ async function main(): Promise<number> {
       return runEvents(args);
     case "org":
       return runOrg(args);
+    case "space":
+      return runSpace(args);
     case "project":
       return runProject(args);
     case "swarm":
@@ -41,6 +60,39 @@ async function main(): Promise<number> {
       return runVcalendar(args);
     case "checkup":
       return runCheckup(args);
+    case "campaign":
+      return runCampaign(args);
+    case "mission":
+      return runMission(args);
+    case "lane":
+      return runLane(args);
+    case "queue":
+      return runQueue(args);
+    case "handoff":
+      return runHandoff(args);
+    case "problem":
+      return runProblem(args);
+    case "blueprint":
+      return runBlueprint(args);
+    case "wiki":
+      return runWiki(args);
+    case "hermes":
+      return runHermes(args);
+    case "harness":
+      return runHarness(args);
+    case "peer":
+      return runPeer(args);
+    case "agent":
+      return runAgent(args);
+    case "next":
+      return runNext(args);
+    case "tl":
+    case "/tl":
+      return runTl(args);
+    case "gap":
+      return runGap(args);
+    case "doctor":
+      return runDoctor(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

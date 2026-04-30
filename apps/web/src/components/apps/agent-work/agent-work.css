@@ -1,0 +1,1048 @@
+.ema-vapp--agent-work {
+  --glass-bg-surface: var(--place-surface-1);
+  --glass-blur-surface: 20px;
+  --ema-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+}
+
+.ema-kicker,
+.ema-pulse-card span {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.ema-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--place-primary-border);
+  border-radius: 999px;
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ema-pill--hot {
+  border-color: var(--place-tertiary-border);
+  background: var(--place-tertiary-subtle);
+  color: var(--place-tertiary-400);
+}
+
+.ema-vapp,
+.ema-settings {
+  animation: ema-rise 380ms var(--place-ease-smooth) both;
+  color: var(--place-text-primary);
+}
+
+.ema-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 410px);
+  gap: 24px;
+  min-height: 260px;
+  padding: 32px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 14px;
+  background:
+    linear-gradient(125deg, var(--place-primary-subtle), transparent 34%),
+    linear-gradient(280deg, var(--place-tertiary-subtle), transparent 36%),
+    var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(160%);
+  box-shadow: var(--ema-shadow);
+}
+
+.ema-hero h1,
+.ema-vapp h1,
+.ema-settings h1 {
+  max-width: 980px;
+  margin: 0;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 3.35rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 0.92;
+}
+
+.ema-hero__copy,
+.ema-vapp__tagline,
+.ema-settings p {
+  max-width: 720px;
+  color: var(--place-text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.ema-hero__card,
+.ema-panel,
+.ema-vapp__section,
+.ema-bp-doc,
+.ema-work-card,
+.ema-placeholder-card {
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.03), transparent),
+    var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  box-shadow: var(--ema-shadow);
+}
+
+.ema-hero__card {
+  display: grid;
+  align-self: end;
+  gap: 12px;
+  padding: 22px;
+}
+.ema-hero__card strong {
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.ema-hero__card p {
+  margin: 0;
+  color: var(--place-text-secondary);
+  line-height: 1.55;
+}
+
+.ema-pulse-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0 20px;
+}
+.ema-pulse-card {
+  min-height: 120px;
+  padding: 16px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: var(--glass-bg-surface);
+}
+.ema-pulse-card strong {
+  display: block;
+  margin: 12px 0 8px;
+  color: var(--place-text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 0.9;
+}
+.ema-pulse-card p {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.ema-hq__matrix {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+  gap: 16px;
+}
+.ema-hq__matrix--lower {
+  grid-template-columns: 0.9fr 1fr 1fr;
+  margin-top: 16px;
+}
+
+.ema-panel,
+.ema-vapp__section,
+.ema-bp-doc { padding: 18px; }
+
+.ema-panel--wide { min-height: 320px; }
+
+.ema-panel__heading,
+.ema-vapp__header--split {
+  display: flex;
+  gap: 16px;
+  align-items: start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.ema-panel__heading h2,
+.ema-vapp__section h2,
+.ema-bp-doc h2,
+.ema-placeholder-card h2,
+.ema-work-card h2 {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 1.52rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.05;
+}
+
+.ema-saw-root {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+}
+
+.ema-saw-header {
+  align-items: flex-start;
+}
+.ema-saw-header__meta {
+  margin-top: 12px;
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.78rem;
+}
+.ema-saw-header__meta code {
+  color: var(--place-primary-400);
+  font-size: inherit;
+}
+.ema-saw-header__notice {
+  display: grid;
+  gap: 10px;
+  align-self: flex-start;
+  min-width: 280px;
+  padding: 18px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, var(--place-tertiary-subtle), transparent 60%),
+    var(--glass-bg-surface);
+  backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-surface)) saturate(150%);
+}
+.ema-saw-header__notice strong {
+  color: var(--place-text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+.ema-saw-header__notice p {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.ema-saw-header__notice code {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.8em;
+}
+
+.ema-saw-region {
+  padding: 18px;
+}
+
+.ema-saw-row {
+  display: grid;
+  gap: 14px;
+}
+.ema-saw-row--vcal-roster {
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+}
+.ema-saw-row--command-prompt {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+}
+.ema-saw-row--queue-graph {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* ---- Region 1 — Top swarm pulse ------------------------------ */
+
+.ema-saw-pulse__grid .ema-pulse-card[data-saw-pulse="blocked"] {
+  border-color: var(--place-tertiary-border);
+  background:
+    linear-gradient(145deg, var(--place-tertiary-subtle), transparent 60%),
+    var(--glass-bg-surface);
+}
+.ema-saw-pulse__grid .ema-pulse-card[data-saw-pulse="blocked"] strong {
+  color: var(--place-tertiary-400);
+}
+
+/* ---- Region 2 — Mission rail --------------------------------- */
+
+.ema-saw-mission-rail__track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+}
+.ema-saw-mission-rail__group {
+  display: grid;
+  gap: 8px;
+  min-width: 280px;
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  scroll-snap-align: start;
+}
+.ema-saw-mission-rail__group-heading {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--place-border-subtle);
+}
+.ema-saw-mission-rail__group-heading strong {
+  color: var(--place-text-primary);
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+.ema-saw-mission-rail__group-heading small {
+  color: var(--place-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.ema-saw-mission-rail__group-heading .ema-pill {
+  justify-self: flex-start;
+}
+.ema-saw-mission-rail__missions {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ema-saw-mission-rail__empty {
+  padding: 10px;
+  color: var(--place-text-tertiary);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+.ema-saw-mission-card {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.ema-saw-mission-card {
+  position: relative;
+  border-left: 3px solid var(--place-border-default);
+  padding-left: 11px;
+  cursor: default;
+  transform: translateY(0);
+  transition:
+    transform 160ms var(--place-ease-smooth),
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 180ms ease;
+}
+.ema-saw-mission-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--place-secondary-border);
+  background: rgba(107, 149, 240, 0.06);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+.ema-saw-mission-card[data-mission-status="active"],
+.ema-saw-mission-card:has(.ema-kicker:where([data-status="active"])) {
+  border-left-color: var(--place-primary-400);
+}
+.ema-saw-mission-card .ema-kicker {
+  color: var(--place-tertiary-400);
+  text-transform: uppercase;
+}
+.ema-saw-mission-card strong {
+  color: var(--place-text-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.ema-saw-cli-hint {
+  display: block;
+  opacity: 0.6;
+  transition: opacity 200ms ease;
+}
+.ema-saw-mission-card:hover .ema-saw-cli-hint { opacity: 1; }
+.ema-saw-cli-hint {
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
+}
+
+/* ---- Region 3 — Lane board ----------------------------------- */
+
+.ema-saw-lane-board__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 1200px) {
+  .ema-saw-lane-board__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.ema-saw-lane-column {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.ema-saw-lane-column[data-column="active"] {
+  border-color: var(--place-primary-border);
+  background:
+    linear-gradient(180deg, var(--place-primary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-lane-column[data-column="blocked"] {
+  border-color: var(--place-tertiary-border);
+  background:
+    linear-gradient(180deg, var(--place-tertiary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-lane-column[data-column="review"] {
+  border-color: var(--place-secondary-border);
+}
+.ema-saw-lane-column__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--place-border-subtle);
+}
+.ema-saw-lane-column__heading strong {
+  color: var(--place-text-primary);
+  font-family: var(--place-font-mono);
+  font-size: 0.82rem;
+}
+.ema-saw-lane-column__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ema-saw-lane-column__empty {
+  padding: 10px;
+  color: var(--place-text-tertiary);
+  font-size: 0.76rem;
+  font-style: italic;
+}
+.ema-saw-lane-card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 12px 12px 11px 14px;
+  border: 1px solid var(--place-border-default);
+  border-left: 3px solid var(--place-border-default);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05), transparent 64%),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+  cursor: grab;
+  transition:
+    transform 160ms var(--place-ease-smooth),
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+.ema-saw-lane-card:active { cursor: grabbing; }
+.ema-saw-lane-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+}
+.ema-saw-lane-card:focus-visible {
+  outline: none;
+  border-color: var(--place-secondary-border);
+  box-shadow:
+    0 0 0 2px var(--place-secondary-400),
+    0 16px 32px rgba(0, 0, 0, 0.32);
+}
+.ema-saw-lane-card[data-owner-kind="agent"]  { border-left-color: var(--place-secondary-400); }
+.ema-saw-lane-card[data-owner-kind="human"]  { border-left-color: var(--place-primary-400); }
+.ema-saw-lane-card[data-status="blocked"]    { border-left-color: var(--place-tertiary-400); }
+.ema-saw-lane-card[data-status="done"]       {
+  opacity: 0.72;
+  border-left-color: var(--place-text-muted);
+}
+.ema-saw-lane-card[data-status="active"]::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--place-primary-400);
+  box-shadow: 0 0 0 0 var(--place-primary-glow);
+  animation: ema-activity-pulse 2.4s ease-in-out infinite;
+}
+.ema-saw-lane-card__head {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+}
+.ema-saw-lane-card__owner {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+.ema-saw-lane-card__name {
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.ema-saw-lane-card strong {
+  color: var(--place-text-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Shared avatar — circular initial badge used by lane cards + actor
+ * roster + anywhere an actor appears. Kind-tinted ring gives instant
+ * signal: teal=human, blue=agent, muted=unassigned. */
+.ema-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--place-border-default);
+  border-radius: 999px;
+  color: var(--place-text-primary);
+  font-family: var(--place-font-sans);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.08);
+  transition: transform 200ms var(--place-ease-smooth);
+}
+.ema-avatar[data-kind="agent"] {
+  border-color: var(--place-secondary-border);
+  color: var(--place-secondary-400);
+  background: rgba(91, 156, 245, 0.16);
+}
+.ema-avatar[data-kind="human"] {
+  border-color: var(--place-primary-border);
+  color: var(--place-primary-400);
+  background: rgba(45, 212, 168, 0.16);
+}
+.ema-avatar[data-kind="unassigned"] {
+  color: var(--place-text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+.ema-saw-lane-card:hover .ema-avatar {
+  transform: scale(1.06);
+}
+.ema-saw-cli {
+  display: block;
+  overflow: hidden;
+  padding: 6px 8px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--place-primary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ema-saw-lane-card footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---- Region 4 — vCalendar strip ------------------------------ */
+
+.ema-saw-work-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ema-saw-work-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-left: 3px solid var(--place-border-default);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent 62%),
+    rgba(255, 255, 255, 0.03);
+}
+.ema-saw-work-item[data-state="ready"],
+.ema-saw-work-item[data-state="active"] {
+  border-left-color: var(--place-primary-400);
+}
+.ema-saw-work-item[data-state="blocked"],
+.ema-saw-work-item[data-state="open"] {
+  border-left-color: var(--place-tertiary-400);
+}
+.ema-saw-work-item header {
+  display: grid;
+  gap: 3px;
+}
+.ema-saw-work-item strong {
+  color: var(--place-text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.ema-saw-work-item p {
+  margin: 0;
+  color: var(--place-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.ema-saw-work-item dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.ema-saw-work-item dl > div {
+  display: grid;
+  gap: 2px;
+}
+.ema-saw-work-item dt {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.ema-saw-work-item dd {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.ema-saw-vcal-strip__blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ema-saw-vcal-tick {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid var(--place-secondary-border);
+  border-left: 3px solid var(--place-secondary-400);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, var(--place-secondary-subtle), transparent 58%),
+    rgba(255, 255, 255, 0.03);
+}
+.ema-saw-vcal-tick[data-mode="planning"] {
+  border-color: var(--place-primary-border);
+  border-left-color: var(--place-primary-400);
+}
+.ema-saw-vcal-tick[data-mode="handoff"],
+.ema-saw-vcal-tick[data-mode="review"] {
+  border-color: var(--place-tertiary-border);
+  border-left-color: var(--place-tertiary-400);
+}
+.ema-saw-vcal-tick strong {
+  color: var(--place-text-primary);
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+.ema-saw-vcal-tick small {
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
+}
+.ema-saw-vcal-tick__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ema-saw-vcal-block {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ema-saw-vcal-block[data-block-kind="focus"] {
+  border-color: var(--place-primary-border);
+  background:
+    linear-gradient(135deg, var(--place-primary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-vcal-block[data-block-kind="review"] {
+  border-color: var(--place-secondary-border);
+  background:
+    linear-gradient(135deg, var(--place-secondary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-vcal-block[data-block-kind="blocked"] {
+  border-color: var(--place-tertiary-border);
+  background:
+    linear-gradient(135deg, var(--place-tertiary-subtle), transparent 60%),
+    rgba(255, 255, 255, 0.02);
+}
+.ema-saw-vcal-block strong {
+  color: var(--place-text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.ema-saw-vcal-block small {
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.68rem;
+}
+.ema-saw-vcal-strip__checkups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid var(--place-border-subtle);
+}
+.ema-saw-vcal-chip small {
+  color: inherit;
+  opacity: 0.7;
+  text-transform: none;
+}
+
+/* VCalendar blocks — Round 5 polish: hover lift, kind-colored
+ * accent stripe top, pulsing dot on focus blocks. */
+.ema-saw-vcal-block {
+  position: relative;
+  overflow: hidden;
+  transition: transform 180ms var(--place-ease-smooth), border-color 180ms ease, box-shadow 180ms ease;
+}
+.ema-saw-vcal-block::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--place-border-default);
+  transition: opacity 200ms ease, height 200ms ease;
+}
+.ema-saw-vcal-block[data-block-kind="focus"]::before   { background: var(--place-primary-400); }
+.ema-saw-vcal-block[data-block-kind="review"]::before  { background: var(--place-secondary-400); }
+.ema-saw-vcal-block[data-block-kind="blocked"]::before { background: var(--place-tertiary-400); }
+.ema-saw-vcal-block[data-block-kind="focus"]::after {
+  content: "";
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: var(--place-primary-400);
+  box-shadow: 0 0 0 0 var(--place-primary-glow);
+  animation: ema-activity-pulse 2.4s ease-in-out infinite;
+}
+.ema-saw-vcal-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+}
+.ema-saw-vcal-block:hover::before { height: 3px; }
+
+/* ---- Region 5 — Agent roster --------------------------------- */
+
+.ema-saw-roster__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.ema-saw-actor-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04), transparent),
+    var(--glass-bg-surface);
+}
+.ema-saw-actor-card[data-actor-kind="agent"] {
+  border-color: var(--place-secondary-border);
+}
+.ema-saw-actor-card[data-actor-kind="human"] {
+  border-color: var(--place-primary-border);
+}
+.ema-saw-actor-card header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--place-border-subtle);
+}
+.ema-saw-actor-card header > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.ema-saw-actor-card header strong {
+  color: var(--place-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.ema-saw-actor-card {
+  transition: border-color 180ms ease, transform 180ms var(--place-ease-smooth), box-shadow 180ms ease;
+}
+.ema-saw-actor-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+}
+.ema-saw-actor-card:hover .ema-avatar {
+  transform: scale(1.04);
+}
+.ema-saw-actor-card__meta {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.ema-saw-actor-card__meta > div {
+  display: grid;
+  gap: 2px;
+}
+.ema-saw-actor-card__meta dt {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ema-saw-actor-card__meta dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 0.86rem;
+}
+.ema-saw-pill-tight {
+  padding: 0 7px;
+  min-height: 18px;
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+}
+
+/* ---- Region 6 — Command panel -------------------------------- */
+
+.ema-saw-command-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.ema-saw-cmd-btn {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ema-saw-cmd-btn[data-state="draft"] {
+  border-color: var(--place-secondary-border);
+}
+.ema-saw-cmd-btn__action {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-primary);
+  text-align: left;
+  cursor: not-allowed;
+  opacity: 0.94;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.ema-saw-cmd-btn__action:hover {
+  border-color: var(--place-tertiary-border);
+  background: var(--place-tertiary-subtle);
+}
+.ema-saw-cmd-btn__action span {
+  color: var(--place-text-primary);
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+.ema-saw-cmd-btn__action strong {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.ema-saw-cmd-btn__hint {
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+}
+.ema-saw-cmd-btn__copy {
+  justify-self: flex-start;
+  padding: 4px 10px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+.ema-saw-cmd-btn__copy:hover {
+  border-color: var(--place-primary-border);
+  color: var(--place-primary-400);
+  background: var(--place-primary-subtle);
+}
+
+/* ---- Region 7 — Agent instruction panel ---------------------- */
+
+.ema-saw-prompt__scope {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ema-saw-prompt__scope > div {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.ema-saw-prompt__scope dt {
+  color: var(--place-tertiary-400);
+  font-family: var(--place-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ema-saw-prompt__scope dd {
+  margin: 0;
+  color: var(--place-text-primary);
+  font-size: 0.88rem;
+  line-height: 1.3;
+}
+.ema-saw-prompt__block {
+  overflow: auto;
+  max-height: 360px;
+  padding: 12px 14px;
+  border: 1px solid var(--place-border-default);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--place-text-secondary);
+  font-family: var(--place-font-mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.ema-saw-prompt__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+.ema-saw-prompt__copy {
+  padding: 6px 14px;
+}
+
+/* ---- Region 8 — Chronicle strip ------------------------------ */
+
+.ema-saw-chronicle__list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--place-border-subtle);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
+}
+.ema-saw-chronicle__item {
+  display: grid;
+  grid-template-columns: 60px 140px 100px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--place-border-subtle);
+  font-family: var(--place-font-mono);
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+.ema-saw-chronicle__item:last-child { border-bottom: none; }
+.ema-saw-chronicle__item time {
+  color: var(--place-text-tertiary);
+}
+.ema-saw-chronicle__actor {
+  color: var(--place-text-primary);
+  font-weight: 600;
+}
+.ema-saw-chronicle__kind {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--place-text-secondary);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.ema-saw-chronicle__item[data-frame="command"] .ema-saw-chronicle__kind {
+  background: var(--place-primary-subtle);
+  color: var(--place-primary-400);
+}
+.ema-saw-chronicle__item[data-frame="event"] .ema-saw-chronicle__kind {
+  background: var(--place-secondary-subtle);
+  color: var(--place-secondary-400);
+}
+.ema-saw-chronicle__item[data-frame="projection"] .ema-saw-chronicle__kind {
+  background: var(--place-tertiary-subtle);
+  color: var(--place-tertiary-400);
+}
+.ema-saw-chronicle__summary {
+  color: var(--place-text-secondary);
+  white-space: normal;
+}
+.ema-saw-chronicle__footer {
+  margin-top: 8px;
+  color: var(--place-text-tertiary);
+  font-family: var(--place-font-mono);
+  font-size: 0.66rem;
+  text-align: right;
+}
+
+/* Responsive compaction */
+@media (max-width: 960px) {
+  .ema-saw-row--vcal-roster,
+  .ema-saw-row--command-prompt,
+  .ema-saw-row--queue-graph {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ema-saw-chronicle__item {
+    grid-template-columns: 56px 110px minmax(0, 1fr);
+  }
+  .ema-saw-chronicle__kind {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ema-saw-mission-card,
+  .ema-saw-cmd-btn__action,
+  .ema-saw-cmd-btn__copy {
+    transition: none;
+  }
+}

@@ -1,26 +1,54 @@
 import type { Metadata } from "next";
-import "@ema/design-system/tokens.css";
-import "../src/app/styles.css";
+import { Cinzel, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { IpcProvider } from "@/src/lib/ipc/provider";
 import "./globals.css";
-import "./donor-tailwind-subset.css";
+import "./tauri-frame.css";
+
+const cinzel = Cinzel({
+	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
+	variable: "--font-cinzel",
+	display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+	subsets: ["latin"],
+	weight: "400",
+	style: ["normal", "italic"],
+	variable: "--font-instrument-serif",
+	display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+	subsets: ["latin"],
+	variable: "--font-jetbrains-mono",
+	display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "EMA vDesktop",
-  description: "EMA browser vDesktop reflected from the place.org stack.",
-};
-
-export const viewport = {
-  themeColor: "#060610",
+	title: "place.org",
+	description: "A virtual desktop OS that actually works",
+	manifest: "/manifest.json",
+	themeColor: "#060610",
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "black-translucent",
+	},
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+	return (
+		<html
+			lang="en"
+			className={`${cinzel.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
+		>
+			<body>
+				<IpcProvider>{children}</IpcProvider>
+			</body>
+		</html>
+	);
 }

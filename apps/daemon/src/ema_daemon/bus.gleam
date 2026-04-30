@@ -11,8 +11,10 @@
 //// database opened in WAL mode. Every append is committed before the
 //// txid is returned.
 
+import ema_companion/ema_companion
 import ema_daemon/event_envelope.{type Envelope}
 import ema_daemon/sqlite_ffi
+import ema_presence/ema_presence
 import gleam/erlang/process.{type Subject}
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -48,14 +50,94 @@ pub type Msg {
 
   PeerTrustProjection(reply: Subject(String))
 
+  InviteProjection(reply: Subject(String))
+
+  ChronicleActivityProjection(reply: Subject(String))
+
+  ProjectFilesystemProjection(reply: Subject(String))
+
+  SpaceVAppsProjection(reply: Subject(String))
+
+  LaneRegistryProjection(reply: Subject(String))
+
+  LaneRegistryProjectionScoped(project_id: String, reply: Subject(String))
+
+  QueueRegistryProjection(reply: Subject(String))
+
+  QueueRegistryProjectionScoped(project_id: String, reply: Subject(String))
+
+  CampaignRegistryProjection(reply: Subject(String))
+
+  MissionRegistryProjection(reply: Subject(String))
+
+  HandoffRegistryProjection(reply: Subject(String))
+
+  ProblemGraphProjection(reply: Subject(String))
+
+  AgentReportsProjection(reply: Subject(String))
+
+  BlueprintProjection(reply: Subject(String))
+
+  BlueprintPlannerProjection(reply: Subject(String))
+
+  VcalendarProjection(reply: Subject(String))
+
+  IntentGraphProjection(reply: Subject(String))
+
+  DesktopPresenceProjection(reply: Subject(String))
+
+  DesktopPresenceJoin(
+    request: ema_presence.JoinRequest,
+    reply: Subject(String),
+  )
+
+  DesktopPresenceLeave(session_id: String, reply: Subject(String))
+
+  DesktopPresenceCursor(
+    request: ema_presence.CursorRequest,
+    reply: Subject(String),
+  )
+
+  DesktopPresenceLocation(
+    request: ema_presence.LocationRequest,
+    reply: Subject(String),
+  )
+
+  AutoCheckupDueLanes(
+    reply: Subject(List(#(String, String, String, String, String))),
+  )
+
+  CompanionStatusProjection(reply: Subject(String))
+
+  CompanionWindowsProjection(reply: Subject(String))
+
+  CompanionOpenWindow(
+    request: ema_companion.WindowRequest,
+    reply: Subject(String),
+  )
+
+  CompanionCloseWindow(window_id: String, reply: Subject(String))
+
+  CompanionFocusWindow(window_id: String, reply: Subject(String))
+
+  CompanionReattachAck(window_id: String, reply: Subject(String))
+
   PeerIsTrusted(org_id: String, peer_device: String, reply: Subject(Bool))
 
   EventExists(kind: String, org_id: String, reply: Subject(Bool))
+
+  WorkspaceResourceExists(
+    resource_kind: String,
+    resource_id: String,
+    org_id: String,
+    reply: Subject(Bool),
+  )
 }
 
 /// Messages sent to subscribers.
 pub type Delivery {
   Event(txid: Int, envelope: Envelope)
+  Projection(name: String, data_json: String)
   SubscriptionDropped(reason: String)
 }
 
@@ -74,7 +156,12 @@ type Subscriber {
 }
 
 type State {
-  State(db: sqlite_ffi.Db, subs: List(Subscriber))
+  State(
+    db: sqlite_ffi.Db,
+    subs: List(Subscriber),
+    companion: ema_companion.State,
+    presence: ema_presence.State,
+  )
 }
 
 const max_pending_messages: Int = 500
@@ -89,7 +176,12 @@ pub fn start(
   actor.new_with_initialiser(5000, fn(self) {
     case init_db(db_path) {
       Ok(db) ->
-        State(db: db, subs: [])
+        State(
+          db: db,
+          subs: [],
+          companion: ema_companion.new(),
+          presence: ema_presence.new(),
+        )
         |> actor.initialised
         |> actor.returning(self)
         |> Ok
@@ -141,8 +233,12 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
           space_id TEXT NOT NULL,
           org_id TEXT NOT NULL,
           name TEXT NOT NULL,
+          local_path TEXT,
+          materialization_status TEXT,
+          materialization_reason TEXT,
           created_at TEXT NOT NULL,
-          created_by TEXT NOT NULL
+          created_by TEXT NOT NULL,
+          UNIQUE(space_id, name)
         );
         CREATE TABLE IF NOT EXISTS memberships (
           org_id TEXT NOT NULL,
@@ -233,7 +329,25 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
           updated_at TEXT NOT NULL
         );"
       case sqlite_ffi.exec(db, ddl) {
-        Ok(Nil) -> Ok(db)
+        Ok(Nil) -> {
+          let _ =
+            sqlite_ffi.exec(
+              db,
+              "ALTER TABLE projects ADD COLUMN local_path TEXT",
+            )
+          let _ =
+            sqlite_ffi.exec(
+              db,
+              "ALTER TABLE projects ADD COLUMN materialization_status TEXT",
+            )
+          let _ =
+            sqlite_ffi.exec(
+              db,
+              "ALTER TABLE projects ADD COLUMN materialization_reason TEXT",
+            )
+          let _ = sqlite_ffi.migrate_projects_unique_name(db)
+          Ok(db)
+        }
         Error(e) -> Error(e)
       }
     }
@@ -305,6 +419,185 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
       actor.continue(state)
     }
 
+    InviteProjection(reply) -> {
+      process.send(reply, sqlite_ffi.invite_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    ChronicleActivityProjection(reply) -> {
+      process.send(reply, sqlite_ffi.chronicle_activity_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    ProjectFilesystemProjection(reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.project_filesystem_projection_json(state.db),
+      )
+      actor.continue(state)
+    }
+
+    SpaceVAppsProjection(reply) -> {
+      process.send(reply, sqlite_ffi.space_vapps_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    LaneRegistryProjection(reply) -> {
+      process.send(reply, sqlite_ffi.lane_registry_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    LaneRegistryProjectionScoped(project_id, reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.lane_registry_projection_json_scoped(state.db, project_id),
+      )
+      actor.continue(state)
+    }
+
+    QueueRegistryProjection(reply) -> {
+      process.send(reply, sqlite_ffi.queue_registry_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    QueueRegistryProjectionScoped(project_id, reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.queue_registry_projection_json_scoped(state.db, project_id),
+      )
+      actor.continue(state)
+    }
+
+    CampaignRegistryProjection(reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.campaign_registry_projection_json(state.db),
+      )
+      actor.continue(state)
+    }
+
+    MissionRegistryProjection(reply) -> {
+      process.send(reply, sqlite_ffi.mission_registry_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    HandoffRegistryProjection(reply) -> {
+      process.send(reply, sqlite_ffi.handoff_registry_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    ProblemGraphProjection(reply) -> {
+      process.send(reply, sqlite_ffi.problem_graph_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    AgentReportsProjection(reply) -> {
+      process.send(reply, sqlite_ffi.agent_reports_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    BlueprintProjection(reply) -> {
+      process.send(reply, sqlite_ffi.blueprint_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    BlueprintPlannerProjection(reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.blueprint_planner_projection_json(state.db),
+      )
+      actor.continue(state)
+    }
+
+    VcalendarProjection(reply) -> {
+      process.send(reply, sqlite_ffi.vcalendar_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    IntentGraphProjection(reply) -> {
+      process.send(reply, sqlite_ffi.intent_graph_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    DesktopPresenceProjection(reply) -> {
+      process.send(reply, ema_presence.projection_json(state.presence))
+      actor.continue(state)
+    }
+
+    DesktopPresenceJoin(request, reply) -> {
+      let presence = ema_presence.join(state.presence, request, iso_now())
+      let projection = ema_presence.projection_json(presence)
+      process.send(reply, projection)
+      let subs = fan_out_projection(state.subs, "desktop.presence", projection)
+      actor.continue(State(..state, presence: presence, subs: subs))
+    }
+
+    DesktopPresenceLeave(session_id, reply) -> {
+      let presence = ema_presence.leave(state.presence, session_id)
+      let projection = ema_presence.projection_json(presence)
+      process.send(reply, projection)
+      let subs = fan_out_projection(state.subs, "desktop.presence", projection)
+      actor.continue(State(..state, presence: presence, subs: subs))
+    }
+
+    DesktopPresenceCursor(request, reply) -> {
+      let presence = ema_presence.cursor(state.presence, request, iso_now())
+      let projection = ema_presence.projection_json(presence)
+      process.send(reply, projection)
+      let subs = fan_out_projection(state.subs, "desktop.presence", projection)
+      actor.continue(State(..state, presence: presence, subs: subs))
+    }
+
+    DesktopPresenceLocation(request, reply) -> {
+      let presence = ema_presence.location(state.presence, request, iso_now())
+      let projection = ema_presence.projection_json(presence)
+      process.send(reply, projection)
+      let subs = fan_out_projection(state.subs, "desktop.presence", projection)
+      actor.continue(State(..state, presence: presence, subs: subs))
+    }
+
+    AutoCheckupDueLanes(reply) -> {
+      process.send(reply, sqlite_ffi.auto_checkup_due_lanes(state.db))
+      actor.continue(state)
+    }
+
+    CompanionStatusProjection(reply) -> {
+      process.send(reply, ema_companion.status_projection_json(state.companion))
+      actor.continue(state)
+    }
+
+    CompanionWindowsProjection(reply) -> {
+      process.send(
+        reply,
+        ema_companion.windows_projection_json(state.companion),
+      )
+      actor.continue(state)
+    }
+
+    CompanionOpenWindow(request, reply) -> {
+      let companion = ema_companion.open_window(state.companion, request)
+      process.send(reply, ema_companion.windows_projection_json(companion))
+      actor.continue(State(..state, companion: companion))
+    }
+
+    CompanionCloseWindow(window_id, reply) -> {
+      let companion = ema_companion.close_window(state.companion, window_id)
+      process.send(reply, ema_companion.windows_projection_json(companion))
+      actor.continue(State(..state, companion: companion))
+    }
+
+    CompanionFocusWindow(window_id, reply) -> {
+      let companion = ema_companion.focus_window(state.companion, window_id)
+      process.send(reply, ema_companion.windows_projection_json(companion))
+      actor.continue(State(..state, companion: companion))
+    }
+
+    CompanionReattachAck(window_id, reply) -> {
+      let companion = ema_companion.reattach_ack(state.companion, window_id)
+      process.send(reply, ema_companion.windows_projection_json(companion))
+      actor.continue(State(..state, companion: companion))
+    }
+
     PeerIsTrusted(org_id, peer_device, reply) -> {
       process.send(
         reply,
@@ -315,6 +608,19 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
 
     EventExists(kind, org_id, reply) -> {
       process.send(reply, sqlite_ffi.event_exists(state.db, kind, org_id))
+      actor.continue(state)
+    }
+
+    WorkspaceResourceExists(resource_kind, resource_id, org_id, reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.workspace_resource_exists(
+          state.db,
+          resource_kind,
+          resource_id,
+          org_id,
+        ),
+      )
       actor.continue(state)
     }
   }
@@ -538,6 +844,46 @@ fn persist_compact_object(
         Ok(Nil) -> Ok(Nil)
         Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
       }
+    "project.materialized" ->
+      case
+        sqlite_ffi.persist_project_materialized(
+          db,
+          env.org_id,
+          opt_str(env.project_id),
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "project.materialization_failed" ->
+      case
+        sqlite_ffi.persist_project_materialized(
+          db,
+          env.org_id,
+          opt_str(env.project_id),
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "project.archived" ->
+      case
+        sqlite_ffi.persist_project_archived(
+          db,
+          opt_str(env.project_id),
+          env.payload_json,
+          env.ts,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
     "membership.role_granted" ->
       case
         sqlite_ffi.persist_membership_role_granted(
@@ -701,6 +1047,25 @@ fn fan_out(
   })
 }
 
+fn fan_out_projection(
+  subs: List(Subscriber),
+  name: String,
+  data_json: String,
+) -> List(Subscriber) {
+  list.filter(subs, fn(sub) {
+    case mailbox_size(sub.target) {
+      size if size > max_pending_messages -> {
+        process.send(sub.target, SubscriptionDropped(reason: "backpressure"))
+        False
+      }
+      _ -> {
+        process.send(sub.target, Projection(name: name, data_json: data_json))
+        True
+      }
+    }
+  })
+}
+
 fn mailbox_size(_target: Subject(Delivery)) -> Int {
   // We could introspect the receiver's process info, but Gleam's
   // `process` module doesn't expose it directly. For wave 1 we always
@@ -760,6 +1125,156 @@ pub fn peer_trust_projection_json(bus: Subject(Msg)) -> String {
   process.call(bus, 5000, fn(reply) { PeerTrustProjection(reply) })
 }
 
+pub fn invite_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { InviteProjection(reply) })
+}
+
+pub fn chronicle_activity_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { ChronicleActivityProjection(reply) })
+}
+
+pub fn project_filesystem_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { ProjectFilesystemProjection(reply) })
+}
+
+pub fn space_vapps_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { SpaceVAppsProjection(reply) })
+}
+
+pub fn lane_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { LaneRegistryProjection(reply) })
+}
+
+pub fn lane_registry_projection_json_scoped(
+  bus: Subject(Msg),
+  project_id: String,
+) -> String {
+  process.call(bus, 5000, fn(reply) {
+    LaneRegistryProjectionScoped(project_id, reply)
+  })
+}
+
+pub fn queue_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { QueueRegistryProjection(reply) })
+}
+
+pub fn queue_registry_projection_json_scoped(
+  bus: Subject(Msg),
+  project_id: String,
+) -> String {
+  process.call(bus, 5000, fn(reply) {
+    QueueRegistryProjectionScoped(project_id, reply)
+  })
+}
+
+pub fn campaign_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { CampaignRegistryProjection(reply) })
+}
+
+pub fn mission_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { MissionRegistryProjection(reply) })
+}
+
+pub fn handoff_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { HandoffRegistryProjection(reply) })
+}
+
+pub fn problem_graph_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { ProblemGraphProjection(reply) })
+}
+
+pub fn agent_reports_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { AgentReportsProjection(reply) })
+}
+
+pub fn blueprint_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { BlueprintProjection(reply) })
+}
+
+pub fn blueprint_planner_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { BlueprintPlannerProjection(reply) })
+}
+
+pub fn vcalendar_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { VcalendarProjection(reply) })
+}
+
+pub fn intent_graph_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { IntentGraphProjection(reply) })
+}
+
+/// Returns the per-lane scope tuple
+/// `#(org_id, space_id, project_id, lane_id, cadence)` for every
+/// active/claimed lane that is due for an auto-checkup. Each tuple's
+/// scope is captured from that lane's own `lane.opened` envelope, so
+/// the auto-checkup tick can emit `checkup.scheduled` events with the
+/// correct per-lane scope (no hard-coded org).
+pub fn auto_checkup_due_lanes(
+  bus: Subject(Msg),
+) -> List(#(String, String, String, String, String)) {
+  process.call(bus, 5000, fn(reply) { AutoCheckupDueLanes(reply) })
+}
+
+pub fn companion_status_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { CompanionStatusProjection(reply) })
+}
+
+pub fn companion_windows_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { CompanionWindowsProjection(reply) })
+}
+
+pub fn companion_open_window(
+  bus: Subject(Msg),
+  request: ema_companion.WindowRequest,
+) -> String {
+  process.call(bus, 5000, fn(reply) { CompanionOpenWindow(request, reply) })
+}
+
+pub fn companion_close_window(bus: Subject(Msg), window_id: String) -> String {
+  process.call(bus, 5000, fn(reply) { CompanionCloseWindow(window_id, reply) })
+}
+
+pub fn companion_focus_window(bus: Subject(Msg), window_id: String) -> String {
+  process.call(bus, 5000, fn(reply) { CompanionFocusWindow(window_id, reply) })
+}
+
+pub fn companion_reattach_ack(bus: Subject(Msg), window_id: String) -> String {
+  process.call(bus, 5000, fn(reply) { CompanionReattachAck(window_id, reply) })
+}
+
+pub fn desktop_presence_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { DesktopPresenceProjection(reply) })
+}
+
+pub fn desktop_presence_join(
+  bus: Subject(Msg),
+  request: ema_presence.JoinRequest,
+) -> String {
+  process.call(bus, 5000, fn(reply) { DesktopPresenceJoin(request, reply) })
+}
+
+pub fn desktop_presence_leave(bus: Subject(Msg), session_id: String) -> String {
+  process.call(bus, 5000, fn(reply) {
+    DesktopPresenceLeave(session_id, reply)
+  })
+}
+
+pub fn desktop_presence_cursor(
+  bus: Subject(Msg),
+  request: ema_presence.CursorRequest,
+) -> String {
+  process.call(bus, 5000, fn(reply) { DesktopPresenceCursor(request, reply) })
+}
+
+pub fn desktop_presence_location(
+  bus: Subject(Msg),
+  request: ema_presence.LocationRequest,
+) -> String {
+  process.call(bus, 5000, fn(reply) {
+    DesktopPresenceLocation(request, reply)
+  })
+}
+
 pub fn peer_is_trusted(
   bus: Subject(Msg),
   org_id: String,
@@ -772,4 +1287,15 @@ pub fn peer_is_trusted(
 
 pub fn event_exists(bus: Subject(Msg), kind: String, org_id: String) -> Bool {
   process.call(bus, 5000, fn(reply) { EventExists(kind, org_id, reply) })
+}
+
+pub fn workspace_resource_exists(
+  bus: Subject(Msg),
+  resource_kind: String,
+  resource_id: String,
+  org_id: String,
+) -> Bool {
+  process.call(bus, 5000, fn(reply) {
+    WorkspaceResourceExists(resource_kind, resource_id, org_id, reply)
+  })
 }

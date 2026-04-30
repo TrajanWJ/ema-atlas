@@ -1,4 +1,4 @@
-# EMA-0.0.5--4-24
+# EMA 0.0.5
 
 This is the actual implementation home for EMA `0.0.5`.
 
@@ -22,7 +22,7 @@ work should happen.
 ## Intended repo shape
 
 ```text
-EMA-0.0.5--4-24/
+EMA-0.0.5/
 ├── apps/
 │   ├── daemon/
 │   ├── desktop/
@@ -87,7 +87,7 @@ EMA-0.0.5--4-24/
 - [docs/cli/see-agent-work.md](./docs/cli/see-agent-work.md)
 - [docs/agents/see-agent-work-agent-usage.md](./docs/agents/see-agent-work-agent-usage.md)
 - [docs/plans/IMPLEMENTATION-ROADMAP.md](./docs/plans/IMPLEMENTATION-ROADMAP.md)
-- [../../doctrine/planning/EMA-0.0.5-LANGUAGE-LOCK.md](../../doctrine/planning/EMA-0.0.5-LANGUAGE-LOCK.md)
-- [../../doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md](../../doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md)
-- [../../doctrine/planning/EMA-0.0.5-PASSOVER-AND-PREP.md](../../doctrine/planning/EMA-0.0.5-PASSOVER-AND-PREP.md)
-- [../../data-model/EMA-DATA-TREATMENT-AND-SOURCE-OF-TRUTH.md](../../data-model/EMA-DATA-TREATMENT-AND-SOURCE-OF-TRUTH.md)
+- [../../Projects/EMA/project.md](../../Projects/EMA/project.md)
+- [../../Projects/EMA/PROJECT-MAP.md](../../Projects/EMA/PROJECT-MAP.md)
+- [../../Projects/EMA/builds/BUILD-MANIFEST.md](../../Projects/EMA/builds/BUILD-MANIFEST.md)
+- [../../Projects/EMA/atlas/README.md](../../Projects/EMA/atlas/README.md)

@@ -23,6 +23,30 @@ payload {
 }
 ```
 
+### `project.materialized`
+```
+payload {
+  project_id:       project:<ulid>
+  space_id:         space:<ulid>
+  name:             string
+  created_event_id: event:<ulid>
+  status:           "materialized"
+  local_path:       string
+}
+```
+
+### `project.materialization_failed`
+```
+payload {
+  project_id:       project:<ulid>
+  space_id:         space:<ulid>
+  name:             string
+  created_event_id: event:<ulid>
+  status:           "materialization_failed"
+  reason:           string
+}
+```
+
 ### `project.archived`
 ```
 payload {

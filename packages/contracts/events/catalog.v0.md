@@ -36,6 +36,8 @@ or surface code must appear in this list.
 ## project
 
 - `project.created`
+- `project.materialized`
+- `project.materialization_failed`
 - `project.renamed`
 - `project.archived`
 - `project.moved`               (cross-space move, preserves lineage)
@@ -92,9 +94,30 @@ or surface code must appear in this list.
 ## lane
 
 - `lane.opened`
+- `lane.claimed`
+- `lane.moved`
+- `lane.released`
+- `lane.blocked`
 - `lane.closed`
-- `lane.item_added`
-- `lane.item_moved`
+
+## queue_item
+
+- `queue_item.added`
+- `queue_item.ready`
+- `queue_item.blocked`
+- `queue_item.closed`
+
+## campaign
+
+- `campaign.created`
+- `campaign.archived`
+
+## mission
+
+- `mission.created`
+- `mission.started`
+- `mission.paused`
+- `mission.completed`
 
 ## handoff
 
@@ -102,6 +125,16 @@ or surface code must appear in this list.
 - `handoff.accepted`
 - `handoff.rejected`
 - `handoff.completed`
+
+## problem
+
+- `problem.logged`
+- `problem.solution_added`
+- `problem.linked`
+
+## agent
+
+- `agent.reported`
 
 ## proposal
 
@@ -149,6 +182,18 @@ or surface code must appear in this list.
 - `blueprint.comment.resolved`
 - `blueprint.attachment.linked`
 - `blueprint.attachment.unlinked`
+- `blueprint.gac.created`
+- `blueprint.gac.answered`
+- `blueprint.gac.deferred`
+- `blueprint.gac.promoted`
+- `blueprint.blocker.opened`
+- `blueprint.blocker.resolved`
+- `blueprint.blocker.promoted`
+- `blueprint.aspiration.captured`
+- `blueprint.aspiration.promoted`
+- `blueprint.aspiration.archived`
+- `blueprint.decision.locked`
+- `blueprint.decision.superseded`
 
 ## collab
 

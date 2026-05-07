@@ -33,6 +33,7 @@ import {
 	RssIcon,
 	ChartIcon,
 	HomeIcon,
+	GlobeIcon,
 } from '@/src/components/icons';
 import type { AppId } from '@/src/types/window';
 import type { FileRow } from '@/src/db/queries/files';
@@ -153,9 +154,12 @@ const APP_ICON_MAP: Record<AppId, React.ReactNode> = {
 	contacts: <UserIcon size={24} />,
 	plate: <TargetIcon size={24} />,
 	rewind: <RepeatIcon size={24} />,
+	atlas: <GlobeIcon size={24} />,
 	blueprint: <DocumentIcon size={24} />,
 	// EMA additions
 	hq: <ChartIcon size={24} />,
+	cwt: <CheckIcon size={24} />,
+	clients: <UserIcon size={24} />,
 	"git-ema": <FolderIcon size={24} />,
 	"agent-work": <TargetIcon size={24} />,
 	chronicle: <ZapIcon size={24} />,
@@ -199,9 +203,12 @@ const APP_DESCRIPTIONS: Record<AppId, string> = {
 	contacts: 'People I talked to and when',
 	plate: 'Everything currently on your plate, visualized',
 	rewind: 'Auto-drafted weekly review',
+	atlas: 'Live project map, lanes, handoffs, source docs',
 	blueprint: 'EMA Blueprint — sections, GAC cards, decisions, intent graph',
 	// EMA additions
 	hq: 'EMA · operations control room',
+	cwt: 'Current work, clients, projects, lanes, and queue',
+	clients: 'Client record boundary and CWT launch targets',
 	"git-ema": 'Connectors, repos, attachments — daemon-owned',
 	"agent-work": 'Lanes, missions, queues, vcalendar',
 	chronicle: 'Daemon event stream, sessions, and replay',

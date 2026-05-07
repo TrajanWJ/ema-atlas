@@ -45,6 +45,9 @@ type SurfaceLink = {
 // corresponding window through the central window store.
 const SURFACE_LINKS: readonly SurfaceLink[] = [
 	{ id: "hq", eyebrow: "control room", label: "HQ", status: "live" },
+	{ id: "atlas", eyebrow: "project map", label: "Atlas", status: "live" },
+	{ id: "cwt", eyebrow: "central tracker", label: "Current Work", status: "bridge" },
+	{ id: "clients", eyebrow: "boundary", label: "Clients", status: "pointer" },
 	{ id: "blueprint", eyebrow: "system map", label: "Blueprint", status: "live" },
 	{ id: "git-ema", eyebrow: "connectors", label: "git-ema", status: "live" },
 	{ id: "agent-work", eyebrow: "swarm + lanes", label: "Agent Work", status: "live" },

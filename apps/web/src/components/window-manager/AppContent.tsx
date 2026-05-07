@@ -231,6 +231,11 @@ const RewindApp = dynamic(
 	{ ssr: false },
 );
 
+const AtlasApp = dynamic(
+	() => import("@/src/components/apps/atlas/AtlasApp").then((m) => m.AtlasApp),
+	{ ssr: false },
+);
+
 const BlueprintApp = dynamic(
 	() => import("@/src/components/apps/blueprint").then((m) => m.BlueprintPage),
 	{ ssr: false },
@@ -238,6 +243,16 @@ const BlueprintApp = dynamic(
 
 const HqApp = dynamic(
 	() => import("@/src/components/apps/hq").then((m) => m.HqApp),
+	{ ssr: false },
+);
+
+const CwtApp = dynamic(
+	() => import("@/src/components/apps/cwt").then((m) => m.CwtApp),
+	{ ssr: false },
+);
+
+const ClientsApp = dynamic(
+	() => import("@/src/components/apps/clients/ClientsApp").then((m) => m.ClientsApp),
 	{ ssr: false },
 );
 
@@ -320,8 +335,11 @@ export function AppContent({ appId }: { readonly appId: AppId }): ReactNode {
 	if (appId === "contacts") return <ContactsApp />;
 	if (appId === "plate") return <PlateApp />;
 	if (appId === "rewind") return <RewindApp />;
+	if (appId === "atlas") return <AtlasApp />;
 	if (appId === "blueprint") return <BlueprintApp />;
 	if (appId === "hq") return <HqApp />;
+	if (appId === "cwt") return <CwtApp />;
+	if (appId === "clients") return <ClientsApp />;
 	if (appId === "git-ema") return <GitEmaApp />;
 	if (appId === "agent-work") return <AgentWorkApp />;
 	if (appId === "chronicle") return <ChronicleApp />;

@@ -36,8 +36,11 @@ export const PLACE_TOOL_APP_IDS = [
 ] as const satisfies readonly AppId[];
 
 export const EMA_VAPP_IDS = [
+	"atlas",
 	"blueprint",
 	"hq",
+	"cwt",
+	"clients",
 	"agent-work",
 	"chronicle",
 	"git-ema",

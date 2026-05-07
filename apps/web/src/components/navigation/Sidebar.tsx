@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-	LayoutGrid,
 	Rocket,
 	Brain,
+	ClipboardList,
 	Crown,
 	Compass,
 	Bot,
@@ -16,7 +16,9 @@ import {
 	GitBranch,
 	LampDesk,
 	Frame,
+	Wrench,
 	User,
+	Users,
 	Sparkles,
 	Settings,
 	type LucideIcon,
@@ -37,8 +39,10 @@ const NAV_GROUPS: ReadonlyArray<NavGroup> = [
 	{
 		label: 'Workspace',
 		items: [
-			{ href: '/', label: 'Desktop', icon: LayoutGrid },
 			{ href: '/launchpad', label: 'Launchpad', icon: Rocket },
+			{ href: '/atlas', label: 'Atlas', icon: BookOpen },
+			{ href: '/cwt', label: 'Current Work', icon: ClipboardList },
+			{ href: '/clients', label: 'Clients', icon: Users },
 			{ href: '/brain-dump', label: 'Brain Dump', icon: Brain },
 			{ href: '/hq', label: 'HQ', icon: Crown },
 			{ href: '/blueprint', label: 'Blueprint', icon: Compass },
@@ -47,6 +51,7 @@ const NAV_GROUPS: ReadonlyArray<NavGroup> = [
 			{ href: '/wiki', label: 'Wiki', icon: BookMarked },
 			{ href: '/chronicle', label: 'Chronicle', icon: BookOpen },
 			{ href: '/git-ema', label: 'Git EMA', icon: GitBranch },
+			{ href: '/place-tools', label: 'Place Tools', icon: Wrench },
 		],
 	},
 	{
@@ -145,12 +150,12 @@ export function Sidebar() {
 	const pathname = usePathname() ?? '/';
 	const [expanded, setExpanded] = useState(false);
 
-	// Don't render the sidebar inside popout windows — they're standalone surfaces.
-	if (pathname.startsWith('/popout')) return null;
+	// Holodeck navigation is a mode-specific rail; desktop and popouts stand alone.
+	if (pathname === '/' || pathname.startsWith('/popout')) return null;
 
 	return (
 		<aside
-			aria-label="EMA navigation"
+			aria-label="Holodeck navigation"
 			onMouseEnter={() => setExpanded(true)}
 			onMouseLeave={() => setExpanded(false)}
 			onFocus={() => setExpanded(true)}
@@ -199,7 +204,7 @@ export function Sidebar() {
 							'var(--font-cinzel), var(--place-font-sans)',
 					}}
 				>
-					EMA
+					Holodeck
 				</span>
 			</div>
 

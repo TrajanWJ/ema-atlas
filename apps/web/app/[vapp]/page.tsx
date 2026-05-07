@@ -2,26 +2,14 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { PanelAppFrame } from "@/src/components/apps/PanelAppFrame";
-import { isAppId } from "@/src/lib/app-ids";
+import { APP_IDS, isAppId } from "@/src/lib/app-ids";
 import type { AppId } from "@/src/types/window";
 
 const LEGACY_PANEL_ALIASES = {
 	braindump: "brain-dump",
 } as const satisfies Record<string, AppId>;
 
-const PANEL_ROUTE_IDS = [
-	"launchpad",
-	"braindump",
-	"brain-dump",
-	"hq",
-	"blueprint",
-	"git-ema",
-	"agent-work",
-	"chronicle",
-	"wiki",
-	"threads",
-	"settings",
-] as const;
+const PANEL_ROUTE_IDS = ["braindump", ...APP_IDS] as const;
 
 type PageProps = {
 	readonly params: Promise<{ readonly vapp: string }>;

@@ -899,6 +899,17 @@ export function registerAllApps(): void {
 	});
 
 	registerApp({
+		id: "atlas",
+		name: "Atlas",
+		icon: icon(GlobeIcon),
+		defaultSize: sizeOf("atlas"),
+		titlebarDotColor: "#7cc4ff",
+		getCurrentStatus: () => null,
+		listFiles: () => [],
+		menuBar: fileMenuOnly(),
+	});
+
+	registerApp({
 		id: "blueprint",
 		name: "Blueprint",
 		icon: icon(DocumentIcon),
@@ -921,6 +932,28 @@ export function registerAllApps(): void {
 		icon: icon(ChartIcon),
 		defaultSize: sizeOf("hq"),
 		titlebarDotColor: "#8b5cf6",
+		getCurrentStatus: () => null,
+		listFiles: () => [],
+		menuBar: fileMenuOnly(),
+	});
+
+	registerApp({
+		id: "cwt",
+		name: "Current Work",
+		icon: icon(CheckIcon),
+		defaultSize: sizeOf("cwt"),
+		titlebarDotColor: "#5b8def",
+		getCurrentStatus: () => null,
+		listFiles: () => [],
+		menuBar: fileMenuOnly(),
+	});
+
+	registerApp({
+		id: "clients",
+		name: "Clients",
+		icon: icon(UserIcon),
+		defaultSize: sizeOf("clients"),
+		titlebarDotColor: "#9de0b5",
 		getCurrentStatus: () => null,
 		listFiles: () => [],
 		menuBar: fileMenuOnly(),
@@ -1006,7 +1039,7 @@ export function registerAllApps(): void {
 	// ----------------------------------------------------------------------------
 	// Group + dock-order assignment (post-pass).
 	//
-	// EMA's 8 canonical vApps render primary in dock + Launchpad. The Place Tools
+	// EMA's canonical vApps render primary in dock + Launchpad. The Place Tools
 	// folder icon sits at the dock end and opens a window with the 32 grouped
 	// place.org personal-productivity apps. Run after all registerApp() calls so
 	// we can mutate via re-register (Map.set overwrites by id).

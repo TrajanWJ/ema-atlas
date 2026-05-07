@@ -6,7 +6,7 @@ import type { AppId } from "@/src/types/window";
 // ----------------------------------------------------------------------------
 
 /**
- * Logical grouping for the dock + Launchpad. EMA's 8 canonical vApps render
+ * Logical grouping for the dock + Launchpad. EMA's canonical vApps render
  * primary; place.org's 32 personal-productivity vApps live under "place-tools"
  * and surface via the Place Tools folder icon at the end of the dock.
  */

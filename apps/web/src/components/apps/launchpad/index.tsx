@@ -77,15 +77,15 @@ export function LaunchpadApp() {
 				<motion.button
 					type="button"
 					className="lp-hero__resume"
-					onClick={() => openApp("blueprint")}
+					onClick={() => openApp("atlas")}
 					initial={{ opacity: 0, y: 4 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.2, ease: FADE_EASE }}
 				>
 					<span className="lp-hero__resume-eyebrow">resume</span>
-					<strong className="lp-hero__resume-title">Blueprint</strong>
+					<strong className="lp-hero__resume-title">Atlas</strong>
 					<span className="lp-hero__resume-detail">
-						{EMA_SCOPE.spaceName} · {EMA_SCOPE.projectName}
+						{EMA_SCOPE.projectName} · live project map
 					</span>
 				</motion.button>
 			</section>

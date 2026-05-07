@@ -39,6 +39,7 @@ export const DEFAULT_WINDOW_SIZES: Record<AppId, WindowPosition> = {
 	// EMA additions
 	hq: { x: 100, y: 50, width: 760, height: 540 },
 	cwt: { x: 72, y: 44, width: 980, height: 640 },
+	cockpit: { x: 72, y: 44, width: 1100, height: 720 },
 	clients: { x: 96, y: 62, width: 760, height: 540 },
 	"git-ema": { x: 140, y: 70, width: 720, height: 520 },
 	"agent-work": { x: 80, y: 50, width: 880, height: 580 },
@@ -102,6 +103,7 @@ export const POPOUT_WINDOW_SIZES: Record<AppId, { width: number; height: number 
 	// EMA additions
 	hq: { width: 880, height: 600 },
 	cwt: { width: 1100, height: 720 },
+	cockpit: { width: 1180, height: 760 },
 	clients: { width: 860, height: 600 },
 	"git-ema": { width: 820, height: 580 },
 	"agent-work": { width: 1000, height: 640 },
@@ -155,6 +157,7 @@ export const APP_LABELS: Record<AppId, string> = {
 	// EMA additions
 	hq: "HQ",
 	cwt: "Current Work",
+	cockpit: "Cockpit",
 	clients: "Clients",
 	"git-ema": "git-ema",
 	"agent-work": "Agent Work",

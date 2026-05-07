@@ -113,10 +113,28 @@ Promotion preview:
 ema cwt ingest --dry-run --json
 ```
 
-The non-dry-run ingest path intentionally returns `writer_pending`. That is the
-correct behavior until EMA has a daemon writer that accepts a CWT import bundle
-and emits canonical `project`, `lane`, `queue_item`, `problem`, `handoff`,
-`execution`, and `vcalendar` events.
+Promotion commit:
+
+```bash
+ema cwt ingest --all --json
+ema cwt ingest --only queue:<id>,problem:<id> --json
+```
+
+The non-dry-run ingest path writes the first proven record families through the
+existing daemon command writers:
+
+- `lane` -> `lane.open`
+- `queue_item` -> `queue.add`
+- `problem` -> `problem.log`
+
+Every imported record carries a `cwt.shared_files:<cwt-id>` source marker. The
+commit path uses that marker as its idempotency key, so re-running the same
+import is a no-op for records already mirrored into daemon state.
+
+The writer refuses records whose `project_id` is not already known by the daemon.
+That keeps CWT import from accidentally minting duplicate project worktrees.
+Project materialization and project-id reconciliation are still explicit follow-up
+work.
 
 Dry-run output includes a `project_storage` policy. The default is
 `driver: "git_worktree"` and `versioning: "git"`, matching EMA project
@@ -127,23 +145,28 @@ materialization.
 The first daemon writer should be named around import intent, not around CWT as
 a permanent subsystem. CWT is a feeder surface.
 
-Recommended writer shape:
+Writer shape:
 
 ```text
 cwt.import_preview     read-only validation and mapping
-cwt.import_commit      daemon event write after operator confirmation
+cwt.import_commit      daemon command write after operator confirmation
 ```
 
-`cwt.import_commit` must:
+Current `cwt.import_commit` behavior:
 
 - preserve the CWT source id in metadata/provenance;
-- map CWT `project.kind` into an EMA-supported field or log a problem record if
-  `project.kind` remains outside `@ema/contracts`;
-- write promoted project artifacts into the daemon-materialized project Git
-  worktree rather than continuing to use the shared-files projection as storage;
+- write lane, queue item, and problem records into daemon-canonical events;
 - reject queue items missing `why`, `done_when`, or `source`;
-- preserve lane/queue/problem/handoff dependencies;
-- record an execution event with the projection root and manifest timestamp.
+- reject records whose projects are not daemon-known;
+- skip records already carrying the same `cwt.shared_files:<cwt-id>` marker.
+
+Remaining promotion work:
+
+- daemon event family or import ledger records for `cwt.*_imported`;
+- write-back of daemon mirror ids to CWT projection/source rows;
+- project materialization/reconciliation for CWT projects not yet daemon-known;
+- expansion beyond lane/queue/problem to campaign, mission, handoff, execution,
+  vCalendar, responsibility, and checkup records.
 
 ## First-Day Operating Contract
 

@@ -1,6 +1,6 @@
 {
   "name": "ema-runtime",
-  "version": "0.0.5-dev",
+  "version": "0.0.6-dev",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.33.2",

@@ -19,6 +19,26 @@ pnpm --filter @ema/cli build
 
 That emits `apps/cli/dist/bin.js` with a `#!/usr/bin/env node` hashbang.
 
+## CLI doctrine (post-cwt-absorption, 2026-05-07)
+
+EMA's CLI is `ema`. Per `~/Desktop/AGENTS.md` and
+`docs/decisions/2026-05-07-cwt-absorbed-by-ema.md`, all record families below
+the org/space layer (`client`, `project`, `queue_item`, `lane`, `mission`,
+`campaign`, `responsibility`, `vcalendar`, `checkup`, `handoff`, `problem`,
+`solution`, `execution`, `dependency`) live in the EMA daemon and surface via
+`ema` verbs:
+
+- Orchestration: `ema next`, `ema lane`, `ema queue`, `ema mission`,
+  `ema agent orient`, `ema tl about`, `ema vcalendar tick`, `ema status`.
+- Cockpit (project/client/work registry, formerly cwt's surface):
+  `ema cockpit next`, `ema cockpit client list`,
+  `ema cockpit project list --client=<id>`, `ema cockpit capture`,
+  `ema cockpit responsibility list` / `add`.
+
+`~/.local/bin/cwt` is a thin alias for `ema cockpit "$@"`. There is no
+separate cwt CLI surface. The earlier two-binary "multi-first-command"
+doctrine is dissolved.
+
 ## Invoke
 
 The canonical invocation in development is the global `ema` wrapper:
@@ -58,8 +78,11 @@ Every command accepts `--json` to emit NDJSON instead of pretty text.
   forward-compat; v0 has no resume-from-txid semantic.
 - `ema cwt status` — inspects the `current-work-tracker-trajan` shared-files
   projection.
-- `ema cwt ingest --dry-run` — previews CWT queue/project promotion without
-  writing daemon events.
+- `ema cwt ingest --dry-run` — previews CWT project, lane, queue, and problem
+  promotion without writing daemon events.
+- `ema cwt ingest --all` — commits supported CWT lane, queue, and problem
+  records through daemon command writers. Re-runs are idempotent via the
+  `cwt.shared_files:<cwt-id>` source marker.
 
 ### Wave 1 — documented grammar, stubbed behavior
 

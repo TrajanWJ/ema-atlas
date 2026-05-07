@@ -4,11 +4,14 @@ import { join, resolve } from "node:path";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
+import { runCwtIngestWriter } from "./cwt-ingest-writer.js";
 import { runStubContract } from "./stub-contract.js";
 
 const DOC_REF = "docs/architecture/20-cwt-integration.md";
 
 type ProjectionCounts = {
+  orgs?: number;
+  spaces?: number;
   projects?: number;
   lanes?: number;
   queue_items?: number;
@@ -34,34 +37,6 @@ type CwtManifest = {
   };
 };
 
-type RecordIndex = {
-  count?: number;
-  records?: Array<{ id: string; path: string }>;
-};
-
-type ProjectRecord = {
-  id?: string;
-  name?: string;
-  title?: string;
-  kind?: string;
-  local_path?: string;
-  repo_url?: string;
-  git_remote?: string;
-  default_branch?: string;
-  status?: string;
-};
-
-type QueueRecord = {
-  id?: string;
-  title?: string;
-  why?: string;
-  done_when?: string;
-  project_id?: string;
-  priority?: number;
-  source?: string;
-  status?: string;
-};
-
 export async function runCwt(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0];
   if (!verb || verb === "help" || flagBool(args, "help") || args.flags.h === true) {
@@ -77,8 +52,8 @@ export async function runCwt(args: ParsedArgs): Promise<number> {
         },
         {
           verb: "ingest",
-          flags: ["root", "dry-run"],
-          summary: "Preview promotion of CWT records into EMA daemon records.",
+          flags: ["root", "dry-run", "all", "only"],
+          summary: "Preview or commit CWT records into EMA daemon records.",
         },
       ],
     });
@@ -143,7 +118,6 @@ async function runStatus(args: ParsedArgs): Promise<number> {
 
 async function runIngest(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
-  const dryRun = flagBool(args, "dry-run");
   const root = projectionRoot(args);
   const manifest = await readManifest(root);
   if (!manifest) {
@@ -151,100 +125,7 @@ async function runIngest(args: ParsedArgs): Promise<number> {
     else emitError(`CWT projection missing at ${root}`);
     return 1;
   }
-  if (!dryRun) {
-    const result = {
-      ok: false,
-      status: "writer_pending",
-      root,
-      reason: "CWT promotion is intentionally dry-run only until the daemon queue/lane/problem import writer lands.",
-      required_next: "Run `ema cwt ingest --dry-run --json`, review candidates, then implement cwt.import_preview -> daemon writer.",
-    };
-    if (json) emitJson(result);
-    else {
-      emitError(result.reason);
-      emitPretty(result.required_next);
-    }
-    return 2;
-  }
-
-  const projects = await readProjectCandidates(root);
-  const queue = await readQueueCandidates(root);
-  const result = {
-    ok: true,
-    source: "cwt.shared_files",
-    mode: "dry_run",
-    root,
-    generated_at: manifest.generated_at ?? null,
-    counts: manifest.counts ?? {},
-    project_storage: projectStoragePolicy(),
-    candidates: {
-      projects: projects.map((project) => ({
-        cwt_id: project.id ?? null,
-        name: project.name ?? project.title ?? "(untitled project)",
-        kind: project.kind ?? "project",
-        status: project.status ?? "active",
-        git: {
-          target_driver: "git_worktree",
-          versioning: "git",
-          remote: project.git_remote ?? project.repo_url ?? null,
-          default_branch: project.default_branch ?? "main",
-          local_path: project.local_path ?? null,
-        },
-        suggested_command: suggestedProjectCommand(project),
-      })),
-      queue_items: queue.map((item) => ({
-        cwt_id: item.id ?? null,
-        title: item.title ?? "(untitled)",
-        why: item.why ?? "",
-        done_when: item.done_when ?? "",
-        project_id: item.project_id ?? null,
-        project_storage_target: {
-          driver: "git_worktree",
-          versioning: "git",
-          project_id: item.project_id ?? null,
-        },
-        priority: item.priority ?? null,
-        source: item.source ?? "cwt.shared_files",
-        suggested_command: suggestedQueueCommand(item),
-      })),
-    },
-    promotion_boundary: "preview_only",
-  };
-
-  if (json) emitJson(result);
-  else {
-    emitPretty("CWT ingest dry-run");
-    emitPretty(`root: ${root}`);
-    emitPretty(`queue candidates: ${result.candidates.queue_items.length}`);
-    for (const candidate of result.candidates.queue_items.slice(0, 8)) {
-      emitPretty(`  ${candidate.title} (${candidate.cwt_id ?? "no id"})`);
-    }
-  }
-  return 0;
-}
-
-async function readQueueCandidates(root: string): Promise<QueueRecord[]> {
-  const indexPath = join(root, "records", "queue", "index.json");
-  const index = await readJson<RecordIndex>(indexPath);
-  const refs = index?.records ?? [];
-  const rows: QueueRecord[] = [];
-  for (const ref of refs) {
-    const row = await readJson<QueueRecord>(join(root, ref.path));
-    if (row && row.status !== "done" && row.status !== "dropped") rows.push(row);
-  }
-  return rows;
-}
-
-async function readProjectCandidates(root: string): Promise<ProjectRecord[]> {
-  const indexPath = join(root, "records", "projects", "index.json");
-  const index = await readJson<RecordIndex>(indexPath);
-  const refs = index?.records ?? [];
-  const rows: ProjectRecord[] = [];
-  for (const ref of refs) {
-    const row = await readJson<ProjectRecord>(join(root, ref.path));
-    if (row && row.status !== "done" && row.status !== "dropped") rows.push(row);
-  }
-  return rows;
+  return runCwtIngestWriter(args, root, manifest);
 }
 
 function projectStoragePolicy() {
@@ -253,20 +134,6 @@ function projectStoragePolicy() {
     versioning: "git",
     target_policy: "project_git_repo",
   };
-}
-
-function suggestedProjectCommand(project: ProjectRecord): string {
-  const name = shellQuote(project.name ?? project.title ?? "(untitled project)");
-  return `ema project create --org <org:id> --space <space:id> --name ${name} --json`;
-}
-
-function suggestedQueueCommand(item: QueueRecord): string {
-  const title = shellQuote(item.title ?? "(untitled)");
-  const why = shellQuote(item.why ?? "Imported from CWT shared-files projection.");
-  const doneWhen = shellQuote(item.done_when ?? "Reviewed and accepted in EMA.");
-  const source = shellQuote(item.source ?? "cwt.shared_files");
-  const project = item.project_id ? ` --project ${shellQuote(item.project_id)}` : "";
-  return `ema queue add${project} --title ${title} --why ${why} --done-when ${doneWhen} --source ${source}`;
 }
 
 function projectionRoot(args: ParsedArgs): string {
@@ -299,8 +166,4 @@ async function exists(path: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-function shellQuote(value: string): string {
-  return `'${value.replaceAll("'", "'\\''")}'`;
 }

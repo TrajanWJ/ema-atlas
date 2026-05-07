@@ -1,14 +1,22 @@
 {
   "name": "@ema/design-system",
-  "version": "0.0.5-dev",
+  "version": "0.0.6-dev.1",
   "private": true,
-  "description": "EMA design system — canonical place-* tokens, glass tiers, theme presets.",
+  "description": "EMA design system — canonical place-* tokens, glass tiers, theme presets, motion contract, spacing/radii/shadows/typography scales.",
   "type": "module",
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
     "./tokens.css": "./src/tokens.css",
     "./glass.css": "./src/glass.css",
-    "./themes": "./src/themes.ts"
+    "./themes": "./src/themes.ts",
+    "./tokens": "./src/tokens/index.ts",
+    "./tokens/colors": "./src/tokens/colors.ts",
+    "./tokens/glass": "./src/tokens/glass.ts",
+    "./tokens/motion": "./src/tokens/motion.ts",
+    "./tokens/spacing": "./src/tokens/spacing.ts",
+    "./tokens/radii": "./src/tokens/radii.ts",
+    "./tokens/shadows": "./src/tokens/shadows.ts",
+    "./tokens/typography": "./src/tokens/typography.ts"
   }
 }

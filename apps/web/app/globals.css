@@ -1,78 +1,18 @@
 @import "tailwindcss";
 
+/* =============================================================================
+ * Canonical place-* tokens + glass tiers
+ * Source of truth: packages/design-system/src/tokens.css + glass.css
+ * (lane:01KR0RQFV003P5XC3P1TE2XKPR — L4 design system centralization).
+ *
+ * The token block (--place-*) AND the four glass tiers
+ * (.glass-ambient / .glass-surface / .glass-elevated / .glass-accent)
+ * now live in the design-system package; do not redefine them here.
+ * ============================================================================= */
+@import "@ema/design-system/tokens.css";
+@import "@ema/design-system/glass.css";
+
 :root {
-	/* ===== New Design Token System (--place-*) ===== */
-
-	/* Surfaces */
-	--place-void: #060610;
-	--place-base: #08090E;
-	--place-surface-1: #0E1017;
-	--place-surface-2: #141620;
-	--place-surface-3: #1A1D2A;
-
-	/* Text (white at opacity) */
-	--place-text-primary: rgba(255,255,255, 0.87);
-	--place-text-secondary: rgba(255,255,255, 0.60);
-	--place-text-tertiary: rgba(255,255,255, 0.40);
-	--place-text-muted: rgba(255,255,255, 0.25);
-	--place-text-ghost: rgba(255,255,255, 0.12);
-
-	/* Primary (Teal) */
-	--place-primary-900: #064E3B;
-	--place-primary-700: #0A7558;
-	--place-primary-500: #0D9373;
-	--place-primary-400: #2DD4A8;
-	--place-primary-300: #5EEAD4;
-	--place-primary-200: #99F6E4;
-	--place-primary-50: #CCFBF1;
-	--place-primary-glow: rgba(13,147,115, 0.25);
-	--place-primary-subtle: rgba(13,147,115, 0.10);
-	--place-primary-border: rgba(45,212,168, 0.20);
-
-	/* Secondary (Slate Blue) */
-	--place-secondary-900: #1E3A6E;
-	--place-secondary-700: #2B5298;
-	--place-secondary-500: #4B7BE5;
-	--place-secondary-400: #6B95F0;
-	--place-secondary-300: #93B4F6;
-	--place-secondary-200: #BDD1FA;
-	--place-secondary-50: #E0ECFD;
-	--place-secondary-glow: rgba(75,123,229, 0.25);
-	--place-secondary-subtle: rgba(75,123,229, 0.10);
-	--place-secondary-border: rgba(107,149,240, 0.20);
-
-	/* Tertiary (Amber) */
-	--place-tertiary-900: #78350F;
-	--place-tertiary-700: #92400E;
-	--place-tertiary-500: #D97706;
-	--place-tertiary-400: #F59E0B;
-	--place-tertiary-300: #FBBF24;
-	--place-tertiary-200: #FDE68A;
-	--place-tertiary-50: #FEF3C7;
-	--place-tertiary-glow: rgba(217,119,6, 0.25);
-	--place-tertiary-subtle: rgba(217,119,6, 0.10);
-	--place-tertiary-border: rgba(245,158,11, 0.20);
-
-	/* Semantic (never themed) */
-	--place-error: #E24B4A;
-	--place-success: #22C55E;
-	--place-warning: #EAB308;
-
-	/* Borders */
-	--place-border-subtle: rgba(255,255,255, 0.04);
-	--place-border-default: rgba(255,255,255, 0.08);
-	--place-border-strong: rgba(255,255,255, 0.15);
-
-	/* Typography */
-	--place-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-	--place-font-mono: "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
-	--place-font-weight-base: 400;
-	--place-font-weight-heading: 600;
-	--place-line-height: 1.5;
-
-	/* Easing */
-	--place-ease-smooth: cubic-bezier(0.65, 0.05, 0, 1);
-
 	/* ===== Backward-compatible aliases — remove after full migration ===== */
 	--bg-deep: var(--place-void);
 	--bg-surface: var(--place-surface-1);
@@ -88,50 +28,6 @@
 	--glow: var(--place-secondary-glow);
 	--glass-blur: 16px;
 	--ease-smooth: var(--place-ease-smooth);
-}
-
-/* ===== Light mode ===== */
-[data-theme="light"] {
-  --place-void: #f5f5f7;
-  --place-base: #ececee;
-  --place-surface-1: #e2e2e6;
-  --place-surface-2: #d8d8dc;
-  --place-surface-3: #ccccd0;
-  --place-text-primary: rgba(0,0,0,0.87);
-  --place-text-secondary: rgba(0,0,0,0.60);
-  --place-text-tertiary: rgba(0,0,0,0.40);
-  --place-text-muted: rgba(0,0,0,0.25);
-  --place-border-default: rgba(0,0,0,0.10);
-  --place-border-subtle: rgba(0,0,0,0.05);
-  --place-border-strong: rgba(0,0,0,0.18);
-}
-
-/* ===== Contrast modes ===== */
-[data-contrast="increased"] {
-  --place-text-primary: rgba(255,255,255,0.95);
-  --place-text-secondary: rgba(255,255,255,0.75);
-  --place-border-default: rgba(255,255,255,0.15);
-}
-
-[data-contrast="high"] {
-  --place-text-primary: #ffffff;
-  --place-text-secondary: rgba(255,255,255,0.85);
-  --place-text-tertiary: rgba(255,255,255,0.65);
-  --place-border-default: rgba(255,255,255,0.25);
-  --place-border-strong: rgba(255,255,255,0.35);
-}
-
-/* ===== Light mode + contrast combos ===== */
-[data-theme="light"][data-contrast="increased"] {
-  --place-text-primary: rgba(0,0,0,0.95);
-  --place-text-secondary: rgba(0,0,0,0.75);
-  --place-border-default: rgba(0,0,0,0.18);
-}
-
-[data-theme="light"][data-contrast="high"] {
-  --place-text-primary: #000000;
-  --place-text-secondary: rgba(0,0,0,0.85);
-  --place-border-default: rgba(0,0,0,0.30);
 }
 
 /* ===== Title bar styles ===== */
@@ -239,42 +135,9 @@ textarea::-webkit-scrollbar-thumb:hover {
 	background: rgba(255, 255, 255, 0.15);
 }
 
-/* ===== Glass tiers — liquid glass best practices ===== */
-/*
- * Each tier layers: tinted background + blur + saturate + border
- * Higher tiers = more opaque + more blur = more readable over busy backgrounds
- * saturate(180%) makes colors behind the glass more vivid (Apple-style)
- */
-.glass-ambient {
-	background: var(--glass-bg-ambient, rgba(14, 16, 23, 0.4));
-	backdrop-filter: blur(var(--glass-blur-ambient, 6px)) saturate(120%);
-	-webkit-backdrop-filter: blur(var(--glass-blur-ambient, 6px)) saturate(120%);
-}
-.glass-surface {
-	background: var(--glass-bg-surface, rgba(14, 16, 23, 0.55));
-	backdrop-filter: blur(var(--glass-blur-surface, 20px)) saturate(150%);
-	-webkit-backdrop-filter: blur(var(--glass-blur-surface, 20px)) saturate(150%);
-	border: 1px solid rgba(255, 255, 255, 0.06);
-}
-.glass-elevated {
-	background: var(--glass-bg-elevated, rgba(14, 16, 23, 0.65));
-	backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
-	-webkit-backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.glass-accent {
-	background: var(--glass-bg-accent, rgba(10, 30, 25, 0.60));
-	backdrop-filter: blur(var(--glass-blur-accent, 32px)) saturate(180%);
-	-webkit-backdrop-filter: blur(var(--glass-blur-accent, 32px)) saturate(180%);
-	border: 1px solid var(--place-primary-border);
-}
-/* .glass = elevated (most common — windows, dock, top bar) */
-.glass {
-	background: var(--glass-bg-elevated, rgba(14, 16, 23, 0.65));
-	backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
-	-webkit-backdrop-filter: blur(var(--glass-blur-elevated, 28px)) saturate(180%);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-}
+/* Glass tiers (.glass-ambient / .glass-surface / .glass-elevated /
+ * .glass-accent / .glass) come from @ema/design-system/glass.css imported
+ * at the top of this file. Don't redeclare them here. */
 
 .gradient-text {
 	display: inline-block;

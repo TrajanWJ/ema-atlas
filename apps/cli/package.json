@@ -1,8 +1,8 @@
 {
   "name": "@ema/cli",
-  "version": "0.0.5-dev",
+  "version": "0.0.6-dev",
   "private": true,
-  "description": "EMA 0.0.5 — command-line surface over the daemon IPC.",
+  "description": "EMA 0.0.6 — command-line surface over the daemon IPC.",
   "type": "module",
   "bin": {
     "ema": "./dist/bin.js"

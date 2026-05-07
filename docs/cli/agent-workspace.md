@@ -8,10 +8,15 @@ writes/projections or explicit file-backed Harness Glue rails:
 `ema next`, `ema tl about`, `ema agent orient`, and `ema vcalendar tick` read
 daemon lane/queue registry state first and only use file-shaped records as
 fallback context when daemon state is unavailable.
-`ema cwt status` and `ema cwt ingest --dry-run` are the bridge commands for
-the sibling `current-work-tracker-trajan` capture surface; they inspect its
-shared-files projection but do not promote records until a daemon import writer
-exists.
+
+CLI doctrine (`~/Desktop/AGENTS.md`, 2026-05-07, post-cwt-absorption): EMA's
+CLI is `ema`. cwt is absorbed; `~/.local/bin/cwt` is now a thin alias for
+`ema cockpit "$@"`. When asked "what projects/clients exist?" or "what's on
+for client X?", route through `ema cockpit …` (the cockpit vApp's CLI
+surface). See
+`docs/decisions/2026-05-07-cwt-absorbed-by-ema.md` (supersedes the same-day
+central-tracker ADR). The earlier `ema cwt status` / `ema cwt ingest`
+commands and the multi-first-command framing are deprecated.
 Command-group `--help` output is the normalized source for current flags and
 implementation status.
 

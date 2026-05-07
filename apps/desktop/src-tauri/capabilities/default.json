@@ -1,0 +1,25 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "EMA desktop shell + companion popouts. Permits the main window, the bundled web origin, and any companion_* labelled popout to invoke the in-process companion commands (open/close/focus/reattach), drag, and resize themselves.",
+  "windows": ["main", "companion_*"],
+  "remote": {
+    "urls": [
+      "http://localhost:5173/*",
+      "http://127.0.0.1:5173/*",
+      "tauri://localhost/*"
+    ]
+  },
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-start-resize-dragging",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
+    "core:window:allow-close",
+    "core:webview:default",
+    "core:event:default"
+  ]
+}

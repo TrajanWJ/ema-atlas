@@ -99,7 +99,7 @@ async function runHelp(args) {
     emitJson({ commands: COMMANDS, global_flags: GLOBAL_FLAGS });
     return 0;
   }
-  emitPretty("ema \u2014 EMA 0.0.5 CLI (wave 1)");
+  emitPretty("ema \u2014 EMA 0.0.6 CLI");
   emitPretty("");
   emitPretty("Usage: ema <command> [args...] [--json]");
   emitPretty("");
@@ -4860,6 +4860,8 @@ function nextActions(lane, blockedCount) {
 import { existsSync as existsSync4, mkdirSync, readFileSync as readFileSync3, readdirSync as readdirSync3, writeFileSync } from "fs";
 import { join as join3 } from "path";
 import { spawnSync } from "child_process";
+var DEFAULT_ORG5 = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR5 = "actor:harness-cli";
 var PROVIDERS = [
   {
     id: "simulated",
@@ -5202,7 +5204,7 @@ function runLog(args) {
   else emitPretty(captured.stdout || captured.stderr || "");
   return captured.status === 0 ? 0 : 1;
 }
-function runDispatch(args) {
+async function runDispatch(args) {
   const provider = flagString(args, "provider") ?? "simulated";
   const found = PROVIDERS.find((candidate) => candidate.id === provider);
   if (!found) {
@@ -5227,6 +5229,30 @@ function runDispatch(args) {
     else emitPretty(`${provider} adapter pending; simulated provider is ready`);
     return 0;
   }
+  const org = flagString(args, "org") ?? DEFAULT_ORG5;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR5;
+  const intent = prompt.length > 0 ? summarize(prompt) : "harness dispatch";
+  const useDaemon = !flagBool(args, "no-daemon");
+  if (useDaemon) {
+    const daemonResult = await tryDaemonDispatch({
+      org,
+      actor,
+      provider,
+      intent,
+      lane,
+      cwd,
+      prompt
+    });
+    if (daemonResult.ok) {
+      if (flagBool(args, "json")) emitJson(daemonResult.payload);
+      else emitPretty(`execution: ${daemonResult.payload.execution.id}`);
+      return 0;
+    }
+    if (daemonResult.fallback === false) {
+      emitError(`ema harness dispatch: ${daemonResult.error}`);
+      return 1;
+    }
+  }
   const executionId = `execution:simulated:${stableId(`${lane ?? "no-lane"}:${cwd}:${prompt}`)}`;
   const events = timeline(executionId, lane, cwd, prompt);
   const payload = {
@@ -5234,6 +5260,7 @@ function runDispatch(args) {
     command: "harness dispatch",
     provider,
     status: "simulated_execution_completed",
+    source: "client_side_fallback",
     projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
     dispatch: { id: `dispatch:simulated:${stableId(prompt || executionId)}`, lane, cwd, prompt },
     execution: { id: executionId, provider, status: "completed", lane, cwd },
@@ -5242,6 +5269,120 @@ function runDispatch(args) {
   if (flagBool(args, "json")) emitJson(payload);
   else emitPretty(`execution: ${executionId}`);
   return 0;
+}
+async function tryDaemonDispatch(spec) {
+  let client = null;
+  try {
+    client = await connect({ surface: "desktop" });
+  } catch (err) {
+    if (err instanceof DaemonUnreachableError) {
+      return { ok: false, fallback: true, error: err.message };
+    }
+    return { ok: false, fallback: false, error: err instanceof Error ? err.message : String(err) };
+  }
+  try {
+    const { org, actor, provider, intent, lane } = spec;
+    const startResult = await client.command("dispatch.start", {
+      org_id: org,
+      actor_id: actor,
+      intent,
+      provider,
+      lane_id: lane
+    });
+    const startCheck = expectOk(startResult, "dispatch.start");
+    if (startCheck) return { ok: false, fallback: false, error: startCheck };
+    const dispatchId = startResult.resource;
+    const dispatchEventId = startResult.events?.[0] ?? "";
+    if (!dispatchId) return { ok: false, fallback: false, error: "dispatch.start returned no resource id" };
+    const execStart = await client.command("execution.start", {
+      org_id: org,
+      actor_id: actor,
+      dispatch_id: dispatchId,
+      exec_kind: "tool",
+      name: "simulated.provider",
+      provider
+    });
+    const execStartCheck = expectOk(execStart, "execution.start");
+    if (execStartCheck) return { ok: false, fallback: false, error: execStartCheck };
+    const executionId = execStart.resource;
+    const execStartEventId = execStart.events?.[0] ?? "";
+    if (!executionId)
+      return { ok: false, fallback: false, error: "execution.start returned no resource id" };
+    const toolInvoke = await client.command("tool.invoke", {
+      org_id: org,
+      actor_id: actor,
+      dispatch_id: dispatchId,
+      execution_id: executionId,
+      tool_name: "simulated.provider",
+      args_json: JSON.stringify({ prompt: spec.prompt, cwd: spec.cwd }),
+      provider
+    });
+    const toolInvokeCheck = expectOk(toolInvoke, "tool.invoke");
+    if (toolInvokeCheck) return { ok: false, fallback: false, error: toolInvokeCheck };
+    const toolInvokeEventId = toolInvoke.events?.[0] ?? "";
+    const toolReturn = await client.command("tool.return", {
+      org_id: org,
+      actor_id: actor,
+      dispatch_id: dispatchId,
+      execution_id: executionId,
+      tool_name: "simulated.provider",
+      result_summary: "ok"
+    });
+    const toolReturnCheck = expectOk(toolReturn, "tool.return");
+    if (toolReturnCheck) return { ok: false, fallback: false, error: toolReturnCheck };
+    const toolReturnEventId = toolReturn.events?.[0] ?? "";
+    const execEnd = await client.command("execution.end", {
+      org_id: org,
+      actor_id: actor,
+      dispatch_id: dispatchId,
+      execution_id: executionId,
+      outcome: "ok",
+      duration_ms: 1
+    });
+    const execEndCheck = expectOk(execEnd, "execution.end");
+    if (execEndCheck) return { ok: false, fallback: false, error: execEndCheck };
+    const execEndEventId = execEnd.events?.[0] ?? "";
+    const dispatchEnd = await client.command("dispatch.end", {
+      org_id: org,
+      actor_id: actor,
+      dispatch_id: dispatchId,
+      outcome: "ok",
+      provider
+    });
+    const dispatchEndCheck = expectOk(dispatchEnd, "dispatch.end");
+    if (dispatchEndCheck) return { ok: false, fallback: false, error: dispatchEndCheck };
+    const dispatchEndEventId = dispatchEnd.events?.[0] ?? "";
+    return {
+      ok: true,
+      payload: {
+        ok: true,
+        command: "harness dispatch",
+        provider,
+        status: "simulated_execution_completed",
+        source: "daemon_canonical",
+        projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
+        dispatch: { id: dispatchId, lane, cwd: spec.cwd, prompt: spec.prompt, intent },
+        execution: { id: executionId, provider, status: "completed", lane, cwd: spec.cwd },
+        events: [
+          { type: "dispatch.started", event_id: dispatchEventId },
+          { type: "execution.started", event_id: execStartEventId },
+          { type: "tool.invoked", event_id: toolInvokeEventId },
+          { type: "tool.returned", event_id: toolReturnEventId },
+          { type: "execution.ended", event_id: execEndEventId },
+          { type: "dispatch.ended", event_id: dispatchEndEventId }
+        ]
+      }
+    };
+  } catch (err) {
+    return { ok: false, fallback: false, error: err instanceof Error ? err.message : String(err) };
+  } finally {
+    client?.close();
+  }
+}
+function expectOk(result, op) {
+  if (result.ok === true) return null;
+  const error = result.error;
+  return `${op}: ${error.class}: ${error.message}`;
 }
 function runStream(args) {
   const execution = flagString(args, "execution");
@@ -5642,8 +5783,8 @@ function savePeers(peers) {
 
 // src/commands/gap.ts
 var W4_PREFIX = "[W4-gap]";
-var DEFAULT_ORG5 = "org:01J00000000000000000000001";
-var DEFAULT_ACTOR5 = "actor:dev-console";
+var DEFAULT_ORG6 = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR6 = "actor:dev-console";
 async function runGap(args) {
   const verb = args.positional[0];
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") {
@@ -5808,8 +5949,8 @@ async function runClaim2(args) {
     }
     const c = await connect({ surface: "desktop" });
     const result = await c.command("lane.claim", {
-      org_id: flagString(args, "org") ?? DEFAULT_ORG5,
-      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR5,
+      org_id: flagString(args, "org") ?? DEFAULT_ORG6,
+      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR6,
       lane_id: lane.id,
       scope: flagString(args, "scope") ?? lane.scope ?? "ship the gap",
       goal: flagString(args, "goal") ?? `close ${refOf(lane.title) ?? ""}`,
@@ -5849,8 +5990,8 @@ async function runClose3(args) {
     }
     const c = await connect({ surface: "desktop" });
     const result = await c.command("lane.close", {
-      org_id: flagString(args, "org") ?? DEFAULT_ORG5,
-      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR5,
+      org_id: flagString(args, "org") ?? DEFAULT_ORG6,
+      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR6,
       lane_id: lane.id,
       reason: flagString(args, "reason") ?? "shipped",
       verify
@@ -6186,9 +6327,396 @@ async function runScan(args) {
 }
 
 // src/commands/cwt.ts
-import { access, readFile } from "fs/promises";
+import { access, readFile as readFile2 } from "fs/promises";
 import { homedir } from "os";
-import { join as join5, resolve } from "path";
+import { join as join6, resolve } from "path";
+
+// src/commands/cwt-ingest-writer.ts
+import { readFile } from "fs/promises";
+import { join as join5 } from "path";
+var CWT_SOURCE_PREFIX = "cwt.shared_files:";
+async function runCwtIngestWriter(args, root, manifest) {
+  const json = flagBool(args, "json");
+  const dryRun = flagBool(args, "dry-run");
+  const only = onlyFilter(args);
+  const snapshot = await readSnapshot(root, only);
+  if (dryRun) return emitDryRun(json, root, manifest, snapshot);
+  return commit(args, root, manifest, snapshot, only);
+}
+function emitDryRun(json, root, manifest, snapshot) {
+  const result = {
+    ok: true,
+    source: "cwt.shared_files",
+    mode: "dry_run",
+    root,
+    generated_at: manifest.generated_at ?? null,
+    counts: manifest.counts ?? {},
+    project_storage: projectStoragePolicy(),
+    candidates: {
+      projects: snapshot.projects.map((project) => ({
+        cwt_id: project.id ?? null,
+        name: project.name ?? project.title ?? "(untitled project)",
+        kind: project.kind ?? "project",
+        status: project.status ?? "active",
+        git: {
+          target_driver: "git_worktree",
+          versioning: "git",
+          remote: project.git_remote ?? project.repo_url ?? null,
+          default_branch: project.default_branch ?? "main",
+          local_path: project.local_path ?? null
+        }
+      })),
+      lanes: snapshot.lanes.map((lane) => ({
+        cwt_id: lane.id ?? null,
+        title: lane.title ?? "(untitled lane)",
+        status: lane.status ?? "open",
+        project_id: lane.project_id ?? null,
+        source_marker: lane.id ? marker(lane.id) : null
+      })),
+      queue_items: snapshot.queue.map((item) => ({
+        cwt_id: item.id ?? null,
+        title: item.title ?? "(untitled)",
+        why: item.why ?? "",
+        done_when: item.done_when ?? "",
+        project_id: item.project_id ?? null,
+        priority: item.priority ?? null,
+        source: item.id ? sourceWithMarker(item.id, item.source) : item.source ?? "cwt.shared_files"
+      })),
+      problems: snapshot.problems.map((problem) => ({
+        cwt_id: problem.id ?? null,
+        title: problem.title ?? "(untitled problem)",
+        why: problem.why ?? "",
+        project_id: problem.project_id ?? null,
+        source_marker: problem.id ? marker(problem.id) : null
+      }))
+    },
+    promotion_boundary: "preview_only"
+  };
+  if (json) emitJson(result);
+  else {
+    emitPretty("CWT ingest dry-run");
+    emitPretty(`root: ${root}`);
+    emitPretty(`lane candidates: ${snapshot.lanes.length}`);
+    emitPretty(`queue candidates: ${snapshot.queue.length}`);
+    emitPretty(`problem candidates: ${snapshot.problems.length}`);
+  }
+  return 0;
+}
+async function commit(args, root, manifest, snapshot, only) {
+  const json = flagBool(args, "json");
+  const actorId = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+  const results = [];
+  const laneMirror = /* @__PURE__ */ new Map();
+  let client = null;
+  try {
+    client = await connect({ surface: "desktop" });
+    const daemonProjects = await readProjection3(client, "project.filesystem_status", "projects");
+    const daemonLanes = await readProjection3(client, "lane.registry", "lanes");
+    const daemonQueue = await readProjection3(client, "queue.registry", "queue_items");
+    const daemonProblems = await readProjection3(client, "problem.graph", "problems");
+    const resolveProject = makeProjectResolver(snapshot.projects, daemonProjects);
+    for (const lane of snapshot.lanes) {
+      const result = await importLane(client, lane, resolveProject, actorId, daemonLanes);
+      results.push(result);
+      if (lane.id && result.daemon_id) laneMirror.set(lane.id, result.daemon_id);
+      if (result.status === "imported" && result.daemon_id) {
+        daemonLanes.push({ id: result.daemon_id, lane_id: result.daemon_id, scope: marker(lane.id ?? "") });
+      }
+    }
+    for (const item of snapshot.queue) {
+      const result = await importQueue(client, item, resolveProject, actorId, daemonQueue, laneMirror);
+      results.push(result);
+      if (result.status === "imported" && result.daemon_id) {
+        daemonQueue.push({ id: result.daemon_id, queue_item_id: result.daemon_id, source: marker(item.id ?? "") });
+      }
+    }
+    for (const problem of snapshot.problems) {
+      const result = await importProblem(client, problem, resolveProject, actorId, daemonProblems, laneMirror);
+      results.push(result);
+      if (result.status === "imported" && result.daemon_id) {
+        daemonProblems.push({ id: result.daemon_id, problem_id: result.daemon_id, source: marker(problem.id ?? "") });
+      }
+    }
+  } catch (err) {
+    const result = {
+      ok: false,
+      source: "cwt.shared_files",
+      mode: "commit",
+      root,
+      generated_at: manifest.generated_at ?? null,
+      error: err instanceof Error ? err.message : String(err),
+      results
+    };
+    if (json) emitJson(result);
+    else emitError(result.error);
+    return 1;
+  } finally {
+    client?.close();
+  }
+  const summary = summarize2(results);
+  const failures = results.filter((result) => result.status === "failed");
+  const output = {
+    ok: failures.length === 0,
+    source: "cwt.shared_files",
+    mode: "commit",
+    root,
+    generated_at: manifest.generated_at ?? null,
+    daemon_authority: "canonical_events",
+    filter: { all: flagBool(args, "all"), only: only ? [...only] : null },
+    summary,
+    results,
+    promotion_boundary: "daemon_command_writer"
+  };
+  if (json) emitJson(output);
+  else {
+    emitPretty("CWT ingest commit");
+    emitPretty(`imported: ${summary.imported}`);
+    emitPretty(`skipped: ${summary.skipped}`);
+    emitPretty(`failed: ${summary.failed}`);
+    for (const failure of failures.slice(0, 8)) {
+      emitPretty(`  [failed] ${failure.family} ${failure.cwt_id ?? "(no id)"}: ${failure.reason ?? "unknown"}`);
+    }
+  }
+  return failures.length === 0 ? 0 : 1;
+}
+async function importLane(client, lane, resolveProject, actorId, daemonLanes) {
+  const cwtId = lane.id ?? null;
+  const title = lane.title ?? "(untitled lane)";
+  if (!cwtId) return failed("lane", cwtId, title, "missing cwt id");
+  const existing = findMirrored(daemonLanes, cwtId, (record) => record.scope);
+  if (existing) return skipped("lane", cwtId, title, daemonId(existing));
+  if (lane.local_daemon_mirror_id) return skipped("lane", cwtId, title, lane.local_daemon_mirror_id);
+  const project = resolveProject(lane.project_id);
+  if (!project.ok) return failed("lane", cwtId, title, project.reason);
+  const result = await commandOrFailure(client, "lane.open", {
+    org_id: lane.org_id ?? project.org_id ?? DEFAULT_ORG3,
+    actor_id: actorId,
+    name: title,
+    project_id: project.project_id,
+    mission_id: lane.mission_id ?? null,
+    scope: laneScope(lane),
+    done_when: lane.done_when ?? lane.why ?? null,
+    depends_on: lane.depends_on ?? null
+  }, "lane", cwtId, title, project.project_id);
+  if (isImportResult(result)) return result;
+  return commandResult("lane", cwtId, title, project.project_id, result);
+}
+async function importQueue(client, item, resolveProject, actorId, daemonQueue, laneMirror) {
+  const cwtId = item.id ?? null;
+  const title = item.title ?? "(untitled queue item)";
+  if (!cwtId) return failed("queue_item", cwtId, title, "missing cwt id");
+  if (!item.why?.trim()) return failed("queue_item", cwtId, title, "missing why");
+  if (!item.done_when?.trim()) return failed("queue_item", cwtId, title, "missing done_when");
+  const existing = findMirrored(daemonQueue, cwtId, (record) => record.source);
+  if (existing) return skipped("queue_item", cwtId, title, daemonId(existing));
+  if (item.local_daemon_mirror_id) return skipped("queue_item", cwtId, title, item.local_daemon_mirror_id);
+  const project = resolveProject(item.project_id);
+  if (!project.ok) return failed("queue_item", cwtId, title, project.reason);
+  const result = await commandOrFailure(client, "queue.add", {
+    org_id: item.org_id ?? project.org_id ?? DEFAULT_ORG3,
+    actor_id: actorId,
+    name: title,
+    reason: item.why,
+    project_id: project.project_id,
+    mission_id: null,
+    lane_id: item.lane_id ? laneMirror.get(item.lane_id) ?? null : null,
+    depends_on: firstJsonString(item.depends_on_json) ?? item.depends_on ?? null,
+    blocked_by: firstJsonString(item.blocked_by_json) ?? item.blocked_by ?? null,
+    done_when: item.done_when,
+    source: sourceWithMarker(cwtId, item.source)
+  }, "queue_item", cwtId, title, project.project_id);
+  if (isImportResult(result)) return result;
+  return commandResult("queue_item", cwtId, title, project.project_id, result);
+}
+async function importProblem(client, problem, resolveProject, actorId, daemonProblems, laneMirror) {
+  const cwtId = problem.id ?? null;
+  const title = problem.title ?? "(untitled problem)";
+  if (!cwtId) return failed("problem", cwtId, title, "missing cwt id");
+  const existing = findMirrored(daemonProblems, cwtId, (record) => record.source);
+  if (existing) return skipped("problem", cwtId, title, daemonId(existing));
+  if (problem.local_daemon_mirror_id) return skipped("problem", cwtId, title, problem.local_daemon_mirror_id);
+  const project = resolveProject(problem.project_id);
+  if (!project.ok) return failed("problem", cwtId, title, project.reason);
+  const result = await commandOrFailure(client, "problem.log", {
+    org_id: problem.org_id ?? project.org_id ?? DEFAULT_ORG3,
+    actor_id: actorId,
+    title,
+    project_id: project.project_id,
+    lane_id: problem.lane_id ? laneMirror.get(problem.lane_id) ?? null : null,
+    cause: problem.why ?? null,
+    source: sourceWithMarker(cwtId, problem.source)
+  }, "problem", cwtId, title, project.project_id);
+  if (isImportResult(result)) return result;
+  return commandResult("problem", cwtId, title, project.project_id, result);
+}
+async function commandOrFailure(client, op, args, family, cwtId, title, projectId) {
+  try {
+    return await client.command(op, args);
+  } catch (err) {
+    return failed(family, cwtId, title, err instanceof Error ? err.message : String(err), projectId);
+  }
+}
+function commandResult(family, cwtId, title, projectId, result) {
+  if (result.ok !== true) {
+    return failed(family, cwtId, title, `${result.error.class}: ${result.error.message}`, projectId);
+  }
+  return {
+    family,
+    cwt_id: cwtId,
+    title,
+    status: "imported",
+    daemon_id: typeof result.resource === "string" ? result.resource : null,
+    events: result.events ?? [],
+    project_id: projectId
+  };
+}
+function makeProjectResolver(cwtProjects, daemonProjects) {
+  const daemonById = /* @__PURE__ */ new Map();
+  const daemonByName = /* @__PURE__ */ new Map();
+  for (const project of daemonProjects) {
+    const id = project.project_id ?? project.id;
+    if (id) daemonById.set(id, project);
+    if (project.name) daemonByName.set(project.name.toLowerCase(), project);
+  }
+  const cwtById = new Map(cwtProjects.flatMap((project) => project.id ? [[project.id, project]] : []));
+  return (projectId) => {
+    if (!projectId) return { ok: true, project_id: null, org_id: null };
+    const exact = daemonById.get(projectId);
+    if (exact) return { ok: true, project_id: projectId, org_id: exact.org_id ?? null };
+    const cwtProject = cwtById.get(projectId);
+    const byName = cwtProject?.name ? daemonByName.get(cwtProject.name.toLowerCase()) : null;
+    if (byName) return { ok: true, project_id: byName.project_id ?? byName.id ?? projectId, org_id: byName.org_id ?? cwtProject?.org_id ?? null };
+    return { ok: false, reason: `daemon project not found for ${projectId}; run project seeding/materialization before importing this record` };
+  };
+}
+async function readSnapshot(root, only) {
+  return {
+    projects: await readRecords3(root, "projects", null),
+    lanes: await readRecords3(root, "lanes", only),
+    queue: await readRecords3(root, "queue", only),
+    problems: await readRecords3(root, "problems", only)
+  };
+}
+async function readRecords3(root, dir, only) {
+  const index = await readJson(join5(root, "records", dir, "index.json"));
+  const rows = [];
+  for (const ref of index?.records ?? []) {
+    const row = await readJson(join5(root, ref.path));
+    if (!row || !isOpen(row)) continue;
+    if (only && (!row.id || !only.has(row.id))) continue;
+    rows.push(row);
+  }
+  return rows;
+}
+async function readProjection3(client, name, key) {
+  return new Promise((resolve2) => {
+    const timer = setTimeout(() => resolve2([]), 1500);
+    client.onMessage((msg) => {
+      if (msg.type !== "projection" || msg.name !== name) return;
+      clearTimeout(timer);
+      const data = msg.data ?? {};
+      resolve2(data[key] ?? []);
+    });
+    client.subscribe(name);
+  });
+}
+async function readJson(path2) {
+  try {
+    return JSON.parse(await readFile(path2, "utf8"));
+  } catch {
+    return null;
+  }
+}
+function isOpen(row) {
+  if (row.tombstone) return false;
+  return !["done", "dropped", "closed", "archived"].includes(row.status ?? "");
+}
+function skipped(family, cwtId, title, daemonId2) {
+  return { family, cwt_id: cwtId, title, status: "skipped", daemon_id: daemonId2, events: [], reason: "already mirrored" };
+}
+function failed(family, cwtId, title, reason, projectId = null) {
+  return { family, cwt_id: cwtId, title, status: "failed", daemon_id: null, events: [], project_id: projectId, reason };
+}
+function summarize2(results) {
+  return {
+    imported: results.filter((result) => result.status === "imported").length,
+    skipped: results.filter((result) => result.status === "skipped").length,
+    failed: results.filter((result) => result.status === "failed").length,
+    lanes: summarizeFamily(results, "lane"),
+    queue_items: summarizeFamily(results, "queue_item"),
+    problems: summarizeFamily(results, "problem")
+  };
+}
+function summarizeFamily(results, family) {
+  const scoped = results.filter((result) => result.family === family);
+  return {
+    imported: scoped.filter((result) => result.status === "imported").length,
+    skipped: scoped.filter((result) => result.status === "skipped").length,
+    failed: scoped.filter((result) => result.status === "failed").length
+  };
+}
+function findMirrored(records, cwtId, pick) {
+  const source = marker(cwtId);
+  return records.find((record) => pick(record)?.includes(source)) ?? null;
+}
+function daemonId(record) {
+  return record.id ?? record.lane_id ?? record.queue_item_id ?? record.problem_id ?? null;
+}
+function isImportResult(value) {
+  return typeof value.family === "string" && "cwt_id" in value;
+}
+function onlyFilter(args) {
+  const raw = flagString(args, "only");
+  if (!raw) return null;
+  const ids = raw.split(",").map((id) => id.trim()).filter(Boolean);
+  return ids.length > 0 ? new Set(ids) : null;
+}
+function marker(id) {
+  return `${CWT_SOURCE_PREFIX}${id}`;
+}
+function sourceWithMarker(id, source) {
+  const sourceMarker = marker(id);
+  if (!source?.trim()) return sourceMarker;
+  if (source.includes(sourceMarker)) return source;
+  return `${sourceMarker} | ${source}`;
+}
+function laneScope(lane) {
+  return [
+    lane.id ? marker(lane.id) : null,
+    parseScopeJson(lane.scope_json ?? void 0),
+    lane.why,
+    lane.tags ? `tags=${lane.tags}` : null
+  ].filter((part) => Boolean(part && part.trim())).join(" | ") || "Imported from CWT shared-files projection.";
+}
+function parseScopeJson(raw) {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.filter((item) => typeof item === "string").join(", ");
+  } catch {
+    return raw;
+  }
+  return raw;
+}
+function firstJsonString(raw) {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.find((item) => typeof item === "string" && item.length > 0) ?? null;
+  } catch {
+    return raw.trim() || null;
+  }
+  return null;
+}
+function projectStoragePolicy() {
+  return {
+    driver: "git_worktree",
+    versioning: "git",
+    target_policy: "project_git_repo"
+  };
+}
+
+// src/commands/cwt.ts
 var DOC_REF7 = "docs/architecture/20-cwt-integration.md";
 async function runCwt(args) {
   const verb = args.positional[0];
@@ -6205,8 +6733,8 @@ async function runCwt(args) {
         },
         {
           verb: "ingest",
-          flags: ["root", "dry-run"],
-          summary: "Preview promotion of CWT records into EMA daemon records."
+          flags: ["root", "dry-run", "all", "only"],
+          summary: "Preview or commit CWT records into EMA daemon records."
         }
       ]
     });
@@ -6226,7 +6754,7 @@ async function runStatus4(args) {
       source: "cwt.shared_files",
       status: "missing_projection",
       root,
-      expected: join5(root, "manifest.json"),
+      expected: join6(root, "manifest.json"),
       next: "Run CWT and send `sync` in the in-app Agent Chat."
     };
     if (json) emitJson(result2);
@@ -6237,7 +6765,7 @@ async function runStatus4(args) {
     }
     return 1;
   }
-  const statePath = join5(root, manifest.local_n_sync?.current_state ?? "local-n-sync/current-state.md");
+  const statePath = join6(root, manifest.local_n_sync?.current_state ?? "local-n-sync/current-state.md");
   const stateExists = await exists(statePath);
   const result = {
     ok: true,
@@ -6248,7 +6776,7 @@ async function runStatus4(args) {
     projection: manifest.projection ?? null,
     counts: manifest.counts ?? {},
     local_n_sync: manifest.local_n_sync ?? null,
-    project_storage: projectStoragePolicy(),
+    project_storage: projectStoragePolicy2(),
     current_state_exists: stateExists,
     next: "ema cwt ingest --dry-run --json"
   };
@@ -6265,7 +6793,6 @@ async function runStatus4(args) {
 }
 async function runIngest(args) {
   const json = flagBool(args, "json");
-  const dryRun = flagBool(args, "dry-run");
   const root = projectionRoot(args);
   const manifest = await readManifest(root);
   if (!manifest) {
@@ -6273,115 +6800,14 @@ async function runIngest(args) {
     else emitError(`CWT projection missing at ${root}`);
     return 1;
   }
-  if (!dryRun) {
-    const result2 = {
-      ok: false,
-      status: "writer_pending",
-      root,
-      reason: "CWT promotion is intentionally dry-run only until the daemon queue/lane/problem import writer lands.",
-      required_next: "Run `ema cwt ingest --dry-run --json`, review candidates, then implement cwt.import_preview -> daemon writer."
-    };
-    if (json) emitJson(result2);
-    else {
-      emitError(result2.reason);
-      emitPretty(result2.required_next);
-    }
-    return 2;
-  }
-  const projects = await readProjectCandidates(root);
-  const queue = await readQueueCandidates(root);
-  const result = {
-    ok: true,
-    source: "cwt.shared_files",
-    mode: "dry_run",
-    root,
-    generated_at: manifest.generated_at ?? null,
-    counts: manifest.counts ?? {},
-    project_storage: projectStoragePolicy(),
-    candidates: {
-      projects: projects.map((project) => ({
-        cwt_id: project.id ?? null,
-        name: project.name ?? project.title ?? "(untitled project)",
-        kind: project.kind ?? "project",
-        status: project.status ?? "active",
-        git: {
-          target_driver: "git_worktree",
-          versioning: "git",
-          remote: project.git_remote ?? project.repo_url ?? null,
-          default_branch: project.default_branch ?? "main",
-          local_path: project.local_path ?? null
-        },
-        suggested_command: suggestedProjectCommand(project)
-      })),
-      queue_items: queue.map((item) => ({
-        cwt_id: item.id ?? null,
-        title: item.title ?? "(untitled)",
-        why: item.why ?? "",
-        done_when: item.done_when ?? "",
-        project_id: item.project_id ?? null,
-        project_storage_target: {
-          driver: "git_worktree",
-          versioning: "git",
-          project_id: item.project_id ?? null
-        },
-        priority: item.priority ?? null,
-        source: item.source ?? "cwt.shared_files",
-        suggested_command: suggestedQueueCommand(item)
-      }))
-    },
-    promotion_boundary: "preview_only"
-  };
-  if (json) emitJson(result);
-  else {
-    emitPretty("CWT ingest dry-run");
-    emitPretty(`root: ${root}`);
-    emitPretty(`queue candidates: ${result.candidates.queue_items.length}`);
-    for (const candidate of result.candidates.queue_items.slice(0, 8)) {
-      emitPretty(`  ${candidate.title} (${candidate.cwt_id ?? "no id"})`);
-    }
-  }
-  return 0;
+  return runCwtIngestWriter(args, root, manifest);
 }
-async function readQueueCandidates(root) {
-  const indexPath = join5(root, "records", "queue", "index.json");
-  const index = await readJson(indexPath);
-  const refs = index?.records ?? [];
-  const rows = [];
-  for (const ref of refs) {
-    const row = await readJson(join5(root, ref.path));
-    if (row && row.status !== "done" && row.status !== "dropped") rows.push(row);
-  }
-  return rows;
-}
-async function readProjectCandidates(root) {
-  const indexPath = join5(root, "records", "projects", "index.json");
-  const index = await readJson(indexPath);
-  const refs = index?.records ?? [];
-  const rows = [];
-  for (const ref of refs) {
-    const row = await readJson(join5(root, ref.path));
-    if (row && row.status !== "done" && row.status !== "dropped") rows.push(row);
-  }
-  return rows;
-}
-function projectStoragePolicy() {
+function projectStoragePolicy2() {
   return {
     driver: "git_worktree",
     versioning: "git",
     target_policy: "project_git_repo"
   };
-}
-function suggestedProjectCommand(project) {
-  const name = shellQuote3(project.name ?? project.title ?? "(untitled project)");
-  return `ema project create --org <org:id> --space <space:id> --name ${name} --json`;
-}
-function suggestedQueueCommand(item) {
-  const title = shellQuote3(item.title ?? "(untitled)");
-  const why = shellQuote3(item.why ?? "Imported from CWT shared-files projection.");
-  const doneWhen = shellQuote3(item.done_when ?? "Reviewed and accepted in EMA.");
-  const source = shellQuote3(item.source ?? "cwt.shared_files");
-  const project = item.project_id ? ` --project ${shellQuote3(item.project_id)}` : "";
-  return `ema queue add${project} --title ${title} --why ${why} --done-when ${doneWhen} --source ${source}`;
 }
 function projectionRoot(args) {
   const raw = flagString(args, "root");
@@ -6394,11 +6820,11 @@ function projectionRoot(args) {
   );
 }
 async function readManifest(root) {
-  return readJson(join5(root, "manifest.json"));
+  return readJson2(join6(root, "manifest.json"));
 }
-async function readJson(path2) {
+async function readJson2(path2) {
   try {
-    return JSON.parse(await readFile(path2, "utf8"));
+    return JSON.parse(await readFile2(path2, "utf8"));
   } catch {
     return null;
   }
@@ -6410,9 +6836,6 @@ async function exists(path2) {
   } catch {
     return false;
   }
-}
-function shellQuote3(value) {
-  return `'${value.replaceAll("'", "'\\''")}'`;
 }
 
 // src/bin.ts

@@ -74,6 +74,18 @@
 
 	/* ===== Easing — fast start, smooth land ===== */
 	--place-ease-smooth: cubic-bezier(0.65, 0.05, 0, 1);
+
+	/* ===== Cockpit accents — work-tracker semantic colors =====
+	 * Source: cwt donor `globals.css` --color-accent-* tokens, retained as
+	 * named semantics so vApps that classify projects by kind (client /
+	 * personal / internal) speak the same color language. The base accent
+	 * shares hue with --place-secondary-400; the variants are donor-defined.
+	 */
+	--place-accent-client:    #5b8def;
+	--place-accent-personal:  #7ed957;
+	--place-accent-internal:  #a78bfa;
+	--place-accent-warning:   #f5a524;
+	--place-accent-danger:    #f25f4c;
 }
 
 /* ===== Light mode ===== */

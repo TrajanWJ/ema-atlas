@@ -1,0 +1,29 @@
+{
+  "name": "@ema/contracts-ts",
+  "version": "0.0.6-dev",
+  "private": true,
+  "description": "Generated TypeScript types for the EMA contracts (events, ids, envelope). Generated from packages/contracts/events/*.md.",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./generated": "./src/generated/index.ts"
+  },
+  "files": [
+    "src",
+    "tsconfig.json",
+    "README.md"
+  ],
+  "scripts": {
+    "generate": "node --experimental-strip-types src/codegen.ts",
+    "build": "pnpm run generate && tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@ema/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}

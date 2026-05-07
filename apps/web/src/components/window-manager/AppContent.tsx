@@ -246,8 +246,8 @@ const HqApp = dynamic(
 	{ ssr: false },
 );
 
-const CwtApp = dynamic(
-	() => import("@/src/components/apps/cwt").then((m) => m.CwtApp),
+const CockpitApp = dynamic(
+	() => import("@/src/vapps/cockpit").then((m) => m.CockpitApp),
 	{ ssr: false },
 );
 
@@ -338,7 +338,10 @@ export function AppContent({ appId }: { readonly appId: AppId }): ReactNode {
 	if (appId === "atlas") return <AtlasApp />;
 	if (appId === "blueprint") return <BlueprintApp />;
 	if (appId === "hq") return <HqApp />;
-	if (appId === "cwt") return <CwtApp />;
+	// `cwt` aliases the cockpit vApp for backward compatibility with
+	// existing `?vapp=cwt` deep-links. See `lib/url-nav.ts` for the URL
+	// alias and `lib/app-registrations.ts` for the registry entry.
+	if (appId === "cockpit" || appId === "cwt") return <CockpitApp />;
 	if (appId === "clients") return <ClientsApp />;
 	if (appId === "git-ema") return <GitEmaApp />;
 	if (appId === "agent-work") return <AgentWorkApp />;

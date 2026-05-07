@@ -58,7 +58,7 @@ export async function runHelp(args: ParsedArgs): Promise<number> {
     emitJson({ commands: COMMANDS, global_flags: GLOBAL_FLAGS });
     return 0;
   }
-  emitPretty("ema — EMA 0.0.5 CLI (wave 1)");
+  emitPretty("ema — EMA 0.0.6 CLI");
   emitPretty("");
   emitPretty("Usage: ema <command> [args...] [--json]");
   emitPretty("");

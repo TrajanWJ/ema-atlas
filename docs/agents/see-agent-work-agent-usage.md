@@ -7,6 +7,13 @@ agents directly.
 See Agent Work is the human-visible control room. This file is the
 agent-facing runbook for behaving as if that control room already exists.
 
+> CLI doctrine (`~/Desktop/AGENTS.md`, 2026-05-07, post-cwt-absorption):
+> EMA's CLI is `ema`. cwt is absorbed into EMA — its surface is the
+> `cockpit` vApp (`?vapp=cockpit` in web; `ema cockpit …` in CLI). The
+> `~/.local/bin/cwt` wrapper is a thin alias for `ema cockpit "$@"`. When
+> asked "what projects/clients exist?" or "what's on for client X?", route
+> through `ema cockpit …`.
+
 ## Default Scope
 
 Unless a lane states otherwise, agents should assume:

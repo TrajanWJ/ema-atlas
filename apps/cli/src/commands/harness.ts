@@ -4,6 +4,10 @@ import { spawnSync } from "node:child_process";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
+import { connect, DaemonUnreachableError, type CommandResult } from "../ws-client.js";
+
+const DEFAULT_ORG = "org:01J00000000000000000000001";
+const DEFAULT_ACTOR = "actor:harness-cli";
 
 const PROVIDERS = [
 	{
@@ -55,7 +59,7 @@ const DONORS = [
 	},
 ];
 
-export function runHarness(args: ParsedArgs): number {
+export function runHarness(args: ParsedArgs): number | Promise<number> {
 	const verb = args.positional[0] ?? "providers";
 	if (flagBool(args, "help") || args.flags.h === true || verb === "help") return runHarnessHelp(args);
 	if (verb === "providers" || verb === "sessions") return runProviders(args, verb);
@@ -363,7 +367,7 @@ function runLog(args: ParsedArgs): number {
 	return captured.status === 0 ? 0 : 1;
 }
 
-function runDispatch(args: ParsedArgs): number {
+async function runDispatch(args: ParsedArgs): Promise<number> {
 	const provider = flagString(args, "provider") ?? "simulated";
 	const found = PROVIDERS.find((candidate) => candidate.id === provider);
 	if (!found) {
@@ -388,6 +392,37 @@ function runDispatch(args: ParsedArgs): number {
 		else emitPretty(`${provider} adapter pending; simulated provider is ready`);
 		return 0;
 	}
+
+	// L2 (humble-sketch lane:01KR0RQ6JK): when --provider simulated and the
+	// daemon is reachable, drive the canonical 6-event chain through the
+	// IPC arms. Fall back to the client-side timeline if the daemon is not
+	// up — this keeps the offline path that unit tests exercise intact.
+	const org = flagString(args, "org") ?? DEFAULT_ORG;
+	const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
+	const intent = prompt.length > 0 ? summarize(prompt) : "harness dispatch";
+	const useDaemon = !flagBool(args, "no-daemon");
+	if (useDaemon) {
+		const daemonResult = await tryDaemonDispatch({
+			org,
+			actor,
+			provider,
+			intent,
+			lane,
+			cwd,
+			prompt,
+		});
+		if (daemonResult.ok) {
+			if (flagBool(args, "json")) emitJson(daemonResult.payload);
+			else emitPretty(`execution: ${daemonResult.payload.execution.id}`);
+			return 0;
+		}
+		if (daemonResult.fallback === false) {
+			emitError(`ema harness dispatch: ${daemonResult.error}`);
+			return 1;
+		}
+		// fall through to client-side timeline if the daemon was unreachable
+	}
+
 	const executionId = `execution:simulated:${stableId(`${lane ?? "no-lane"}:${cwd}:${prompt}`)}`;
 	const events = timeline(executionId, lane, cwd, prompt);
 	const payload = {
@@ -395,6 +430,7 @@ function runDispatch(args: ParsedArgs): number {
 		command: "harness dispatch",
 		provider,
 		status: "simulated_execution_completed",
+		source: "client_side_fallback",
 		projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
 		dispatch: { id: `dispatch:simulated:${stableId(prompt || executionId)}`, lane, cwd, prompt },
 		execution: { id: executionId, provider, status: "completed", lane, cwd },
@@ -403,6 +439,160 @@ function runDispatch(args: ParsedArgs): number {
 	if (flagBool(args, "json")) emitJson(payload);
 	else emitPretty(`execution: ${executionId}`);
 	return 0;
+}
+
+interface DaemonDispatchSpec {
+	org: string;
+	actor: string;
+	provider: string;
+	intent: string;
+	lane: string | null;
+	cwd: string;
+	prompt: string;
+}
+
+interface DaemonDispatchOk {
+	ok: true;
+	payload: {
+		ok: true;
+		command: string;
+		provider: string;
+		status: string;
+		source: string;
+		projections: string[];
+		dispatch: { id: string; lane: string | null; cwd: string; prompt: string; intent: string };
+		execution: { id: string; provider: string; status: string; lane: string | null; cwd: string };
+		events: { type: string; event_id: string }[];
+	};
+}
+
+interface DaemonDispatchErr {
+	ok: false;
+	fallback: boolean;
+	error: string;
+}
+
+async function tryDaemonDispatch(spec: DaemonDispatchSpec): Promise<DaemonDispatchOk | DaemonDispatchErr> {
+	let client: Awaited<ReturnType<typeof connect>> | null = null;
+	try {
+		client = await connect({ surface: "desktop" });
+	} catch (err) {
+		if (err instanceof DaemonUnreachableError) {
+			return { ok: false, fallback: true, error: err.message };
+		}
+		return { ok: false, fallback: false, error: err instanceof Error ? err.message : String(err) };
+	}
+
+	try {
+		const { org, actor, provider, intent, lane } = spec;
+		const startResult = await client.command("dispatch.start", {
+			org_id: org,
+			actor_id: actor,
+			intent,
+			provider,
+			lane_id: lane,
+		});
+		const startCheck = expectOk(startResult, "dispatch.start");
+		if (startCheck) return { ok: false, fallback: false, error: startCheck };
+		const dispatchId = (startResult as { resource?: string }).resource;
+		const dispatchEventId = (startResult as { events?: string[] }).events?.[0] ?? "";
+		if (!dispatchId) return { ok: false, fallback: false, error: "dispatch.start returned no resource id" };
+
+		const execStart = await client.command("execution.start", {
+			org_id: org,
+			actor_id: actor,
+			dispatch_id: dispatchId,
+			exec_kind: "tool",
+			name: "simulated.provider",
+			provider,
+		});
+		const execStartCheck = expectOk(execStart, "execution.start");
+		if (execStartCheck) return { ok: false, fallback: false, error: execStartCheck };
+		const executionId = (execStart as { resource?: string }).resource;
+		const execStartEventId = (execStart as { events?: string[] }).events?.[0] ?? "";
+		if (!executionId)
+			return { ok: false, fallback: false, error: "execution.start returned no resource id" };
+
+		const toolInvoke = await client.command("tool.invoke", {
+			org_id: org,
+			actor_id: actor,
+			dispatch_id: dispatchId,
+			execution_id: executionId,
+			tool_name: "simulated.provider",
+			args_json: JSON.stringify({ prompt: spec.prompt, cwd: spec.cwd }),
+			provider,
+		});
+		const toolInvokeCheck = expectOk(toolInvoke, "tool.invoke");
+		if (toolInvokeCheck) return { ok: false, fallback: false, error: toolInvokeCheck };
+		const toolInvokeEventId = (toolInvoke as { events?: string[] }).events?.[0] ?? "";
+
+		const toolReturn = await client.command("tool.return", {
+			org_id: org,
+			actor_id: actor,
+			dispatch_id: dispatchId,
+			execution_id: executionId,
+			tool_name: "simulated.provider",
+			result_summary: "ok",
+		});
+		const toolReturnCheck = expectOk(toolReturn, "tool.return");
+		if (toolReturnCheck) return { ok: false, fallback: false, error: toolReturnCheck };
+		const toolReturnEventId = (toolReturn as { events?: string[] }).events?.[0] ?? "";
+
+		const execEnd = await client.command("execution.end", {
+			org_id: org,
+			actor_id: actor,
+			dispatch_id: dispatchId,
+			execution_id: executionId,
+			outcome: "ok",
+			duration_ms: 1,
+		});
+		const execEndCheck = expectOk(execEnd, "execution.end");
+		if (execEndCheck) return { ok: false, fallback: false, error: execEndCheck };
+		const execEndEventId = (execEnd as { events?: string[] }).events?.[0] ?? "";
+
+		const dispatchEnd = await client.command("dispatch.end", {
+			org_id: org,
+			actor_id: actor,
+			dispatch_id: dispatchId,
+			outcome: "ok",
+			provider,
+		});
+		const dispatchEndCheck = expectOk(dispatchEnd, "dispatch.end");
+		if (dispatchEndCheck) return { ok: false, fallback: false, error: dispatchEndCheck };
+		const dispatchEndEventId = (dispatchEnd as { events?: string[] }).events?.[0] ?? "";
+
+		return {
+			ok: true,
+			payload: {
+				ok: true,
+				command: "harness dispatch",
+				provider,
+				status: "simulated_execution_completed",
+				source: "daemon_canonical",
+				projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
+				dispatch: { id: dispatchId, lane, cwd: spec.cwd, prompt: spec.prompt, intent },
+				execution: { id: executionId, provider, status: "completed", lane, cwd: spec.cwd },
+				events: [
+					{ type: "dispatch.started", event_id: dispatchEventId },
+					{ type: "execution.started", event_id: execStartEventId },
+					{ type: "tool.invoked", event_id: toolInvokeEventId },
+					{ type: "tool.returned", event_id: toolReturnEventId },
+					{ type: "execution.ended", event_id: execEndEventId },
+					{ type: "dispatch.ended", event_id: dispatchEndEventId },
+				],
+			},
+		};
+	} catch (err) {
+		return { ok: false, fallback: false, error: err instanceof Error ? err.message : String(err) };
+	} finally {
+		client?.close();
+	}
+}
+
+function expectOk(result: CommandResult, op: string): string | null {
+	if (result.ok === true) return null;
+	const error = result.error;
+	return `${op}: ${error.class}: ${error.message}`;
 }
 
 function runStream(args: ParsedArgs): number {

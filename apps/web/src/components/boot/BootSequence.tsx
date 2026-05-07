@@ -3,7 +3,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { getDbClient } from "@/src/db/client";
-import { getUnprocessedCount } from "@/src/db/queries/inbox";
 import { getSetting } from "@/src/db/queries/settings";
 import { useTypewriter } from "@/src/hooks/use-typewriter";
 import type { BootLine } from "@/src/lib/boot-messages";
@@ -75,7 +74,7 @@ function BootTerminal({
 							key={`${i}-${bootLine.text}`}
 							initial={{ opacity: 0, y: 3 }}
 							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.10 }}
+							transition={{ duration: 0.1 }}
 							style={{
 								color: getColorForLine(bootLine),
 								fontSize: "0.875rem",
@@ -97,7 +96,7 @@ function BootTerminal({
 							key={`current-${currentLineIndex}`}
 							initial={{ opacity: 0, y: 3 }}
 							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.10 }}
+							transition={{ duration: 0.1 }}
 							style={{
 								color: getColorForLine(currentLine),
 								fontSize: "0.875rem",
@@ -221,23 +220,35 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 		}
 	}, [autoLogin, isAuthenticated, quickLogin]);
 
+	// Autologin no longer waits for `ready` — the boot terminal can keep
+	// playing as decoration after we've already moved the user along.
 	useEffect(() => {
-		if (autoLogin && ready && isAuthenticated) {
+		if (autoLogin && isAuthenticated) {
 			onComplete();
 		}
-	}, [autoLogin, ready, isAuthenticated, onComplete]);
+	}, [autoLogin, isAuthenticated, onComplete]);
 
-	// Init DB and build boot lines
+	// Boot lines render synchronously on mount. They used to wait on db.init()
+	// + getUnprocessedCount() to resolve, which on dev (5173) added ~1s of
+	// black-terminal time before the first character even typed. The lines
+	// don't depend on db state — only the optional entry count did, and the
+	// trimmed boot message no longer carries that line.
+	useEffect(() => {
+		const hour = new Date().getHours();
+		const session = loadStoredSessionDirect();
+		setAllLines(getBootLines(hour, DB_VERSION, undefined, session?.name));
+	}, []);
+
+	// DB init runs in the background, parallel to the boot terminal animation
+	// and the right-panel render. The user's already interacting before this
+	// resolves on a cold start.
 	useEffect(() => {
 		let cancelled = false;
-
-		setTimeout(async () => {
-			if (cancelled) return;
+		(async () => {
 			try {
 				const db = getDbClient();
 				await db.init();
 				if (cancelled) return;
-
 				const accentColor = await getSetting(db, "accent-color");
 				if (accentColor && !cancelled) {
 					document.documentElement.style.setProperty(
@@ -245,37 +256,10 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 						accentColor,
 					);
 				}
-				if (cancelled) return;
-
-				const entryCount = await getUnprocessedCount(db);
-				if (cancelled) return;
-
-				const hour = new Date().getHours();
-				const session = loadStoredSessionDirect();
-				const bootLines = getBootLines(
-					hour,
-					DB_VERSION,
-					entryCount,
-					session?.name,
-				);
-
-				if (!cancelled) setAllLines(bootLines);
 			} catch {
-				if (cancelled) return;
-
-				const hour = new Date().getHours();
-				const session = loadStoredSessionDirect();
-				const bootLines = getBootLines(
-					hour,
-					DB_VERSION,
-					undefined,
-					session?.name,
-				);
-
-				if (!cancelled) setAllLines(bootLines);
+				// non-fatal — desktop still mounts
 			}
-		}, 0);
-
+		})();
 		return () => {
 			cancelled = true;
 		};
@@ -301,12 +285,44 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 		return () => clearTimeout(timer);
 	}, [isComplete, currentLineIndex, currentLine, allLines.length]);
 
-	// No auto-proceed on key/click — user must use the buttons or auth panel
+	// Skip boot — clicking the terminal area or pressing any key fast-forwards
+	// the rest of the lines and snaps to "ready". The right panel is already
+	// interactive without this, but the cosmetics shouldn't trail behind.
+	function skipBoot() {
+		if (allLines.length === 0) return;
+		setCompletedLines(allLines);
+		setCurrentLineIndex(allLines.length);
+		setReady(true);
+	}
+
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			const target = e.target as HTMLElement | null;
+			if (
+				target &&
+				(target.tagName === "INPUT" ||
+					target.tagName === "TEXTAREA" ||
+					target.isContentEditable)
+			) {
+				return;
+			}
+			if (ready) return;
+			skipBoot();
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allLines, ready]);
 
 	return (
 		<div className="flex h-full w-full">
-			{/* Left side — terminal boot messages */}
-			<div className="flex w-[60%] shrink-0">
+			{/* Left side — terminal boot messages. Click anywhere to skip. */}
+			<button
+				type="button"
+				onClick={skipBoot}
+				className="flex w-[60%] shrink-0 cursor-default border-0 bg-transparent p-0 text-left"
+				aria-label={ready ? "boot complete" : "skip boot animation"}
+			>
 				<BootTerminal
 					allLines={allLines}
 					completedLines={completedLines}
@@ -317,22 +333,24 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 					cursorVisible={cursorVisible}
 					ready={ready}
 				/>
-			</div>
+			</button>
 
-			{/* Right side — EMA identity panel (Tauri) or place.org auth panel (browser) */}
+			{/* Right side — interactive immediately. The auth/entry panel is no
+			    longer gated on the boot terminal completing; the user can pick
+			    a surface as soon as the page mounts. */}
 			<div
 				ref={authPanelRef}
 				className="flex w-[40%] items-center justify-center p-8"
 			>
-				{ready && isTauriRuntime ? (
+				{isTauriRuntime ? (
 					<EmaIdentityPanel onContinue={onComplete} />
-				) : ready ? (
+				) : (
 					<AuthPanel
 						onContinue={onComplete}
 						user={isAuthenticated ? user : null}
 						justSignedUp={justSignedUp}
 					/>
-				) : null}
+				)}
 			</div>
 		</div>
 	);

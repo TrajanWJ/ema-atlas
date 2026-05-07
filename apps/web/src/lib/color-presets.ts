@@ -1,12 +1,12 @@
-export const COLOR_PRESETS = [
-	{ id: 'ocean',     name: 'Ocean',       primary: '#0EA5E9', accent: '#2DD4A8' },
-	{ id: 'sunset',    name: 'Sunset',      primary: '#F97316', accent: '#EF4444' },
-	{ id: 'forest',    name: 'Forest',      primary: '#22C55E', accent: '#16A34A' },
-	{ id: 'neon',      name: 'Neon',        primary: '#A855F7', accent: '#EC4899' },
-	{ id: 'mono',      name: 'Monochrome',  primary: '#94A3B8', accent: '#CBD5E1' },
-	{ id: 'ember',     name: 'Ember',       primary: '#DC2626', accent: '#F59E0B' },
-	{ id: 'midnight',  name: 'Midnight',    primary: '#6366F1', accent: '#8B5CF6' },
-	{ id: 'rose',      name: 'Rose',        primary: '#F43F5E', accent: '#FB923C' },
-] as const;
+// =============================================================================
+// apps/web/src/lib/color-presets.ts
+//
+// Source-of-truth for the primary/accent quick-pick presets is now
+// @ema/design-system/tokens/colors. This file exists only as a backwards-
+// compatible re-export so callers using the @/src/lib/color-presets path
+// keep working. New code should import from @ema/design-system directly.
+//
+// Lane: lane:01KR0RQFV003P5XC3P1TE2XKPR (L4 — Design system + UX manifesto)
+// =============================================================================
 
-export type ColorPreset = typeof COLOR_PRESETS[number];
+export { COLOR_PRESETS, type ColorPreset } from "@ema/design-system/tokens/colors";

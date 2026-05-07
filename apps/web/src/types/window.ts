@@ -36,6 +36,7 @@ export type AppId =
 	| "blueprint"
 	| "hq"
 	| "cwt"
+	| "cockpit"
 	| "clients"
 	| "git-ema"
 	| "agent-work"

@@ -39,6 +39,7 @@ export const EMA_VAPP_IDS = [
 	"atlas",
 	"blueprint",
 	"hq",
+	"cockpit",
 	"cwt",
 	"clients",
 	"agent-work",

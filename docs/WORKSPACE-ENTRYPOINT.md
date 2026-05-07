@@ -21,6 +21,17 @@ Read:
 13. `operations/peer-computer-access.md`
 14. `plans/IMPLEMENTATION-ROADMAP.md`
 
+## CLI doctrine
+
+EMA's CLI is `ema` (post-cwt-absorption, 2026-05-07). All record families
+below org/space surface via `ema` verbs.
+
+The cockpit vApp (`?vapp=cockpit` in EMA web; `ema cockpit …` in CLI) owns
+project/client/work registry surfacing — formerly cwt's role. The
+`~/.local/bin/cwt` alias execs `ema cockpit "$@"`; there is no separate
+binary. See `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md` and the
+`Agent Workspace CLI Loop` section in `~/Desktop/AGENTS.md`.
+
 ## First build assumptions
 
 - backend language direction: Gleam / BEAM

@@ -1,0 +1,20 @@
+# Mix (Elixir) build output and deps
+_build/
+deps/
+
+# ExUnit ephemera
+*.exs.lock
+*.beam
+
+# Mix cover output
+cover/
+.mix_test_failures
+erl_crash.dump
+
+# Repeat the top-level .gitignore patterns relevant to this directory
+# so a daemon-only checkout still excludes them.
+build/
+canonical*.db
+canonical*.db-*
+*.sqlite
+*.sqlite-*

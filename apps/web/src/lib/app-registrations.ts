@@ -938,6 +938,21 @@ export function registerAllApps(): void {
 	});
 
 	registerApp({
+		id: "cockpit",
+		name: "Cockpit",
+		icon: icon(CheckIcon),
+		defaultSize: sizeOf("cockpit"),
+		titlebarDotColor: "#5b8def",
+		getCurrentStatus: () => null,
+		listFiles: () => [],
+		menuBar: fileMenuOnly(),
+	});
+
+	// `cwt` is retained as a backward-compatibility alias so that
+	// `?vapp=cwt` deep-links keep resolving. It renders the same
+	// `CockpitApp` component as `cockpit`. See `AppContent.tsx` for the
+	// dispatch mapping and `url-nav.ts` for the URL alias.
+	registerApp({
 		id: "cwt",
 		name: "Current Work",
 		icon: icon(CheckIcon),

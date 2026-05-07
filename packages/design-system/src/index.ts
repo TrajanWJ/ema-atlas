@@ -5,6 +5,7 @@
  *   import "@ema/design-system/tokens.css";  // CSS custom properties
  *   import "@ema/design-system/glass.css";   // .glass-* tier classes
  *   import { THEME_PRESETS, getPresetById, applyTheme } from "@ema/design-system/themes";
+ *   import { PRIMARY, SPRINGS, EASE_SMOOTH } from "@ema/design-system/tokens";
  *
  * Skills that govern this package:
  *   - place-design-tokens
@@ -13,9 +14,24 @@
  *
  * The above skills are auto-loaded into every vApp via .claude/skills/.
  * Read SKILL.md before changing token names, scales, or tier semantics.
+ *
+ * Companion doctrine:
+ *   Projects/EMA/atlas/doctrine/design/place-org-ux-manifesto.md
  */
 
 export { THEME_PRESETS, getPresetById, type ThemePreset } from "./themes";
+
+// Token primitives — JS-side mirror of tokens.css / glass.css plus the
+// scales the donor never bothered to codify (motion, spacing, radii,
+// shadows, typography). Import a specific module for typed access:
+//
+//   import { COLOR_PRESETS, PRIMARY } from "@ema/design-system/tokens/colors";
+//   import { SPRINGS, EASE_SMOOTH } from "@ema/design-system/tokens/motion";
+//
+// …or the barrel:
+//
+//   import { COLORS, SPRINGS, GLASS_TIERS } from "@ema/design-system/tokens";
+export * from "./tokens";
 
 /**
  * Applies a theme preset by writing its tokens to <html> as inline style props.
@@ -82,4 +98,4 @@ export function setBaseTheme(mode: "default" | "light" | "dark"): void {
 	}
 }
 
-export const EMA_DS_VERSION = "0.0.5-dev";
+export const EMA_DS_VERSION = "0.0.5-dev.1";

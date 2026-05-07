@@ -1,6 +1,6 @@
 {
   "name": "@ema/surface-core",
-  "version": "0.0.5-dev",
+  "version": "0.0.6-dev",
   "private": true,
   "description": "Framework-agnostic EMA surface logic: IPC client, selectors, projections.",
   "type": "module",

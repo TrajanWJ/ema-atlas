@@ -39,6 +39,18 @@ type RecordIndex = {
   records?: Array<{ id: string; path: string }>;
 };
 
+type ProjectRecord = {
+  id?: string;
+  name?: string;
+  title?: string;
+  kind?: string;
+  local_path?: string;
+  repo_url?: string;
+  git_remote?: string;
+  default_branch?: string;
+  status?: string;
+};
+
 type QueueRecord = {
   id?: string;
   title?: string;
@@ -112,6 +124,7 @@ async function runStatus(args: ParsedArgs): Promise<number> {
     projection: manifest.projection ?? null,
     counts: manifest.counts ?? {},
     local_n_sync: manifest.local_n_sync ?? null,
+    project_storage: projectStoragePolicy(),
     current_state_exists: stateExists,
     next: "ema cwt ingest --dry-run --json",
   };
@@ -154,6 +167,7 @@ async function runIngest(args: ParsedArgs): Promise<number> {
     return 2;
   }
 
+  const projects = await readProjectCandidates(root);
   const queue = await readQueueCandidates(root);
   const result = {
     ok: true,
@@ -162,13 +176,33 @@ async function runIngest(args: ParsedArgs): Promise<number> {
     root,
     generated_at: manifest.generated_at ?? null,
     counts: manifest.counts ?? {},
+    project_storage: projectStoragePolicy(),
     candidates: {
+      projects: projects.map((project) => ({
+        cwt_id: project.id ?? null,
+        name: project.name ?? project.title ?? "(untitled project)",
+        kind: project.kind ?? "project",
+        status: project.status ?? "active",
+        git: {
+          target_driver: "git_worktree",
+          versioning: "git",
+          remote: project.git_remote ?? project.repo_url ?? null,
+          default_branch: project.default_branch ?? "main",
+          local_path: project.local_path ?? null,
+        },
+        suggested_command: suggestedProjectCommand(project),
+      })),
       queue_items: queue.map((item) => ({
         cwt_id: item.id ?? null,
         title: item.title ?? "(untitled)",
         why: item.why ?? "",
         done_when: item.done_when ?? "",
         project_id: item.project_id ?? null,
+        project_storage_target: {
+          driver: "git_worktree",
+          versioning: "git",
+          project_id: item.project_id ?? null,
+        },
         priority: item.priority ?? null,
         source: item.source ?? "cwt.shared_files",
         suggested_command: suggestedQueueCommand(item),
@@ -199,6 +233,31 @@ async function readQueueCandidates(root: string): Promise<QueueRecord[]> {
     if (row && row.status !== "done" && row.status !== "dropped") rows.push(row);
   }
   return rows;
+}
+
+async function readProjectCandidates(root: string): Promise<ProjectRecord[]> {
+  const indexPath = join(root, "records", "projects", "index.json");
+  const index = await readJson<RecordIndex>(indexPath);
+  const refs = index?.records ?? [];
+  const rows: ProjectRecord[] = [];
+  for (const ref of refs) {
+    const row = await readJson<ProjectRecord>(join(root, ref.path));
+    if (row && row.status !== "done" && row.status !== "dropped") rows.push(row);
+  }
+  return rows;
+}
+
+function projectStoragePolicy() {
+  return {
+    driver: "git_worktree",
+    versioning: "git",
+    target_policy: "project_git_repo",
+  };
+}
+
+function suggestedProjectCommand(project: ProjectRecord): string {
+  const name = shellQuote(project.name ?? project.title ?? "(untitled project)");
+  return `ema project create --org <org:id> --space <space:id> --name ${name} --json`;
 }
 
 function suggestedQueueCommand(item: QueueRecord): string {

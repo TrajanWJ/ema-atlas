@@ -13,6 +13,11 @@ file bytes. The attachment **record** is canonical truth; the attachment
 **content** is external (a pointer to Drive, GitHub, a git URL, or a local
 blob).
 
+This is adjacent to, but distinct from, Git-backed project storage. EMA project
+records are materialized as local Git worktrees by default; `git-ema` links
+external repos/files into those projects. See
+`docs/architecture/22-git-backed-project-storage.md`.
+
 ## Data plane
 
 Attachments are plane-5 (external/imported) per the data-treatment doc.

@@ -102,19 +102,23 @@ fn materialization_envelope(
   now: String,
 ) -> Envelope {
   let event_id = "event:" <> ulid()
-  let fields = [
-    #("project_id", json.string(project_id)),
-    #("space_id", json.string(space_id)),
-    #("name", json.string(name)),
-    #("created_event_id", json.string(created_event_id)),
-    ..case materialized {
-      Ok(path) -> [
-        #("status", json.string("materialized")),
-        #("local_path", json.string(path)),
-      ]
-      Error(reason) -> [
-        #("status", json.string("materialization_failed")),
-        #("reason", json.string(reason)),
+      let fields = [
+        #("project_id", json.string(project_id)),
+        #("space_id", json.string(space_id)),
+        #("name", json.string(name)),
+        #("created_event_id", json.string(created_event_id)),
+        #("storage_driver", json.string("git_worktree")),
+        #("versioning", json.string("git")),
+        #("git_branch", json.string("main")),
+        ..case materialized {
+          Ok(path) -> [
+            #("status", json.string("materialized")),
+            #("local_path", json.string(path)),
+            #("git_repo_path", json.string(path)),
+          ]
+          Error(reason) -> [
+            #("status", json.string("materialization_failed")),
+            #("reason", json.string(reason)),
       ]
     }
   ]

@@ -365,6 +365,10 @@ ProjectFilesystemProjection {
       org_id: org:<ulid>
       name: string
       local_path: string
+      storage_driver: "git_worktree"
+      versioning: "git"
+      git_repo_path: string
+      git_branch: string
       status: "pending" | "materialized" | "materialization_failed"
       reason: string
     }

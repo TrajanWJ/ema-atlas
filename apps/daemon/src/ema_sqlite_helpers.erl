@@ -2240,6 +2240,10 @@ project_filesystem_json(Id, SpaceId, OrgId, Name, LocalPath, Status, Reason) ->
         <<"\"org_id\":\"">>, json_escape(OrgId), <<"\",">>,
         <<"\"name\":\"">>, json_escape(Name), <<"\",">>,
         <<"\"local_path\":\"">>, json_escape(LocalPath), <<"\",">>,
+        <<"\"storage_driver\":\"git_worktree\",">>,
+        <<"\"versioning\":\"git\",">>,
+        <<"\"git_repo_path\":\"">>, json_escape(LocalPath), <<"\",">>,
+        <<"\"git_branch\":\"main\",">>,
         <<"\"status\":\"">>, json_escape(Status), <<"\",">>,
         <<"\"reason\":\"">>, json_escape(Reason), <<"\"}">>
     ].

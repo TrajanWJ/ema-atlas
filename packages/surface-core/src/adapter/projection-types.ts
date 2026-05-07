@@ -244,6 +244,10 @@ export type ProjectFilesystemProjection = {
     org_id: string;
     name: string;
     local_path: string;
+    storage_driver?: "git_worktree" | string;
+    versioning?: "git" | string;
+    git_repo_path?: string;
+    git_branch?: string;
     status: "pending" | "materialized" | "materialization_failed" | string;
     reason: string;
   }>;
@@ -346,6 +350,11 @@ export type CwtSharedFilesProjection = {
     current_state?: string;
   } | null;
   promotion_boundary: "preview_only" | "daemon_writer_ready" | string;
+  project_storage?: {
+    driver: "git_worktree" | string;
+    versioning: "git" | string;
+    target_policy: "project_git_repo" | "preview_only" | string;
+  };
 };
 
 // ----------------------------------------------------------------------------

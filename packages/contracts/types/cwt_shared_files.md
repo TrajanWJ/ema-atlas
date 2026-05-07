@@ -44,6 +44,11 @@ type CwtSharedFilesProjection = {
     index?: string
     current_state?: string
   } | null
+  project_storage?: {
+    driver: "git_worktree" | string
+    versioning: "git" | string
+    target_policy: "project_git_repo" | "preview_only" | string
+  }
   promotion_boundary: "preview_only" | "daemon_writer_ready" | string
 }
 ```
@@ -56,3 +61,6 @@ type CwtSharedFilesProjection = {
   canonical EMA writes.
 - `project.kind` is treated as a known CWT extension until `@ema/contracts`
   either adopts it or exposes an equivalent classification field.
+- CWT project and queue previews must name their target EMA project storage
+  policy. The default target is a daemon-materialized project Git worktree, not
+  an unversioned shared-files folder.

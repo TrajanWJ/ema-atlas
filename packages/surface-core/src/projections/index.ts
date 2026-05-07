@@ -188,6 +188,10 @@ export type ProjectFilesystemProjection = {
     org_id: string;
     name: string;
     local_path: string;
+    storage_driver?: "git_worktree" | string;
+    versioning?: "git" | string;
+    git_repo_path?: string;
+    git_branch?: string;
     status: "pending" | "materialized" | "materialization_failed" | string;
     reason: string;
   }>;

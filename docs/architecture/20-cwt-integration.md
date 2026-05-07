@@ -17,6 +17,8 @@ The integration rule is simple:
 - EMA may inspect that projection and preview promotion.
 - EMA must not treat CWT SQLite or the shared-files mirror as canonical daemon
   truth until a daemon import writer records EMA events.
+- Promoted CWT project/storage artifacts should land in EMA project Git
+  worktrees. CWT shared files are feeder projections, not durable versioning.
 
 ## File Projection
 
@@ -88,6 +90,10 @@ correct behavior until EMA has a daemon writer that accepts a CWT import bundle
 and emits canonical `project`, `lane`, `queue_item`, `problem`, `handoff`,
 `execution`, and `vcalendar` events.
 
+Dry-run output includes a `project_storage` policy. The default is
+`driver: "git_worktree"` and `versioning: "git"`, matching EMA project
+materialization.
+
 ## Promotion Boundary
 
 The first daemon writer should be named around import intent, not around CWT as
@@ -105,6 +111,8 @@ cwt.import_commit      daemon event write after operator confirmation
 - preserve the CWT source id in metadata/provenance;
 - map CWT `project.kind` into an EMA-supported field or log a problem record if
   `project.kind` remains outside `@ema/contracts`;
+- write promoted project artifacts into the daemon-materialized project Git
+  worktree rather than continuing to use the shared-files projection as storage;
 - reject queue items missing `why`, `done_when`, or `source`;
 - preserve lane/queue/problem/handoff dependencies;
 - record an execution event with the projection root and manifest timestamp.

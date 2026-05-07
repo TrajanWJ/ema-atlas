@@ -16,7 +16,14 @@ materialize_project(ProjectName, ProjectId, DesktopRoot) ->
                 filename:join([Root, "PROJECT-MAP.md"]),
                 project_map_md(Name, Atlas, Builds)
             ),
-            {ok, to_binary(Root)};
+            ok = write_if_missing(
+                filename:join([Root, ".gitignore"]),
+                gitignore()
+            ),
+            case ensure_git_repo(Root) of
+                ok -> {ok, to_binary(Root)};
+                {error, Reason} -> {error, Reason}
+            end;
         {error, Reason} ->
             {error, inspect_reason(Reason)}
     end.
@@ -57,9 +64,55 @@ project_map_md(Name, Atlas, Builds) ->
         <<"## Folders\n\n">>,
         <<"- `atlas/` -> ">>, to_binary(Atlas), <<"\n">>,
         <<"- `builds/` -> ">>, to_binary(Builds), <<"\n\n">>,
+        <<"## Storage\n\n">>,
+        <<"- Driver: `git_worktree`\n">>,
+        <<"- Versioning: local Git repository initialized at project root.\n\n">>,
         <<"## Notes\n\n">>,
-        <<"This record was created by EMA from a daemon `project.create` command.\n">>
+        <<"This record was created by EMA from a daemon `project.create` command.\n">>,
+        <<"Project storage is versioned through Git by default; daemon events remain canonical coordination truth.\n">>
     ]).
+
+gitignore() ->
+    <<
+        ".DS_Store\n",
+        ".ema-dev/\n",
+        "node_modules/\n",
+        ".next/\n",
+        "dist/\n",
+        "build/\n"
+    >>.
+
+ensure_git_repo(Root) ->
+    GitDir = filename:join([Root, ".git"]),
+    case filelib:is_dir(GitDir) of
+        true -> ok;
+        false -> run_git(["init", "-b", "main", Root])
+    end.
+
+run_git(Args) ->
+    case os:find_executable("git") of
+        false -> {error, <<"git executable not found">>};
+        Git ->
+            Port = open_port(
+                {spawn_executable, Git},
+                [{args, Args}, exit_status, stderr_to_stdout, binary]
+            ),
+            collect_git_port(Port, [])
+    end.
+
+collect_git_port(Port, Acc) ->
+    receive
+        {Port, {data, Data}} ->
+            collect_git_port(Port, [Data | Acc]);
+        {Port, {exit_status, 0}} ->
+            ok;
+        {Port, {exit_status, Status}} ->
+            Output = iolist_to_binary(lists:reverse(Acc)),
+            {error, iolist_to_binary(io_lib:format("git init failed (~p): ~s", [Status, Output]))}
+    after 5000 ->
+        port_close(Port),
+        {error, <<"git init timed out">>}
+    end.
 
 safe_name(Value) ->
     Trimmed = string:trim(to_list(Value)),

@@ -32,6 +32,10 @@ payload {
   created_event_id: event:<ulid>
   status:           "materialized"
   local_path:       string
+  storage_driver:   "git_worktree"
+  versioning:       "git"
+  git_repo_path:    string
+  git_branch:       string
 }
 ```
 
@@ -68,3 +72,18 @@ payload {
 Moving a project preserves its id. The event log is the lineage —
 consumers that care about space-local ordering should respect
 `project.moved` and re-anchor.
+
+## Storage Versioning Rule
+
+EMA project storage is Git-backed by default. `project.materialized` means the
+daemon created the project record folder and initialized a local Git worktree
+at `local_path`.
+
+The Git repo versions files, build artifacts, imported CWT records, and project
+storage snapshots. EMA daemon events remain the canonical coordination truth;
+Git is the storage/versioning substrate for project files and promotion
+artifacts.
+
+If Git initialization fails, project materialization fails with
+`project.materialization_failed` rather than silently creating an unversioned
+project record.

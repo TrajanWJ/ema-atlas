@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useTrackersStore } from "@/src/stores/trackers-store";
 
 function relative(iso: string): string {
@@ -12,12 +12,15 @@ function relative(iso: string): string {
 }
 
 export function AvoidingApp() {
-	const { avoiding, logAvoiding, resolveAvoiding, deleteAvoiding, loadAll, loading } = useTrackersStore();
+	const { avoiding, logAvoiding, resolveAvoiding, deleteAvoiding, loadAll } = useTrackersStore();
 	const [text, setText] = useState("");
+	const didLoad = useRef(false);
 
 	useEffect(() => {
-		if (avoiding.length === 0 && !loading) void loadAll();
-	}, [avoiding.length, loading, loadAll]);
+		if (didLoad.current) return;
+		didLoad.current = true;
+		void loadAll();
+	}, [loadAll]);
 
 	const active = useMemo(() => avoiding.filter((a) => a.state === "active"), [avoiding]);
 	const resolved = useMemo(() => avoiding.filter((a) => a.state === "resolved").slice(0, 10), [avoiding]);

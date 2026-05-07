@@ -24,6 +24,12 @@ const COLUMNS: readonly ColumnDef[] = [
 	{ id: "done", label: "DONE", accentVar: "var(--place-primary-border)" },
 ];
 
+const SAMPLE_BY_COLUMN: Record<ColumnId, string> = {
+	inbox: "Desktop refinement backlog",
+	processing: "Holodeck content pass",
+	done: "Desktop removed from sidebar",
+};
+
 // ----------------------------------------------------------------------------
 // Helpers
 // ----------------------------------------------------------------------------
@@ -178,6 +184,17 @@ function KanbanColumn({
 						</motion.div>
 					))}
 				</AnimatePresence>
+				{items.length === 0 ? (
+					<div
+						className="rounded-md border border-dashed p-3 text-xs leading-relaxed"
+						style={{
+							borderColor: "var(--place-border-default)",
+							color: "var(--place-text-muted)",
+						}}
+					>
+						{SAMPLE_BY_COLUMN[column.id]}
+					</div>
+				) : null}
 			</div>
 		</div>
 	);

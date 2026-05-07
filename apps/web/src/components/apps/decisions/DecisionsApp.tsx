@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTrackersStore } from "@/src/stores/trackers-store";
 
 function relative(iso: string): string {
@@ -12,16 +12,19 @@ function relative(iso: string): string {
 }
 
 export function DecisionsApp() {
-	const { decisions, logDecision, setDecisionOutcome, deleteDecision, loadAll, loading } = useTrackersStore();
+	const { decisions, logDecision, setDecisionOutcome, deleteDecision, loadAll } = useTrackersStore();
 	const [title, setTitle] = useState("");
 	const [choice, setChoice] = useState("");
 	const [why, setWhy] = useState("");
 	const [reversible, setReversible] = useState(true);
 	const [expanded, setExpanded] = useState(false);
+	const didLoad = useRef(false);
 
 	useEffect(() => {
-		if (decisions.length === 0 && !loading) void loadAll();
-	}, [decisions.length, loading, loadAll]);
+		if (didLoad.current) return;
+		didLoad.current = true;
+		void loadAll();
+	}, [loadAll]);
 
 	async function handleAdd() {
 		if (!title.trim()) return;

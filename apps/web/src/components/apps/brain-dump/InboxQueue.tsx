@@ -4,6 +4,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { InboxItem } from "./InboxItem";
 import type { InboxItem as InboxItemType } from "@/src/types/inbox";
 
+const SAMPLE_CAPTURES = [
+	"Desktop refinement: dock app states, window memory, and missing app actions.",
+	"Holodeck pass: every sidebar route needs a visible sample surface.",
+	"Blueprint note: keep Desktop as a mode switch, not a sidebar item.",
+] as const;
+
 interface InboxQueueProps {
 	readonly items: readonly InboxItemType[];
 	readonly onProcess: (id: string, action: "task" | "journal" | "archive") => void;
@@ -24,7 +30,7 @@ export function InboxQueue({
 	if (items.length === 0) {
 		return (
 			<div
-				className="flex flex-1 flex-col items-center justify-center gap-3"
+				className="flex flex-1 flex-col items-center justify-center gap-4 overflow-auto"
 				style={{ padding: "2rem" }}
 			>
 				<svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="var(--place-text-ghost, rgba(255,255,255,0.15))" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -37,6 +43,24 @@ export function InboxQueue({
 				<span style={{ fontSize: "0.65rem", color: "var(--place-text-muted, rgba(255,255,255,0.25))" }}>
 					Type above or use voice input
 				</span>
+				<div
+					className="grid w-full max-w-2xl gap-2 sm:grid-cols-3"
+					aria-label="Sample captures"
+				>
+					{SAMPLE_CAPTURES.map((capture) => (
+						<div
+							key={capture}
+							className="rounded-md border p-3 text-left text-xs leading-relaxed"
+							style={{
+								background: "var(--place-surface-1)",
+								borderColor: "var(--place-border-default)",
+								color: "var(--place-text-secondary)",
+							}}
+						>
+							{capture}
+						</div>
+					))}
+				</div>
 			</div>
 		);
 	}

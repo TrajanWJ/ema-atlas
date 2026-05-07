@@ -1,16 +1,19 @@
 'use client';
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useTrackersStore } from "@/src/stores/trackers-store";
 
 export function QuestionsApp() {
-	const { questions, openQuestion, answerQuestion, deleteQuestion, loadAll, loading } = useTrackersStore();
+	const { questions, openQuestion, answerQuestion, deleteQuestion, loadAll } = useTrackersStore();
 	const [text, setText] = useState("");
 	const [answerDraft, setAnswerDraft] = useState<Record<string, string>>({});
+	const didLoad = useRef(false);
 
 	useEffect(() => {
-		if (questions.length === 0 && !loading) void loadAll();
-	}, [questions.length, loading, loadAll]);
+		if (didLoad.current) return;
+		didLoad.current = true;
+		void loadAll();
+	}, [loadAll]);
 
 	const open = useMemo(() => questions.filter((q) => q.state === "open"), [questions]);
 	const answered = useMemo(

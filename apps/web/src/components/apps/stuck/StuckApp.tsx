@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useTrackersStore } from "@/src/stores/trackers-store";
 
 function relative(iso: string): string {
@@ -12,12 +12,15 @@ function relative(iso: string): string {
 }
 
 export function StuckApp() {
-	const { stucks, logStuck, resolveStuck, deleteStuck, loading, loadAll } = useTrackersStore();
+	const { stucks, logStuck, resolveStuck, deleteStuck, loadAll } = useTrackersStore();
 	const [text, setText] = useState("");
+	const didLoad = useRef(false);
 
 	useEffect(() => {
-		if (stucks.length === 0 && !loading) void loadAll();
-	}, [stucks.length, loading, loadAll]);
+		if (didLoad.current) return;
+		didLoad.current = true;
+		void loadAll();
+	}, [loadAll]);
 
 	const open = useMemo(() => stucks.filter((s) => s.state === "open"), [stucks]);
 	const resolved = useMemo(() => stucks.filter((s) => s.state === "resolved").slice(0, 10), [stucks]);

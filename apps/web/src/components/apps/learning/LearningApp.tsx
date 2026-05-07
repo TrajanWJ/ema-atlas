@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTrackersStore } from "@/src/stores/trackers-store";
 
 function relative(iso: string): string {
@@ -13,13 +13,16 @@ function relative(iso: string): string {
 }
 
 export function LearningApp() {
-	const { learning, logLearning, deleteLearning, loadAll, loading } = useTrackersStore();
+	const { learning, logLearning, deleteLearning, loadAll } = useTrackersStore();
 	const [text, setText] = useState("");
 	const [topic, setTopic] = useState("");
+	const didLoad = useRef(false);
 
 	useEffect(() => {
-		if (learning.length === 0 && !loading) void loadAll();
-	}, [learning.length, loading, loadAll]);
+		if (didLoad.current) return;
+		didLoad.current = true;
+		void loadAll();
+	}, [loadAll]);
 
 	async function handleAdd() {
 		if (!text.trim()) return;

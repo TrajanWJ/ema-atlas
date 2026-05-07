@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useTrackersStore } from "@/src/stores/trackers-store";
 
 function relative(iso: string): string {
@@ -13,14 +13,17 @@ function relative(iso: string): string {
 }
 
 export function ContactsApp() {
-	const { contacts, logContactTouch, deleteContactTouch, loadAll, loading } = useTrackersStore();
+	const { contacts, logContactTouch, deleteContactTouch, loadAll } = useTrackersStore();
 	const [name, setName] = useState("");
 	const [oneWord, setOneWord] = useState("");
 	const [channel, setChannel] = useState("");
+	const didLoad = useRef(false);
 
 	useEffect(() => {
-		if (contacts.length === 0 && !loading) void loadAll();
-	}, [contacts.length, loading, loadAll]);
+		if (didLoad.current) return;
+		didLoad.current = true;
+		void loadAll();
+	}, [loadAll]);
 
 	// Last touch per person
 	const latestByName = useMemo(() => {

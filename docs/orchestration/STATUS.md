@@ -32,6 +32,31 @@ Verified:
 - `node apps/cli/dist/bin.js lane list --json`
 - `node apps/cli/dist/bin.js queue list --json`
 
+## Session update 2026-05-07 - Temporary workspace for GitHub cleanup
+
+Codex introduced a temporary workspace pattern for bounded topic/concept work:
+
+- Temporary workspace doctrine is recorded in
+  `docs/architecture/21-temporary-workspaces.md`.
+- A concrete GitHub cleanup workspace was created under daemon space
+  `Temporary Workspaces` (`space:01KR0C50SN013YRCCZA1875CQG`) as project
+  `tmp-github-cleanup-2026-05-07`
+  (`project:01KR0C598B014Z8B9TNG9PR64C`).
+- The cleanup lane is `lane:01KR0C5QRW0168DJ4QGJRKJJ5K`.
+- The repo inventory and approval matrix are recorded in
+  `docs/orchestration/temp-workspaces/github-cleanup-2026-05-07.md`.
+- No GitHub repo visibility, rename, delete, transfer, or remote mutation was
+  executed in this pass. The temporary workspace is proposal-only until the
+  user approves exact actions.
+
+Current recommended first GitHub batch: make the four EMA public repos private
+before any rename/delete/consolidation work:
+
+- `TrajanWJ/EMA-CENTRAL-EVERYTHING`
+- `TrajanWJ/ema`
+- `TrajanWJ/ema-atlas`
+- `TrajanWJ/ema-transfer-pack-20260422-095631`
+
 ## Session update 2026-04-29 — Blueprint convergence pass
 
 Codex converged the active Blueprint swarm slice:

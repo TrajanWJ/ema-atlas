@@ -151,11 +151,14 @@ function parseAtom(doc: Document): ParsedFeed {
 /** Strip HTML to plain text (for previews) */
 function stripHtml(html: string): string {
 	if (!html) return "";
-	// Remove tags and decode entities via a temp element
 	if (typeof document !== "undefined") {
-		const tmp = document.createElement("div");
-		tmp.innerHTML = html;
-		return tmp.textContent?.trim() ?? "";
+		const textOnly = html
+			.replace(/<script[\s\S]*?<\/script>/gi, " ")
+			.replace(/<style[\s\S]*?<\/style>/gi, " ")
+			.replace(/<[^>]+>/g, " ");
+		const decoder = document.createElement("textarea");
+		decoder.innerHTML = textOnly;
+		return decoder.value.replace(/\s+/g, " ").trim();
 	}
 	// Fallback for SSR (shouldn't happen but safety)
 	return html.replace(/<[^>]*>/g, "").trim();
@@ -167,11 +170,17 @@ export function sanitizeHtml(html: string): string {
 	if (typeof document === "undefined") return html;
 
 	const tmp = document.createElement("div");
-	tmp.innerHTML = html;
+	const inertHtml = html
+		.replace(
+			/<(script|style|iframe|object|embed|form|textarea|select|button)\b[\s\S]*?<\/\1>/gi,
+			"",
+		)
+		.replace(/<(img|picture|source|video|audio|input)\b[^>]*>/gi, "");
+	tmp.innerHTML = inertHtml;
 
 	// Remove dangerous elements
 	const dangerous = tmp.querySelectorAll(
-		"script, iframe, object, embed, form, input, textarea, select, button, style",
+		"script, iframe, object, embed, form, input, textarea, select, button, style, img, picture, source, video, audio",
 	);
 	for (const el of dangerous) {
 		el.remove();

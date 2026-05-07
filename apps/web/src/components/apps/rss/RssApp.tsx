@@ -40,6 +40,19 @@ function truncate(str: string, max: number): string {
 	return `${str.slice(0, max)}...`;
 }
 
+function canRenderEmbeddedImage(src: string | null): src is string {
+	if (!src) return false;
+	if (/^(data|blob):/i.test(src)) return true;
+	if (src.startsWith('/')) return true;
+	if (typeof window === 'undefined') return false;
+
+	try {
+		return new URL(src, window.location.href).origin === window.location.origin;
+	} catch {
+		return false;
+	}
+}
+
 // ----------------------------------------------------------------------------
 // Star Icon (inline SVG)
 // ----------------------------------------------------------------------------
@@ -199,7 +212,7 @@ function FeedRow({
 					: 'var(--place-text-secondary)',
 			}}
 		>
-			{favicon ? (
+			{canRenderEmbeddedImage(favicon) ? (
 				<img
 					src={favicon}
 					alt=""
@@ -309,9 +322,15 @@ function ArticleRow({
 	readonly onToggleStar: () => void;
 }) {
 	return (
-		<button
-			type="button"
+		<div
+			role="button"
+			tabIndex={0}
 			onClick={onSelect}
+			onKeyDown={(event) => {
+				if (event.key !== 'Enter' && event.key !== ' ') return;
+				event.preventDefault();
+				onSelect();
+			}}
 			className="flex w-full gap-2 px-2 py-2 text-left"
 			style={{
 				background: active
@@ -320,9 +339,10 @@ function ArticleRow({
 				border: 'none',
 				borderBottom: '1px solid var(--place-border)',
 				cursor: 'pointer',
+				outline: 'none',
 			}}
 		>
-			{item.thumbnail && (
+			{canRenderEmbeddedImage(item.thumbnail) && (
 				<img
 					src={item.thumbnail}
 					alt=""
@@ -381,6 +401,7 @@ function ArticleRow({
 					e.stopPropagation();
 					onToggleStar();
 				}}
+				onKeyDown={(e) => e.stopPropagation()}
 				style={{
 					background: 'none',
 					border: 'none',
@@ -393,7 +414,7 @@ function ArticleRow({
 			>
 				<StarIcon filled={item.starred} />
 			</button>
-		</button>
+		</div>
 	);
 }
 

@@ -33,6 +33,19 @@ function formatDate(ts: number): string {
 	});
 }
 
+function canRenderEmbeddedImage(src: string | null): src is string {
+	if (!src) return false;
+	if (/^(data|blob):/i.test(src)) return true;
+	if (src.startsWith('/')) return true;
+	if (typeof window === 'undefined') return false;
+
+	try {
+		return new URL(src, window.location.href).origin === window.location.origin;
+	} catch {
+		return false;
+	}
+}
+
 // ----------------------------------------------------------------------------
 // Reading View
 // ----------------------------------------------------------------------------
@@ -44,6 +57,11 @@ export function ReadingView({
 	readonly item: RssItem | null;
 	readonly feedName: string;
 }) {
+	const sanitized = useMemo(
+		() => (item ? sanitizeHtml(item.description) : ''),
+		[item],
+	);
+
 	if (!item) {
 		return (
 			<div
@@ -58,15 +76,10 @@ export function ReadingView({
 		);
 	}
 
-	const sanitized = useMemo(
-		() => sanitizeHtml(item.description),
-		[item.description],
-	);
-
 	return (
 		<div className="flex h-full flex-col overflow-y-auto">
 			<div className="flex flex-col gap-2 p-3">
-				{item.thumbnail && (
+				{canRenderEmbeddedImage(item.thumbnail) && (
 					<img
 						src={item.thumbnail}
 						alt=""

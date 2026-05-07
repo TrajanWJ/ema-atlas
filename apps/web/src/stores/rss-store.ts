@@ -134,8 +134,13 @@ function faviconUrl(feedUrl: string): string | null {
 	}
 }
 
-async function fetchFeedXml(url: string): Promise<string> {
-	const proxyUrl = `/api/rss?url=${encodeURIComponent(url)}`;
+async function fetchFeedXml(
+	url: string,
+	options: { readonly softFail?: boolean } = {},
+): Promise<string> {
+	const params = new URLSearchParams({ url });
+	if (options.softFail) params.set("soft", "1");
+	const proxyUrl = `/api/rss?${params.toString()}`;
 	const resp = await fetch(proxyUrl);
 	if (!resp.ok) {
 		const body: unknown = await resp.json().catch(() => null);
@@ -208,7 +213,7 @@ export const useRssStore = create<RssState & RssActions>((set, get) => ({
 		set({ loading: true });
 
 		try {
-			const xml = await fetchFeedXml(url);
+			const xml = await fetchFeedXml(url, { softFail: false });
 			const parsed = parseRssFeed(xml);
 			const starredIds = loadStarred();
 			const readIds = loadReadIds();
@@ -272,7 +277,7 @@ export const useRssStore = create<RssState & RssActions>((set, get) => ({
 		const feed = get().feeds.find((f) => f.id === feedIdToRefresh);
 		if (!feed) return;
 
-		const xml = await fetchFeedXml(feed.url);
+		const xml = await fetchFeedXml(feed.url, { softFail: true });
 		const parsed = parseRssFeed(xml);
 		const starredIds = loadStarred();
 		const readIds = loadReadIds();

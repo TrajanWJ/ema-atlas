@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cinzel, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { IpcProvider } from "@/src/lib/ipc/provider";
 import { Sidebar } from "@/src/components/navigation/Sidebar";
+import { SurfaceModeSwitch } from "@/src/components/navigation/SurfaceModeSwitch";
 import "./globals.css";
 import "./tauri-frame.css";
 
@@ -30,11 +31,14 @@ export const metadata: Metadata = {
 	title: "place.org",
 	description: "A virtual desktop OS that actually works",
 	manifest: "/manifest.json",
-	themeColor: "#060610",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "black-translucent",
 	},
+};
+
+export const viewport: Viewport = {
+	themeColor: "#060610",
 };
 
 export default function RootLayout({
@@ -49,6 +53,7 @@ export default function RootLayout({
 		>
 			<body>
 				<IpcProvider>
+					<SurfaceModeSwitch />
 					<Sidebar />
 					{children}
 				</IpcProvider>

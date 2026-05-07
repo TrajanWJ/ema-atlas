@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ToastContainer } from "@/src/components/ui/ToastContainer";
+import { holodeckInsetStyle } from "@/src/lib/holodeck-layout";
 
 export const metadata: Metadata = {
 	title: "Desk — place.org",
@@ -17,6 +18,7 @@ export default function DeskLayout({
 			style={{
 				backgroundColor: "var(--place-void, #060610)",
 				color: "var(--place-text-primary, rgba(255,255,255,0.87))",
+				...holodeckInsetStyle(),
 			}}
 		>
 			{children}

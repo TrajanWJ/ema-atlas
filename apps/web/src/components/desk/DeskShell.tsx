@@ -34,7 +34,7 @@ export function DeskShell() {
 	return (
 		<div
 			style={{
-				width: "100dvw",
+				width: "100%",
 				height: "100dvh",
 				display: "grid",
 				gridTemplateRows: "auto auto 1fr auto auto",

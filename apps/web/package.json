@@ -3,11 +3,11 @@
   "version": "0.0.5-dev",
   "private": true,
   "description": "EMA 0.0.5 — browser-hosted shell. Forked wholesale from place.org (TrajanWJ/place.org @ c81fe8b).",
-  "type": "module",
-  "scripts": {
-    "dev": "next dev -p 5173",
-    "build": "next build",
-    "preview": "next start -p 5173",
+	"type": "module",
+	"scripts": {
+		"dev": "next dev -p 5173 -H 0.0.0.0",
+		"build": "next build",
+		"preview": "next start -p 5173 -H 0.0.0.0",
     "lint": "biome check .",
     "test": "vitest",
     "test:unit": "vitest --run",

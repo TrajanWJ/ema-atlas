@@ -1,9 +1,16 @@
-# EMA 0.0.5
+# EMA 0.0.6
 
-This is the actual implementation home for EMA `0.0.5`.
+This is the actual implementation home for EMA `0.0.6` (in-flight; tracked
+as `0.0.6-dev` in `package.json`).
 
 If you are writing code for EMA rather than reading history, this is where that
 work should happen.
+
+The 0.0.6 architecture audit and rearchitecture plan live at:
+
+- `docs/plans/0.0.6-ARCHITECTURE-AUDIT-2026-05-07.md` — audit + 8 rearch moves
+- `docs/plans/0.0.6-LANE-PLAN-2026-05-07.md` — lane plan (9 missions, ~17 lanes)
+- `Projects/EMA/atlas/intent/transcripts/2026-05-07-0.0.6-architecture-audit-and-rearchitecture.md` — verbatim transcript
 
 ## Product direction locked for this repo
 

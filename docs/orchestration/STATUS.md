@@ -1,10 +1,52 @@
-# EMA 0.0.5 Orchestration Status
+# EMA 0.0.6 Orchestration Status
 
-Canonical live ledger for the 0.0.5 buildout. One coordinator, many workers.
-Every session — Codex, Claude CLI, or human — reads this file on cold start.
+Canonical live ledger for the 0.0.6 buildout (continues the 0.0.5 ledger after
+the 2026-05-07 cut). One coordinator, many workers. Every session — Codex,
+Claude CLI, or human — reads this file on cold start.
 
 Coordinator: Claude (replacement orchestrator, consolidated role).
-Last coordinator sweep: 2026-05-07T00:45-04:00.
+Last coordinator sweep: 2026-05-07T19:00-04:00.
+
+## Session update 2026-05-07 — 0.0.6 architecture audit + rearch campaign opened
+
+Claude (Opus 4.7) ran a head-orchestrator audit pass for 0.0.6, separate from
+(and superseding) the morning's `MASTER-ORCHESTRATION-2026-05-07.md` 14-lane
+wave plan. Operator-confirmed scope: audit + start rearchitecture, fresh
+re-evaluation, structural + module + code-level depth.
+
+**Outputs:**
+- Audit: `docs/plans/0.0.6-ARCHITECTURE-AUDIT-2026-05-07.md`
+- Lane plan: `docs/plans/0.0.6-LANE-PLAN-2026-05-07.md`
+- Transcript: `Projects/EMA/atlas/intent/transcripts/2026-05-07-0.0.6-architecture-audit-and-rearchitecture.md`
+- Doc drift sync: README, BUILD-MANIFEST, Cargo.toml all bumped 0.0.5 → 0.0.6.
+- Daemon registry: campaign lane `lane:01KR1VDN9X009DM3S8QKRJTC7B` (claimed)
+  + first 5 rearch lanes opened (LR1/LR2/LR3/LD1/LX1).
+
+**Headline finding:** packages aren't load-bearing — three parallel
+implementations of the same event/IPC contract live across `apps/daemon`
+(126 events hand-coded), `packages/contracts/` (144-event canonical
+markdown), and `packages/contracts-ts/` (2,415 LOC of generated TS
+unimported by any app). `apps/web`, `apps/cli`, and
+`apps/agent-blueprint-grower` each maintain their own IPC client and
+projection types. The 0.0.6 highest-leverage move is making
+`packages/` actually load-bearing.
+
+**Reconciliation with morning plan:** L0/L1/L4 close (already done);
+L2/L6/L7 dissolve into rearch moves; L3 reframes as LX1; the rest
+survive. See lane plan §"Reconciliation map" for detail.
+
+**Decisions deferred to operator:** LX1 path A (implement place-companion)
+vs path B (delete 5 dead Rust modules); ratification of the new lane plan
+as superseder for the morning plan vs co-existence; sequencing intensity
+(M1 in parallel with in-flight L5/L11, or pause to focus on M1 first).
+
+Verified:
+
+- `ema lane open` × 6 — daemon registry round-trips for the campaign lane
+  + LR1, LR2, LR3, LD1, LX1.
+- `ema lane claim --lane lane:01KR1VDN9X009DM3S8QKRJTC7B` — claim recorded.
+- Audit, lane plan, transcript, README, BUILD-MANIFEST, CHANGELOG, and
+  Cargo.toml writes confirmed by Edit/Write tool acknowledgements.
 
 ## Session update 2026-05-07 - Coordination authority consolidation
 

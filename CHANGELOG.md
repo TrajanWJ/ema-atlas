@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-05-07 — 0.0.6 architecture audit + rearchitecture campaign opened
+
+**Audit and lane plan**
+- New architecture audit at `docs/plans/0.0.6-ARCHITECTURE-AUDIT-2026-05-07.md`
+  identifies six core findings: (A) packages aren't load-bearing — three
+  parallel implementations of the same event/IPC contract drift across daemon,
+  web, and CLI; (B) `ema_shell_ipc.gleam` is a 6,666-LOC god module routing
+  all IPC inline; (C) bounded-context leakage (`ema_orgs` direct-imports
+  `ema_spaces`; Elixir contexts on ETS aren't on the canonical bus); (D) web
+  shell mixes 8 production vApps with 32 legacy place-tools; (E) dead Rust
+  modules in `apps/desktop/src-tauri` (~831 LOC not invoked from `main.rs`);
+  (F) no schema migration spine.
+- 8-move rearchitecture proposal: make packages load-bearing, codegen Gleam
+  from contracts, finish surface-core IPC and consolidate consumers, decompose
+  `ema_shell_ipc`, heal context leakage, web shell hygiene, decide place-
+  companion, add migration spine.
+- Companion lane plan at `docs/plans/0.0.6-LANE-PLAN-2026-05-07.md`: 9
+  missions / ~17 lanes, supersedes the morning's `MASTER-ORCHESTRATION-2026-05-07.md`
+  14-lane wave plan. Ten morning lanes survive (renamed/reframed); four
+  dissolve into rearchitecture moves.
+- Daemon registry seeded with the campaign lane and the first five rearch
+  lanes (LR1, LR2, LR3, LD1, LX1).
+- Verbatim transcript at `Projects/EMA/atlas/intent/transcripts/2026-05-07-0.0.6-architecture-audit-and-rearchitecture.md`.
+
+**Doc drift sync**
+- Repo title, build manifest, and Tauri Cargo.toml all bumped from `0.0.5` to
+  `0.0.6`. `package.json` already said `0.0.6-dev`; `~/.local/bin/ema`
+  `EMA_HOME_DEFAULT` already pointed at `EMA-0.0.6`. Drift closed.
+
 ## 2026-04-29
 
 ### Design system overhaul + URL nav contract + E2E test bench

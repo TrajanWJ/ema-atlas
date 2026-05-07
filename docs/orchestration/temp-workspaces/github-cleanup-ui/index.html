@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EMA GitHub Cleanup</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f7f4;
+        --panel: #ffffff;
+        --ink: #1c1f24;
+        --muted: #666f7a;
+        --line: #d9ddd7;
+        --accent: #0f766e;
+        --accent-weak: #d9f2ed;
+        --danger: #b42318;
+        --warn: #9a5b00;
+        --blue: #2457a6;
+        --shadow: 0 10px 30px rgba(20, 24, 29, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.35;
+      }
+
+      header {
+        padding: 24px 28px 18px;
+        border-bottom: 1px solid var(--line);
+        background: #fbfbf8;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        letter-spacing: 0;
+      }
+
+      .sub {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      main {
+        padding: 22px 28px 210px;
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .metric, .section {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .metric {
+        padding: 14px;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 24px;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .section {
+        margin: 14px 0;
+        overflow: hidden;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: #fbfbf8;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .bulk {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      button, select, input[type="text"] {
+        font: inherit;
+      }
+
+      button {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        border-radius: 6px;
+        padding: 7px 10px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: #9aa3a3;
+      }
+
+      .primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+
+      .repo {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.4fr) 90px 80px minmax(180px, 1fr) 180px;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .repo:last-child { border-bottom: 0; }
+
+      .name {
+        font-weight: 650;
+        overflow-wrap: anywhere;
+      }
+
+      .desc {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .tag {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 3px 8px;
+        font-size: 12px;
+        color: var(--muted);
+        background: #fff;
+      }
+
+      .public { color: var(--warn); border-color: #e8c27b; background: #fff7e6; }
+      .private { color: var(--accent); border-color: #9bd4c9; background: var(--accent-weak); }
+      .fork { color: var(--blue); border-color: #adc4ec; background: #edf4ff; }
+
+      select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 8px;
+        background: #fff;
+      }
+
+      .note {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 8px;
+        background: #fff;
+      }
+
+      .footer {
+        position: fixed;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        background: #14181d;
+        color: #eef2f2;
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 12px;
+        z-index: 20;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 124px;
+        resize: vertical;
+        border: 1px solid #39414a;
+        border-radius: 7px;
+        padding: 10px;
+        background: #0d1116;
+        color: #eef2f2;
+        font: 12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .footer-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 160px;
+      }
+
+      .footer button {
+        border-color: #39414a;
+      }
+
+      .copy-status {
+        min-height: 18px;
+        color: #b6c2c2;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      @media (max-width: 920px) {
+        .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .repo {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        .footer {
+          grid-template-columns: 1fr;
+        }
+        .footer-actions {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>EMA GitHub Cleanup Temporary Workspace</h1>
+      <div class="sub">
+        <span>Project: <strong>tmp-github-cleanup-2026-05-07</strong></span>
+        <span>Lane: <strong>lane:01KR0C5QRW0168DJ4QGJRKJJ5K</strong></span>
+        <span>No GitHub changes happen from this page.</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="summary">
+        <div class="metric"><strong id="totalRepos">0</strong><span>repos inventoried</span></div>
+        <div class="metric"><strong id="publicRepos">0</strong><span>currently public</span></div>
+        <div class="metric"><strong id="selectedActions">0</strong><span>selected actions</span></div>
+        <div class="metric"><strong id="destructiveActions">0</strong><span>delete/rename choices</span></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>EMA First Batch</h2>
+            <div class="hint">Recommended first move: make these private before any rename/delete/consolidation.</div>
+          </div>
+          <div class="bulk">
+            <button class="primary" data-bulk="ema-private">Select first batch private</button>
+            <button data-bulk="ema-review">Mark EMA review</button>
+          </div>
+        </div>
+        <div id="emaRepos"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>Public Non-EMA Repos</h2>
+            <div class="hint">Choose what should stay public, become private, archive, rename, or delete.</div>
+          </div>
+          <div class="bulk">
+            <button data-bulk="public-private">Make all public non-EMA private</button>
+            <button data-bulk="public-review">Mark all review</button>
+          </div>
+        </div>
+        <div id="publicReposList"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>Private Repos</h2>
+            <div class="hint">These already have reduced exposure. Most should stay private or be reviewed for archive/delete.</div>
+          </div>
+          <div class="bulk">
+            <button data-bulk="private-keep">Keep all private</button>
+            <button data-bulk="private-review">Mark all review</button>
+          </div>
+        </div>
+        <div id="privateReposList"></div>
+      </section>
+    </main>
+
+    <div class="footer">
+      <textarea id="output" readonly></textarea>
+      <div class="footer-actions">
+        <button class="primary" id="copyBtn">Copy selected options</button>
+        <button id="resetBtn">Reset selections</button>
+        <div class="copy-status" id="copyStatus"></div>
+      </div>
+    </div>
+
+    <script>
+      const repos = [
+        { name: "TrajanWJ/proslync-mobile-app-v1", visibility: "PRIVATE", kind: "source", pushed: "2026-05-07", language: "TypeScript", description: "Proslync client demo v1 - Expo React Native mobile app" },
+        { name: "TrajanWJ/luxury-rental-website", visibility: "PRIVATE", kind: "site", pushed: "2026-05-05", language: "TypeScript", description: "" },
+        { name: "TrajanWJ/EMA-CENTRAL-EVERYTHING", visibility: "PRIVATE", kind: "ema", pushed: "2026-04-30", language: "TypeScript", description: "Active EMA remote; candidate canonical private repo" },
+        { name: "TrajanWJ/ema-atlas", visibility: "PRIVATE", kind: "ema", pushed: "2026-04-22", language: "TypeScript", description: "Temporary public transfer pack for EMA/Hermes rewrite handoff" },
+        { name: "TrajanWJ/ema-transfer-pack-20260422-095631", visibility: "PRIVATE", kind: "ema", pushed: "2026-04-22", language: "", description: "Temporary public handoff repo for EMA/Hermes lineage transfer pack" },
+        { name: "TrajanWJ/proslync-website", visibility: "PRIVATE", kind: "site", pushed: "2026-04-18", language: "TypeScript", description: "Operator-grade NIL marketing site" },
+        { name: "TrajanWJ/proslync-device-preview-v1", visibility: "PRIVATE", kind: "preview", pushed: "2026-04-15", language: "HTML", description: "Proslync client demo v1 preview harness" },
+        { name: "TrajanWJ/place.org", visibility: "PRIVATE", kind: "donor", pushed: "2026-04-13", language: "TypeScript", description: "EMA donor/reference" },
+        { name: "TrajanWJ/t3code", visibility: "PUBLIC", kind: "archived fork", pushed: "2026-04-13", language: "TypeScript", description: "Fork" },
+        { name: "TrajanWJ/ema", visibility: "PRIVATE", kind: "ema", pushed: "2026-04-13", language: "TypeScript", description: "Older EMA repo; make private then decide archive/rename" },
+        { name: "TrajanWJ/hate-my-brother", visibility: "PUBLIC", kind: "demo", pushed: "2026-03-26", language: "HTML", description: "Interactive 3D experience" },
+        { name: "TrajanWJ/place-companion", visibility: "PRIVATE", kind: "donor", pushed: "2026-03-25", language: "Rust", description: "EMA donor/reference native companion" },
+        { name: "TrajanWJ/agent-os-demo", visibility: "PRIVATE", kind: "demo", pushed: "2026-03-20", language: "JavaScript", description: "Agent OS demo; possible EMA lineage donor" },
+        { name: "TrajanWJ/letmescale", visibility: "PRIVATE", kind: "source", pushed: "2026-03-16", language: "TypeScript", description: "" },
+        { name: "TrajanWJ/dispohub", visibility: "PRIVATE", kind: "app", pushed: "2026-02-26", language: "JavaScript", description: "" },
+        { name: "TrajanWJ/truk-landing", visibility: "PRIVATE", kind: "site", pushed: "2026-02-24", language: "TypeScript", description: "" },
+        { name: "TrajanWJ/blueprint-media-full-archive", visibility: "PRIVATE", kind: "archive", pushed: "2026-01-15", language: "JavaScript", description: "" },
+        { name: "TrajanWJ/execudeck", visibility: "PRIVATE", kind: "donor", pushed: "2026-01-13", language: "TypeScript", description: "EMA lineage donor" },
+        { name: "TrajanWJ/caspian-dashboard", visibility: "PRIVATE", kind: "dashboard", pushed: "2025-12-30", language: "TypeScript", description: "Promoter Analytics Dashboard" },
+        { name: "TrajanWJ/caspian_dash_render_webhook", visibility: "PRIVATE", kind: "service", pushed: "2025-12-23", language: "TypeScript", description: "" },
+        { name: "TrajanWJ/Executive", visibility: "PRIVATE", kind: "empty", pushed: "2024-10-15", language: "", description: "Multi-agent experiments empty repo" },
+        { name: "TrajanWJ/Multi-agent-expirements", visibility: "PRIVATE", kind: "donor", pushed: "2024-09-09", language: "Python", description: "EMA lineage donor" },
+        { name: "TrajanWJ/mentalGPT", visibility: "PUBLIC", kind: "experiment", pushed: "2024-05-02", language: "Python", description: "" },
+        { name: "TrajanWJ/Ebay-Link-Viewer-Nice", visibility: "PUBLIC", kind: "utility", pushed: "2024-04-24", language: "Python", description: "" },
+        { name: "TrajanWJ/Auto-GPT", visibility: "PUBLIC", kind: "archived fork", pushed: "2023-05-19", language: "Python", description: "Fork" },
+        { name: "TrajanWJ/AgentGPT", visibility: "PUBLIC", kind: "archived fork", pushed: "2023-04-11", language: "TypeScript", description: "Fork" }
+      ];
+
+      const actions = [
+        ["", "No decision"],
+        ["keep", "Keep as-is"],
+        ["make_private", "Make private"],
+        ["keep_public", "Keep public"],
+        ["archive", "Archive"],
+        ["rename", "Rename"],
+        ["delete", "Delete"],
+        ["copy_successor", "Copy to new repo"],
+        ["review", "Review later"]
+      ];
+
+      const state = new Map();
+
+      function defaultAction(repo) {
+        if (repo.kind === "ema" && repo.visibility === "PUBLIC") return "make_private";
+        if (repo.visibility === "PRIVATE") return "keep";
+        if (repo.kind === "empty") return "delete";
+        if (repo.kind === "fork" || repo.kind === "archived fork") return "archive";
+        return "review";
+      }
+
+      function renderRepo(repo) {
+        if (!state.has(repo.name)) state.set(repo.name, { action: defaultAction(repo), note: "" });
+        const current = state.get(repo.name);
+        const row = document.createElement("div");
+        row.className = "repo";
+        row.innerHTML = `
+          <div>
+            <div class="name">${repo.name}</div>
+            <div class="desc">${repo.description || repo.language || "No description"} · pushed ${repo.pushed}</div>
+          </div>
+          <span class="tag ${repo.visibility === "PUBLIC" ? "public" : "private"}">${repo.visibility.toLowerCase()}</span>
+          <span class="tag ${repo.kind.includes("fork") ? "fork" : ""}">${repo.kind}</span>
+          <select aria-label="Action for ${repo.name}">
+            ${actions.map(([value, label]) => `<option value="${value}" ${value === current.action ? "selected" : ""}>${label}</option>`).join("")}
+          </select>
+          <input class="note" type="text" value="${current.note}" placeholder="Optional note / new name" />
+        `;
+        const select = row.querySelector("select");
+        const note = row.querySelector("input");
+        select.addEventListener("change", () => {
+          state.set(repo.name, { ...state.get(repo.name), action: select.value });
+          updateOutput();
+        });
+        note.addEventListener("input", () => {
+          state.set(repo.name, { ...state.get(repo.name), note: note.value });
+          updateOutput();
+        });
+        return row;
+      }
+
+      function render() {
+        const ema = repos.filter((r) => r.kind === "ema");
+        const publicNonEma = repos.filter((r) => r.visibility === "PUBLIC" && r.kind !== "ema");
+        const privateRepos = repos.filter((r) => r.visibility === "PRIVATE");
+
+        document.getElementById("emaRepos").replaceChildren(...ema.map(renderRepo));
+        document.getElementById("publicReposList").replaceChildren(...publicNonEma.map(renderRepo));
+        document.getElementById("privateReposList").replaceChildren(...privateRepos.map(renderRepo));
+        document.getElementById("totalRepos").textContent = String(repos.length);
+        document.getElementById("publicRepos").textContent = String(repos.filter((r) => r.visibility === "PUBLIC").length);
+        updateOutput();
+      }
+
+      function setWhere(predicate, action) {
+        for (const repo of repos) {
+          if (predicate(repo)) {
+            state.set(repo.name, { ...state.get(repo.name), action });
+          }
+        }
+        render();
+      }
+
+      document.addEventListener("click", (event) => {
+        const bulk = event.target?.dataset?.bulk;
+        if (!bulk) return;
+        if (bulk === "ema-private") setWhere((r) => r.kind === "ema", "make_private");
+        if (bulk === "ema-review") setWhere((r) => r.kind === "ema", "review");
+        if (bulk === "public-private") setWhere((r) => r.visibility === "PUBLIC" && r.kind !== "ema", "make_private");
+        if (bulk === "public-review") setWhere((r) => r.visibility === "PUBLIC" && r.kind !== "ema", "review");
+        if (bulk === "private-keep") setWhere((r) => r.visibility === "PRIVATE", "keep");
+        if (bulk === "private-review") setWhere((r) => r.visibility === "PRIVATE", "review");
+      });
+
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        state.clear();
+        render();
+      });
+
+      document.getElementById("copyBtn").addEventListener("click", async () => {
+        const text = document.getElementById("output").value;
+        await navigator.clipboard.writeText(text);
+        document.getElementById("copyStatus").textContent = "Copied";
+        setTimeout(() => document.getElementById("copyStatus").textContent = "", 1400);
+      });
+
+      function updateOutput() {
+        const selected = repos
+          .map((repo) => ({ repo, ...state.get(repo.name) }))
+          .filter((item) => item.action);
+        const destructive = selected.filter((item) => item.action === "delete" || item.action === "rename");
+        document.getElementById("selectedActions").textContent = String(selected.length);
+        document.getElementById("destructiveActions").textContent = String(destructive.length);
+
+        const lines = [
+          "EMA GitHub cleanup selections",
+          "Temporary workspace: tmp-github-cleanup-2026-05-07",
+          "Lane: lane:01KR0C5QRW0168DJ4QGJRKJJ5K",
+          "",
+          "Selected actions:"
+        ];
+        for (const item of selected) {
+          lines.push(`- ${item.repo.name}: ${item.action}${item.note ? ` (${item.note})` : ""}`);
+        }
+        lines.push("");
+        lines.push("Approval note:");
+        lines.push("I approve only the actions listed above. Do not perform unlisted delete, rename, visibility, transfer, or force-push actions.");
+        document.getElementById("output").value = lines.join("\n");
+      }
+
+      render();
+    </script>
+  </body>
+</html>

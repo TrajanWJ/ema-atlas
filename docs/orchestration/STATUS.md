@@ -57,6 +57,17 @@ before any rename/delete/consolidation work:
 - `TrajanWJ/ema-atlas`
 - `TrajanWJ/ema-transfer-pack-20260422-095631`
 
+Execution update:
+
+- The approved make-private batch was executed for EMA, selected business/demo
+  repos, and selected app repos.
+- `TrajanWJ/t3code`, `TrajanWJ/Auto-GPT`, and `TrajanWJ/AgentGPT` were
+  archived.
+- `TrajanWJ/luxury-rental-website-trajan` was deleted.
+- No private repo was made public from an ambiguous `keep_public` selection.
+- No Wilson site rename was performed because only `make_private` was selected;
+  the rename note needs a concrete repo name approval.
+
 ## Session update 2026-04-29 — Blueprint convergence pass
 
 Codex converged the active Blueprint swarm slice:

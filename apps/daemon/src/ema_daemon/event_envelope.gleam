@@ -92,6 +92,7 @@ fn validate_payload(env: Envelope) -> Result(Nil, ValidationError) {
 
 pub fn kind_in_catalog(kind: String) -> Bool {
   case kind {
+    "install.initialized" -> True
     "actor.created" -> True
     "actor.assigned_to_project" -> True
     "identity.user_upserted" -> True

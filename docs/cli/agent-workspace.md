@@ -1,13 +1,19 @@
 # Agent Workspace CLI Operating Contract
 
-Status: immediate agent-use contract. Core workspace commands are live through
-daemon writes/projections or explicit file-backed Harness Glue rails:
+Status: immediate agent-use contract. The daemon registry is the live
+coordination source. Core workspace commands are live through daemon
+writes/projections or explicit file-backed Harness Glue rails:
 `vcalendar.*`, `checkup.*`, org/space/project creation, `campaign`, `mission`,
 `lane`, `queue`, `handoff`, `problem`, `agent report`, and `agent prompt`.
-`ema tl about`, `ema agent orient`, and `ema vcalendar tick` merge daemon
-lane/queue state with fallback file-shaped workspace context. Command-group
-`--help` output is the normalized source for current flags and implementation
-status.
+`ema next`, `ema tl about`, `ema agent orient`, and `ema vcalendar tick` read
+daemon lane/queue registry state first and only use file-shaped records as
+fallback context when daemon state is unavailable.
+`ema cwt status` and `ema cwt ingest --dry-run` are the bridge commands for
+the sibling `current-work-tracker-trajan` capture surface; they inspect its
+shared-files projection but do not promote records until a daemon import writer
+exists.
+Command-group `--help` output is the normalized source for current flags and
+implementation status.
 
 This document defines how agents use EMA while working. The CLI is not just an
 admin tool. It is the project-management, organization, executive-function, and
@@ -31,20 +37,36 @@ For the current build order and gap map, see
 
 ## Bootstrap Milestone
 
-The bounded bootstrap milestone is daemon-owned Slice A: make `lane` and
-`queue` perform real writes and read projections through the daemon. Slice A is
-partially complete and usable for agent work today. Agents still use the
-commands below as the required operating grammar; pending-writer responses are
-implementation status, not permission to skip the workflow.
+The bounded bootstrap milestone is daemon-owned Slice A: `lane` and `queue`
+perform real writes and read projections through the daemon. Agents still use
+the commands below as the required operating grammar; pending-writer responses
+on other nouns are implementation status, not permission to skip the workflow.
 
-Slice A is complete only when:
+Slice A is operational when:
 
-- `ema lane open` and `ema lane list` use daemon-backed lane events and
-  projections. `claim`, `block`, `move`, `release`, and `close` are next.
-- `ema queue add` and `ema queue list` use daemon-backed queue-item events and
-  projections. `show`, `ready`, `block`, and `close` are next.
-- The daemon owns canonical state; markdown is fallback context, not the
-  durable writer.
+- `ema lane open/list/show/claim/block/move/release/close` use daemon-backed
+  lane events and projections.
+- `ema queue add/list/show/ready/block/close` use daemon-backed queue-item
+  events and projections.
+- `ema lane list` and `ema queue list` honor project scope plus the advertised
+  status, mission, and lane filters.
+- The daemon owns canonical state; markdown is fallback context or a snapshot,
+  not a durable writer.
+
+## Authority Rule
+
+For active coordination, agents must trust this order:
+
+```text
+daemon registry -> daemon command result -> CLI projection -> file snapshot -> docs/template
+```
+
+The coordination files under `Projects/EMA/atlas/workspace/` are templates or
+emergency snapshots unless a command explicitly exports them from the daemon.
+Do not treat an empty `CLAIMS.md`, `HANDOFFS_PENDING.md`, `LANES_CATALOG.md`,
+`PROTECTED_ZONES.md`, or `BLOCKERS.md` as proof that nobody owns work. Use
+`ema agent orient --json`, `ema lane list --json`, `ema queue list --json`, and
+`ema handoff list --json` instead.
 
 ## Start Every Session
 
@@ -52,7 +74,8 @@ Run orientation before editing:
 
 ```bash
 ema help
-ema tl about --json
+ema next --json
+ema tl about --summary --json
 ema lane --help
 ema queue --help
 ema problem --help
@@ -62,16 +85,21 @@ ema agent meta-progress --json
 ema vcalendar tick --json
 ```
 
-Agents must run `ema tl about --json` and `ema vcalendar tick --json` at the
-start of every session. These are mandatory session-start commands, not
-optional reading shortcuts. `tl about` establishes the task-layer map;
-`vcalendar tick` establishes the current planning / execution / review phase.
+Agents must run `ema next --json`, `ema tl about --summary --json`, and
+`ema vcalendar tick --json` at the start of every session. These are mandatory
+session-start commands, not optional reading shortcuts. `next` gives the
+smallest actionable command, compact `tl about` establishes the task-layer map,
+and `vcalendar tick` establishes the current planning / execution / review
+phase. Use full `ema tl about --json` only when the complete lane and queue
+arrays are needed.
 
-`ema /tl about --json` is an alias for agents or humans with slash-command
-muscle memory. It reports the actual file-shaped workspace record, current
-counts, orientation docs, enforcement rules, and the current vCalendar phase.
+`ema /tl about --summary --json` is an alias for agents or humans with
+slash-command muscle memory. It reports the current daemon registry projection
+when available, the fallback project-record snapshot, orientation docs,
+enforcement rules, and the current vCalendar phase.
 
-If the daemon is unavailable, read the file-shaped workspace:
+If the daemon is unavailable, read the file-shaped workspace as stale fallback
+context only:
 
 ```text
 Projects/EMA/atlas/workspace/CLAIMS.md
@@ -81,6 +109,10 @@ Projects/EMA/atlas/workspace/PROTECTED_ZONES.md
 Projects/EMA/atlas/workspace/BLOCKERS.md
 Projects/<project>/{lanes,queue,handoffs,responsibilities,weekly,checkups,executions}/
 ```
+
+After daemon recovery, reconcile any useful fallback discovery into daemon
+objects with `ema lane`, `ema queue`, `ema handoff`, `ema problem`, or
+`ema agent report`; do not keep writing coordination truth into the templates.
 
 ## Core Hierarchy
 
@@ -107,28 +139,31 @@ campaign -> mission -> lane -> queue_item -> execution -> result
 ## Orientation Commands
 
 ```bash
-ema tl about --json
-ema /tl about --json
+ema next --json
+ema tl about --summary --json
+ema /tl about --summary --json
 ema agent orient --json
 ema agent meta-progress --json
 ema vcalendar tick --json
-ema campaign list --project "EMA 0.0.5"
-ema mission list --project "EMA 0.0.5"
-ema lane list --project "EMA 0.0.5"
-ema queue list --project "EMA 0.0.5"
-ema handoff list --project "EMA 0.0.5"
-ema vcalendar week --project "EMA 0.0.5"
+ema campaign list --project EMA
+ema mission list --project EMA
+ema lane list --project EMA --status active
+ema queue list --project EMA --status ready
+ema handoff list --project EMA
+ema vcalendar week --project EMA
+ema cwt status --json
+ema cwt ingest --dry-run --json
 ```
 
 The commands above are the standard cold-start map for any agent. `tl`,
-`agent orient`, `agent meta-progress`, and `vcalendar tick` return daemon
-lane/queue registry state when the daemon is available and file-shaped fallback
-context otherwise. `agent meta-progress` is the compact self-progress snapshot:
-it counts lane and queue statuses, lists pressure signals, includes recent agent
-reports, and names the next action to preserve momentum. Writers that are still
-pending return command-shaped stubs rather than fake state. That is intentional:
-agents should learn and obey the grammar without mistaking drafts for daemon
-truth.
+`agent orient`, `agent meta-progress`, `next`, and `vcalendar tick` return
+daemon lane/queue registry state when the daemon is available and file-shaped
+fallback context otherwise. `next` is the compact "what should I do now?"
+answer. `agent meta-progress` is the compact self-progress snapshot: it counts
+lane and queue statuses, lists pressure signals, includes recent agent reports,
+and names the next action to preserve momentum. Writers that are still pending
+return command-shaped stubs rather than fake state. That is intentional: agents
+should learn and obey the grammar without mistaking drafts for daemon truth.
 
 ## Claim Work
 
@@ -341,10 +376,12 @@ Problem graph updates:
 - Live daemon workspace writes/projections: `ema campaign *`, `ema mission *`,
   `ema lane *`, `ema queue *`, `ema handoff *`, `ema problem *`.
 - Live daemon-plus-fallback orientation/progress: `ema tl about`,
-  `ema /tl about`, `ema agent orient`, `ema agent meta-progress`,
-  `ema vcalendar tick`.
+  `ema /tl about`, `ema next`, `ema agent orient`,
+  `ema agent meta-progress`, `ema vcalendar tick`.
 - Live daemon workspace reports/prompts: `ema agent report`,
   `ema agent prompt`.
+- Live diagnostics: `ema doctor` reports daemon/workspace cohesion and exits
+  non-zero when missing or partial subsystems remain.
 - Harness Glue execution rail: `ema harness providers/status/dispatch/start/
   list/assign/context/events/grep/log/stream/stop`; simulated dispatch is
   usable now, while tmux-backed Codex/Claude workers use file-backed registries

@@ -88,6 +88,7 @@ event {
 
 | Family        | File                | Owner context         |
 | ------------- | ------------------- | --------------------- |
+| install       | `install.md`        | ema_identity          |
 | actor         | `actor.md`          | ema_identity          |
 | agent         | `agent.md`          | ema_swarm_coordination |
 | org           | `org.md`            | ema_orgs              |

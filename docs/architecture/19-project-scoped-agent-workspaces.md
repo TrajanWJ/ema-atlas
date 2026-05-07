@@ -9,7 +9,7 @@ The CLI currently resolves agent workspace state as one global EMA daemon worksp
 
 That is not the intended Desktop model. Durable project state lives under `Desktop/Projects/<project>/`, while active coding happens under `Desktop/Active builds/<build>/`. Agent workspace records must follow the project being operated on.
 
-The symptom is visible in `pnpm cli tl about --json` from `Active builds/EMA-0.0.5`: the active build is EMA, but `project_record` reports `Projects/EMA/subprojects/agent-workspace-vapp`. All lane, queue, vCalendar, checkup, and report state is therefore read as one shared workspace instead of a project/space-scoped workspace instance.
+The symptom is visible in `ema tl about --json` from `Active builds/EMA-0.0.5`: the active build is EMA, but `project_record` reports `Projects/EMA/subprojects/agent-workspace-vapp`. All lane, queue, vCalendar, checkup, and report state is therefore read as one shared workspace instead of a project/space-scoped workspace instance.
 
 Current operator scope as of 2026-04-29:
 
@@ -129,14 +129,14 @@ Examples:
 
 ```text
 cd ~/Desktop/Active\ builds/EMA-0.0.5
-pnpm cli tl about --json
+ema tl about --json
 # resolves to Projects/EMA, build 0.0.5
 
 cd ~/Desktop/Projects/duct-tape-onion-harness
-pnpm --dir ~/Desktop/Active\ builds/EMA-0.0.5 cli queue list --json
+ema queue list --json
 # resolves to Projects/duct-tape-onion-harness because cwd is the donor project
 
-pnpm cli queue list --project EMA --json
+ema queue list --project EMA --json
 # resolves to EMA regardless of cwd
 ```
 

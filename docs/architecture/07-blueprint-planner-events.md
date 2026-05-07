@@ -396,11 +396,11 @@ After this lands:
   - All four reuse the bus append helper and the per-daemon monotonic
     `txid` from ADR 06.
 
-- **New CLI subcommands** under `pnpm cli blueprint`:
-  - `pnpm cli blueprint gac create | answer | defer | promote | list`
-  - `pnpm cli blueprint blocker open | resolve | promote | list`
-  - `pnpm cli blueprint aspiration capture | promote | archive | list`
-  - `pnpm cli blueprint decision lock | supersede | list`
+- **New CLI subcommands** under `ema blueprint`:
+  - `ema blueprint gac create | answer | defer | promote | list`
+  - `ema blueprint blocker open | resolve | promote | list`
+  - `ema blueprint aspiration capture | promote | archive | list`
+  - `ema blueprint decision lock | supersede | list`
   - Each subcommand is a thin wrapper over the writer, returning the new
     `<prefix>:<ulid>` on stdout for piping.
 

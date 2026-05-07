@@ -217,10 +217,10 @@ Queue Context:
 <ready and blocked queue items for the lane>
 
 Rules:
-- Run `pnpm cli tl about --json` and `pnpm cli vcalendar tick --json` first.
+- Run `ema tl about --json` and `ema vcalendar tick --json` first.
 - Keep work lane-scoped and claim/refresh ownership before edits.
-- Log later work with `pnpm cli queue add`.
-- Report changed, verified, risks, and next with `pnpm cli agent report`.
+- Log later work with `ema queue add`.
+- Report changed, verified, risks, and next with `ema agent report`.
 - Use handoff language if blocked or transferring ownership.
 ```
 

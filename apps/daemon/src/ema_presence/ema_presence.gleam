@@ -127,17 +127,15 @@ pub fn join(state: State, req: JoinRequest, now: String) -> State {
       status: "active",
       last_seen_at: now,
     )
-  State(
-    ..state,
-    revision: state.revision + 1,
-    sessions: [session, ..without_session(state.sessions, session.session_id)],
-  )
+  State(..state, revision: state.revision + 1, sessions: [
+    session,
+    ..without_session(state.sessions, session.session_id)
+  ])
 }
 
 pub fn leave(state: State, session_id: String) -> State {
   let clean_session = clean_or(session_id, "session:local")
   State(
-    ..state,
     revision: state.revision + 1,
     sessions: without_session(state.sessions, clean_session),
     cursors: without_cursor(state.cursors, clean_session),
@@ -173,11 +171,10 @@ pub fn cursor(state: State, req: CursorRequest, now: String) -> State {
       app_id: clean_option(req.app_id),
       updated_at: now,
     )
-  State(
-    ..joined,
-    revision: joined.revision + 1,
-    cursors: [c, ..without_cursor(joined.cursors, c.session_id)],
-  )
+  State(..joined, revision: joined.revision + 1, cursors: [
+    c,
+    ..without_cursor(joined.cursors, c.session_id)
+  ])
 }
 
 pub fn location(state: State, req: LocationRequest, now: String) -> State {
@@ -206,11 +203,10 @@ pub fn location(state: State, req: LocationRequest, now: String) -> State {
       label: clean_or(req.label, clean_or(req.app_id, "unknown")),
       updated_at: now,
     )
-  State(
-    ..joined,
-    revision: joined.revision + 1,
-    locations: [loc, ..without_location(joined.locations, loc.session_id)],
-  )
+  State(..joined, revision: joined.revision + 1, locations: [
+    loc,
+    ..without_location(joined.locations, loc.session_id)
+  ])
 }
 
 pub fn projection_json(state: State) -> String {
@@ -224,11 +220,11 @@ pub fn projection_json(state: State) -> String {
         "sessions",
         json.preprocessed_array(list.map(state.sessions, session_json)),
       ),
+      #("actors", json.preprocessed_array(list.map(state.sessions, actor_json))),
       #(
-        "actors",
-        json.preprocessed_array(list.map(state.sessions, actor_json)),
+        "cursors",
+        json.preprocessed_array(list.map(state.cursors, cursor_json)),
       ),
-      #("cursors", json.preprocessed_array(list.map(state.cursors, cursor_json))),
       #(
         "app_locations",
         json.preprocessed_array(list.map(state.locations, location_json)),
@@ -308,7 +304,10 @@ fn window_outline_json(loc: AppLocation) -> json.Json {
   ])
 }
 
-fn without_session(sessions: List(Session), session_id: String) -> List(Session) {
+fn without_session(
+  sessions: List(Session),
+  session_id: String,
+) -> List(Session) {
   list.filter(sessions, fn(s) { s.session_id != session_id })
 }
 

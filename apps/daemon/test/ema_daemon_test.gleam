@@ -9,6 +9,7 @@ import ema_daemon/bus
 import ema_daemon/event_envelope.{Envelope}
 import ema_identity/ema_device_keys
 import ema_identity/ema_identity
+import ema_identity/ema_pairing
 import ema_invites/ema_invites
 import ema_orgs/ema_orgs
 import ema_replication/ema_collab_sync
@@ -70,6 +71,14 @@ pub fn first_boot_seeds_once_test() {
     bus.event_exists(bus_subject, "org.created", first_boot.personal_org_id),
     True,
   )
+  should.equal(
+    bus.event_exists(bus_subject, "install.initialized", first_boot.install_id),
+    True,
+  )
+  should.equal(
+    bus.event_exists(bus_subject, "identity.user_upserted", "org:identity"),
+    True,
+  )
 
   let _ = delete_file(path)
 }
@@ -84,6 +93,8 @@ pub fn first_boot_appends_ordered_seed_events_to_sqlite_test() {
   let assert Ok(_) = first_boot.seed_if_needed(bus_subject)
 
   should.equal(event_kind_org_rows(path), [
+    #("install.initialized", first_boot.install_id),
+    #("identity.user_upserted", "org:identity"),
     #("device.registered", first_boot.org_id),
     #("actor.created", first_boot.org_id),
     #("actor.created", first_boot.org_id),
@@ -102,6 +113,8 @@ pub fn first_boot_appends_ordered_seed_events_to_sqlite_test() {
     #("attachment.linked", first_boot.org_id),
     #("blueprint.attachment.linked", first_boot.org_id),
   ])
+  should.equal(table_count(path, "install"), 1)
+  should.equal(table_count(path, "users"), 1)
 
   let _ = delete_file(path)
 }
@@ -116,6 +129,20 @@ pub fn topbar_uses_home_current_node_state_test() {
   let assert Ok(_) = first_boot.seed_if_needed(bus_subject)
   let projection = bus.topbar_projection_json(bus_subject)
 
+  should.equal(
+    string.contains(
+      projection,
+      "\"install\":{\"id\":\"" <> first_boot.install_id,
+    ),
+    True,
+  )
+  should.equal(
+    string.contains(
+      projection,
+      "\"user\":{\"id\":\"" <> first_boot.genesis_user_id,
+    ),
+    True,
+  )
   should.equal(
     string.contains(projection, "\"node_state\":\"home_current\""),
     True,
@@ -290,10 +317,177 @@ pub fn device_register_persists_machine_registry_test() {
   )
   should.equal(string.contains(projection, "Friend MacBook"), True)
   should.equal(string.contains(projection, "\"bootstrap\":\"paired\""), True)
+  should.equal(string.contains(projection, "\"attested_by\":null"), True)
+  should.equal(string.contains(projection, "\"capabilities\":[]"), True)
   should.equal(string.contains(projection, "\"status\":\"trusted\""), True)
   should.equal(
     string.contains(projection, "\"machine_peer_ready\":false"),
     True,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn device_register_persists_attestation_and_capabilities_test() {
+  let path = tmp_path("ema-device-attested-register.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(result) =
+    ema_identity.register_device_with_attestation(
+      bus_subject,
+      "org:test",
+      "device:01TESTATTESTEDDEVICE0000001",
+      "user:01TESTIDENTITY000000000001",
+      "Studio Workstation",
+      "ed25519:workstation-public-key",
+      "paired",
+      Some("device:01TESTGENESISDEVICE0000001"),
+      ["runs_agents", "serves_files"],
+    )
+
+  let projection = bus.device_projection_json(bus_subject)
+
+  should.equal(result.device_id, "device:01TESTATTESTEDDEVICE0000001")
+  should.equal(
+    string.contains(
+      projection,
+      "\"attested_by\":\"device:01TESTGENESISDEVICE0000001\"",
+    ),
+    True,
+  )
+  should.equal(
+    string.contains(
+      projection,
+      "\"capabilities\":[\"runs_agents\",\"serves_files\"]",
+    ),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn pairing_offer_create_returns_copyable_offer_test() {
+  let assert Ok(offer) =
+    ema_pairing.create_offer(
+      " org:test ",
+      " user:01TESTIDENTITY000000000001 ",
+      " Studio Workstation ",
+      " ed25519:workstation-public-key ",
+      [" runs_agents ", "", "serves_files"],
+    )
+
+  should.equal(string.starts_with(offer.offer_id, "pairing_offer:"), True)
+  should.equal(offer.org_id, "org:test")
+  should.equal(offer.user_id, "user:01TESTIDENTITY000000000001")
+  should.equal(string.starts_with(offer.device_id, "device:"), True)
+  should.equal(offer.name, "Studio Workstation")
+  should.equal(offer.pubkey, "ed25519:workstation-public-key")
+  should.equal(offer.capabilities, ["runs_agents", "serves_files"])
+  should.equal(string.length(offer.short_code), 6)
+  should.equal(string.starts_with(offer.created_at, "20"), True)
+
+  let as_json = ema_pairing.offer_json(offer)
+  should.equal(string.contains(as_json, "\"offer_id\":\"pairing_offer:"), True)
+  should.equal(string.contains(as_json, "\"short_code\":\""), True)
+}
+
+pub fn pairing_offer_approve_registers_attested_device_test() {
+  let path = tmp_path("ema-pairing-approve.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+  let assert Ok(offer) =
+    ema_pairing.create_offer(
+      "org:test",
+      "user:01TESTIDENTITY000000000001",
+      "Studio Workstation",
+      "ed25519:workstation-public-key",
+      ["runs_agents", "serves_files"],
+    )
+
+  let assert Ok(approval) =
+    ema_pairing.approve_offer(
+      bus_subject,
+      offer.offer_id,
+      offer.org_id,
+      offer.user_id,
+      offer.device_id,
+      offer.name,
+      offer.pubkey,
+      offer.capabilities,
+      offer.short_code,
+      offer.short_code,
+      "device:01TESTGENESISDEVICE0000001",
+    )
+
+  let projection = bus.device_projection_json(bus_subject)
+
+  should.equal(approval.offer_id, offer.offer_id)
+  should.equal(approval.device_id, offer.device_id)
+  should.equal(string.starts_with(approval.event_id, "event:"), True)
+  should.equal(
+    bus.event_exists(bus_subject, "device.registered", "org:test"),
+    True,
+  )
+  should.equal(string.contains(projection, "\"bootstrap\":\"paired\""), True)
+  should.equal(
+    string.contains(
+      projection,
+      "\"attested_by\":\"device:01TESTGENESISDEVICE0000001\"",
+    ),
+    True,
+  )
+  should.equal(
+    string.contains(
+      projection,
+      "\"capabilities\":[\"runs_agents\",\"serves_files\"]",
+    ),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn pairing_offer_approve_rejects_wrong_short_code_test() {
+  let path = tmp_path("ema-pairing-short-code.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+  let assert Ok(offer) =
+    ema_pairing.create_offer(
+      "org:test",
+      "user:01TESTIDENTITY000000000001",
+      "Studio Workstation",
+      "ed25519:workstation-public-key",
+      ["runs_agents"],
+    )
+
+  let assert Error(ema_pairing.ShortCodeMismatch) =
+    ema_pairing.approve_offer(
+      bus_subject,
+      offer.offer_id,
+      offer.org_id,
+      offer.user_id,
+      offer.device_id,
+      offer.name,
+      offer.pubkey,
+      offer.capabilities,
+      offer.short_code,
+      case offer.short_code {
+        "000000" -> "111111"
+        _ -> "000000"
+      },
+      "device:01TESTGENESISDEVICE0000001",
+    )
+
+  should.equal(
+    bus.event_exists(bus_subject, "device.registered", "org:test"),
+    False,
   )
 
   let _ = delete_file(path)
@@ -1467,14 +1661,8 @@ pub fn tick_auto_checkups_uses_per_lane_org_test() {
   should.equal(list.length(result.lane_ids), 2)
 
   // Checkups landed in each lane's actual org.
-  should.equal(
-    bus.event_exists(bus_subject, "checkup.scheduled", org_a),
-    True,
-  )
-  should.equal(
-    bus.event_exists(bus_subject, "checkup.scheduled", org_b),
-    True,
-  )
+  should.equal(bus.event_exists(bus_subject, "checkup.scheduled", org_a), True)
+  should.equal(bus.event_exists(bus_subject, "checkup.scheduled", org_b), True)
   // Critically: no checkup leaked into the legacy hard-coded org.
   should.equal(
     bus.event_exists(bus_subject, "checkup.scheduled", legacy_hardcoded),
@@ -1494,7 +1682,6 @@ pub fn tick_auto_checkups_uses_per_lane_org_test() {
 /// an envelope. The richer silent-zero diagnostic ("no_due_lanes" vs
 /// "already_within_window") tracked in
 /// queue_item:01KQE5P02F015GF0KXM6KHZWWR will layer on top of this.
-
 @external(erlang, "ema_test_helpers", "tmp_path")
 fn tmp_path(suffix: String) -> String
 
@@ -1503,3 +1690,6 @@ fn delete_file(path: String) -> Result(Nil, Nil)
 
 @external(erlang, "ema_test_helpers", "event_kind_org_rows")
 fn event_kind_org_rows(path: String) -> List(#(String, String))
+
+@external(erlang, "ema_test_helpers", "table_count")
+fn table_count(path: String, table: String) -> Int

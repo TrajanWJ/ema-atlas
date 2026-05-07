@@ -20,6 +20,7 @@ type QueueRecord = {
   title: string;
   why: string;
   project_id?: string | null;
+  mission_id?: string | null;
   status: string;
   lane_id?: string | null;
   depends_on?: string | null;
@@ -192,6 +193,8 @@ async function runRecentList(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
   const queue = await loadQueue(args);
   if (!queue) return 1;
+  const activeFilters = listFilters(args);
+  const items = filterQueue(queue.items, activeFilters);
   if (json) {
     emitJson({
       ok: true,
@@ -200,18 +203,46 @@ async function runRecentList(args: ParsedArgs): Promise<number> {
       workspace_scope: queue.context.scope,
       all_projects: queue.context.allProjects,
       filter: queue.context.allProjects ? "all_projects" : "project",
-      queue: queue.items,
+      filters: activeFilters,
+      queue: items,
     });
   } else {
     emitPretty("# queue");
-    if (queue.items.length === 0) emitPretty("  (none)");
-    for (const item of queue.items) {
+    if (activeFilters.length > 0) {
+      emitPretty(`filters: ${activeFilters.map((f) => `${f.key}=${f.value}`).join(" ")}`);
+    }
+    if (items.length === 0) emitPretty("  (none)");
+    for (const item of items) {
       const lane = item.lane_id ? ` lane=${item.lane_id}` : "";
+      const mission = item.mission_id ? ` mission=${item.mission_id}` : "";
       const blocked = item.blocked_by ? ` blocked_by=${item.blocked_by}` : "";
-      emitPretty(`  ${item.id} [${item.status}] ${item.title}${lane}${blocked}`);
+      emitPretty(`  ${item.id} [${item.status}] ${item.title}${lane}${mission}${blocked}`);
     }
   }
   return 0;
+}
+
+type ListFilter = { key: "status" | "mission" | "lane"; value: string };
+
+function listFilters(args: ParsedArgs): ListFilter[] {
+  return [
+    ["status", flagString(args, "status")],
+    ["mission", flagString(args, "mission")],
+    ["lane", flagString(args, "lane")],
+  ].flatMap(([key, value]) =>
+    value ? [{ key: key as ListFilter["key"], value }] : [],
+  );
+}
+
+function filterQueue(items: QueueRecord[], filters: ListFilter[]): QueueRecord[] {
+  if (filters.length === 0) return items;
+  return items.filter((item) =>
+    filters.every((filter) => {
+      if (filter.key === "status") return item.status === filter.value;
+      if (filter.key === "mission") return item.mission_id === filter.value;
+      return item.lane_id === filter.value;
+    }),
+  );
 }
 
 async function loadQueue(args: ParsedArgs): Promise<QueueLoadResult | null> {

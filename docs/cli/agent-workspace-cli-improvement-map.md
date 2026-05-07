@@ -9,18 +9,24 @@ The CLI is no longer only a grammar sketch. The first daemon-backed workspace
 slice exists:
 
 - `ema agent orient --json` reads daemon `lane.registry` and `queue.registry`.
+- `ema tl about --summary --json` reports compact daemon lane/queue state for
+  startup; full `ema tl about --json` is available when complete arrays are
+  needed.
 - `ema tl about --json` reports daemon lane/queue state when available and
-  fallback file-shaped workspace context otherwise.
-- `ema lane open` appends canonical daemon events.
-- `ema lane list` reads the daemon lane registry projection.
-- `ema queue add` appends canonical daemon events.
-- `ema queue list` reads the daemon queue registry projection.
+  stale fallback project-record context otherwise.
+- `ema lane open/list/show/claim/block/move/release/close` use canonical
+  daemon commands and `lane.registry`.
+- `ema queue add/list/show/ready/block/close` use canonical daemon commands
+  and `queue.registry`.
+- Workspace reads subscribe with resolved `project_id`; client-side filtering
+  remains as a defensive guard.
 - `ema vcalendar *` and `ema checkup *` are already daemon-backed.
 - `pnpm cli` now serializes its build step so parallel agents do not race
-  `apps/cli/dist/bin.js`.
+  `apps/cli/dist/bin.js`. Agents should still prefer `ema <command>` (the
+  global wrapper, which never rebuilds) to avoid the race entirely.
 
-This is enough for agents to orient, open a lane, log follow-up work, inspect
-the queue, and pace work against the vCalendar.
+This is enough for agents to orient, claim/refresh a lane, log follow-up work,
+inspect queue pressure, report progress, and pace work against the vCalendar.
 
 Scope correction for active iOS app work:
 
@@ -32,31 +38,20 @@ Scope correction for active iOS app work:
 - Do not create or target a separate `lockedinIOSapp` space. The accidental
   `lockedinIOSapp` space/project is non-canonical cleanup work.
 
-## What Is Still Fake Or Partial
+## What Is Still Partial
 
-These commands are CLI-visible but not yet real daemon lifecycle writers:
+The lane and queue lifecycle is daemon-backed. Remaining partial areas are the
+broader orchestration graph and surface parity:
 
-- `lane claim`
-- `lane block`
-- `lane move`
-- `lane release`
-- `lane close`
-- `lane show`
-- `queue show`
-- `queue ready`
-- `queue block`
-- `queue close`
-- `problem log`
-- `problem solution`
-- `problem link`
-- `handoff request`
-- `handoff list`
-- `campaign create/list/show`
-- `mission create/list/show`
-- `agent report`
+- `problem log/solution/link`
+- campaign and mission depth beyond basic registry use
+- handoff projection scoping and richer lifecycle views
+- agent report surfacing in every See-Agent-Work panel
+- exported markdown snapshots generated from daemon state
 
-The important distinction: the object language is right, but the state machine
-is incomplete.
+The important distinction: active coordination now belongs to the daemon
+registry. File-shaped workspace records are fallback context or exports, not
+the source agents should write during normal work.
 
 ## Immediate Build Order
 
@@ -202,11 +197,13 @@ Done when:
 - current phase from vCalendar
 - "next command to run"
 
-### Add `ema next`
+### `ema next` Is Live
 
-Agents need one command that answers: what should I do now?
+Agents need one command that answers: what should I do now? `ema next --json`
+now does this and returns the active lane, recommended lane, first ready queue
+item, current phase, and the next command to run.
 
-Potential output:
+Current output shape:
 
 ```json
 {
@@ -219,7 +216,10 @@ Potential output:
 
 ### Add `ema workspace doctor`
 
-This should find drift:
+`ema doctor --json` is live as `ema doctor`; it checks daemon projections,
+Blueprint counts, workspace lane/queue counts, gap counts, and subsystem
+readiness. The next improvement is to broaden it with the agent-workspace drift
+checks below:
 
 - open lanes with no owner
 - claimed lanes past refresh window

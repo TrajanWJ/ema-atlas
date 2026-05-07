@@ -25,6 +25,7 @@ import ema_daemon/bus
 import ema_daemon/event_envelope.{type Envelope, Envelope}
 import ema_identity/ema_device_keys
 import ema_identity/ema_identity
+import ema_identity/ema_pairing
 import ema_invites/ema_invites
 import ema_memberships/ema_memberships
 import ema_orgs/ema_orgs
@@ -1219,7 +1220,7 @@ fn handle_text(
                   Some(bootstrap)
                 ->
                   case
-                    ema_identity.register_device(
+                    ema_identity.register_device_with_attestation(
                       bus_subj,
                       org_id,
                       device_id,
@@ -1227,6 +1228,8 @@ fn handle_text(
                       name,
                       pubkey,
                       bootstrap,
+                      incoming.attested_by,
+                      incoming.capabilities,
                     )
                   {
                     Ok(result) -> {
@@ -1261,6 +1264,133 @@ fn handle_text(
                         incoming.id,
                         "invalid_args",
                         "missing device registration args",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("device.pairing_offer.create") -> {
+              case
+                incoming.org_id,
+                incoming.user_id,
+                incoming.name,
+                incoming.pubkey
+              {
+                Some(org_id), Some(user_id), Some(name), Some(pubkey) ->
+                  case
+                    ema_pairing.create_offer(
+                      org_id,
+                      user_id,
+                      name,
+                      pubkey,
+                      incoming.capabilities,
+                    )
+                  {
+                    Ok(offer) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_data(
+                            incoming.id,
+                            "device.pairing_offer",
+                            ema_pairing.offer_json(offer),
+                          ),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          pairing_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing pairing offer args",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("device.pairing_offer.approve") -> {
+              case
+                incoming.offer_id,
+                incoming.org_id,
+                incoming.user_id,
+                incoming.device_id,
+                incoming.name,
+                incoming.pubkey,
+                incoming.short_code,
+                incoming.confirmed_short_code,
+                incoming.attested_by
+              {
+                Some(offer_id),
+                  Some(org_id),
+                  Some(user_id),
+                  Some(device_id),
+                  Some(name),
+                  Some(pubkey),
+                  Some(short_code),
+                  Some(confirmed_short_code),
+                  Some(attested_by)
+                ->
+                  case
+                    ema_pairing.approve_offer(
+                      bus_subj,
+                      offer_id,
+                      org_id,
+                      user_id,
+                      device_id,
+                      name,
+                      pubkey,
+                      incoming.capabilities,
+                      short_code,
+                      confirmed_short_code,
+                      attested_by,
+                    )
+                  {
+                    Ok(approval) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [approval.event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("device.registry"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          pairing_error(incoming.id, e),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                _, _, _, _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing pairing approval args",
                       ),
                     )
                   mist.continue(state)
@@ -3546,6 +3676,11 @@ type Incoming {
     secret_ref: Option(String),
     pubkey: Option(String),
     bootstrap: Option(String),
+    attested_by: Option(String),
+    capabilities: List(String),
+    offer_id: Option(String),
+    short_code: Option(String),
+    confirmed_short_code: Option(String),
     peer_device: Option(String),
     peer_pubkey: Option(String),
     local_pubkey: Option(String),
@@ -3659,6 +3794,11 @@ type IncomingArgs {
     secret_ref: Option(String),
     pubkey: Option(String),
     bootstrap: Option(String),
+    attested_by: Option(String),
+    capabilities: List(String),
+    offer_id: Option(String),
+    short_code: Option(String),
+    confirmed_short_code: Option(String),
     peer_device: Option(String),
     peer_pubkey: Option(String),
     local_pubkey: Option(String),
@@ -3901,6 +4041,31 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
+    use attested_by <- decode.optional_field(
+      "attested_by",
+      None,
+      decode.optional(decode.string),
+    )
+    use capabilities <- decode.optional_field(
+      "capabilities",
+      [],
+      decode.list(decode.string),
+    )
+    use offer_id <- decode.optional_field(
+      "offer_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use short_code <- decode.optional_field(
+      "short_code",
+      None,
+      decode.optional(decode.string),
+    )
+    use confirmed_short_code <- decode.optional_field(
+      "confirmed_short_code",
+      None,
+      decode.optional(decode.string),
+    )
     use peer_device <- decode.optional_field(
       "peer_device",
       None,
@@ -3981,6 +4146,23 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
+    use room_id <- decode.optional_field(
+      "room_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use color <- decode.optional_field(
+      "color",
+      None,
+      decode.optional(decode.string),
+    )
+    use surface <- decode.optional_field(
+      "surface",
+      None,
+      decode.optional(decode.string),
+    )
+    use x <- decode.optional_field("x", None, decode.optional(decode.int))
+    use y <- decode.optional_field("y", None, decode.optional(decode.int))
     use block_id <- decode.optional_field(
       "block_id",
       None,
@@ -4297,6 +4479,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       secret_ref: secret_ref,
       pubkey: pubkey,
       bootstrap: bootstrap,
+      attested_by: attested_by,
+      capabilities: capabilities,
+      offer_id: offer_id,
+      short_code: short_code,
+      confirmed_short_code: confirmed_short_code,
       peer_device: peer_device,
       peer_pubkey: peer_pubkey,
       local_pubkey: local_pubkey,
@@ -4313,6 +4500,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       source: source,
       scopes: scopes,
       actor_id: actor_id,
+      room_id: room_id,
+      color: color,
+      surface: surface,
+      x: x,
+      y: y,
       block_id: block_id,
       block_kind: block_kind,
       label: label,
@@ -4414,6 +4606,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         secret_ref: None,
         pubkey: None,
         bootstrap: None,
+        attested_by: None,
+        capabilities: [],
+        offer_id: None,
+        short_code: None,
+        confirmed_short_code: None,
         peer_device: None,
         peer_pubkey: None,
         local_pubkey: None,
@@ -4430,6 +4627,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         source: None,
         scopes: [],
         actor_id: None,
+        room_id: None,
+        color: None,
+        surface: None,
+        x: None,
+        y: None,
         block_id: None,
         block_kind: None,
         label: None,
@@ -4525,6 +4727,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       secret_ref: args.secret_ref,
       pubkey: args.pubkey,
       bootstrap: args.bootstrap,
+      attested_by: args.attested_by,
+      capabilities: args.capabilities,
+      offer_id: args.offer_id,
+      short_code: args.short_code,
+      confirmed_short_code: args.confirmed_short_code,
       peer_device: args.peer_device,
       peer_pubkey: args.peer_pubkey,
       local_pubkey: args.local_pubkey,
@@ -4541,6 +4748,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       source: args.source,
       scopes: args.scopes,
       actor_id: args.actor_id,
+      room_id: args.room_id,
+      color: args.color,
+      surface: args.surface,
+      x: args.x,
+      y: args.y,
       block_id: args.block_id,
       block_kind: args.block_kind,
       label: args.label,
@@ -4976,6 +5188,68 @@ fn companion_window_id_from(incoming: Incoming) -> String {
   ema_companion.normalize_window_id(incoming.window_id, incoming.id)
 }
 
+fn presence_join_request(incoming: Incoming) -> ema_presence.JoinRequest {
+  ema_presence.JoinRequest(
+    org_id: string_or(incoming.org_id, "org:local"),
+    space_id: string_or(incoming.space_id, "space:local"),
+    room_id: string_or(incoming.room_id, "desktop_room:default"),
+    session_id: presence_session_id_from(incoming),
+    actor_id: string_or(incoming.actor_id, "actor:dev-console"),
+    display_name: string_or(incoming.display_name, "Codex"),
+    color: string_or(incoming.color, "#5eead4"),
+  )
+}
+
+fn presence_cursor_request(incoming: Incoming) -> ema_presence.CursorRequest {
+  ema_presence.CursorRequest(
+    org_id: string_or(incoming.org_id, "org:local"),
+    space_id: string_or(incoming.space_id, "space:local"),
+    room_id: string_or(incoming.room_id, "desktop_room:default"),
+    session_id: presence_session_id_from(incoming),
+    actor_id: string_or(incoming.actor_id, "actor:dev-console"),
+    display_name: string_or(incoming.display_name, "Codex"),
+    color: string_or(incoming.color, "#5eead4"),
+    x: int_or(incoming.x, 0),
+    y: int_or(incoming.y, 0),
+    surface: string_or(incoming.surface, "desktop"),
+    window_id: incoming.window_id,
+    app_id: incoming.app_id,
+  )
+}
+
+fn presence_location_request(
+  incoming: Incoming,
+) -> ema_presence.LocationRequest {
+  let app_id = string_or(incoming.app_id, "unknown")
+  ema_presence.LocationRequest(
+    org_id: string_or(incoming.org_id, "org:local"),
+    space_id: string_or(incoming.space_id, "space:local"),
+    room_id: string_or(incoming.room_id, "desktop_room:default"),
+    session_id: presence_session_id_from(incoming),
+    actor_id: string_or(incoming.actor_id, "actor:dev-console"),
+    display_name: string_or(incoming.display_name, "Codex"),
+    color: string_or(incoming.color, "#5eead4"),
+    window_id: incoming.window_id,
+    app_id: app_id,
+    label: string_or(incoming.label, app_id),
+  )
+}
+
+fn presence_session_id_from(incoming: Incoming) -> String {
+  string_or(incoming.session_id, "presence:" <> incoming.id)
+}
+
+fn string_or(value: Option(String), fallback: String) -> String {
+  case value {
+    Some(raw) ->
+      case string.trim(raw) {
+        "" -> fallback
+        clean -> clean
+      }
+    None -> fallback
+  }
+}
+
 fn err(in_reply_to: String, class: String, message: String) -> String {
   json.to_string(
     json.object([
@@ -5180,6 +5454,33 @@ fn device_key_error(
       err(in_reply_to, "internal", "device key signing failed: " <> reason)
     ema_device_keys.RegisterFailed(identity) ->
       identity_error(in_reply_to, identity)
+  }
+}
+
+fn pairing_error(
+  in_reply_to: String,
+  error: ema_pairing.PairingError,
+) -> String {
+  case error {
+    ema_pairing.EmptyOffer ->
+      err(in_reply_to, "invalid_args", "offer_id is required")
+    ema_pairing.EmptyOrg ->
+      err(in_reply_to, "invalid_args", "org_id is required")
+    ema_pairing.EmptyUser ->
+      err(in_reply_to, "invalid_args", "user_id is required")
+    ema_pairing.EmptyDevice ->
+      err(in_reply_to, "invalid_args", "device_id is required")
+    ema_pairing.EmptyName ->
+      err(in_reply_to, "invalid_args", "device name is required")
+    ema_pairing.EmptyPubkey ->
+      err(in_reply_to, "invalid_args", "pubkey is required")
+    ema_pairing.EmptyShortCode ->
+      err(in_reply_to, "invalid_args", "short_code is required")
+    ema_pairing.EmptyAttester ->
+      err(in_reply_to, "invalid_args", "attested_by is required")
+    ema_pairing.ShortCodeMismatch ->
+      err(in_reply_to, "invalid_args", "confirmed_short_code does not match")
+    ema_pairing.AppendFailed(reason) -> err(in_reply_to, "internal", reason)
   }
 }
 

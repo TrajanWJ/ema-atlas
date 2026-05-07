@@ -89,7 +89,7 @@ export function workspaceSummary(opts: WorkspaceSummaryOptions = {}): WorkspaceS
     records,
     tick: vcalendarTick(now),
     enforcement: [
-      "Start every agent session with `ema tl about --json` or `ema agent orient --json`.",
+      "Start every agent session with `ema next --json`, `ema tl about --summary --json`, and `ema vcalendar tick --json`.",
       "Claim or open a lane before broad edits; keep work inside that scope.",
       "When later work appears, log it as a queue item with why, dependency, done-when, and source.",
       "When a blocker recurs, log a problem and candidate solution edge.",

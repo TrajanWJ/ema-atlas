@@ -11,7 +11,7 @@ daemon companion work, workspace CLI grammar, and runtime projection debt.
 - Active code root: `Active builds/EMA-0.0.5/`.
 - Current web dev surface: `http://localhost:5173`.
 - Current daemon IPC: `ws://127.0.0.1:49555`.
-- Current org/space from `pnpm cli status --json`: `Trajan's Organization`
+- Current org/space from `ema status --json`: `Trajan's Organization`
   / `Personal Workspace`, no current project selected.
 - Current CLI workspace projection split: `lane` / `queue` writes append
   daemon events, but `tl about` still reads the file-backed projection and
@@ -130,4 +130,5 @@ progress cards.
 
 Avoid running multiple `pnpm cli ...` commands in parallel until
 `queue_item:01KQC4ZW6X00E9FXNKG01FZ1RJ` is closed; the wrapper rebuilds
-`apps/cli/dist/bin.js` and can race itself.
+`apps/cli/dist/bin.js` and can race itself. Use `ema <command>` (global
+wrapper, never rebuilds) for parallel calls.

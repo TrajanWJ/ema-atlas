@@ -84,8 +84,12 @@ export async function loadRecentWorkspaceTrail(args?: ParsedArgs): Promise<Recen
           finish();
         }
       });
-      c.subscribe("lane.registry");
-      c.subscribe("queue.registry");
+      const projectId =
+        context && !context.allProjects && context.scope.project_id
+          ? context.scope.project_id
+          : null;
+      c.subscribe("lane.registry", projectId ? { project_id: projectId } : undefined);
+      c.subscribe("queue.registry", projectId ? { project_id: projectId } : undefined);
     });
     c.close();
 
@@ -106,7 +110,7 @@ export async function loadRecentWorkspaceTrail(args?: ParsedArgs): Promise<Recen
       filter: context?.allProjects ? "all_projects" : context?.scope.project_id ? "project" : "unresolved",
       note: context?.allProjects
         ? "Daemon lane.registry and queue.registry are shown in aggregate because --all-projects was passed."
-        : "Daemon lane.registry and queue.registry were filtered client-side by resolved project_id.",
+        : "Daemon lane.registry and queue.registry were subscribed with the resolved project_id; client-side filtering remains a defensive guard.",
     };
   } catch (err) {
     return {
@@ -117,7 +121,7 @@ export async function loadRecentWorkspaceTrail(args?: ParsedArgs): Promise<Recen
       workspace_scope: context?.scope ?? null,
       all_projects: context?.allProjects ?? false,
       filter: context?.allProjects ? "all_projects" : context?.scope.project_id ? "project" : "unresolved",
-      note: "Could not read daemon workspace registries; file-backed workspace projection is still available.",
+      note: "Could not read daemon workspace registries; file-backed workspace projection is stale fallback context only.",
       error: err instanceof Error ? err.message : String(err),
     };
   }

@@ -24,6 +24,12 @@ export type NodeState =
   | "replica_stale";
 
 export type TopbarUser = { id: string; display_name: string };
+export type TopbarInstall = {
+  id: string;
+  genesis_device_id: string;
+  install_pubkey: string;
+  display_name: string;
+};
 export type TopbarOrg = { id: string; name: string };
 export type TopbarSpace = { id: string; org_id: string; name: string };
 export type TopbarProject = { id: string; space_id: string; name: string };
@@ -34,6 +40,7 @@ export type TopbarMembership = {
 };
 
 export type TopbarProjection = {
+  install?: TopbarInstall | null;
   user: TopbarUser;
   orgs: TopbarOrg[];
   current_org?: TopbarOrg;
@@ -193,6 +200,8 @@ export type DeviceRegistryProjection = {
     name: string;
     pubkey: string;
     bootstrap: "genesis" | "paired" | string;
+    attested_by: string | null;
+    capabilities: string[];
     status: "trusted" | "revoked" | string;
     updated_at: string;
   }>;
@@ -306,6 +315,40 @@ export type QueueRegistryProjection = {
 };
 
 // ----------------------------------------------------------------------------
+// cwt.shared_files — current-work-tracker-trajan integration bridge.
+// This is file-backed today, not daemon-owned canonical state. The shape lets
+// EMA surfaces inspect readiness and preview promotion without treating the
+// local CWT SQLite store as EMA truth.
+// ----------------------------------------------------------------------------
+
+export type CwtSharedFilesProjection = {
+  source: "cwt.shared_files" | string;
+  status: "missing_projection" | "projection_found" | "stale" | "writer_pending" | string;
+  root: string;
+  generated_at: string | null;
+  projection: "cwt-shared-files-v0" | string | null;
+  counts: {
+    projects?: number;
+    lanes?: number;
+    queue_items?: number;
+    campaigns?: number;
+    problems?: number;
+    handoffs?: number;
+    vcalendar_blocks?: number;
+    executions?: number;
+    responsibilities?: number;
+    checkups?: number;
+  };
+  local_n_sync: {
+    mode?: "file_projection" | string;
+    namespace?: string;
+    index?: string;
+    current_state?: string;
+  } | null;
+  promotion_boundary: "preview_only" | "daemon_writer_ready" | string;
+};
+
+// ----------------------------------------------------------------------------
 // pending daemon writer — shapes referenced by the shell but not yet
 // delivered by the daemon. Naming them here makes the Runtime handoff
 // explicit.
@@ -330,11 +373,63 @@ export type WallpaperProjection = {
   wallpaper_key: string;
 };
 
-// pending daemon writer: desktop.presence (deferred collab-plane)
 export type PresenceProjection = {
-  project_id: string;
-  cursors: Array<{ actor_id: string; x: number; y: number; color: string }>;
-  window_outlines: Array<{ actor_id: string; window_id: string; color: string }>;
+  source: "ema_presence" | string;
+  authority: "daemon_ephemeral" | string;
+  revision: number;
+  mesh_ready: boolean;
+  sessions: Array<{
+    session_id: string;
+    actor_id: string;
+    display_name: string;
+    color: string;
+    org_id: string;
+    space_id: string;
+    room_id: string;
+    status: "active" | "idle" | "disconnected" | string;
+    last_seen_at: string;
+  }>;
+  actors: Array<{
+    actor_id: string;
+    display_name: string;
+    color: string;
+    kind: "human" | "agent" | string;
+  }>;
+  cursors: Array<{
+    session_id: string;
+    actor_id: string;
+    display_name: string;
+    color: string;
+    org_id: string;
+    space_id: string;
+    room_id: string;
+    x: number;
+    y: number;
+    surface: "desktop" | "window" | "app" | string;
+    window_id: string | null;
+    app_id: string | null;
+    updated_at: string;
+  }>;
+  app_locations: Array<{
+    session_id: string;
+    actor_id: string;
+    display_name: string;
+    color: string;
+    org_id: string;
+    space_id: string;
+    room_id: string;
+    window_id: string | null;
+    app_id: string;
+    label: string;
+    updated_at: string;
+  }>;
+  window_outlines: Array<{
+    actor_id: string;
+    display_name: string;
+    window_id: string | null;
+    app_id: string;
+    color: string;
+  }>;
 };
 
 // ----------------------------------------------------------------------------
@@ -352,6 +447,7 @@ export type ProjectionMap = {
   "space.installed_vapps": SpaceInstalledVAppsProjection;
   "lane.registry": LaneRegistryProjection;
   "queue.registry": QueueRegistryProjection;
+  "cwt.shared_files": CwtSharedFilesProjection;
   "blueprint.sections": BlueprintSectionsProjection;
   "see_agent_work.project_pulse": SeeAgentWorkProjection;
   "git_ema.user_connectors": UserConnectorsProjection;

@@ -218,6 +218,18 @@ pub fn persist_membership_role_granted(
   }
 }
 
+pub fn persist_install_initialized(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_install_initialized_raw(db, payload_json, created_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
 pub fn persist_identity_user_upserted(
   db: Db,
   payload_json: String,
@@ -478,7 +490,10 @@ pub fn lane_registry_projection_json(db: Db) -> String {
   lane_registry_projection_json_raw(db)
 }
 
-pub fn lane_registry_projection_json_scoped(db: Db, project_id: String) -> String {
+pub fn lane_registry_projection_json_scoped(
+  db: Db,
+  project_id: String,
+) -> String {
   lane_registry_projection_json_scoped_raw(db, project_id)
 }
 
@@ -486,7 +501,10 @@ pub fn queue_registry_projection_json(db: Db) -> String {
   queue_registry_projection_json_raw(db)
 }
 
-pub fn queue_registry_projection_json_scoped(db: Db, project_id: String) -> String {
+pub fn queue_registry_projection_json_scoped(
+  db: Db,
+  project_id: String,
+) -> String {
   queue_registry_projection_json_scoped_raw(db, project_id)
 }
 
@@ -631,6 +649,14 @@ fn persist_project_archived_raw(
 
 @external(erlang, "ema_sqlite_helpers", "migrate_projects_unique_name")
 fn migrate_projects_unique_name_raw(db: Db) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_install_initialized")
+fn persist_install_initialized_raw(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
 
 @external(erlang, "ema_sqlite_helpers", "persist_identity_user_upserted")
 fn persist_identity_user_upserted_raw(
@@ -802,13 +828,19 @@ fn space_vapps_projection_json_raw(db: Db) -> String
 fn lane_registry_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "lane_registry_projection_json_scoped")
-fn lane_registry_projection_json_scoped_raw(db: Db, project_id: String) -> String
+fn lane_registry_projection_json_scoped_raw(
+  db: Db,
+  project_id: String,
+) -> String
 
 @external(erlang, "ema_sqlite_helpers", "queue_registry_projection_json")
 fn queue_registry_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "queue_registry_projection_json_scoped")
-fn queue_registry_projection_json_scoped_raw(db: Db, project_id: String) -> String
+fn queue_registry_projection_json_scoped_raw(
+  db: Db,
+  project_id: String,
+) -> String
 
 @external(erlang, "ema_sqlite_helpers", "campaign_registry_projection_json")
 fn campaign_registry_projection_json_raw(db: Db) -> String

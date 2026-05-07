@@ -59,6 +59,7 @@ var COMMANDS = [
   { name: "tl about", summary: "Show daemon-backed lane/queue records, fallback workspace records, and current vCalendar phase." },
   { name: "/tl about", summary: "Alias for `ema tl about`; matches slash-command muscle memory." },
   { name: "agent orient", summary: "Print the enforced agent orientation checklist and workspace summary." },
+  { name: "next", summary: "Recommend the next lane, queue item, or orientation command." },
   { name: "campaign create/list/show", summary: "Manage long-running initiatives. (pending daemon writer)" },
   { name: "mission create/list/show", summary: "Manage mission bundles under campaigns. (pending daemon writer)" },
   { name: "lane open/list", summary: "Open and list daemon-backed lane ownership records." },
@@ -72,6 +73,9 @@ var COMMANDS = [
   { name: "hermes orient/plan/sweep", summary: "Preview the future Hermes orchestrator packet and plan shape. (projection seed)" },
   { name: "harness providers/donors/dispatch", summary: "Prepare Chronicle + Duct Tape Harness Glue rails. (simulated provider ready)" },
   { name: "peer add/doctor/tunnel", summary: "Manage trusted-dev peer rails. (local registry first, SSH first)" },
+  { name: "desktop presence", summary: "Show, join, and publish shared vDesktop presence." },
+  { name: "recovery scan", summary: "Read-only desktop-wide donor, worktree, stale-lane, and lost-work scan." },
+  { name: "cwt status/ingest", summary: "Inspect current-work-tracker shared-files projection and dry-run EMA promotion." },
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
   { name: "swarm list", summary: "List swarms for a project. (wave 1: stubbed)" },
   { name: "swarm show", summary: "Show a single swarm. (wave 1: stubbed)" },
@@ -83,6 +87,7 @@ var COMMANDS = [
   { name: "vcalendar phase set", summary: "Set the current weekly phase label for an actor." },
   { name: "checkup schedule", summary: "Schedule a cadence-based checkup on a lane." },
   { name: "checkup complete", summary: "Mark a checkup complete with a result." },
+  { name: "doctor", summary: "Run a daemon/workspace cohesion diagnostic and report drift." },
   { name: "help", summary: "Show this help." }
 ];
 var GLOBAL_FLAGS = [
@@ -162,7 +167,7 @@ var Client = class {
     return await this.sendHello();
   }
   openSocket() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve2, reject) => {
       let settled = false;
       const ws = new WebSocket(this.url);
       this.ws = ws;
@@ -173,7 +178,7 @@ var Client = class {
         ws.on("message", (raw) => this.handleRaw(raw));
         ws.on("close", () => this.handleClose());
         ws.on("error", (err) => this.handleSocketError(err));
-        resolve();
+        resolve2();
       };
       const onErr = (err) => {
         if (settled) return;
@@ -187,7 +192,7 @@ var Client = class {
     });
   }
   sendHello() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve2, reject) => {
       const id = nextId();
       const timer = setTimeout(() => {
         reject(new ProtocolError("hello timed out"));
@@ -197,12 +202,12 @@ var Client = class {
           clearTimeout(timer);
           this.handlers = this.handlers.filter((h) => h !== handler);
           this.hello = msg;
-          resolve(msg);
+          resolve2(msg);
         } else if (msg.type === "hello") {
           clearTimeout(timer);
           this.handlers = this.handlers.filter((h) => h !== handler);
           this.hello = msg;
-          resolve(msg);
+          resolve2(msg);
         }
       };
       this.handlers.push(handler);
@@ -217,7 +222,7 @@ var Client = class {
   }
   /** Send a command, return the daemon's command_result. */
   command(op, args = {}) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve2, reject) => {
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
         reject(new ProtocolError("socket not open"));
         return;
@@ -227,13 +232,13 @@ var Client = class {
         this.pendingCommands.delete(id);
         reject(new ProtocolError(`command ${op} timed out`));
       }, COMMAND_TIMEOUT_MS);
-      this.pendingCommands.set(id, { resolve, reject, timer });
+      this.pendingCommands.set(id, { resolve: resolve2, reject, timer });
       this.sendRaw({ v: 0, id, type: "command", op, args });
     });
   }
   /** Send ping, resolve with RTT ms. */
   ping() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve2, reject) => {
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
         reject(new ProtocolError("socket not open"));
         return;
@@ -244,7 +249,7 @@ var Client = class {
         this.pendingPings.delete(id);
         reject(new ProtocolError("ping timed out"));
       }, 15e3);
-      this.pendingPings.set(id, { sentAt, resolve, reject, timer });
+      this.pendingPings.set(id, { sentAt, resolve: resolve2, reject, timer });
       this.sendRaw({ v: 0, id, type: "ping" });
     });
   }
@@ -458,7 +463,7 @@ function reportError(err, json) {
 }
 
 // src/workspace-scope.ts
-import { existsSync as existsSync2, readdirSync as readdirSync2, realpathSync, statSync as statSync2 } from "fs";
+import { existsSync as existsSync2, readFileSync as readFileSync2, readdirSync as readdirSync2, realpathSync, statSync as statSync2 } from "fs";
 import { join as join2, relative as relative2, resolve as resolvePath, sep } from "path";
 
 // src/workspace-state.ts
@@ -500,7 +505,7 @@ function workspaceSummary(opts = {}) {
     records,
     tick: vcalendarTick(now),
     enforcement: [
-      "Start every agent session with `ema tl about --json` or `ema agent orient --json`.",
+      "Start every agent session with `ema next --json`, `ema tl about --summary --json`, and `ema vcalendar tick --json`.",
       "Claim or open a lane before broad edits; keep work inside that scope.",
       "When later work appears, log it as a queue item with why, dependency, done-when, and source.",
       "When a blocker recurs, log a problem and candidate solution edge.",
@@ -670,7 +675,7 @@ var DAEMON_PROJECTION_TIMEOUT_MS = 1500;
 async function resolveWorkspaceScope(opts = {}) {
   const cwd = canonicalCwd(opts.cwd ?? process.cwd());
   const env = opts.env ?? process.env;
-  const projects = await loadDaemonProjects();
+  const projects = mergeProjects(await loadDaemonProjects(), loadFileProjects());
   const flagProject = opts.args ? flagString(opts.args, "project") : void 0;
   const flagSpace = opts.args ? flagString(opts.args, "space") : void 0;
   const flagOrg = opts.args ? flagString(opts.args, "org") : void 0;
@@ -715,11 +720,11 @@ function canonicalCwd(raw) {
 }
 function decorate(project, source, cwd, overrides) {
   const projectRecord = project.local_path && project.local_path.length > 0 ? project.local_path : join2(PROJECTS_DIR, project.name);
-  const { activeBuild, buildVersion, buildRecord } = inferBuildPaths(project.name, projectRecord, cwd);
+  const { activeBuild, buildVersion, buildRecord } = inferBuildPaths(project.name, projectRecord, cwd, project.active_build);
   return {
-    org_id: overrides.orgOverride ?? project.org_id,
-    space_id: overrides.spaceOverride ?? project.space_id,
-    project_id: project.id,
+    org_id: nullIfEmpty(overrides.orgOverride ?? project.org_id),
+    space_id: nullIfEmpty(overrides.spaceOverride ?? project.space_id),
+    project_id: nullIfEmpty(project.id),
     project_name: project.name,
     project_record: projectRecord,
     active_build: activeBuild,
@@ -758,15 +763,33 @@ function inferFromCwd(cwd, projects) {
     const buildVersion = inferBuildVersionUnderProject(projectRecord, cwd);
     const buildRecord = buildVersion ? join2(projectRecord, "builds", buildVersion) : null;
     return {
-      org_id: project.org_id,
-      space_id: project.space_id,
-      project_id: project.id,
+      org_id: nullIfEmpty(project.org_id),
+      space_id: nullIfEmpty(project.space_id),
+      project_id: nullIfEmpty(project.id),
       project_name: project.name,
       project_record: projectRecord,
-      active_build: matchActiveBuildPath(project.name) ?? null,
+      active_build: project.active_build ?? matchActiveBuildPath(project.name) ?? null,
       build_version: buildVersion,
       build_record: buildRecord,
       resolution_source: buildVersion ? "cwd-build" : "cwd-project",
+      cwd,
+      note: null
+    };
+  }
+  const byActiveBuild = projects.filter((p) => p.active_build && p.active_build.length > 0).map((p) => ({ p, prefix: ensureTrailingSep(canonicalMaybe(p.active_build ?? "")) })).filter(({ prefix }) => cwd === stripTrailingSep(prefix) || cwd.startsWith(prefix)).sort((a, b) => b.prefix.length - a.prefix.length)[0];
+  if (byActiveBuild) {
+    const project = byActiveBuild.p;
+    const projectRecord = project.local_path && project.local_path.length > 0 ? project.local_path : join2(PROJECTS_DIR, project.name);
+    return {
+      org_id: nullIfEmpty(project.org_id),
+      space_id: nullIfEmpty(project.space_id),
+      project_id: nullIfEmpty(project.id),
+      project_name: project.name,
+      project_record: projectRecord,
+      active_build: canonicalMaybe(project.active_build ?? ""),
+      build_version: null,
+      build_record: null,
+      resolution_source: "cwd-active-build",
       cwd,
       note: null
     };
@@ -783,9 +806,9 @@ function inferFromCwd(cwd, projects) {
         const activeBuild = join2(ACTIVE_BUILDS_DIR, buildName);
         const buildRecord = version ? join2(projectRecord, "builds", version) : null;
         return {
-          org_id: project.org_id,
-          space_id: project.space_id,
-          project_id: project.id,
+          org_id: nullIfEmpty(project.org_id),
+          space_id: nullIfEmpty(project.space_id),
+          project_id: nullIfEmpty(project.id),
           project_name: project.name,
           project_record: projectRecord,
           active_build: activeBuild,
@@ -800,7 +823,18 @@ function inferFromCwd(cwd, projects) {
   }
   return null;
 }
-function inferBuildPaths(projectName, projectRecord, cwd) {
+function nullIfEmpty(value) {
+  return value && value.length > 0 ? value : null;
+}
+function inferBuildPaths(projectName, projectRecord, cwd, configuredActiveBuild) {
+  const configured = configuredActiveBuild ? canonicalMaybe(configuredActiveBuild) : null;
+  if (configured && (cwd === configured || cwd.startsWith(ensureTrailingSep(configured)))) {
+    return {
+      activeBuild: configured,
+      buildVersion: null,
+      buildRecord: null
+    };
+  }
   const activePrefix = ensureTrailingSep(ACTIVE_BUILDS_DIR);
   if (cwd.startsWith(activePrefix)) {
     const buildName = relative2(ACTIVE_BUILDS_DIR, cwd).split(sep)[0] ?? "";
@@ -818,10 +852,18 @@ function inferBuildPaths(projectName, projectRecord, cwd) {
   }
   const buildVersion = inferBuildVersionUnderProject(projectRecord, cwd);
   return {
-    activeBuild: matchActiveBuildPath(projectName),
+    activeBuild: configured ?? matchActiveBuildPath(projectName),
     buildVersion,
     buildRecord: buildVersion ? join2(projectRecord, "builds", buildVersion) : null
   };
+}
+function canonicalMaybe(raw) {
+  const clean = raw.replaceAll("\\ ", " ");
+  try {
+    return realpathSync(clean);
+  } catch {
+    return resolvePath(clean);
+  }
 }
 function inferBuildVersionUnderProject(projectRecord, cwd) {
   const buildsRoot = ensureTrailingSep(join2(projectRecord, "builds"));
@@ -865,14 +907,14 @@ function isDirectory(path2) {
 async function loadDaemonProjects() {
   try {
     const c = await connect({ surface: "desktop" });
-    const projects = await new Promise((resolve) => {
-      const timer = setTimeout(() => resolve([]), DAEMON_PROJECTION_TIMEOUT_MS);
+    const projects = await new Promise((resolve2) => {
+      const timer = setTimeout(() => resolve2([]), DAEMON_PROJECTION_TIMEOUT_MS);
       c.onMessage((msg) => {
         if (msg.type !== "projection") return;
         if (msg.name !== "project.filesystem_status") return;
         clearTimeout(timer);
         const data = msg.data;
-        resolve((data?.projects ?? []).map(toDaemonProject));
+        resolve2((data?.projects ?? []).map(toDaemonProject));
       });
       c.subscribe("project.filesystem_status");
     });
@@ -882,17 +924,107 @@ async function loadDaemonProjects() {
     return [];
   }
 }
+function loadFileProjects() {
+  if (!existsSync2(PROJECTS_DIR)) return [];
+  const projectPaths = [
+    ...projectRecordPaths(PROJECTS_DIR),
+    ...projectRecordPaths(join2(PROJECTS_DIR, "EMA", "subprojects"))
+  ];
+  return projectPaths.map(readFileProject).filter((project) => project !== null);
+}
+function projectRecordPaths(root) {
+  if (!existsSync2(root)) return [];
+  try {
+    return readdirSync2(root).map((name) => join2(root, name)).filter((path2) => isDirectory(path2) && existsSync2(join2(path2, "project.md")));
+  } catch {
+    return [];
+  }
+}
+function readFileProject(path2) {
+  try {
+    const raw = readFileSync2(join2(path2, "project.md"), "utf8");
+    const meta = {
+      ...parseMarkdownFields(raw),
+      ...parseFrontmatter2(raw)
+    };
+    const name = meta.name ?? path2.split(sep).pop() ?? "";
+    if (!name) return null;
+    return {
+      id: meta.project_id ?? "",
+      name,
+      org_id: meta.org_id ?? "",
+      space_id: meta.space_id ?? "",
+      local_path: path2,
+      active_build: meta.active_build ? resolveMetadataPath(path2, meta.active_build) : void 0,
+      materialization_status: meta.status ?? "file_record"
+    };
+  } catch {
+    return null;
+  }
+}
+function mergeProjects(daemon, fileProjects) {
+  const merged = /* @__PURE__ */ new Map();
+  for (const project of fileProjects) {
+    merged.set(projectKey(project), project);
+  }
+  for (const project of daemon) {
+    const existing = merged.get(projectKey(project));
+    merged.set(projectKey(project), {
+      ...existing,
+      ...project,
+      id: project.id || existing?.id || "",
+      org_id: project.org_id || existing?.org_id || "",
+      space_id: project.space_id || existing?.space_id || "",
+      local_path: project.local_path || existing?.local_path || "",
+      active_build: project.active_build || existing?.active_build,
+      materialization_status: project.materialization_status || existing?.materialization_status || ""
+    });
+  }
+  return [...merged.values()];
+}
+function resolveMetadataPath(projectRecord, raw) {
+  const clean = raw.replaceAll("\\ ", " ");
+  if (clean.startsWith("/")) return canonicalMaybe(clean);
+  return canonicalMaybe(join2(projectRecord, clean));
+}
+function projectKey(project) {
+  return project.id || project.name.toLowerCase() || project.local_path;
+}
+function parseFrontmatter2(raw) {
+  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return {};
+  const out = {};
+  for (const line of (match[1] ?? "").split("\n")) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    const value = line.slice(idx + 1).trim();
+    if (key) out[key] = value.replace(/^["']|["']$/g, "");
+  }
+  return out;
+}
+function parseMarkdownFields(raw) {
+  const out = {};
+  for (const line of raw.split("\n")) {
+    const match = line.match(/^\s*-\s*([a-zA-Z0-9_]+):\s*`?([^`]+?)`?\s*$/);
+    if (!match) continue;
+    const key = match[1];
+    const value = match[2]?.trim();
+    if (key && value) out[key] = value;
+  }
+  return out;
+}
 async function loadDaemonTopbar() {
   try {
     const c = await connect({ surface: "desktop" });
-    const topbar = await new Promise((resolve) => {
-      const timer = setTimeout(() => resolve(null), DAEMON_PROJECTION_TIMEOUT_MS);
+    const topbar = await new Promise((resolve2) => {
+      const timer = setTimeout(() => resolve2(null), DAEMON_PROJECTION_TIMEOUT_MS);
       c.onMessage((msg) => {
         if (msg.type !== "projection") return;
         if (msg.name !== "topbar") return;
         clearTimeout(timer);
         const d = msg.data ?? {};
-        resolve({
+        resolve2({
           current_org: pickIdName(d.current_org),
           current_space: pickIdName(d.current_space),
           current_project: pickIdName(d.current_project)
@@ -947,7 +1079,7 @@ async function runStatus(args) {
   const json = flagBool(args, "json");
   try {
     const c = await connect({ surface: "desktop" });
-    const data = await new Promise((resolve, reject) => {
+    const data = await new Promise((resolve2, reject) => {
       const timer = setTimeout(
         () => reject(new Error("timed out waiting for topbar projection")),
         PROJECTION_TIMEOUT_MS
@@ -955,7 +1087,7 @@ async function runStatus(args) {
       c.onMessage((msg) => {
         if (msg.type === "projection" && msg.name === "topbar") {
           clearTimeout(timer);
-          resolve(msg.data);
+          resolve2(msg.data);
         }
       });
       const userId = c.hello?.accepted_device_id ?? null;
@@ -969,6 +1101,7 @@ async function runStatus(args) {
       project: data.current_project ?? null,
       node_state: data.node_state ?? null
     };
+    const scopeWarning = homeCurrent.project?.id && workspaceScope.project_id && homeCurrent.project.id !== workspaceScope.project_id ? `home_current project ${homeCurrent.project.name} (${homeCurrent.project.id}) differs from workspace_scope project ${workspaceScope.project_name ?? "(unnamed)"} (${workspaceScope.project_id}); workspace commands use workspace_scope unless --project overrides it.` : null;
     if (json) {
       emitJson({
         ok: true,
@@ -978,6 +1111,7 @@ async function runStatus(args) {
         node_state: data.node_state ?? null,
         home_current: homeCurrent,
         workspace_scope: workspaceScope,
+        scope_warning: scopeWarning,
         scope_note: "org/space/project are the daemon topbar home_current selection; workspace_scope is the flag/env/cwd-resolved project scope used by workspace commands."
       });
     } else {
@@ -991,6 +1125,7 @@ async function runStatus(args) {
       emitPretty(`project: ${workspaceScope.project_name ?? "(unresolved)"} (${workspaceScope.project_id ?? "no id"})`);
       emitPretty(`source:  ${workspaceScope.resolution_source}`);
       emitPretty(`cwd:     ${workspaceScope.cwd}`);
+      if (scopeWarning) emitPretty(`warning: ${scopeWarning}`);
       if (workspaceScope.note) emitPretty(`note:    ${workspaceScope.note}`);
     }
     c.close();
@@ -1064,10 +1199,10 @@ async function runEvents(args) {
     if (device) {
       c.subscribe(`user.${device}.orgs`);
     }
-    await new Promise((resolve) => {
+    await new Promise((resolve2) => {
       const shutdown = () => {
         c.close();
-        resolve();
+        resolve2();
       };
       process.on("SIGINT", shutdown);
       process.on("SIGTERM", shutdown);
@@ -1426,10 +1561,46 @@ var PHASE_MODE = {
 function modeFromHour(hour, fallback) {
   if (hour < 9) return "planning";
   if (hour < 11) return "planning";
-  if (hour < 16) return "planning";
-  if (hour < 18) return "execution";
-  if (hour < 24) return "review";
+  if (hour < 16) return "execution";
+  if (hour < 18) return "review";
+  if (hour < 24) return "handoff";
   return fallback;
+}
+function instructionsForPhase(phase, fallback) {
+  switch (phase) {
+    case "intake and orientation":
+      return [
+        "Read orientation docs.",
+        "Run `ema status --json` and `ema agent orient --json`.",
+        "Pick or open the lane before editing."
+      ];
+    case "planning and lane claim":
+      return [
+        "Clarify campaign, mission, lane, dependencies, and done-when.",
+        "Log discovered later work to queue instead of expanding scope.",
+        "Schedule checkups for risky or long-running lanes."
+      ];
+    case "execution block":
+      return [
+        "Work inside the claimed lane scope.",
+        "Keep dependency discoveries in queue/problem graph.",
+        "Run verification before crossing into review."
+      ];
+    case "review and checkup":
+      return [
+        "Run verification and summarize changed files.",
+        "Close or update queue items.",
+        "Record blockers as problem/solution graph nodes."
+      ];
+    case "handoff and next-day queue":
+      return [
+        "Request or complete handoff before leaving partial work.",
+        "Move unfinished discoveries to queue with dependencies.",
+        "Set next vCalendar block and checkup cadence."
+      ];
+    default:
+      return fallback;
+  }
 }
 function phaseToMode(phase, setAt, heuristicMode) {
   const mapped = PHASE_MODE[phase];
@@ -1445,12 +1616,12 @@ function phaseToMode(phase, setAt, heuristicMode) {
 async function readVcalendarState() {
   try {
     const c = await connect({ surface: "desktop" });
-    const data = await new Promise((resolve) => {
+    const data = await new Promise((resolve2) => {
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          resolve(null);
+          resolve2(null);
         }
       }, 1500);
       c.onMessage((msg) => {
@@ -1458,7 +1629,7 @@ async function readVcalendarState() {
           if (!settled) {
             settled = true;
             clearTimeout(timer);
-            resolve(msg.data);
+            resolve2(msg.data);
           }
         }
       });
@@ -1502,7 +1673,7 @@ async function runTick(args) {
     should_checkup: mode === "review" || mode === "handoff",
     should_handoff: mode === "handoff",
     next_tick: heuristic.next_tick,
-    instructions: heuristic.instructions
+    instructions: instructionsForPhase(phase, heuristic.instructions)
   };
   if (json) {
     emitJson({
@@ -1558,11 +1729,22 @@ async function runTickCheckups(args) {
     const data = result.data ?? {};
     const emitted = data.emitted ?? 0;
     const laneIds = data.lane_ids ?? [];
+    const skippedUnscoped = data.skipped_unscoped ?? 0;
+    const reason = emitted === 0 ? skippedUnscoped > 0 ? "skipped_unscoped" : "no_due_lanes" : null;
     if (json) {
-      emitJson({ ok: true, emitted, lane_ids: laneIds });
+      emitJson({
+        ok: true,
+        emitted,
+        lane_ids: laneIds,
+        skipped_unscoped: skippedUnscoped,
+        reason
+      });
     } else {
       emitPretty(`# vcalendar tick-checkups`);
       emitPretty(`emitted: ${emitted}`);
+      if (skippedUnscoped > 0)
+        emitPretty(`skipped_unscoped: ${skippedUnscoped}  (legacy lanes with no envelope org_id; M9 backfill required)`);
+      if (reason) emitPretty(`reason: ${reason}`);
       for (const id of laneIds) emitPretty(`  + ${id}`);
     }
     return 0;
@@ -1573,12 +1755,12 @@ async function runTickCheckups(args) {
 async function runReadQuery(_args, json, opts) {
   try {
     const c = await connect({ surface: "desktop" });
-    const eventTrailRows = await new Promise((resolve) => {
+    const eventTrailRows = await new Promise((resolve2) => {
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          resolve([]);
+          resolve2([]);
         }
       }, 1200);
       c.onMessage((msg) => {
@@ -1587,7 +1769,7 @@ async function runReadQuery(_args, json, opts) {
           if (!settled) {
             settled = true;
             clearTimeout(timer);
-            resolve(data.events ?? []);
+            resolve2(data.events ?? []);
           }
         }
       });
@@ -1828,12 +2010,12 @@ async function readProjection(args, spec) {
     const scopeContext = await workspaceScopeContext(args);
     const projectId = !scopeContext.allProjects && scopeContext.scope.project_id ? scopeContext.scope.project_id : null;
     const c = await connect({ surface: "desktop" });
-    const value = await new Promise((resolve) => {
-      const timer = setTimeout(() => resolve(spec.pick({})), 1200);
+    const value = await new Promise((resolve2) => {
+      const timer = setTimeout(() => resolve2(spec.pick({})), 1200);
       c.onMessage((msg) => {
         if (msg.type === "projection" && msg.name === spec.name) {
           clearTimeout(timer);
-          resolve(spec.pick(msg.data ?? {}));
+          resolve2(spec.pick(msg.data ?? {}));
         }
       });
       c.subscribe(spec.name, projectId ? { project_id: projectId } : void 0);
@@ -2229,6 +2411,8 @@ async function runRecentList(args) {
   const json = flagBool(args, "json");
   const lanes = await loadLanes(args);
   if (!lanes) return 1;
+  const activeFilters = listFilters(args);
+  const items = filterLanes(lanes.items, activeFilters);
   if (json) {
     emitJson({
       ok: true,
@@ -2237,18 +2421,40 @@ async function runRecentList(args) {
       workspace_scope: lanes.context.scope,
       all_projects: lanes.context.allProjects,
       filter: lanes.context.allProjects ? "all_projects" : "project",
-      lanes: lanes.items
+      filters: activeFilters,
+      lanes: items
     });
   } else {
     emitPretty("# lanes");
-    if (lanes.items.length === 0) emitPretty("  (none)");
-    for (const lane of lanes.items) {
+    if (activeFilters.length > 0) {
+      emitPretty(`filters: ${activeFilters.map((f) => `${f.key}=${f.value}`).join(" ")}`);
+    }
+    if (items.length === 0) emitPretty("  (none)");
+    for (const lane of items) {
       const owner = lane.actor_id ? ` owner=${lane.actor_id}` : "";
+      const mission = lane.mission_id ? ` mission=${lane.mission_id}` : "";
       const updated = lane.updated_at ? ` updated=${lane.updated_at}` : "";
-      emitPretty(`  ${lane.id} [${lane.status}] ${lane.title}${owner}${updated}`);
+      emitPretty(`  ${lane.id} [${lane.status}] ${lane.title}${owner}${mission}${updated}`);
     }
   }
   return 0;
+}
+function listFilters(args) {
+  return [
+    ["status", flagString(args, "status")],
+    ["mission", flagString(args, "mission")]
+  ].flatMap(
+    ([key, value]) => value ? [{ key, value }] : []
+  );
+}
+function filterLanes(items, filters) {
+  if (filters.length === 0) return items;
+  return items.filter(
+    (item) => filters.every((filter) => {
+      if (filter.key === "status") return item.status === filter.value;
+      return item.mission_id === filter.value;
+    })
+  );
 }
 async function loadLanes(args) {
   const context = await workspaceScopeContext(args);
@@ -2416,6 +2622,8 @@ async function runRecentList2(args) {
   const json = flagBool(args, "json");
   const queue = await loadQueue(args);
   if (!queue) return 1;
+  const activeFilters = listFilters2(args);
+  const items = filterQueue(queue.items, activeFilters);
   if (json) {
     emitJson({
       ok: true,
@@ -2424,18 +2632,42 @@ async function runRecentList2(args) {
       workspace_scope: queue.context.scope,
       all_projects: queue.context.allProjects,
       filter: queue.context.allProjects ? "all_projects" : "project",
-      queue: queue.items
+      filters: activeFilters,
+      queue: items
     });
   } else {
     emitPretty("# queue");
-    if (queue.items.length === 0) emitPretty("  (none)");
-    for (const item of queue.items) {
+    if (activeFilters.length > 0) {
+      emitPretty(`filters: ${activeFilters.map((f) => `${f.key}=${f.value}`).join(" ")}`);
+    }
+    if (items.length === 0) emitPretty("  (none)");
+    for (const item of items) {
       const lane = item.lane_id ? ` lane=${item.lane_id}` : "";
+      const mission = item.mission_id ? ` mission=${item.mission_id}` : "";
       const blocked = item.blocked_by ? ` blocked_by=${item.blocked_by}` : "";
-      emitPretty(`  ${item.id} [${item.status}] ${item.title}${lane}${blocked}`);
+      emitPretty(`  ${item.id} [${item.status}] ${item.title}${lane}${mission}${blocked}`);
     }
   }
   return 0;
+}
+function listFilters2(args) {
+  return [
+    ["status", flagString(args, "status")],
+    ["mission", flagString(args, "mission")],
+    ["lane", flagString(args, "lane")]
+  ].flatMap(
+    ([key, value]) => value ? [{ key, value }] : []
+  );
+}
+function filterQueue(items, filters) {
+  if (filters.length === 0) return items;
+  return items.filter(
+    (item) => filters.every((filter) => {
+      if (filter.key === "status") return item.status === filter.value;
+      if (filter.key === "mission") return item.mission_id === filter.value;
+      return item.lane_id === filter.value;
+    })
+  );
 }
 async function loadQueue(args) {
   const context = await workspaceScopeContext(args);
@@ -2656,15 +2888,15 @@ async function loadRecentWorkspaceTrail(args) {
     const c = await connect({ surface: "desktop" });
     let lanes = null;
     let queue = null;
-    const result = await new Promise((resolve) => {
-      const timer = setTimeout(() => resolve({
+    const result = await new Promise((resolve2) => {
+      const timer = setTimeout(() => resolve2({
         lanes: lanes ?? [],
         queue: queue ?? []
       }), 1200);
       const finish = () => {
         if (lanes && queue) {
           clearTimeout(timer);
-          resolve({ lanes, queue });
+          resolve2({ lanes, queue });
         }
       };
       c.onMessage((msg) => {
@@ -2681,8 +2913,9 @@ async function loadRecentWorkspaceTrail(args) {
           finish();
         }
       });
-      c.subscribe("lane.registry");
-      c.subscribe("queue.registry");
+      const projectId = context && !context.allProjects && context.scope.project_id ? context.scope.project_id : null;
+      c.subscribe("lane.registry", projectId ? { project_id: projectId } : void 0);
+      c.subscribe("queue.registry", projectId ? { project_id: projectId } : void 0);
     });
     c.close();
     const lanesScoped = context ? filterProjectScopedRecords(result.lanes, context) : result.lanes;
@@ -2695,7 +2928,7 @@ async function loadRecentWorkspaceTrail(args) {
       workspace_scope: context?.scope ?? null,
       all_projects: context?.allProjects ?? true,
       filter: context?.allProjects ? "all_projects" : context?.scope.project_id ? "project" : "unresolved",
-      note: context?.allProjects ? "Daemon lane.registry and queue.registry are shown in aggregate because --all-projects was passed." : "Daemon lane.registry and queue.registry were filtered client-side by resolved project_id."
+      note: context?.allProjects ? "Daemon lane.registry and queue.registry are shown in aggregate because --all-projects was passed." : "Daemon lane.registry and queue.registry were subscribed with the resolved project_id; client-side filtering remains a defensive guard."
     };
   } catch (err) {
     return {
@@ -2706,7 +2939,7 @@ async function loadRecentWorkspaceTrail(args) {
       workspace_scope: context?.scope ?? null,
       all_projects: context?.allProjects ?? false,
       filter: context?.allProjects ? "all_projects" : context?.scope.project_id ? "project" : "unresolved",
-      note: "Could not read daemon workspace registries; file-backed workspace projection is still available.",
+      note: "Could not read daemon workspace registries; file-backed workspace projection is stale fallback context only.",
       error: err instanceof Error ? err.message : String(err)
     };
   }
@@ -2802,10 +3035,10 @@ async function runPrompt(args) {
     blockedQueue.length > 0 ? `- Blocked: ${blockedQueue.map((item) => `${item.id} ${item.title}`).join("; ")}` : "- Blocked: none for this lane",
     "",
     "Required EMA Loop:",
-    "- Run pnpm cli tl about --json and pnpm cli vcalendar tick --json first.",
-    "- Use pnpm cli lane show/list before edits; claim or refresh ownership if you edit.",
-    "- Log later work with pnpm cli queue add including why, done-when, source, and blockers.",
-    "- Finish with pnpm cli agent report --actor <actor> --lane <lane> --changed ... --verified ... --risks ... --next ...",
+    "- Run ema tl about --json and ema vcalendar tick --json first.",
+    "- Use ema lane show/list before edits; claim or refresh ownership if you edit.",
+    "- Log later work with ema queue add including why, done-when, source, and blockers.",
+    "- Finish with ema agent report --actor <actor> --lane <lane> --changed ... --verified ... --risks ... --next ...",
     mode === "handoff" ? "- If you cannot continue, request or update a handoff rather than leaving chat-only context." : "- Keep the Harness execution tied to the lane and use harness context/events for recovery."
   ].filter((line) => line !== null);
   const prompt = promptLines.join("\n");
@@ -2813,8 +3046,8 @@ async function runPrompt(args) {
   const providerArg = ` --provider ${shellQuote(provider)}`;
   const cwdArg = ` --cwd ${shellQuote(cwd)}`;
   const promptArg = ` --prompt ${shellQuote(prompt)}`;
-  const harnessCommand = provider === "simulated" ? `pnpm cli harness dispatch${providerArg}${laneArg}${cwdArg}${promptArg} --json` : `pnpm cli harness start${providerArg}${laneArg}${cwdArg}${promptArg} --json`;
-  const handoffCommand = lane ? `pnpm cli handoff request --from ${shellQuote(lane.id)} --to ${shellQuote(target)} --needed ${shellQuote(objective ?? title)} --context ${shellQuote(prompt)} --verify ${shellQuote("agent report recorded with changed/verified/risks/next")} --json` : null;
+  const harnessCommand = provider === "simulated" ? `ema harness dispatch${providerArg}${laneArg}${cwdArg}${promptArg} --json` : `ema harness start${providerArg}${laneArg}${cwdArg}${promptArg} --json`;
+  const handoffCommand = lane ? `ema handoff request --from ${shellQuote(lane.id)} --to ${shellQuote(target)} --needed ${shellQuote(objective ?? title)} --context ${shellQuote(prompt)} --verify ${shellQuote("agent report recorded with changed/verified/risks/next")} --json` : null;
   const payload = {
     ok: true,
     command: "agent prompt",
@@ -2833,8 +3066,8 @@ async function runPrompt(args) {
     commands: {
       harness: harnessCommand,
       handoff: handoffCommand,
-      context: lane ? `pnpm cli harness context --lane ${shellQuote(lane.id)} --json` : "pnpm cli harness context --json",
-      report: lane ? `pnpm cli agent report --actor ${shellQuote(target)} --lane ${shellQuote(lane.id)} --changed <changed> --verified <verified> --risks <risks> --next <next> --json` : null
+      context: lane ? `ema harness context --lane ${shellQuote(lane.id)} --json` : "ema harness context --json",
+      report: lane ? `ema agent report --actor ${shellQuote(target)} --lane ${shellQuote(lane.id)} --changed <changed> --verified <verified> --risks <risks> --next <next> --json` : null
     }
   };
   if (json) {
@@ -2888,6 +3121,10 @@ function toVcalendarState(data) {
     current_phase_set_at: readStringField(data, "current_phase_set_at"),
     current_phase_set_by: readStringField(data, "current_phase_set_by")
   };
+}
+function filterResolvedProjectRecords(records, projectId, allProjects) {
+  if (allProjects || !projectId) return [...records];
+  return records.filter((record) => record.project_id === projectId);
 }
 async function runMetaProgress(args) {
   const json = flagBool(args, "json");
@@ -3086,11 +3323,17 @@ async function runOrient(args) {
   const json = flagBool(args, "json");
   const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
   const scope = await resolveWorkspaceScope({ args });
+  const allProjects = flagBool(args, "all-projects");
   const daemonRecent = await loadRecentWorkspaceTrail(args);
-  const handoffs = await readProjection(args, {
+  const handoffsRaw = await readProjection(args, {
     name: "handoff.registry",
     pick: (data) => data.handoffs ?? []
   }) ?? [];
+  const handoffs = filterResolvedProjectRecords(
+    handoffsRaw,
+    scope.project_id,
+    allProjects
+  );
   const reports = await readProjection(args, {
     name: "agent.reports",
     pick: (data) => data.reports ?? []
@@ -3239,9 +3482,9 @@ async function runTl(args) {
       status: "available",
       docRef: "docs/cli/agent-workspace.md",
       commands: [
-        { verb: "about", flags: ["project", "all-projects", "json"], summary: "Show task-layer orientation and daemon-backed workspace records." },
-        { verb: "status", flags: ["project", "all-projects", "json"], summary: "Alias-style task-layer status view." },
-        { verb: "tick", flags: ["project", "all-projects", "json"], summary: "Show task-layer state with vCalendar tick context." }
+        { verb: "about", flags: ["project", "all-projects", "summary", "json"], summary: "Show task-layer orientation and daemon-backed workspace records." },
+        { verb: "status", flags: ["project", "all-projects", "summary", "json"], summary: "Alias-style task-layer status view." },
+        { verb: "tick", flags: ["project", "all-projects", "summary", "json"], summary: "Show task-layer state with vCalendar tick context." }
       ]
     });
   }
@@ -3268,6 +3511,53 @@ async function runTl(args) {
     }))
   });
   if (json) {
+    if (flagBool(args, "summary") || flagBool(args, "compact")) {
+      const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+      const activeLane = daemonRecent.lanes.find(
+        (lane) => lane.actor_id === actor && lane.status !== "done" && lane.status !== "closed"
+      ) ?? null;
+      const readyLanes = daemonRecent.lanes.filter((lane) => lane.status === "ready" || lane.status === "idea");
+      const readyQueue = daemonRecent.queue.filter((item) => item.status === "ready");
+      const blockedQueue = daemonRecent.queue.filter((item) => item.status === "blocked");
+      emitJson({
+        ok: true,
+        command: `tl ${sub}`,
+        compact: true,
+        actor,
+        workspace: {
+          source: summary.source,
+          daemon_authority: summary.daemon_authority,
+          root: summary.root,
+          project_record: summary.project_record,
+          active_build: summary.active_build,
+          workspace_scope: summary.workspace_scope,
+          orientation_docs: summary.orientation_docs,
+          counts: summary.counts,
+          tick: summary.tick,
+          enforcement: summary.enforcement
+        },
+        daemon_recent: {
+          source: daemonRecent.source,
+          daemon_authority: daemonRecent.daemon_authority,
+          workspace_scope: daemonRecent.workspace_scope,
+          all_projects: daemonRecent.all_projects,
+          filter: daemonRecent.filter,
+          note: daemonRecent.note,
+          error: daemonRecent.error,
+          totals: {
+            lanes: daemonRecent.lanes.length,
+            queue: daemonRecent.queue.length
+          },
+          lane_status: countByStatus2(daemonRecent.lanes),
+          queue_status: countByStatus2(daemonRecent.queue),
+          active_lane: activeLane,
+          ready_lanes: readyLanes.slice(0, 5),
+          ready_queue: readyQueue.slice(0, 10),
+          blocked_queue_count: blockedQueue.length
+        }
+      });
+      return 0;
+    }
     emitJson({
       ok: true,
       command: `tl ${sub}`,
@@ -3307,6 +3597,12 @@ async function runTl(args) {
     emitPretty(`  - ${rule}`);
   }
   return 0;
+}
+function countByStatus2(records) {
+  return records.reduce((counts, record) => {
+    counts[record.status] = (counts[record.status] ?? 0) + 1;
+    return counts;
+  }, {});
 }
 
 // src/commands/blueprint.ts
@@ -4128,16 +4424,16 @@ function optionalArgs(args) {
   return Object.fromEntries(Object.entries(args).filter(([, value]) => value !== void 0));
 }
 function readProjection2(c, channel) {
-  return new Promise((resolve) => {
+  return new Promise((resolve2) => {
     const timer = setTimeout(
-      () => resolve({ received: false, name: channel, data: null }),
+      () => resolve2({ received: false, name: channel, data: null }),
       1500
     );
     c.onMessage((msg) => {
       const env = msg;
       if (env.type === "projection" && env.name === channel) {
         clearTimeout(timer);
-        resolve({ received: true, name: channel, data: env.data });
+        resolve2({ received: true, name: channel, data: env.data });
       }
     });
     c.subscribe(channel);
@@ -4305,7 +4601,7 @@ async function walk(root) {
   return out;
 }
 function noteFromContent(rel, content) {
-  const frontmatter = parseFrontmatter2(content);
+  const frontmatter = parseFrontmatter3(content);
   const body = content.replace(/^---[\s\S]*?---\n*/m, "");
   const heading = body.match(/^#\s+(.+)$/m)?.[1]?.trim();
   const fallback = path.basename(rel).replace(/\.(qmd|md)$/i, "").replace(/[-_]/g, " ");
@@ -4318,7 +4614,7 @@ function noteFromContent(rel, content) {
     excerpt: body.split(/\r?\n/).map((line) => line.trim()).filter((line) => line && !line.startsWith("#")).slice(0, 2).join(" ").slice(0, 240)
   };
 }
-function parseFrontmatter2(content) {
+function parseFrontmatter3(content) {
   const match = content.match(/^---\n([\s\S]*?)\n---/m);
   if (!match?.[1]) return {};
   const out = {};
@@ -4450,7 +4746,7 @@ async function runHermesOrient(args, verb) {
     active_dispatches: [],
     chronicle_recent_events: { projection: "chronicle.activity", status: "pending_daemon_projection" },
     peer_status: { rail: "ssh", status: "local_only_until_peer_registry" },
-    dev_server_status: { status: "not_checked", commands: ["ema status --json", "pnpm cli status --json"] },
+    dev_server_status: { status: "not_checked", commands: ["ema status --json"] },
     recommended_lane: recommendedLane,
     active_risks: activeRisks,
     blocked_work: blockedWork,
@@ -4561,7 +4857,7 @@ function nextActions(lane, blockedCount) {
 }
 
 // src/commands/harness.ts
-import { existsSync as existsSync4, mkdirSync, readFileSync as readFileSync2, readdirSync as readdirSync3, writeFileSync } from "fs";
+import { existsSync as existsSync4, mkdirSync, readFileSync as readFileSync3, readdirSync as readdirSync3, writeFileSync } from "fs";
 import { join as join3 } from "path";
 import { spawnSync } from "child_process";
 var PROVIDERS = [
@@ -4760,11 +5056,11 @@ function runStart(args) {
     commands: {
       tmux_session: session,
       launch: command,
-      context: `pnpm cli harness context --execution ${executionId} --json`,
-      events: `pnpm cli harness events --execution ${executionId} --json`,
-      grep: `pnpm cli harness grep --execution ${executionId} --query <text> --json`,
-      log: `pnpm cli harness log --execution ${executionId} --json`,
-      stop: `pnpm cli harness stop --execution ${executionId} --json`
+      context: `ema harness context --execution ${executionId} --json`,
+      events: `ema harness events --execution ${executionId} --json`,
+      grep: `ema harness grep --execution ${executionId} --query <text> --json`,
+      log: `ema harness log --execution ${executionId} --json`,
+      stop: `ema harness stop --execution ${executionId} --json`
     },
     lane_assignment: lane ? { lane_id: lane, execution_id: executionId, session_id: session, actor_id: actor, provider } : null
   };
@@ -5033,12 +5329,12 @@ function writeRecord(record) {
 function readRecord(executionId) {
   const path2 = registryPath(executionId);
   if (!existsSync4(path2)) return null;
-  return JSON.parse(readFileSync2(path2, "utf8"));
+  return JSON.parse(readFileSync3(path2, "utf8"));
 }
 function readRecords2() {
   const dir = registryDir();
   if (!existsSync4(dir)) return [];
-  return readdirSync3(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync2(join3(dir, file), "utf8")));
+  return readdirSync3(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync3(join3(dir, file), "utf8")));
 }
 function laneAssignmentsDir() {
   return join3(process.cwd(), ".ema-dev", "harness-glue", "lane-sessions");
@@ -5072,12 +5368,12 @@ function upsertLaneAssignment(lane, record) {
 function readLaneAssignment(lane) {
   const path2 = laneAssignmentPath(lane);
   if (!existsSync4(path2)) return null;
-  return JSON.parse(readFileSync2(path2, "utf8"));
+  return JSON.parse(readFileSync3(path2, "utf8"));
 }
 function readLaneAssignments() {
   const dir = laneAssignmentsDir();
   if (!existsSync4(dir)) return [];
-  return readdirSync3(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync2(join3(dir, file), "utf8")));
+  return readdirSync3(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync3(join3(dir, file), "utf8")));
 }
 function appendEvents(events) {
   mkdirSync(join3(process.cwd(), ".ema-dev", "harness-glue"), { recursive: true });
@@ -5089,7 +5385,7 @@ function readEvents(selector) {
   const path2 = eventLogPath();
   let events = [];
   if (existsSync4(path2)) {
-    events = readFileSync2(path2, "utf8").split("\n").filter(Boolean).map((line) => {
+    events = readFileSync3(path2, "utf8").split("\n").filter(Boolean).map((line) => {
       try {
         return JSON.parse(line);
       } catch {
@@ -5176,7 +5472,7 @@ function stableId(input) {
 
 // src/commands/peer.ts
 import { execFileSync } from "child_process";
-import { existsSync as existsSync5, readFileSync as readFileSync3, writeFileSync as writeFileSync2 } from "fs";
+import { existsSync as existsSync5, readFileSync as readFileSync4, writeFileSync as writeFileSync2 } from "fs";
 import { dirname, join as join4 } from "path";
 var REGISTRY_PATH = join4(EMA_ACTIVE_BUILD, ".ema", "peers.json");
 function runPeer(args) {
@@ -5332,7 +5628,7 @@ function commandCheck(name, args) {
 function loadPeers() {
   if (!existsSync5(REGISTRY_PATH)) return [];
   try {
-    const parsed = JSON.parse(readFileSync3(REGISTRY_PATH, "utf8"));
+    const parsed = JSON.parse(readFileSync4(REGISTRY_PATH, "utf8"));
     return Array.isArray(parsed.peers) ? parsed.peers : [];
   } catch {
     return [];
@@ -5372,14 +5668,14 @@ async function runGap(args) {
 }
 async function readLanes() {
   const c = await connect({ surface: "desktop" });
-  const lanes = await new Promise((resolve) => {
-    const timer = setTimeout(() => resolve([]), 1500);
+  const lanes = await new Promise((resolve2) => {
+    const timer = setTimeout(() => resolve2([]), 1500);
     c.onMessage((msg) => {
       const env = msg;
       if (env.type === "projection" && env.name === "lane.registry") {
         clearTimeout(timer);
         const data = env.data;
-        resolve(data?.lanes ?? []);
+        resolve2(data?.lanes ?? []);
       }
     });
     c.subscribe("lane.registry");
@@ -5577,13 +5873,13 @@ async function runClose3(args) {
 async function readChannel(channel, timeoutMs) {
   try {
     const c = await connect({ surface: "desktop" });
-    const data = await new Promise((resolve) => {
-      const timer = setTimeout(() => resolve(null), timeoutMs);
+    const data = await new Promise((resolve2) => {
+      const timer = setTimeout(() => resolve2(null), timeoutMs);
       c.onMessage((msg) => {
         const env = msg;
         if (env.type === "projection" && env.name === channel) {
           clearTimeout(timer);
-          resolve(env.data);
+          resolve2(env.data);
         }
       });
       c.subscribe(channel);
@@ -5722,6 +6018,359 @@ async function runDoctor2(args) {
   }
 }
 
+// src/commands/desktop.ts
+async function runDesktop(args) {
+  const verb = args.positional[0] ?? "presence";
+  if (flagBool(args, "help") || args.flags.h === true || verb === "help") {
+    return runHelp4(args);
+  }
+  if (verb === "presence") return runPresence(args);
+  emitError(`ema desktop: unknown subcommand "${verb}" (expected: presence)`);
+  return 64;
+}
+function runHelp4(args) {
+  const commands = [
+    { verb: "presence", summary: "Show daemon-backed shared desktop presence." },
+    { verb: "presence join", summary: "Join a shared vDesktop presence room." },
+    { verb: "presence cursor", summary: "Publish a named cursor position." },
+    { verb: "presence location", summary: "Publish current app/window location." },
+    { verb: "presence leave", summary: "Leave a shared vDesktop presence room." }
+  ];
+  if (flagBool(args, "json")) {
+    emitJson({ noun: "desktop", projection: "desktop.presence", commands });
+    return 0;
+  }
+  emitPretty("ema desktop - shared vDesktop controls");
+  for (const command of commands) emitPretty(`  ${command.verb.padEnd(18)} ${command.summary}`);
+  return 0;
+}
+async function runPresence(args) {
+  const action = args.positional[1] ?? "show";
+  if (action === "show" || action === "list") return showPresence(args);
+  if (action === "join") return sendPresence(args, "desktop.presence.join", await basePayload(args));
+  if (action === "leave") {
+    return sendPresence(args, "desktop.presence.leave", {
+      session_id: flagString(args, "session") ?? "presence:cli"
+    });
+  }
+  if (action === "cursor") {
+    return sendPresence(args, "desktop.presence.cursor", {
+      ...await basePayload(args),
+      x: intFlag(args, "x", 0),
+      y: intFlag(args, "y", 0),
+      surface: flagString(args, "surface") ?? "desktop",
+      window_id: flagString(args, "window") ?? null,
+      app_id: flagString(args, "app") ?? null
+    });
+  }
+  if (action === "location") {
+    const app = flagString(args, "app");
+    if (!app) {
+      emitError("ema desktop presence location: --app is required");
+      return 64;
+    }
+    return sendPresence(args, "desktop.presence.location", {
+      ...await basePayload(args),
+      window_id: flagString(args, "window") ?? null,
+      app_id: app,
+      label: flagString(args, "label") ?? app
+    });
+  }
+  emitError(`ema desktop presence: unknown action "${action}" (expected: show | join | cursor | location | leave)`);
+  return 64;
+}
+async function showPresence(args) {
+  const json = flagBool(args, "json");
+  const projection = await readProjection(args, {
+    name: "desktop.presence",
+    pick: (data) => data
+  });
+  const payload = projection ?? {};
+  if (json) {
+    emitJson({ ok: true, command: "desktop presence show", projection: "desktop.presence", data: payload });
+  } else {
+    emitPretty("# desktop.presence");
+    emitPretty(`source: ${payload.source ?? "(unavailable)"}`);
+    emitPretty(`revision: ${payload.revision ?? 0}`);
+    emitPretty(`sessions: ${payload.sessions?.length ?? 0}`);
+    emitPretty(`cursors: ${payload.cursors?.length ?? 0}`);
+    emitPretty(`app locations: ${payload.app_locations?.length ?? 0}`);
+  }
+  return 0;
+}
+async function sendPresence(args, op, payload) {
+  const json = flagBool(args, "json");
+  try {
+    const c = await connect({ surface: "desktop" });
+    const result = await c.command(op, payload);
+    c.close();
+    if (json) emitJson({ ok: result.ok, command: op, projection: "desktop.presence", result });
+    else emitPretty(`${op}: ${result.ok ? "ok" : "failed"}`);
+    return result.ok ? 0 : 1;
+  } catch (err) {
+    return reportError(err, json);
+  }
+}
+async function basePayload(args) {
+  const scope = await resolveWorkspaceScope({ args });
+  return {
+    org_id: flagString(args, "org") ?? scope.org_id ?? "org:local",
+    space_id: flagString(args, "space") ?? scope.space_id ?? "space:local",
+    room_id: flagString(args, "room") ?? "desktop_room:default",
+    session_id: flagString(args, "session") ?? "presence:cli",
+    actor_id: flagString(args, "actor") ?? "actor:codex",
+    display_name: flagString(args, "name") ?? "Codex",
+    color: flagString(args, "color") ?? "#5eead4"
+  };
+}
+function intFlag(args, name, fallback) {
+  const raw = flagString(args, name);
+  if (!raw) return fallback;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+// src/commands/recovery.ts
+import { execFile } from "child_process";
+import { promisify } from "util";
+var execFileAsync = promisify(execFile);
+async function runRecovery(args) {
+  const verb = args.positional[0] ?? "scan";
+  if (flagBool(args, "help") || args.flags.h === true || verb === "help") {
+    return runHelp5(args);
+  }
+  if (verb === "scan") return runScan(args);
+  emitError(`ema recovery: unknown subcommand "${verb}" (expected: scan)`);
+  return 64;
+}
+function runHelp5(args) {
+  const commands = [
+    { verb: "scan", summary: "Read-only desktop-wide donor/lost-work scan." }
+  ];
+  if (flagBool(args, "json")) {
+    emitJson({ noun: "recovery", commands, policy: "donor projects are read-only" });
+    return 0;
+  }
+  emitPretty("ema recovery - read-only donor and lost-work recovery tools");
+  for (const command of commands) emitPretty(`  ${command.verb.padEnd(12)} ${command.summary}`);
+  emitPretty("");
+  emitPretty("Usage: ema recovery scan [--json] [--limit 250] [--max-depth 8] [--kind stale-queue] [--confidence high]");
+  return 0;
+}
+async function runScan(args) {
+  const script = "tooling/recovery/desktop-recovery-scan.mjs";
+  const argv = [script];
+  if (flagBool(args, "json")) argv.push("--json");
+  const limit = flagString(args, "limit");
+  const maxDepth = flagString(args, "max-depth");
+  const source = flagString(args, "source");
+  const kind = flagString(args, "kind");
+  const confidence = flagString(args, "confidence");
+  if (limit) argv.push("--limit", limit);
+  if (maxDepth) argv.push("--max-depth", maxDepth);
+  if (source) argv.push("--source", source);
+  if (kind) argv.push("--kind", kind);
+  if (confidence) argv.push("--confidence", confidence);
+  try {
+    const { stdout } = await execFileAsync("node", argv, {
+      cwd: process.cwd(),
+      maxBuffer: 20 * 1024 * 1024
+    });
+    process.stdout.write(stdout);
+    return 0;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    emitError(`ema recovery scan failed: ${message}`);
+    return 1;
+  }
+}
+
+// src/commands/cwt.ts
+import { access, readFile } from "fs/promises";
+import { homedir } from "os";
+import { join as join5, resolve } from "path";
+var DOC_REF7 = "docs/architecture/20-cwt-integration.md";
+async function runCwt(args) {
+  const verb = args.positional[0];
+  if (!verb || verb === "help" || flagBool(args, "help") || args.flags.h === true) {
+    return runStubContract(args, {
+      noun: "cwt",
+      status: "available",
+      docRef: DOC_REF7,
+      commands: [
+        {
+          verb: "status",
+          flags: ["root"],
+          summary: "Inspect the current-work-tracker shared-files projection."
+        },
+        {
+          verb: "ingest",
+          flags: ["root", "dry-run"],
+          summary: "Preview promotion of CWT records into EMA daemon records."
+        }
+      ]
+    });
+  }
+  if (verb === "status") return runStatus4(args);
+  if (verb === "ingest") return runIngest(args);
+  emitError(`ema cwt: unknown subcommand "${verb}" (expected: status, ingest)`);
+  return 64;
+}
+async function runStatus4(args) {
+  const json = flagBool(args, "json");
+  const root = projectionRoot(args);
+  const manifest = await readManifest(root);
+  if (!manifest) {
+    const result2 = {
+      ok: false,
+      source: "cwt.shared_files",
+      status: "missing_projection",
+      root,
+      expected: join5(root, "manifest.json"),
+      next: "Run CWT and send `sync` in the in-app Agent Chat."
+    };
+    if (json) emitJson(result2);
+    else {
+      emitPretty("CWT projection missing");
+      emitPretty(`root: ${root}`);
+      emitPretty(result2.next);
+    }
+    return 1;
+  }
+  const statePath = join5(root, manifest.local_n_sync?.current_state ?? "local-n-sync/current-state.md");
+  const stateExists = await exists(statePath);
+  const result = {
+    ok: true,
+    source: "cwt.shared_files",
+    status: "projection_found",
+    root,
+    generated_at: manifest.generated_at ?? null,
+    projection: manifest.projection ?? null,
+    counts: manifest.counts ?? {},
+    local_n_sync: manifest.local_n_sync ?? null,
+    current_state_exists: stateExists,
+    next: "ema cwt ingest --dry-run --json"
+  };
+  if (json) emitJson(result);
+  else {
+    emitPretty("CWT projection found");
+    emitPretty(`root: ${root}`);
+    emitPretty(`generated: ${result.generated_at ?? "(unknown)"}`);
+    emitPretty(`projects: ${result.counts.projects ?? 0}`);
+    emitPretty(`queue items: ${result.counts.queue_items ?? 0}`);
+    emitPretty(`next: ${result.next}`);
+  }
+  return 0;
+}
+async function runIngest(args) {
+  const json = flagBool(args, "json");
+  const dryRun = flagBool(args, "dry-run");
+  const root = projectionRoot(args);
+  const manifest = await readManifest(root);
+  if (!manifest) {
+    if (json) emitJson({ ok: false, status: "missing_projection", root });
+    else emitError(`CWT projection missing at ${root}`);
+    return 1;
+  }
+  if (!dryRun) {
+    const result2 = {
+      ok: false,
+      status: "writer_pending",
+      root,
+      reason: "CWT promotion is intentionally dry-run only until the daemon queue/lane/problem import writer lands.",
+      required_next: "Run `ema cwt ingest --dry-run --json`, review candidates, then implement cwt.import_preview -> daemon writer."
+    };
+    if (json) emitJson(result2);
+    else {
+      emitError(result2.reason);
+      emitPretty(result2.required_next);
+    }
+    return 2;
+  }
+  const queue = await readQueueCandidates(root);
+  const result = {
+    ok: true,
+    source: "cwt.shared_files",
+    mode: "dry_run",
+    root,
+    generated_at: manifest.generated_at ?? null,
+    counts: manifest.counts ?? {},
+    candidates: {
+      queue_items: queue.map((item) => ({
+        cwt_id: item.id ?? null,
+        title: item.title ?? "(untitled)",
+        why: item.why ?? "",
+        done_when: item.done_when ?? "",
+        project_id: item.project_id ?? null,
+        priority: item.priority ?? null,
+        source: item.source ?? "cwt.shared_files",
+        suggested_command: suggestedQueueCommand(item)
+      }))
+    },
+    promotion_boundary: "preview_only"
+  };
+  if (json) emitJson(result);
+  else {
+    emitPretty("CWT ingest dry-run");
+    emitPretty(`root: ${root}`);
+    emitPretty(`queue candidates: ${result.candidates.queue_items.length}`);
+    for (const candidate of result.candidates.queue_items.slice(0, 8)) {
+      emitPretty(`  ${candidate.title} (${candidate.cwt_id ?? "no id"})`);
+    }
+  }
+  return 0;
+}
+async function readQueueCandidates(root) {
+  const indexPath = join5(root, "records", "queue", "index.json");
+  const index = await readJson(indexPath);
+  const refs = index?.records ?? [];
+  const rows = [];
+  for (const ref of refs) {
+    const row = await readJson(join5(root, ref.path));
+    if (row && row.status !== "done" && row.status !== "dropped") rows.push(row);
+  }
+  return rows;
+}
+function suggestedQueueCommand(item) {
+  const title = shellQuote3(item.title ?? "(untitled)");
+  const why = shellQuote3(item.why ?? "Imported from CWT shared-files projection.");
+  const doneWhen = shellQuote3(item.done_when ?? "Reviewed and accepted in EMA.");
+  const source = shellQuote3(item.source ?? "cwt.shared_files");
+  const project = item.project_id ? ` --project ${shellQuote3(item.project_id)}` : "";
+  return `ema queue add${project} --title ${title} --why ${why} --done-when ${doneWhen} --source ${source}`;
+}
+function projectionRoot(args) {
+  const raw = flagString(args, "root");
+  if (raw) return resolve(raw);
+  return resolve(
+    homedir(),
+    "Desktop",
+    "Space shared files-uploads-vDesktop-vFilesystem-root",
+    "current-work-tracker-trajan"
+  );
+}
+async function readManifest(root) {
+  return readJson(join5(root, "manifest.json"));
+}
+async function readJson(path2) {
+  try {
+    return JSON.parse(await readFile(path2, "utf8"));
+  } catch {
+    return null;
+  }
+}
+async function exists(path2) {
+  try {
+    await access(path2);
+    return true;
+  } catch {
+    return false;
+  }
+}
+function shellQuote3(value) {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
 // src/bin.ts
 async function main() {
   const [, , cmd, ...rest] = process.argv;
@@ -5783,6 +6432,12 @@ async function main() {
       return runGap(args);
     case "doctor":
       return runDoctor2(args);
+    case "desktop":
+      return runDesktop(args);
+    case "recovery":
+      return runRecovery(args);
+    case "cwt":
+      return runCwt(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

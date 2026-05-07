@@ -62,6 +62,12 @@ export async function runStatus(args: ParsedArgs): Promise<number> {
       project: data.current_project ?? null,
       node_state: data.node_state ?? null,
     };
+    const scopeWarning =
+      homeCurrent.project?.id &&
+      workspaceScope.project_id &&
+      homeCurrent.project.id !== workspaceScope.project_id
+        ? `home_current project ${homeCurrent.project.name} (${homeCurrent.project.id}) differs from workspace_scope project ${workspaceScope.project_name ?? "(unnamed)"} (${workspaceScope.project_id}); workspace commands use workspace_scope unless --project overrides it.`
+        : null;
 
     if (json) {
       emitJson({
@@ -72,6 +78,7 @@ export async function runStatus(args: ParsedArgs): Promise<number> {
         node_state: data.node_state ?? null,
         home_current: homeCurrent,
         workspace_scope: workspaceScope,
+        scope_warning: scopeWarning,
         scope_note:
           "org/space/project are the daemon topbar home_current selection; workspace_scope is the flag/env/cwd-resolved project scope used by workspace commands.",
       });
@@ -86,6 +93,7 @@ export async function runStatus(args: ParsedArgs): Promise<number> {
       emitPretty(`project: ${workspaceScope.project_name ?? "(unresolved)"} (${workspaceScope.project_id ?? "no id"})`);
       emitPretty(`source:  ${workspaceScope.resolution_source}`);
       emitPretty(`cwd:     ${workspaceScope.cwd}`);
+      if (scopeWarning) emitPretty(`warning: ${scopeWarning}`);
       if (workspaceScope.note) emitPretty(`note:    ${workspaceScope.note}`);
     }
     c.close();

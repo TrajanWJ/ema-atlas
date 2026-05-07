@@ -21,6 +21,7 @@
     persist_project_materialized/6,
     persist_project_archived/4,
     migrate_projects_unique_name/1,
+    persist_install_initialized/4,
     persist_identity_user_upserted/3,
     persist_identity_google_linked/3,
     persist_identity_authenticator_enabled/3,
@@ -180,6 +181,16 @@ migrate_projects_unique_name(Db) ->
             end
     end.
 
+persist_install_initialized(Db, PayloadJson, CreatedAt, Actor) ->
+    InstallId = extract_json_string(PayloadJson, <<"install_id">>),
+    GenesisDeviceId = extract_json_string(PayloadJson, <<"genesis_device_id">>),
+    InstallPubkey = extract_json_string(PayloadJson, <<"install_pubkey">>),
+    DisplayName = extract_json_string(PayloadJson, <<"display_name">>),
+    Sql = <<"INSERT OR REPLACE INTO install
+             (id, genesis_device_id, install_pubkey, display_name, created_at, created_by)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6)">>,
+    exec_bound(Db, Sql, [InstallId, GenesisDeviceId, InstallPubkey, DisplayName, CreatedAt, Actor]).
+
 persist_identity_user_upserted(Db, PayloadJson, UpdatedAt) ->
     UserId = extract_json_string(PayloadJson, <<"user_id">>),
     DisplayName = extract_json_string(PayloadJson, <<"display_name">>),
@@ -233,10 +244,12 @@ persist_device_registered(Db, OrgId, PayloadJson, UpdatedAt, Actor) ->
     Name = extract_json_string(PayloadJson, <<"name">>),
     Pubkey = extract_json_string(PayloadJson, <<"pubkey">>),
     Bootstrap = extract_json_string(PayloadJson, <<"bootstrap">>),
+    AttestedBy = extract_json_string(PayloadJson, <<"attested_by">>),
+    CapabilitiesJson = extract_json_array(PayloadJson, <<"capabilities">>),
     Sql = <<"INSERT OR REPLACE INTO devices
-             (id, org_id, user_id, name, pubkey, bootstrap, status, updated_at, updated_by)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'trusted', ?7, ?8)">>,
-    exec_bound(Db, Sql, [DeviceId, OrgId, UserId, Name, Pubkey, Bootstrap, UpdatedAt, Actor]).
+             (id, org_id, user_id, name, pubkey, bootstrap, attested_by, capabilities_json, status, updated_at, updated_by)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, 'trusted', ?9, ?10)">>,
+    exec_bound(Db, Sql, [DeviceId, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, UpdatedAt, Actor]).
 
 persist_device_renamed(Db, PayloadJson, UpdatedAt, Actor) ->
     DeviceId = extract_json_string(PayloadJson, <<"device_id">>),
@@ -427,7 +440,8 @@ exec_bound(Db, Sql, Args) ->
     end.
 
 topbar_projection_json(Db) ->
-    UserId = <<"user:dev-local">>,
+    Install = install_json(select_install(Db)),
+    {UserId, DisplayName} = select_current_user(Db),
     Orgs = select_orgs_for_user(Db, UserId),
     CurrentOrgId = current_org_id(Orgs),
     Spaces = select_spaces(Db, CurrentOrgId),
@@ -442,7 +456,8 @@ topbar_projection_json(Db) ->
     ProjectArray = join_json([project_json(Id, SpaceId, Name) || {Id, SpaceId, Name} <- Projects]),
     MembershipArray = join_json([membership_json(User, Role, Status) || {User, Role, Status} <- Memberships]),
     iolist_to_binary([
-        <<"{\"user\":{\"id\":\"user:dev-local\",\"display_name\":\"Dev Operator\"},">>,
+        <<"{\"install\":">>, Install, <<",">>,
+        <<"\"user\":">>, user_json(UserId, DisplayName), <<",">>,
         <<"\"orgs\":[">>, OrgArray, <<"],">>,
         <<"\"current_org\":">>, Current, <<",">>,
         <<"\"spaces\":[">>, SpaceArray, <<"],">>,
@@ -470,7 +485,7 @@ access_session_projection_json(Db) ->
 
 device_projection_json(Db) ->
     Devices = select_devices(Db),
-    DeviceArray = join_json([device_json(Id, OrgId, UserId, Name, Pubkey, Bootstrap, Status, UpdatedAt) || {Id, OrgId, UserId, Name, Pubkey, Bootstrap, Status, UpdatedAt} <- Devices]),
+    DeviceArray = join_json([device_json(Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt) || {Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt} <- Devices]),
     iolist_to_binary([
         <<"{\"devices\":[">>, DeviceArray, <<"],">>,
         <<"\"machine_peer_ready\":false,">>,
@@ -1746,6 +1761,35 @@ select_orgs(Db) ->
         {error, _} -> []
     end.
 
+select_install(Db) ->
+    Sql = <<"SELECT id, genesis_device_id, install_pubkey, display_name FROM install ORDER BY created_at ASC LIMIT 1">>,
+    case esqlite3:prepare(Db, Sql) of
+        {ok, Stmt} ->
+            case esqlite3:step(Stmt) of
+                [Id, GenesisDeviceId, InstallPubkey, DisplayName] ->
+                    {to_binary(Id), to_binary(GenesisDeviceId), to_binary(InstallPubkey), to_binary(DisplayName)};
+                {row, {Id, GenesisDeviceId, InstallPubkey, DisplayName}} ->
+                    {to_binary(Id), to_binary(GenesisDeviceId), to_binary(InstallPubkey), to_binary(DisplayName)};
+                {row, [Id, GenesisDeviceId, InstallPubkey, DisplayName]} ->
+                    {to_binary(Id), to_binary(GenesisDeviceId), to_binary(InstallPubkey), to_binary(DisplayName)};
+                _ -> none
+            end;
+        _ -> none
+    end.
+
+select_current_user(Db) ->
+    Sql = <<"SELECT id, display_name FROM users ORDER BY updated_at ASC, id ASC LIMIT 1">>,
+    case esqlite3:prepare(Db, Sql) of
+        {ok, Stmt} ->
+            case esqlite3:step(Stmt) of
+                [Id, DisplayName] -> {to_binary(Id), to_binary(DisplayName)};
+                {row, {Id, DisplayName}} -> {to_binary(Id), to_binary(DisplayName)};
+                {row, [Id, DisplayName]} -> {to_binary(Id), to_binary(DisplayName)};
+                _ -> {<<"user:dev-local">>, <<"Dev Operator">>}
+            end;
+        _ -> {<<"user:dev-local">>, <<"Dev Operator">>}
+    end.
+
 select_orgs_for_user(Db, UserId) ->
     Sql = <<"SELECT o.id, o.name FROM orgs o
              INNER JOIN memberships m ON m.org_id = o.id
@@ -2000,7 +2044,7 @@ collect_access_session_rows(Stmt, Acc) ->
     end.
 
 select_devices(Db) ->
-    Sql = <<"SELECT id, org_id, user_id, name, pubkey, bootstrap, status, updated_at
+    Sql = <<"SELECT id, org_id, user_id, name, pubkey, bootstrap, COALESCE(attested_by, ''), COALESCE(capabilities_json, '[]'), status, updated_at
              FROM devices ORDER BY updated_at DESC, id DESC">>,
     case esqlite3:prepare(Db, Sql) of
         {ok, Stmt} -> collect_device_rows(Stmt, []);
@@ -2009,15 +2053,18 @@ select_devices(Db) ->
 
 collect_device_rows(Stmt, Acc) ->
     case esqlite3:step(Stmt) of
-        [Id, OrgId, UserId, Name, Pubkey, Bootstrap, Status, UpdatedAt] ->
-            collect_device_rows(Stmt, [{to_binary(Id), to_binary(OrgId), to_binary(UserId), to_binary(Name), to_binary(Pubkey), to_binary(Bootstrap), to_binary(Status), to_binary(UpdatedAt)} | Acc]);
-        {row, {Id, OrgId, UserId, Name, Pubkey, Bootstrap, Status, UpdatedAt}} ->
-            collect_device_rows(Stmt, [{to_binary(Id), to_binary(OrgId), to_binary(UserId), to_binary(Name), to_binary(Pubkey), to_binary(Bootstrap), to_binary(Status), to_binary(UpdatedAt)} | Acc]);
-        {row, [Id, OrgId, UserId, Name, Pubkey, Bootstrap, Status, UpdatedAt]} ->
-            collect_device_rows(Stmt, [{to_binary(Id), to_binary(OrgId), to_binary(UserId), to_binary(Name), to_binary(Pubkey), to_binary(Bootstrap), to_binary(Status), to_binary(UpdatedAt)} | Acc]);
+        [Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt] ->
+            collect_device_rows(Stmt, [device_row(Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt) | Acc]);
+        {row, {Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt}} ->
+            collect_device_rows(Stmt, [device_row(Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt) | Acc]);
+        {row, [Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt]} ->
+            collect_device_rows(Stmt, [device_row(Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt) | Acc]);
         '$done' -> lists:reverse(Acc);
         _ -> lists:reverse(Acc)
     end.
+
+device_row(Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt) ->
+    {to_binary(Id), to_binary(OrgId), to_binary(UserId), to_binary(Name), to_binary(Pubkey), to_binary(Bootstrap), to_binary(AttestedBy), to_binary(CapabilitiesJson), to_binary(Status), to_binary(UpdatedAt)}.
 
 select_peer_trust(Db) ->
     Sql = <<"SELECT org_id, peer_device, peer_pubkey, local_pubkey, ceremony_kind, ceremony_id, status, established_at
@@ -2148,7 +2195,7 @@ access_session_json(Id, ChallengeId, OrgId, UserId, Device, ScopesJson, Status, 
         <<"\"expires_at\":\"">>, json_escape(ExpiresAt), <<"\"}">>
     ].
 
-device_json(Id, OrgId, UserId, Name, Pubkey, Bootstrap, Status, UpdatedAt) ->
+device_json(Id, OrgId, UserId, Name, Pubkey, Bootstrap, AttestedBy, CapabilitiesJson, Status, UpdatedAt) ->
     [
         <<"{\"device_id\":\"">>, json_escape(Id), <<"\",">>,
         <<"\"org_id\":\"">>, json_escape(OrgId), <<"\",">>,
@@ -2156,6 +2203,8 @@ device_json(Id, OrgId, UserId, Name, Pubkey, Bootstrap, Status, UpdatedAt) ->
         <<"\"name\":\"">>, json_escape(Name), <<"\",">>,
         <<"\"pubkey\":\"">>, json_escape(Pubkey), <<"\",">>,
         <<"\"bootstrap\":\"">>, json_escape(Bootstrap), <<"\",">>,
+        <<"\"attested_by\":">>, nullable_json_string(AttestedBy), <<",">>,
+        <<"\"capabilities\":">>, CapabilitiesJson, <<",">>,
         <<"\"status\":\"">>, json_escape(Status), <<"\",">>,
         <<"\"updated_at\":\"">>, json_escape(UpdatedAt), <<"\"}">>
     ].
@@ -2213,6 +2262,22 @@ current_org_json([]) ->
     <<"null">>;
 current_org_json([{Id, Name} | _]) ->
     org_json(Id, Name).
+
+install_json(none) ->
+    <<"null">>;
+install_json({Id, GenesisDeviceId, InstallPubkey, DisplayName}) ->
+    [
+        <<"{\"id\":\"">>, json_escape(Id), <<"\",">>,
+        <<"\"genesis_device_id\":\"">>, json_escape(GenesisDeviceId), <<"\",">>,
+        <<"\"install_pubkey\":\"">>, json_escape(InstallPubkey), <<"\",">>,
+        <<"\"display_name\":\"">>, json_escape(DisplayName), <<"\"}">>
+    ].
+
+user_json(Id, DisplayName) ->
+    [
+        <<"{\"id\":\"">>, json_escape(Id), <<"\",">>,
+        <<"\"display_name\":\"">>, json_escape(DisplayName), <<"\"}">>
+    ].
 
 current_space_json([]) ->
     <<"null">>;
@@ -2866,6 +2931,11 @@ extract_json_array(PayloadJson, Key) ->
         _ ->
             <<"[]">>
     end.
+
+nullable_json_string(<<>>) ->
+    <<"null">>;
+nullable_json_string(Value) ->
+    [<<"\"">>, json_escape(Value), <<"\"">>].
 
 json_escape(Value) ->
     json_escape(to_binary(Value), []).

@@ -14,10 +14,53 @@ Spaces contain multiple projects. `locked-in-ios-app` is a project in
 
 - project: `/Users/trajanm4air/Desktop/Projects/locked-in-ios-app`
 - project_id: `project:01KQD9RMA000Y2Z58RCSNCJNT0`
-- orientation command: `pnpm cli agent orient --project locked-in-ios-app --json`
+- orientation command: `ema agent orient --project locked-in-ios-app --json`
+
+The CLI is invoked globally as `ema <command>` (wrapper at `~/.local/bin/ema`,
+default `EMA_HOME=Active builds/EMA-0.0.5`); `pnpm cli <command>` from this
+build root is equivalent and is the fallback when the wrapper is unavailable.
 
 Do not use the mistaken `lockedinIOSapp` space/project as canonical context.
 It is a cleanup target once archive/move writers exist.
+
+## Central tracker boundary (2026-05-07)
+
+`current-work-tracker-trajan` (project id
+`project:01KR0AAG8D004J8015N9P8A0VY`) is **EMA's central tracker for
+projects, clients, and work**. Its active build is at
+`/Users/trajanm4air/Desktop/Active builds/current-work-tracker-trajan/`.
+
+cwt owns these record families as writer-of-truth:
+
+- `client` (first-class; one client → many projects)
+- `project` (with `client_id`, `kind`, `client_label`, `client_color`)
+- `campaign`, `mission`, `lane`, `queue`, `problem`, `solution`,
+  `vcalendar`, `checkup`, `handoff`, `execution`, `dependency`,
+  `responsibility`
+
+EMA owns these:
+
+- `org`, `space`, agent identity, daemon-process, shell-state
+- the daemon transport itself
+
+When `ema` needs project or client metadata (e.g. for `ema agent orient
+--project <name>` or `ema status`), it reads from cwt's local SQLite
+store today, and from the daemon's projection once `@ema/contracts` ships
+project + client extensions and cwt becomes a daemon-mirroring writer.
+
+Do **not** add new project- or client-related record families to EMA
+core. Add them to cwt (`Active builds/current-work-tracker-trajan/packages/contracts/`)
+and let the daemon absorb them when contracts ship the extension.
+
+See `docs/decisions/2026-05-07-cwt-central-tracker.md` and the cwt
+blueprint `Projects/current-work-tracker-trajan/blueprint/09-ema-central-tracker-promotion.md`.
+
+## Multi-first-command CLI doctrine
+
+EMA's CLI is split across multiple first commands on `PATH`. `ema` is
+one; `cwt` is another. They cooperate via the contracts layer, never via
+subcommand inheritance. New CLI verbs for projects/clients/work go on
+`cwt`, not `ema`.
 
 ## Auto-loaded skills
 

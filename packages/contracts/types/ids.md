@@ -9,11 +9,13 @@ Example: `project:01JFYV6W2H7K9Z8XR3BDQG4T5P`.
 
 | Prefix            | Entity                                    |
 | ----------------- | ----------------------------------------- |
+| `install`         | self-hosted EMA install root              |
 | `user`            | user account                              |
 | `actor`           | human, agent, personal AI, or service actor |
 | `agent`           | agent identity                            |
 | `personal_ai`     | personal AI identity                      |
 | `device`          | a registered device for a user            |
+| `pairing_offer`   | temporary manual device pairing offer     |
 | `org`             | organization                              |
 | `space`           | space inside an org                       |
 | `project`         | project inside a space                    |

@@ -32,6 +32,7 @@ events/
 types/
   ids.md                 ULID + typed prefix + registry key conventions
   attachment.md          attachment record schema
+  cwt_shared_files.md    current-work-tracker shared-files projection schema
   collab.md              BEAM live document projection/frame schema
   connector.md           connector record schema
 ipc/

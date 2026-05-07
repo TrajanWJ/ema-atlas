@@ -248,9 +248,7 @@ pub type AutoCheckupTick {
 /// a hard-coded org. The skip is observable via `skipped_unscoped` on
 /// the return so the silent-zero case (queue_item:01KQE5P02F015GF0KXM6KHZWWR)
 /// has a real diagnostic.
-pub fn tick_auto_checkups(
-  bus_subject: Subject(bus.Msg),
-) -> AutoCheckupTick {
+pub fn tick_auto_checkups(bus_subject: Subject(bus.Msg)) -> AutoCheckupTick {
   let due = bus.auto_checkup_due_lanes(bus_subject)
   let actor = "actor:agent:checkup-scheduler"
   let #(emitted_ids, skipped) =

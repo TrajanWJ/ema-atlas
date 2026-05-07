@@ -206,10 +206,47 @@ const PHASE_MODE: Record<string, VcalendarMode> = {
 function modeFromHour(hour: number, fallback: VcalendarMode): VcalendarMode {
   if (hour < 9) return "planning";
   if (hour < 11) return "planning";
-  if (hour < 16) return "planning";
-  if (hour < 18) return "execution";
-  if (hour < 24) return "review";
+  if (hour < 16) return "execution";
+  if (hour < 18) return "review";
+  if (hour < 24) return "handoff";
   return fallback;
+}
+
+function instructionsForPhase(phase: string, fallback: string[]): string[] {
+  switch (phase) {
+    case "intake and orientation":
+      return [
+        "Read orientation docs.",
+        "Run `ema status --json` and `ema agent orient --json`.",
+        "Pick or open the lane before editing.",
+      ];
+    case "planning and lane claim":
+      return [
+        "Clarify campaign, mission, lane, dependencies, and done-when.",
+        "Log discovered later work to queue instead of expanding scope.",
+        "Schedule checkups for risky or long-running lanes.",
+      ];
+    case "execution block":
+      return [
+        "Work inside the claimed lane scope.",
+        "Keep dependency discoveries in queue/problem graph.",
+        "Run verification before crossing into review.",
+      ];
+    case "review and checkup":
+      return [
+        "Run verification and summarize changed files.",
+        "Close or update queue items.",
+        "Record blockers as problem/solution graph nodes.",
+      ];
+    case "handoff and next-day queue":
+      return [
+        "Request or complete handoff before leaving partial work.",
+        "Move unfinished discoveries to queue with dependencies.",
+        "Set next vCalendar block and checkup cadence.",
+      ];
+    default:
+      return fallback;
+  }
 }
 
 function phaseToMode(
@@ -308,7 +345,7 @@ async function runTick(args: ParsedArgs): Promise<number> {
     should_checkup: mode === "review" || mode === "handoff",
     should_handoff: mode === "handoff",
     next_tick: heuristic.next_tick,
-    instructions: heuristic.instructions,
+    instructions: instructionsForPhase(phase, heuristic.instructions),
   };
 
   if (json) {

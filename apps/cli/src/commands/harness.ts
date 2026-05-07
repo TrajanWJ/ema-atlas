@@ -209,11 +209,11 @@ function runStart(args: ParsedArgs): number {
 		commands: {
 			tmux_session: session,
 			launch: command,
-			context: `pnpm cli harness context --execution ${executionId} --json`,
-			events: `pnpm cli harness events --execution ${executionId} --json`,
-			grep: `pnpm cli harness grep --execution ${executionId} --query <text> --json`,
-			log: `pnpm cli harness log --execution ${executionId} --json`,
-			stop: `pnpm cli harness stop --execution ${executionId} --json`,
+			context: `ema harness context --execution ${executionId} --json`,
+			events: `ema harness events --execution ${executionId} --json`,
+			grep: `ema harness grep --execution ${executionId} --query <text> --json`,
+			log: `ema harness log --execution ${executionId} --json`,
+			stop: `ema harness stop --execution ${executionId} --json`,
 		},
 		lane_assignment: lane ? { lane_id: lane, execution_id: executionId, session_id: session, actor_id: actor, provider } : null,
 	};

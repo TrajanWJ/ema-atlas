@@ -4,7 +4,33 @@ Canonical live ledger for the 0.0.5 buildout. One coordinator, many workers.
 Every session — Codex, Claude CLI, or human — reads this file on cold start.
 
 Coordinator: Claude (replacement orchestrator, consolidated role).
-Last coordinator sweep: 2026-04-29T07:06Z.
+Last coordinator sweep: 2026-05-07T00:45-04:00.
+
+## Session update 2026-05-07 - Coordination authority consolidation
+
+Codex consolidated the active build around daemon-owned coordination state:
+
+- `ema agent orient --json` now reads daemon lane/queue registries through the
+  resolved project scope and filters broad handoff projections out of the EMA
+  startup view unless they match the active project.
+- Agent Workspace and CLI docs now state the authority order explicitly:
+  daemon command result, daemon registry projection, CLI projection summary,
+  exported markdown snapshot, then project-record template.
+- `Projects/EMA/atlas/workspace/` is documented as fallback snapshots/templates,
+  not live ownership truth. Empty coordination templates are no longer evidence
+  that the swarm is idle.
+- The stale `L-agent-workspace-writer` brief is marked closed for Slice A and
+  retained as historical context.
+- Next-round intake is recorded at
+  `docs/orchestration/NEXT-INTAKE-2026-05-07.md`.
+
+Verified:
+
+- `pnpm --filter @ema/cli typecheck`
+- `pnpm --filter @ema/cli build`
+- `node apps/cli/dist/bin.js agent orient --json`
+- `node apps/cli/dist/bin.js lane list --json`
+- `node apps/cli/dist/bin.js queue list --json`
 
 ## Session update 2026-04-29 — Blueprint convergence pass
 
@@ -51,7 +77,8 @@ New queue records cover:
   surfaces;
 - pending runtime projections and command writers must ship before honest-mock
   entries can retire;
-- parallel `pnpm cli ...` calls currently race the CLI build output.
+- parallel `pnpm cli ...` calls currently race the CLI build output;
+  `ema <command>` (global wrapper) never rebuilds and is the safe form.
 
 Use the orchestration map as the next-session intake packet before opening new
 lanes.
@@ -192,8 +219,8 @@ Meta-checks (all green):
 Bootstrap evidence:
 - `bash scripts/start-ema-dev.sh --no-tail` → daemon (BEAM, pid 67280) up on `127.0.0.1:49555`; web (Next, pid 67245) up on `*:5173`. Pid files written.
 - `node tooling/m1-round-trip.mjs` → `m1-round-trip: OK`.
-- `pnpm cli status --json` → `{"ok":true,"org":{"id":"org:01J00000000000000000000012","name":"Trajan's Organization"},"space":{"id":"space:01J00000000000000000000013","name":"Personal Workspace","is_default":true},"project":null,"node_state":"home_current"}`.
-- `pnpm cli agent orient --json` → `pending_daemon_writer` (grammar registered, writes not yet wired).
+- `ema status --json` → `{"ok":true,"org":{"id":"org:01J00000000000000000000012","name":"Trajan's Organization"},"space":{"id":"space:01J00000000000000000000013","name":"Personal Workspace","is_default":true},"project":null,"node_state":"home_current"}`.
+- `ema agent orient --json` → `pending_daemon_writer` (grammar registered, writes not yet wired).
 
 Live state vs doctrine drift:
 - First-boot seed currently produces `Trajan's Organization` / `Personal Workspace` (no project). The Implementation Roadmap M2 exit text still describes `Founding-Fathers-EMA` / same-name default space / `EMA 0.0.5` project. `apps/daemon/src/ema_swarm_coordination/first_boot.gleam` is in the dirty worktree; the seed values were changed but the doctrine reference text was not. **Treat the runtime seed as the new canon and update doctrine on the next Canon Writers slice; do not revert the seed.**

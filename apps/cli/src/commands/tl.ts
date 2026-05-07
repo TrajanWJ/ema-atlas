@@ -1,10 +1,11 @@
 import type { ParsedArgs } from "../args.js";
-import { flagBool } from "../args.js";
+import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
 import { withDaemonWorkspaceRecords, workspaceSummary } from "../workspace-state.js";
 import { resolveWorkspaceScope } from "../workspace-scope.js";
 import { loadRecentWorkspaceTrail } from "../workspace-trail.js";
 import { runStubContract } from "./stub-contract.js";
+import { DEFAULT_ACTOR } from "./workspace-daemon.js";
 
 export async function runTl(args: ParsedArgs): Promise<number> {
   const sub = args.positional[0] ?? "about";
@@ -15,9 +16,9 @@ export async function runTl(args: ParsedArgs): Promise<number> {
       status: "available",
       docRef: "docs/cli/agent-workspace.md",
       commands: [
-        { verb: "about", flags: ["project", "all-projects", "json"], summary: "Show task-layer orientation and daemon-backed workspace records." },
-        { verb: "status", flags: ["project", "all-projects", "json"], summary: "Alias-style task-layer status view." },
-        { verb: "tick", flags: ["project", "all-projects", "json"], summary: "Show task-layer state with vCalendar tick context." },
+        { verb: "about", flags: ["project", "all-projects", "summary", "json"], summary: "Show task-layer orientation and daemon-backed workspace records." },
+        { verb: "status", flags: ["project", "all-projects", "summary", "json"], summary: "Alias-style task-layer status view." },
+        { verb: "tick", flags: ["project", "all-projects", "summary", "json"], summary: "Show task-layer state with vCalendar tick context." },
       ],
     });
   }
@@ -47,6 +48,53 @@ export async function runTl(args: ParsedArgs): Promise<number> {
   });
 
   if (json) {
+    if (flagBool(args, "summary") || flagBool(args, "compact")) {
+      const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
+      const activeLane = daemonRecent.lanes.find(
+        (lane) => lane.actor_id === actor && lane.status !== "done" && lane.status !== "closed",
+      ) ?? null;
+      const readyLanes = daemonRecent.lanes.filter((lane) => lane.status === "ready" || lane.status === "idea");
+      const readyQueue = daemonRecent.queue.filter((item) => item.status === "ready");
+      const blockedQueue = daemonRecent.queue.filter((item) => item.status === "blocked");
+      emitJson({
+        ok: true,
+        command: `tl ${sub}`,
+        compact: true,
+        actor,
+        workspace: {
+          source: summary.source,
+          daemon_authority: summary.daemon_authority,
+          root: summary.root,
+          project_record: summary.project_record,
+          active_build: summary.active_build,
+          workspace_scope: summary.workspace_scope,
+          orientation_docs: summary.orientation_docs,
+          counts: summary.counts,
+          tick: summary.tick,
+          enforcement: summary.enforcement,
+        },
+        daemon_recent: {
+          source: daemonRecent.source,
+          daemon_authority: daemonRecent.daemon_authority,
+          workspace_scope: daemonRecent.workspace_scope,
+          all_projects: daemonRecent.all_projects,
+          filter: daemonRecent.filter,
+          note: daemonRecent.note,
+          error: daemonRecent.error,
+          totals: {
+            lanes: daemonRecent.lanes.length,
+            queue: daemonRecent.queue.length,
+          },
+          lane_status: countByStatus(daemonRecent.lanes),
+          queue_status: countByStatus(daemonRecent.queue),
+          active_lane: activeLane,
+          ready_lanes: readyLanes.slice(0, 5),
+          ready_queue: readyQueue.slice(0, 10),
+          blocked_queue_count: blockedQueue.length,
+        },
+      });
+      return 0;
+    }
     emitJson({
       ok: true,
       command: `tl ${sub}`,
@@ -87,4 +135,11 @@ export async function runTl(args: ParsedArgs): Promise<number> {
     emitPretty(`  - ${rule}`);
   }
   return 0;
+}
+
+function countByStatus(records: readonly { status: string }[]): Record<string, number> {
+  return records.reduce<Record<string, number>>((counts, record) => {
+    counts[record.status] = (counts[record.status] ?? 0) + 1;
+    return counts;
+  }, {});
 }

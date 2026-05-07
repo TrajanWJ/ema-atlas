@@ -86,10 +86,7 @@ pub type Msg {
 
   DesktopPresenceProjection(reply: Subject(String))
 
-  DesktopPresenceJoin(
-    request: ema_presence.JoinRequest,
-    reply: Subject(String),
-  )
+  DesktopPresenceJoin(request: ema_presence.JoinRequest, reply: Subject(String))
 
   DesktopPresenceLeave(session_id: String, reply: Subject(String))
 
@@ -214,6 +211,14 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
           execution_id TEXT,
           payload_json TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS install (
+          id TEXT PRIMARY KEY,
+          genesis_device_id TEXT NOT NULL,
+          install_pubkey TEXT NOT NULL,
+          display_name TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          created_by TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS orgs (
           id TEXT PRIMARY KEY,
           name TEXT NOT NULL,
@@ -277,6 +282,8 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
           name TEXT NOT NULL,
           pubkey TEXT NOT NULL,
           bootstrap TEXT NOT NULL,
+          attested_by TEXT,
+          capabilities_json TEXT,
           status TEXT NOT NULL,
           updated_at TEXT NOT NULL,
           updated_by TEXT NOT NULL
@@ -344,6 +351,16 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
             sqlite_ffi.exec(
               db,
               "ALTER TABLE projects ADD COLUMN materialization_reason TEXT",
+            )
+          let _ =
+            sqlite_ffi.exec(
+              db,
+              "ALTER TABLE devices ADD COLUMN attested_by TEXT",
+            )
+          let _ =
+            sqlite_ffi.exec(
+              db,
+              "ALTER TABLE devices ADD COLUMN capabilities_json TEXT",
             )
           let _ = sqlite_ffi.migrate_projects_unique_name(db)
           Ok(db)
@@ -425,7 +442,10 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
     }
 
     ChronicleActivityProjection(reply) -> {
-      process.send(reply, sqlite_ffi.chronicle_activity_projection_json(state.db))
+      process.send(
+        reply,
+        sqlite_ffi.chronicle_activity_projection_json(state.db),
+      )
       actor.continue(state)
     }
 
@@ -702,6 +722,18 @@ fn persist_compact_object(
   env: Envelope,
 ) -> Result(Nil, AppendError) {
   case env.kind {
+    "install.initialized" ->
+      case
+        sqlite_ffi.persist_install_initialized(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
     "identity.user_upserted" ->
       case
         sqlite_ffi.persist_identity_user_upserted(db, env.payload_json, env.ts)
@@ -1074,6 +1106,9 @@ fn mailbox_size(_target: Subject(Delivery)) -> Int {
   0
 }
 
+@external(erlang, "ema_time_ffi", "iso_now")
+fn iso_now() -> String
+
 fn replay_from(
   _db: sqlite_ffi.Db,
   _since: Int,
@@ -1254,9 +1289,7 @@ pub fn desktop_presence_join(
 }
 
 pub fn desktop_presence_leave(bus: Subject(Msg), session_id: String) -> String {
-  process.call(bus, 5000, fn(reply) {
-    DesktopPresenceLeave(session_id, reply)
-  })
+  process.call(bus, 5000, fn(reply) { DesktopPresenceLeave(session_id, reply) })
 }
 
 pub fn desktop_presence_cursor(
@@ -1270,9 +1303,7 @@ pub fn desktop_presence_location(
   bus: Subject(Msg),
   request: ema_presence.LocationRequest,
 ) -> String {
-  process.call(bus, 5000, fn(reply) {
-    DesktopPresenceLocation(request, reply)
-  })
+  process.call(bus, 5000, fn(reply) { DesktopPresenceLocation(request, reply) })
 }
 
 pub fn peer_is_trusted(

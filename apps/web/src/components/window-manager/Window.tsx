@@ -9,7 +9,10 @@ import { WindowTitleBar } from "./WindowTitleBar";
 import { SnapZones } from "./SnapZones";
 import { useWindowStore } from "@/src/stores/window-store";
 import { useSettingsStore } from "@/src/stores/settings-store";
+import { usePresence } from "@/src/projections/use-presence";
+import { useTopbar } from "@/src/projections/use-topbar";
 import { APP_LABELS } from "@/src/lib/constants";
+import { getPresenceSessionId, publishPresenceCursor, publishPresenceLocation } from "@/src/lib/presence-client";
 import { useSound } from "@/src/hooks/use-sound";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { SPRINGS, getTransition } from "@/src/lib/springs";
@@ -56,14 +59,26 @@ function isCursorOutsideViewport(x: number, y: number): boolean {
 const SHADOW_NORMAL = '0 4px 24px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.04) inset';
 const SHADOW_FOCUSED = '0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 1px 0 rgba(255,255,255,0.06) inset';
 
+function presenceShadow(base: string, color?: string): string {
+	if (!color) return base;
+	return `${base}, 0 0 0 1px ${color}, 0 0 22px ${color}66`;
+}
+
 export function Window({ win, children }: WindowProps) {
 	const { closeWindow, minimizeWindow, maximizeWindow, focusWindow, moveWindow, resizeWindow } =
 		useWindowStore();
 	const activeWindowId = useWindowStore((s) => s.activeWindowId);
+	const { appLocations } = usePresence();
+	const { scope, raw } = useTopbar();
 	const shadowsEnabled = useSettingsStore((s) => s.windowShadows);
 	const isFocused = win.id === activeWindowId;
+	const selfSessionId = getPresenceSessionId();
+	const windowPresence = appLocations
+		.filter((location) => location.session_id !== selfSessionId)
+		.filter((location) => location.window_id === win.id || (!location.window_id && location.app_id === win.appId));
+	const primaryPresence = windowPresence[0] ?? null;
 	const windowShadow = shadowsEnabled
-		? (isFocused ? SHADOW_FOCUSED : SHADOW_NORMAL)
+		? presenceShadow(isFocused ? SHADOW_FOCUSED : SHADOW_NORMAL, primaryPresence?.color)
 		: 'none';
 	const windowRadius = 'var(--place-window-radius, 12px)';
 	const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
@@ -72,6 +87,8 @@ export function Window({ win, children }: WindowProps) {
 	const { playOpen, playClose } = useSound();
 	const reducedMotion = useReducedMotion();
 	const lastFocusRef = useRef(0);
+	const lastCursorSent = useRef(0);
+	const displayName = raw?.user?.display_name ?? "Trajan";
 
 	// Track whether the open animation has completed so the focus pulse can
 	// temporarily override the scale via `animateOverride`.
@@ -117,6 +134,17 @@ export function Window({ win, children }: WindowProps) {
 
 	const handleFocus = useCallback(() => {
 		focusWindow(win.id);
+		publishPresenceLocation(
+			{
+				org_id: scope.org?.id,
+				space_id: scope.space?.id,
+				room_id: "desktop_room:default",
+			},
+			win.id,
+			win.appId,
+			appName,
+			displayName,
+		);
 		// Focus pulse: briefly bump scale then return to resting state
 		const now = Date.now();
 		if (now - lastFocusRef.current < 300) return;
@@ -125,7 +153,27 @@ export function Window({ win, children }: WindowProps) {
 		setAnimateOverride({ scale: 1.01, opacity: 1 });
 		const timer = setTimeout(() => setAnimateOverride(null), 200);
 		return () => clearTimeout(timer);
-	}, [focusWindow, win.id, reducedMotion]);
+	}, [focusWindow, win.id, win.appId, appName, displayName, reducedMotion, scope.org?.id, scope.space?.id]);
+
+	const handlePointerMove = useCallback(
+		(e: React.PointerEvent<HTMLDivElement>) => {
+			const now = Date.now();
+			if (now - lastCursorSent.current < 40) return;
+			lastCursorSent.current = now;
+			publishPresenceCursor(
+				{
+					org_id: scope.org?.id,
+					space_id: scope.space?.id,
+					room_id: "desktop_room:default",
+				},
+				e.clientX,
+				e.clientY,
+				displayName,
+				{ surface: "window", window_id: win.id, app_id: win.appId },
+			);
+		},
+		[displayName, scope.org?.id, scope.space?.id, win.id, win.appId],
+	);
 
 	const handleDetach = () => {
 		const launcher = getPopoutLauncher();
@@ -191,6 +239,11 @@ export function Window({ win, children }: WindowProps) {
 			onMaximize={handleMaximize}
 			onClose={handleClose}
 			onDetach={handleDetach}
+			presence={windowPresence.map((location) => ({
+				actor_id: location.actor_id,
+				display_name: location.display_name,
+				color: location.color,
+			}))}
 		/>
 	);
 
@@ -236,6 +289,7 @@ export function Window({ win, children }: WindowProps) {
 						exit={closeExit}
 						transition={openTransition}
 						onMouseDown={handleFocus}
+						onPointerMove={handlePointerMove}
 						className="glass absolute flex flex-col overflow-hidden"
 						style={{
 							top: "2.5rem",
@@ -292,6 +346,7 @@ export function Window({ win, children }: WindowProps) {
 							exit={exit}
 							transition={openTransition}
 							onMouseDown={handleFocus}
+							onPointerMove={handlePointerMove}
 							className="glass flex h-full w-full flex-col overflow-hidden"
 							style={{
 								contain: "layout paint style",

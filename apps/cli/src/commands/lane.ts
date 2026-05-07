@@ -19,6 +19,7 @@ type LaneRecord = {
   lane_id?: string;
   title: string;
   project_id?: string | null;
+  mission_id?: string | null;
   status: string;
   updated_at?: string | null;
   actor_id?: string | null;
@@ -241,6 +242,8 @@ async function runRecentList(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
   const lanes = await loadLanes(args);
   if (!lanes) return 1;
+  const activeFilters = listFilters(args);
+  const items = filterLanes(lanes.items, activeFilters);
   if (json) {
     emitJson({
       ok: true,
@@ -249,18 +252,44 @@ async function runRecentList(args: ParsedArgs): Promise<number> {
       workspace_scope: lanes.context.scope,
       all_projects: lanes.context.allProjects,
       filter: lanes.context.allProjects ? "all_projects" : "project",
-      lanes: lanes.items,
+      filters: activeFilters,
+      lanes: items,
     });
   } else {
     emitPretty("# lanes");
-    if (lanes.items.length === 0) emitPretty("  (none)");
-    for (const lane of lanes.items) {
+    if (activeFilters.length > 0) {
+      emitPretty(`filters: ${activeFilters.map((f) => `${f.key}=${f.value}`).join(" ")}`);
+    }
+    if (items.length === 0) emitPretty("  (none)");
+    for (const lane of items) {
       const owner = lane.actor_id ? ` owner=${lane.actor_id}` : "";
+      const mission = lane.mission_id ? ` mission=${lane.mission_id}` : "";
       const updated = lane.updated_at ? ` updated=${lane.updated_at}` : "";
-      emitPretty(`  ${lane.id} [${lane.status}] ${lane.title}${owner}${updated}`);
+      emitPretty(`  ${lane.id} [${lane.status}] ${lane.title}${owner}${mission}${updated}`);
     }
   }
   return 0;
+}
+
+type ListFilter = { key: "status" | "mission"; value: string };
+
+function listFilters(args: ParsedArgs): ListFilter[] {
+  return [
+    ["status", flagString(args, "status")],
+    ["mission", flagString(args, "mission")],
+  ].flatMap(([key, value]) =>
+    value ? [{ key: key as ListFilter["key"], value }] : [],
+  );
+}
+
+function filterLanes(items: LaneRecord[], filters: ListFilter[]): LaneRecord[] {
+  if (filters.length === 0) return items;
+  return items.filter((item) =>
+    filters.every((filter) => {
+      if (filter.key === "status") return item.status === filter.value;
+      return item.mission_id === filter.value;
+    }),
+  );
 }
 
 async function loadLanes(args: ParsedArgs): Promise<LaneLoadResult | null> {

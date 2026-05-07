@@ -112,10 +112,7 @@ pub fn open_lane_linked(
                 #("depends_on", optional_string(depends_on)),
                 #("opened_by", json.string(actor)),
                 #("status", json.string("idea")),
-                #(
-                  "blueprint_section_id",
-                  optional_string(blueprint_section_id),
-                ),
+                #("blueprint_section_id", optional_string(blueprint_section_id)),
                 #("blueprint_gac_id", optional_string(blueprint_gac_id)),
                 #(
                   "blueprint_decision_id",
@@ -125,19 +122,19 @@ pub fn open_lane_linked(
               ]),
             )
 
-      let envelope =
-        Envelope(
-          event_id: event_id,
-          kind: "lane.opened",
-          ts: now,
-          actor: actor,
-          org_id: org,
-          space_id: event_envelope.none(),
-          project_id: option_to_envelope(project_id),
-          dispatch_id: event_envelope.none(),
-          execution_id: event_envelope.none(),
-          payload_json: payload,
-        )
+          let envelope =
+            Envelope(
+              event_id: event_id,
+              kind: "lane.opened",
+              ts: now,
+              actor: actor,
+              org_id: org,
+              space_id: event_envelope.none(),
+              project_id: option_to_envelope(project_id),
+              dispatch_id: event_envelope.none(),
+              execution_id: event_envelope.none(),
+              payload_json: payload,
+            )
 
           case bus.append(bus_subject, envelope) {
             Ok(_) -> Ok(LaneOpened(lane_id: lane_id, event_id: event_id))

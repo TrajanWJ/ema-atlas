@@ -21,7 +21,22 @@ That emits `apps/cli/dist/bin.js` with a `#!/usr/bin/env node` hashbang.
 
 ## Invoke
 
-During development you don't need to link the binary globally:
+The canonical invocation in development is the global `ema` wrapper:
+
+```
+ema <command>                           # global launcher, runs from any cwd
+```
+
+The wrapper lives at `~/.local/bin/ema`. It resolves the active build via
+`EMA_HOME` (default `~/Desktop/Active builds/EMA-0.0.5`) and execs
+`apps/cli/dist/bin.js`. To target a different build for one shell:
+
+```
+EMA_HOME="$HOME/Desktop/Active builds/EMA-0.0.6" ema next --json
+```
+
+If the wrapper isn't installed, two equivalent fallbacks work from inside the
+build root:
 
 ```
 pnpm cli <command>                      # root script, via pnpm --filter
@@ -41,6 +56,10 @@ Every command accepts `--json` to emit NDJSON instead of pretty text.
 - `ema events tail [--family <name>] [--since <txid>]` — streams event
   envelopes as JSON lines. Ctrl-C to quit. `--since` is accepted for
   forward-compat; v0 has no resume-from-txid semantic.
+- `ema cwt status` — inspects the `current-work-tracker-trajan` shared-files
+  projection.
+- `ema cwt ingest --dry-run` — previews CWT queue/project promotion without
+  writing daemon events.
 
 ### Wave 1 — documented grammar, stubbed behavior
 
@@ -75,6 +94,7 @@ apps/cli/
       status.ts
       events.ts
       swarm.ts
+      cwt.ts
       help.ts
   tsconfig.json
   tsup.config.ts          # esm, node20, hashbang banner

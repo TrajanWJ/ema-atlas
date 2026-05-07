@@ -26,14 +26,25 @@ projections.
 
 | #  | Event                      | Actor                    | Notes                                                               |
 | -- | -------------------------- | ------------------------ | ------------------------------------------------------------------- |
-| 1  | `device.registered`        | `system:ema_identity`    | `bootstrap: "genesis"`; device pubkey generated locally             |
-| 2  | `org.created`              | `system:ema_orgs`        | `kind: "personal"`; name = `"Trajan's Organization"`                |
-| 3  | `membership.role_granted`  | `system:ema_memberships` | role `"owner"` for user `trajan` on the personal org                |
-| 4  | `space.created`            | `system:ema_spaces`      | same name as personal org; becomes its default space                |
-| 5  | `org.created`              | `system:ema_orgs`        | `kind: "team"`; name = `"Founding-Fathers-EMA"`                     |
-| 6  | `membership.role_granted`  | `system:ema_memberships` | role `"owner"` for user `trajan` on Founding-Fathers-EMA            |
-| 7  | `space.created`            | `system:ema_spaces`      | name = `"Founding-Fathers-EMA"`; default space of that org          |
-| 8  | `project.created`          | `system:ema_projects`    | name = `"EMA 0.0.5"` under the Founding-Fathers-EMA default space   |
+| 1  | `install.initialized`      | `system:ema_identity`    | root install record; captures genesis device and install pubkey     |
+| 2  | `identity.user_upserted`   | `system:ema_identity`    | creates the install-local founding user before device projection    |
+| 3  | `device.registered`        | `system:ema_identity`    | `bootstrap: "genesis"`; `attested_by: null`; local capabilities     |
+| 4  | `actor.created`            | `actor:<trajan>`         | human actor record for Trajan                                       |
+| 5  | `actor.created`            | `actor:<trajan>`         | Codex implementation actor                                          |
+| 6  | `actor.created`            | `actor:<trajan>`         | Claude docs/synthesis actor                                         |
+| 7  | `org.created`              | `system:ema_orgs`        | `kind: "personal"`; name = `"Trajan's Organization"`                |
+| 8  | `membership.role_granted`  | `system:ema_memberships` | role `"owner"` for user `trajan` on the personal org                |
+| 9  | `space.created`            | `system:ema_spaces`      | `"Personal Workspace"`; default space of the personal org           |
+| 10 | `org.created`              | `system:ema_orgs`        | `kind: "team"`; name = `"Founding-Fathers-EMA"`                     |
+| 11 | `membership.role_granted`  | `system:ema_memberships` | role `"owner"` for user `trajan` on Founding-Fathers-EMA            |
+| 12 | `space.created`            | `system:ema_spaces`      | name = `"Founding-Fathers-EMA"`; default space of that org          |
+| 13 | `project.created`          | `system:ema_projects`    | name = `"EMA 0.0.5"` under the Founding-Fathers-EMA default space   |
+| 14 | `blueprint.document.created` | `system:ema_blueprint` | creates the default EMA 0.0.5 Blueprint document                    |
+| 15 | `blueprint.section.added`  | `system:ema_blueprint`   | root section                                                        |
+| 16 | `blueprint.section.added`  | `system:ema_blueprint`   | runtime/source evidence section                                     |
+| 17 | `attachment.created`       | `system:ema_attachments` | local EMA 0.0.5 runtime codebase attachment                         |
+| 18 | `attachment.linked`        | `system:ema_attachments` | links runtime attachment to the Blueprint evidence section          |
+| 19 | `blueprint.attachment.linked` | `system:ema_blueprint` | Blueprint-level attachment link                                     |
 
 The shell boots with the current selection pointed at events 5/7/8
 (Founding-Fathers-EMA → Founding-Fathers-EMA → EMA 0.0.5). The personal
@@ -67,12 +78,14 @@ other operators as `admin` / `member` later.
 
 ## Where this lives in code
 
-- `ema_identity.register_device/1` emits event (1).
-- `ema_orgs.bootstrap_personal/1` emits events (2)–(4) in one writer call.
-- `ema_orgs.bootstrap_team/2` (called with `"Founding-Fathers-EMA"`)
-  emits events (5)–(7).
-- `ema_projects.seed_vanilla_workspace/1` emits event (8) once the
-  Founding-Fathers-EMA default space is visible on the bus.
+- `ema_swarm_coordination.first_boot.seed_if_needed/1` owns the deterministic
+  dev seed and emits the whole first-boot chain above.
+- `install.initialized` is projected into the compact `install` table.
+- `identity.user_upserted` is projected into the compact `users` table.
+- `device.registered` is projected into the compact `devices` table with
+  `attested_by` and `capabilities`.
+- `ema_identity.register_device_with_attestation/9` is the shared writer for
+  genesis and paired devices outside the deterministic seed.
 
 Cross-context calls flow through the registry (`ema_orgs` subscribes to
 `device.registered`; `ema_spaces` subscribes to `org.created`; etc.).
@@ -82,9 +95,12 @@ No context reaches into another's modules directly.
 
 Device 1 runs this full sequence. Device 2 (post-pairing) does **not**
 run it — device 2 instead receives the existing log from its peer and
-projects the same state. The pairing ceremony appends only
-`device.registered` with `bootstrap: "paired"`, and the existing
-org/space/project events are replayed from the replicated log.
+projects the same state. In v0/dev, pairing uses manual JSON copy-paste:
+`device.pairing_offer.create` returns the new device offer and short code,
+then `device.pairing_offer.approve` appends a single `device.registered`
+event with `bootstrap: "paired"` and `attested_by` set to the approving
+trusted device. The existing org/space/project events are replayed from
+the replicated log once replication is enabled.
 
 ## Open questions (deferred)
 

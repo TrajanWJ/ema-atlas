@@ -13,6 +13,10 @@ or surface code must appear in this list.
 - `org.settings_updated`
 - `org.archived`
 
+## install
+
+- `install.initialized`
+
 ## actor
 
 - `actor.created`

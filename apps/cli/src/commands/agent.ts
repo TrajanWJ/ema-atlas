@@ -126,10 +126,10 @@ async function runPrompt(args: ParsedArgs): Promise<number> {
     blockedQueue.length > 0 ? `- Blocked: ${blockedQueue.map((item) => `${item.id} ${item.title}`).join("; ")}` : "- Blocked: none for this lane",
     "",
     "Required EMA Loop:",
-    "- Run pnpm cli tl about --json and pnpm cli vcalendar tick --json first.",
-    "- Use pnpm cli lane show/list before edits; claim or refresh ownership if you edit.",
-    "- Log later work with pnpm cli queue add including why, done-when, source, and blockers.",
-    "- Finish with pnpm cli agent report --actor <actor> --lane <lane> --changed ... --verified ... --risks ... --next ...",
+    "- Run ema tl about --json and ema vcalendar tick --json first.",
+    "- Use ema lane show/list before edits; claim or refresh ownership if you edit.",
+    "- Log later work with ema queue add including why, done-when, source, and blockers.",
+    "- Finish with ema agent report --actor <actor> --lane <lane> --changed ... --verified ... --risks ... --next ...",
     mode === "handoff" ? "- If you cannot continue, request or update a handoff rather than leaving chat-only context." : "- Keep the Harness execution tied to the lane and use harness context/events for recovery.",
   ].filter((line): line is string => line !== null);
   const prompt = promptLines.join("\n");
@@ -138,10 +138,10 @@ async function runPrompt(args: ParsedArgs): Promise<number> {
   const cwdArg = ` --cwd ${shellQuote(cwd)}`;
   const promptArg = ` --prompt ${shellQuote(prompt)}`;
   const harnessCommand = provider === "simulated"
-    ? `pnpm cli harness dispatch${providerArg}${laneArg}${cwdArg}${promptArg} --json`
-    : `pnpm cli harness start${providerArg}${laneArg}${cwdArg}${promptArg} --json`;
+    ? `ema harness dispatch${providerArg}${laneArg}${cwdArg}${promptArg} --json`
+    : `ema harness start${providerArg}${laneArg}${cwdArg}${promptArg} --json`;
   const handoffCommand = lane
-    ? `pnpm cli handoff request --from ${shellQuote(lane.id)} --to ${shellQuote(target)} --needed ${shellQuote(objective ?? title)} --context ${shellQuote(prompt)} --verify ${shellQuote("agent report recorded with changed/verified/risks/next")} --json`
+    ? `ema handoff request --from ${shellQuote(lane.id)} --to ${shellQuote(target)} --needed ${shellQuote(objective ?? title)} --context ${shellQuote(prompt)} --verify ${shellQuote("agent report recorded with changed/verified/risks/next")} --json`
     : null;
   const payload = {
     ok: true,
@@ -161,8 +161,8 @@ async function runPrompt(args: ParsedArgs): Promise<number> {
     commands: {
       harness: harnessCommand,
       handoff: handoffCommand,
-      context: lane ? `pnpm cli harness context --lane ${shellQuote(lane.id)} --json` : "pnpm cli harness context --json",
-      report: lane ? `pnpm cli agent report --actor ${shellQuote(target)} --lane ${shellQuote(lane.id)} --changed <changed> --verified <verified> --risks <risks> --next <next> --json` : null,
+      context: lane ? `ema harness context --lane ${shellQuote(lane.id)} --json` : "ema harness context --json",
+      report: lane ? `ema agent report --actor ${shellQuote(target)} --lane ${shellQuote(lane.id)} --changed <changed> --verified <verified> --risks <risks> --next <next> --json` : null,
     },
   };
 
@@ -200,6 +200,10 @@ type VcalendarStateRecord = {
   readonly current_phase?: string | null;
   readonly current_phase_set_at?: string | null;
   readonly current_phase_set_by?: string | null;
+};
+
+type ProjectScopedProjectionRecord = {
+  readonly project_id?: string | null;
 };
 
 function countByStatus(records: readonly { readonly status: string }[]): Record<string, number> {
@@ -240,6 +244,15 @@ function toVcalendarState(data: Record<string, unknown>): VcalendarStateRecord {
     current_phase_set_at: readStringField(data, "current_phase_set_at"),
     current_phase_set_by: readStringField(data, "current_phase_set_by"),
   };
+}
+
+function filterResolvedProjectRecords<T extends ProjectScopedProjectionRecord>(
+  records: readonly T[],
+  projectId: string | null,
+  allProjects: boolean,
+): T[] {
+  if (allProjects || !projectId) return [...records];
+  return records.filter((record) => record.project_id === projectId);
 }
 
 async function runMetaProgress(args: ParsedArgs): Promise<number> {
@@ -459,11 +472,17 @@ async function runOrient(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
   const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
   const scope = await resolveWorkspaceScope({ args });
+  const allProjects = flagBool(args, "all-projects");
   const daemonRecent = await loadRecentWorkspaceTrail(args);
-  const handoffs = await readProjection(args, {
+  const handoffsRaw = await readProjection(args, {
     name: "handoff.registry",
     pick: (data) => (data.handoffs as unknown[] | undefined) ?? [],
   }) ?? [];
+  const handoffs = filterResolvedProjectRecords(
+    handoffsRaw as ProjectScopedProjectionRecord[],
+    scope.project_id,
+    allProjects,
+  );
   const reports = await readProjection(args, {
     name: "agent.reports",
     pick: (data) => (data.reports as unknown[] | undefined) ?? [],

@@ -11,6 +11,10 @@ import gleam/list
 
 pub const boot_ts: String = "2026-04-24T00:00:00-04:00"
 
+pub const install_id: String = "install:01J00000000000000000000014"
+
+pub const install_pubkey: String = "dev-genesis-pubkey"
+
 pub const genesis_user_id: String = "user:01J00000000000000000000001"
 
 pub const genesis_device_id: String = "device:01J00000000000000000000000"
@@ -134,13 +138,23 @@ pub type SeedError {
 pub fn seed_if_needed(
   bus_subject: Subject(bus.Msg),
 ) -> Result(List(String), SeedError) {
+  let install_seeded =
+    bus.event_exists(bus_subject, "install.initialized", install_id)
+  let user_seeded =
+    bus.event_exists(bus_subject, "identity.user_upserted", "org:identity")
   let team_seeded = bus.event_exists(bus_subject, "org.created", org_id)
   let personal_seeded =
     bus.event_exists(bus_subject, "org.created", personal_org_id)
+  let base_events = missing_base_identity_events(install_seeded, user_seeded)
 
   case team_seeded, personal_seeded {
-    True, True -> Ok([])
-    True, False -> append_all(bus_subject, personal_bootstrap_events(), [])
+    True, True -> append_all(bus_subject, base_events, [])
+    True, False ->
+      append_all(
+        bus_subject,
+        list.append(base_events, personal_bootstrap_events()),
+        [],
+      )
     _, _ -> append_all(bus_subject, first_boot_events(), [])
   }
 }
@@ -271,13 +285,15 @@ pub fn see_agent_work_seed() -> SeeAgentWorkSeed {
 
 pub fn first_boot_events() -> List(Envelope) {
   [
+    install_initialized_event(),
+    identity_user_upserted_event(),
     envelope_with_actor(
       event_id: "event:01J00000000000000000000100",
       kind: "device.registered",
       actor: "system:ema_identity",
       space_id: event_envelope.none(),
       project_id: event_envelope.none(),
-      payload_json: "{\"device_id\":\"device:01J00000000000000000000000\",\"user_id\":\"user:01J00000000000000000000001\",\"name\":\"trajan\",\"pubkey\":\"dev-genesis-pubkey\",\"bootstrap\":\"genesis\"}",
+      payload_json: "{\"device_id\":\"device:01J00000000000000000000000\",\"user_id\":\"user:01J00000000000000000000001\",\"name\":\"trajan\",\"pubkey\":\"dev-genesis-pubkey\",\"bootstrap\":\"genesis\",\"attested_by\":null,\"capabilities\":[\"runs_agents\",\"serves_files\"]}",
     ),
     envelope(
       event_id: "event:01J00000000000000000000101",
@@ -395,6 +411,43 @@ pub fn first_boot_events() -> List(Envelope) {
       payload_json: "{\"attachment_id\":\"attachment:01J00000000000000000000010\",\"section_id\":\"blueprint_sec:01J00000000000000000000009\"}",
     ),
   ]
+}
+
+fn missing_base_identity_events(
+  install_seeded: Bool,
+  user_seeded: Bool,
+) -> List(Envelope) {
+  case install_seeded, user_seeded {
+    True, True -> []
+    False, True -> [install_initialized_event()]
+    True, False -> [identity_user_upserted_event()]
+    False, False -> [
+      install_initialized_event(),
+      identity_user_upserted_event(),
+    ]
+  }
+}
+
+fn install_initialized_event() -> Envelope {
+  envelope_for_org(
+    event_id: "event:01J00000000000000000000098",
+    kind: "install.initialized",
+    space_id: event_envelope.none(),
+    project_id: event_envelope.none(),
+    payload_json: "{\"install_id\":\"install:01J00000000000000000000014\",\"genesis_device_id\":\"device:01J00000000000000000000000\",\"install_pubkey\":\"dev-genesis-pubkey\",\"display_name\":\"Trajan's EMA\"}",
+    org_id: install_id,
+  )
+}
+
+fn identity_user_upserted_event() -> Envelope {
+  envelope_for_org(
+    event_id: "event:01J00000000000000000000099",
+    kind: "identity.user_upserted",
+    space_id: event_envelope.none(),
+    project_id: event_envelope.none(),
+    payload_json: "{\"user_id\":\"user:01J00000000000000000000001\",\"display_name\":\"Trajan\",\"email\":\"trajan@place.org\",\"email_verified\":false,\"primary_device_id\":\"device:01J00000000000000000000000\"}",
+    org_id: "org:identity",
+  )
 }
 
 fn personal_bootstrap_events() -> List(Envelope) {

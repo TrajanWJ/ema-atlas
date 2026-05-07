@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cinzel, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { IpcProvider } from "@/src/lib/ipc/provider";
+import { Sidebar } from "@/src/components/navigation/Sidebar";
 import "./globals.css";
 import "./tauri-frame.css";
 
@@ -47,7 +48,10 @@ export default function RootLayout({
 			className={`${cinzel.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
 		>
 			<body>
-				<IpcProvider>{children}</IpcProvider>
+				<IpcProvider>
+					<Sidebar />
+					{children}
+				</IpcProvider>
 			</body>
 		</html>
 	);

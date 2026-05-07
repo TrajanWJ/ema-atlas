@@ -116,7 +116,7 @@ async function runHermesOrient(args: ParsedArgs, verb: string): Promise<number> 
 		active_dispatches: [],
 		chronicle_recent_events: { projection: "chronicle.activity", status: "pending_daemon_projection" },
 		peer_status: { rail: "ssh", status: "local_only_until_peer_registry" },
-		dev_server_status: { status: "not_checked", commands: ["ema status --json", "pnpm cli status --json"] },
+		dev_server_status: { status: "not_checked", commands: ["ema status --json"] },
 		recommended_lane: recommendedLane,
 		active_risks: activeRisks,
 		blocked_work: blockedWork,

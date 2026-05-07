@@ -122,6 +122,65 @@ export type SeeAgentWorkProjection = {
   cli_suggestions: string[];
 };
 
+export type PresenceProjection = {
+  source: "ema_presence" | string;
+  authority: "daemon_ephemeral" | string;
+  revision: number;
+  mesh_ready: boolean;
+  sessions: Array<{
+    session_id: string;
+    actor_id: string;
+    display_name: string;
+    color: string;
+    org_id: string;
+    space_id: string;
+    room_id: string;
+    status: "active" | "idle" | "disconnected" | string;
+    last_seen_at: string;
+  }>;
+  actors: Array<{
+    actor_id: string;
+    display_name: string;
+    color: string;
+    kind: "human" | "agent" | string;
+  }>;
+  cursors: Array<{
+    session_id: string;
+    actor_id: string;
+    display_name: string;
+    color: string;
+    org_id: string;
+    space_id: string;
+    room_id: string;
+    x: number;
+    y: number;
+    surface: "desktop" | "window" | "app" | string;
+    window_id: string | null;
+    app_id: string | null;
+    updated_at: string;
+  }>;
+  app_locations: Array<{
+    session_id: string;
+    actor_id: string;
+    display_name: string;
+    color: string;
+    org_id: string;
+    space_id: string;
+    room_id: string;
+    window_id: string | null;
+    app_id: string;
+    label: string;
+    updated_at: string;
+  }>;
+  window_outlines: Array<{
+    actor_id: string;
+    display_name: string;
+    window_id: string | null;
+    app_id: string;
+    color: string;
+  }>;
+};
+
 export type ProjectFilesystemProjection = {
   projects: Array<{
     project_id: string;
@@ -161,5 +220,6 @@ export const PROJECTION_NAMES = {
   gitEmaProjectAttachments: "git_ema.project_attachments",
   blueprintSections: "blueprint.sections",
   collabDocument: "collab.document",
+  desktopPresence: "desktop.presence",
   seeAgentWorkProjectPulse: "see_agent_work.project_pulse",
 } as const;

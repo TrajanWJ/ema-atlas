@@ -7,6 +7,8 @@ import ema_daemon/bus
 import ema_daemon/event_envelope.{type Envelope, Envelope}
 import gleam/erlang/process.{type Subject}
 import gleam/json
+import gleam/list
+import gleam/option.{type Option, None, Some}
 import gleam/string
 
 pub type GoogleUser {
@@ -146,12 +148,38 @@ pub fn register_device(
   pubkey: String,
   bootstrap: String,
 ) -> Result(DeviceRegistration, IdentityError) {
+  register_device_with_attestation(
+    bus_subject,
+    org_id,
+    device_id,
+    user_id,
+    name,
+    pubkey,
+    bootstrap,
+    None,
+    [],
+  )
+}
+
+pub fn register_device_with_attestation(
+  bus_subject: Subject(bus.Msg),
+  org_id: String,
+  device_id: String,
+  user_id: String,
+  name: String,
+  pubkey: String,
+  bootstrap: String,
+  attested_by: Option(String),
+  capabilities: List(String),
+) -> Result(DeviceRegistration, IdentityError) {
   let clean_org = string.trim(org_id)
   let clean_device = string.trim(device_id)
   let clean_user = string.trim(user_id)
   let clean_name = string.trim(name)
   let clean_pubkey = string.trim(pubkey)
   let clean_bootstrap = string.trim(bootstrap)
+  let clean_attested_by = option_trim(attested_by)
+  let clean_capabilities = clean_string_list(capabilities)
 
   case
     clean_org,
@@ -175,6 +203,8 @@ pub fn register_device(
         clean_name,
         clean_pubkey,
         clean_bootstrap,
+        clean_attested_by,
+        clean_capabilities,
       )
     _, _, _, _, _, "paired" ->
       append_device_registered(
@@ -185,6 +215,8 @@ pub fn register_device(
         clean_name,
         clean_pubkey,
         clean_bootstrap,
+        clean_attested_by,
+        clean_capabilities,
       )
     _, _, _, _, _, other -> Error(InvalidBootstrap(other))
   }
@@ -198,6 +230,8 @@ fn append_device_registered(
   name: String,
   pubkey: String,
   bootstrap: String,
+  attested_by: Option(String),
+  capabilities: List(String),
 ) -> Result(DeviceRegistration, IdentityError) {
   let now = iso_now()
   let event_id = "event:" <> ulid()
@@ -209,6 +243,11 @@ fn append_device_registered(
         #("name", json.string(name)),
         #("pubkey", json.string(pubkey)),
         #("bootstrap", json.string(bootstrap)),
+        #("attested_by", option_json(attested_by)),
+        #(
+          "capabilities",
+          json.preprocessed_array(list.map(capabilities, json.string)),
+        ),
       ]),
     )
   case
@@ -221,6 +260,31 @@ fn append_device_registered(
     Ok(written) -> Ok(DeviceRegistration(device_id, written))
     Error(e) -> Error(e)
   }
+}
+
+fn option_trim(value: Option(String)) -> Option(String) {
+  case value {
+    None -> None
+    Some(raw) -> {
+      case string.trim(raw) {
+        "" -> None
+        clean -> Some(clean)
+      }
+    }
+  }
+}
+
+fn option_json(value: Option(String)) -> json.Json {
+  case value {
+    None -> json.null()
+    Some(clean) -> json.string(clean)
+  }
+}
+
+fn clean_string_list(values: List(String)) -> List(String) {
+  values
+  |> list.map(string.trim)
+  |> list.filter(fn(value) { value != "" })
 }
 
 fn envelope(

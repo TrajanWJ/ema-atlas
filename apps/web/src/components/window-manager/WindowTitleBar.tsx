@@ -8,6 +8,11 @@ interface WindowTitleBarProps {
 	readonly onMaximize: () => void;
 	readonly onClose: () => void;
 	readonly onDetach?: () => void;
+	readonly presence?: ReadonlyArray<{
+		readonly actor_id: string;
+		readonly display_name: string;
+		readonly color: string;
+	}>;
 }
 
 function DetachIcon() {
@@ -37,6 +42,7 @@ export function WindowTitleBar({
 	onMaximize,
 	onClose,
 	onDetach,
+	presence = [],
 }: WindowTitleBarProps) {
 	const showDetach = onDetach && !isTouchDevice();
 
@@ -96,6 +102,28 @@ export function WindowTitleBar({
 
 			{/* Right-side actions */}
 			<div className="flex items-center gap-1.5">
+				{presence.slice(0, 3).map((actor) => (
+					<span
+						key={actor.actor_id}
+						title={actor.display_name}
+						style={{
+							border: `1px solid ${actor.color}`,
+							borderRadius: 999,
+							boxShadow: `0 0 12px ${actor.color}66`,
+							color: "var(--place-text-primary)",
+							fontSize: 10,
+							fontWeight: 600,
+							lineHeight: 1,
+							maxWidth: 72,
+							overflow: "hidden",
+							padding: "3px 6px",
+							textOverflow: "ellipsis",
+							whiteSpace: "nowrap",
+						}}
+					>
+						{actor.display_name}
+					</span>
+				))}
 				{showDetach && (
 					<button
 						type="button"

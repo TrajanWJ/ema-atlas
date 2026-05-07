@@ -1,0 +1,39 @@
+{
+  "policy": {
+    "donor_projects": "read-only",
+    "mutation_target": "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5",
+    "priority": "executable-agent-workspace"
+  },
+  "accepted_sources": [
+    {
+      "donor": "Active builds/EMA-0.0.5-swarm-claude/docs/orchestration/swarm/",
+      "classification": "swarm-runbook",
+      "target": "docs/orchestration/swarm/",
+      "status": "accepted"
+    },
+    {
+      "donor": "Active builds/EMA-0.0.5-swarm-codex/docs/orchestration/swarm/",
+      "classification": "swarm-operating-model",
+      "target": "docs/orchestration/swarm/",
+      "status": "accepted"
+    },
+    {
+      "donor": "Projects/EMA/atlas/content/swarm/object-model.md",
+      "classification": "canonical-object-model",
+      "target": "packages/contracts + apps/web/src/components/apps/agent-work",
+      "status": "accepted"
+    },
+    {
+      "donor": "Active builds/duct-tape-onion-harness/",
+      "classification": "harness-control-plane",
+      "target": "apps/cli/src/commands/harness.ts + tooling/",
+      "status": "accepted"
+    },
+    {
+      "donor": "Space shared files-uploads-vDesktop-vFilesystem-root/place-companion/",
+      "classification": "native-companion",
+      "target": "apps/desktop/src-tauri + apps/web/src/components/desktop",
+      "status": "accepted"
+    }
+  ]
+}

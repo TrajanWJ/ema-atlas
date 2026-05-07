@@ -31,6 +31,9 @@ import { runHarness } from "./commands/harness.js";
 import { runPeer } from "./commands/peer.js";
 import { runGap } from "./commands/gap.js";
 import { runDoctor } from "./commands/doctor.js";
+import { runDesktop } from "./commands/desktop.js";
+import { runRecovery } from "./commands/recovery.js";
+import { runCwt } from "./commands/cwt.js";
 
 async function main(): Promise<number> {
   const [, , cmd, ...rest] = process.argv;
@@ -93,6 +96,12 @@ async function main(): Promise<number> {
       return runGap(args);
     case "doctor":
       return runDoctor(args);
+    case "desktop":
+      return runDesktop(args);
+    case "recovery":
+      return runRecovery(args);
+    case "cwt":
+      return runCwt(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

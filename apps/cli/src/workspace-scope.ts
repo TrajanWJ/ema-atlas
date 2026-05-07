@@ -9,7 +9,7 @@
 //   4. Daemon current  (topbar projection)
 //   5. Unresolved      — surfaced honestly; no implicit agent-workspace-vapp fallback.
 
-import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { join, relative, resolve as resolvePath, sep } from "node:path";
 import type { ParsedArgs } from "./args.js";
 import { flagString } from "./args.js";
@@ -55,6 +55,7 @@ interface DaemonProject {
   readonly org_id: string;
   readonly space_id: string;
   readonly local_path: string;
+  readonly active_build?: string;
   readonly materialization_status: string;
 }
 
@@ -67,7 +68,7 @@ interface DaemonTopbar {
 export async function resolveWorkspaceScope(opts: ResolveOptions = {}): Promise<WorkspaceScope> {
   const cwd = canonicalCwd(opts.cwd ?? process.cwd());
   const env = opts.env ?? process.env;
-  const projects = await loadDaemonProjects();
+  const projects = mergeProjects(await loadDaemonProjects(), loadFileProjects());
 
   const flagProject = opts.args ? flagString(opts.args, "project") : undefined;
   const flagSpace = opts.args ? flagString(opts.args, "space") : undefined;
@@ -127,11 +128,11 @@ function decorate(
   const projectRecord = project.local_path && project.local_path.length > 0
     ? project.local_path
     : join(PROJECTS_DIR, project.name);
-  const { activeBuild, buildVersion, buildRecord } = inferBuildPaths(project.name, projectRecord, cwd);
+  const { activeBuild, buildVersion, buildRecord } = inferBuildPaths(project.name, projectRecord, cwd, project.active_build);
   return {
-    org_id: overrides.orgOverride ?? project.org_id,
-    space_id: overrides.spaceOverride ?? project.space_id,
-    project_id: project.id,
+    org_id: nullIfEmpty(overrides.orgOverride ?? project.org_id),
+    space_id: nullIfEmpty(overrides.spaceOverride ?? project.space_id),
+    project_id: nullIfEmpty(project.id),
     project_name: project.name,
     project_record: projectRecord,
     active_build: activeBuild,
@@ -185,15 +186,41 @@ function inferFromCwd(cwd: string, projects: DaemonProject[]): WorkspaceScope | 
     const buildVersion = inferBuildVersionUnderProject(projectRecord, cwd);
     const buildRecord = buildVersion ? join(projectRecord, "builds", buildVersion) : null;
     return {
-      org_id: project.org_id,
-      space_id: project.space_id,
-      project_id: project.id,
+      org_id: nullIfEmpty(project.org_id),
+      space_id: nullIfEmpty(project.space_id),
+      project_id: nullIfEmpty(project.id),
       project_name: project.name,
       project_record: projectRecord,
-      active_build: matchActiveBuildPath(project.name) ?? null,
+      active_build: project.active_build ?? matchActiveBuildPath(project.name) ?? null,
       build_version: buildVersion,
       build_record: buildRecord,
       resolution_source: buildVersion ? "cwd-build" : "cwd-project",
+      cwd,
+      note: null,
+    };
+  }
+
+  const byActiveBuild = projects
+    .filter((p) => p.active_build && p.active_build.length > 0)
+    .map((p) => ({ p, prefix: ensureTrailingSep(canonicalMaybe(p.active_build ?? "")) }))
+    .filter(({ prefix }) => cwd === stripTrailingSep(prefix) || cwd.startsWith(prefix))
+    .sort((a, b) => b.prefix.length - a.prefix.length)[0];
+
+  if (byActiveBuild) {
+    const project = byActiveBuild.p;
+    const projectRecord = project.local_path && project.local_path.length > 0
+      ? project.local_path
+      : join(PROJECTS_DIR, project.name);
+    return {
+      org_id: nullIfEmpty(project.org_id),
+      space_id: nullIfEmpty(project.space_id),
+      project_id: nullIfEmpty(project.id),
+      project_name: project.name,
+      project_record: projectRecord,
+      active_build: canonicalMaybe(project.active_build ?? ""),
+      build_version: null,
+      build_record: null,
+      resolution_source: "cwd-active-build",
       cwd,
       note: null,
     };
@@ -214,9 +241,9 @@ function inferFromCwd(cwd: string, projects: DaemonProject[]): WorkspaceScope | 
         const activeBuild = join(ACTIVE_BUILDS_DIR, buildName);
         const buildRecord = version ? join(projectRecord, "builds", version) : null;
         return {
-          org_id: project.org_id,
-          space_id: project.space_id,
-          project_id: project.id,
+          org_id: nullIfEmpty(project.org_id),
+          space_id: nullIfEmpty(project.space_id),
+          project_id: nullIfEmpty(project.id),
           project_name: project.name,
           project_record: projectRecord,
           active_build: activeBuild,
@@ -233,11 +260,24 @@ function inferFromCwd(cwd: string, projects: DaemonProject[]): WorkspaceScope | 
   return null;
 }
 
+function nullIfEmpty(value: string | undefined | null): string | null {
+  return value && value.length > 0 ? value : null;
+}
+
 function inferBuildPaths(
   projectName: string,
   projectRecord: string,
   cwd: string,
+  configuredActiveBuild?: string,
 ): { activeBuild: string | null; buildVersion: string | null; buildRecord: string | null } {
+  const configured = configuredActiveBuild ? canonicalMaybe(configuredActiveBuild) : null;
+  if (configured && (cwd === configured || cwd.startsWith(ensureTrailingSep(configured)))) {
+    return {
+      activeBuild: configured,
+      buildVersion: null,
+      buildRecord: null,
+    };
+  }
   const activePrefix = ensureTrailingSep(ACTIVE_BUILDS_DIR);
   if (cwd.startsWith(activePrefix)) {
     const buildName = relative(ACTIVE_BUILDS_DIR, cwd).split(sep)[0] ?? "";
@@ -255,10 +295,19 @@ function inferBuildPaths(
   }
   const buildVersion = inferBuildVersionUnderProject(projectRecord, cwd);
   return {
-    activeBuild: matchActiveBuildPath(projectName),
+    activeBuild: configured ?? matchActiveBuildPath(projectName),
     buildVersion,
     buildRecord: buildVersion ? join(projectRecord, "builds", buildVersion) : null,
   };
+}
+
+function canonicalMaybe(raw: string): string {
+  const clean = raw.replaceAll("\\ ", " ");
+  try {
+    return realpathSync(clean);
+  } catch {
+    return resolvePath(clean);
+  }
 }
 
 function inferBuildVersionUnderProject(projectRecord: string, cwd: string): string | null {
@@ -328,6 +377,106 @@ async function loadDaemonProjects(): Promise<DaemonProject[]> {
   } catch {
     return [];
   }
+}
+
+function loadFileProjects(): DaemonProject[] {
+  if (!existsSync(PROJECTS_DIR)) return [];
+  const projectPaths = [
+    ...projectRecordPaths(PROJECTS_DIR),
+    ...projectRecordPaths(join(PROJECTS_DIR, "EMA", "subprojects")),
+  ];
+  return projectPaths.map(readFileProject).filter((project): project is DaemonProject => project !== null);
+}
+
+function projectRecordPaths(root: string): string[] {
+  if (!existsSync(root)) return [];
+  try {
+    return readdirSync(root)
+      .map((name) => join(root, name))
+      .filter((path) => isDirectory(path) && existsSync(join(path, "project.md")));
+  } catch {
+    return [];
+  }
+}
+
+function readFileProject(path: string): DaemonProject | null {
+  try {
+    const raw = readFileSync(join(path, "project.md"), "utf8");
+    const meta = {
+      ...parseMarkdownFields(raw),
+      ...parseFrontmatter(raw),
+    };
+    const name = meta.name ?? path.split(sep).pop() ?? "";
+    if (!name) return null;
+    return {
+      id: meta.project_id ?? "",
+      name,
+      org_id: meta.org_id ?? "",
+      space_id: meta.space_id ?? "",
+      local_path: path,
+      active_build: meta.active_build ? resolveMetadataPath(path, meta.active_build) : undefined,
+      materialization_status: meta.status ?? "file_record",
+    };
+  } catch {
+    return null;
+  }
+}
+
+function mergeProjects(daemon: DaemonProject[], fileProjects: DaemonProject[]): DaemonProject[] {
+  const merged = new Map<string, DaemonProject>();
+  for (const project of fileProjects) {
+    merged.set(projectKey(project), project);
+  }
+  for (const project of daemon) {
+    const existing = merged.get(projectKey(project));
+    merged.set(projectKey(project), {
+      ...existing,
+      ...project,
+      id: project.id || existing?.id || "",
+      org_id: project.org_id || existing?.org_id || "",
+      space_id: project.space_id || existing?.space_id || "",
+      local_path: project.local_path || existing?.local_path || "",
+      active_build: project.active_build || existing?.active_build,
+      materialization_status: project.materialization_status || existing?.materialization_status || "",
+    });
+  }
+  return [...merged.values()];
+}
+
+function resolveMetadataPath(projectRecord: string, raw: string): string {
+  const clean = raw.replaceAll("\\ ", " ");
+  if (clean.startsWith("/")) return canonicalMaybe(clean);
+  return canonicalMaybe(join(projectRecord, clean));
+}
+
+function projectKey(project: DaemonProject): string {
+  return project.id || project.name.toLowerCase() || project.local_path;
+}
+
+function parseFrontmatter(raw: string): Record<string, string> {
+  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return {};
+  const out: Record<string, string> = {};
+  for (const line of (match[1] ?? "").split("\n")) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    const value = line.slice(idx + 1).trim();
+    if (key) out[key] = value.replace(/^["']|["']$/g, "");
+  }
+  return out;
+}
+
+function parseMarkdownFields(raw: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const line of raw.split("\n")) {
+    const match = line.match(/^\s*-\s*([a-zA-Z0-9_]+):\s*`?([^`]+?)`?\s*$/);
+    if (!match) continue;
+    const key = match[1];
+    const value = match[2]?.trim();
+    if (key && value) out[key] = value;
+  }
+  return out;
 }
 
 async function loadDaemonTopbar(): Promise<DaemonTopbar | null> {

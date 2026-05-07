@@ -53,6 +53,27 @@ export type DeviceLocalRegisterArgs = {
   bootstrap?: "genesis" | "paired";
 };
 
+export type DevicePairingOfferCreateArgs = {
+  org_id: string;
+  user_id: string;
+  name: string;
+  pubkey: string;
+  capabilities?: string[];
+};
+
+export type DevicePairingOfferApproveArgs = {
+  offer_id: string;
+  org_id: string;
+  user_id: string;
+  device_id: string;
+  name: string;
+  pubkey: string;
+  capabilities?: string[];
+  short_code: string;
+  confirmed_short_code: string;
+  attested_by: string;
+};
+
 export type PeerTrustEstablishArgs = {
   org_id: string;
   peer_device: string;
@@ -95,6 +116,34 @@ export type AttachmentCreateArgs = {
   source: string;
 };
 
+export type DesktopPresenceJoinArgs = {
+  org_id: string;
+  space_id: string;
+  room_id: string;
+  session_id: string;
+  actor_id: string;
+  display_name: string;
+  color: string;
+};
+
+export type DesktopPresenceLeaveArgs = {
+  session_id: string;
+};
+
+export type DesktopPresenceCursorArgs = DesktopPresenceJoinArgs & {
+  x: number;
+  y: number;
+  surface: "desktop" | "window" | "app" | string;
+  window_id?: string | null;
+  app_id?: string | null;
+};
+
+export type DesktopPresenceLocationArgs = DesktopPresenceJoinArgs & {
+  window_id?: string | null;
+  app_id: string;
+  label: string;
+};
+
 // ----------------------------------------------------------------------------
 // Pending daemon writer — referenced by Wave 5 CommandPalette actions
 // ----------------------------------------------------------------------------
@@ -134,12 +183,18 @@ export type CommandMap = {
   "invite.create": InviteCreateArgs;
   "invite.accept": InviteAcceptArgs;
   "device.local_register": DeviceLocalRegisterArgs;
+  "device.pairing_offer.create": DevicePairingOfferCreateArgs;
+  "device.pairing_offer.approve": DevicePairingOfferApproveArgs;
   "peer.trust_establish": PeerTrustEstablishArgs;
   "access_session.challenge": AccessSessionChallengeArgs;
   "access_session.approve": AccessSessionApproveArgs;
   "connector.connect": ConnectorConnectArgs;
   "connector.disconnect": ConnectorDisconnectArgs;
   "attachment.create": AttachmentCreateArgs;
+  "desktop.presence.join": DesktopPresenceJoinArgs;
+  "desktop.presence.leave": DesktopPresenceLeaveArgs;
+  "desktop.presence.cursor": DesktopPresenceCursorArgs;
+  "desktop.presence.location": DesktopPresenceLocationArgs;
   // pending daemon writer (Wave 5)
   "swarm.start": SwarmLifecycleArgs;
   "swarm.pause": SwarmLifecycleArgs;
@@ -165,12 +220,18 @@ export const SHIPPED_COMMAND_OPS: ReadonlySet<CommandOp> = new Set<CommandOp>([
   "invite.create",
   "invite.accept",
   "device.local_register",
+  "device.pairing_offer.create",
+  "device.pairing_offer.approve",
   "peer.trust_establish",
   "access_session.challenge",
   "access_session.approve",
   "connector.connect",
   "connector.disconnect",
   "attachment.create",
+  "desktop.presence.join",
+  "desktop.presence.leave",
+  "desktop.presence.cursor",
+  "desktop.presence.location",
 ]);
 
 export function isShippedCommand(op: string): op is CommandOp {

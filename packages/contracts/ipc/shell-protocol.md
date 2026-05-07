@@ -100,7 +100,9 @@ new class MUST add it here first.
 | `collab.document.replace`     | `{ target: CollabDocumentTarget, revision, text }`           |
 | `identity.google_upsert`      | `{ user_id, google_sub, email, display_name, email_verified }` |
 | `identity.authenticator_enable` | `{ user_id, secret_ref }`                                  |
-| `device.register`             | `{ org_id, device_id, user_id, name, pubkey, bootstrap: "genesis" \| "paired" }` |
+| `device.register`             | `{ org_id, device_id, user_id, name, pubkey, bootstrap: "genesis" \| "paired", attested_by?: device_id, capabilities?: string[] }` |
+| `device.pairing_offer.create` | `{ org_id, user_id, name, pubkey, capabilities?: string[] }` → `command_result.data` |
+| `device.pairing_offer.approve` | `{ offer_id, org_id, user_id, device_id, name, pubkey, capabilities?: string[], short_code, confirmed_short_code, attested_by }` |
 | `device.local_register`       | `{ org_id, user_id, name, bootstrap?: "genesis" \| "paired" }` |
 | `peer.trust_establish`        | `{ org_id, peer_device, peer_pubkey, local_pubkey, ceremony_kind, ceremony_id, lineage_proof? \| device_id? }` |
 | `replication.collab.frames_since` | `{ org_id, peer_device, document_id, after_revision }` → `command_result.data` |
@@ -227,6 +229,7 @@ daemon recomputes:
 
 ```
 TopbarProjection {
+  install?:         { id: install:<ulid>, genesis_device_id: device:<ulid>, install_pubkey: string, display_name: string }
   user:             { id: user:<ulid>, display_name: string }
   orgs:             [ { id: org:<ulid>, name: string } ]
   current_org?:     { id: org:<ulid>, name: string }
@@ -273,12 +276,26 @@ DeviceRegistryProjection {
       name: string
       pubkey: string
       bootstrap: "genesis" | "paired"
+      attested_by: device:<ulid> | null
+      capabilities: string[]
       status: "trusted" | "revoked"
       updated_at: ISO-8601 UTC
     }
   ]
   machine_peer_ready: false
   transport: "disabled"
+}
+
+DevicePairingOffer {
+  offer_id: pairing_offer:<ulid>
+  org_id: org:<ulid>
+  user_id: user:<ulid>
+  device_id: device:<ulid>
+  name: string
+  pubkey: string
+  capabilities: string[]
+  short_code: string
+  created_at: ISO-8601 UTC
 }
 
 CompanionStatusProjection {

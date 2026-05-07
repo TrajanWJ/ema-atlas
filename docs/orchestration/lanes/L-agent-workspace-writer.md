@@ -1,35 +1,45 @@
 # L-agent-workspace-writer — Wire agent/lane/queue grammar to a real daemon writer
 
-**Status:** queued
+**Status:** closed for Slice A; retained as historical lane brief
 **Owner:** daemon (Slice A); coordinator may assign a Runtime Vertical Slice or Canon Writers worker
 **Wave:** W1
 **Opened:** 2026-04-29
 
 ## Bootstrap milestone
 
-This lane is the bounded documentation/agent-instruction bootstrap target for
-the agent workspace. Slice A is daemon-owned and limited to `lane` + `queue`
-real writes plus read projections. It is not a general project-management
-rewrite and it does not authorize UI, campaign, mission, problem, handoff, or
-agent-report writers.
+This lane was the bounded documentation/agent-instruction bootstrap target for
+the agent workspace. Slice A is now daemon-owned and implemented for `lane` +
+`queue` real writes plus read projections. It is not a general
+project-management rewrite and it does not authorize UI, campaign, mission,
+problem, handoff, or agent-report surface parity.
 
 Agents must continue to use the documented commands while this lane is open:
 
 ```bash
-pnpm cli tl about --json
-pnpm cli vcalendar tick --json
-pnpm cli lane --help
-pnpm cli queue --help
+ema tl about --json
+ema vcalendar tick --json
+ema lane --help
+ema queue --help
 ```
 
 `tl about` and `vcalendar tick` are mandatory session-start context. `lane` and
-`queue` are the Slice A write/read surface that must become daemon-backed.
+`queue` are the Slice A write/read surface that is daemon-backed.
 
 ## Why this lane exists
 
-`pnpm cli lane`, `queue`, `mission`, `campaign`, `agent`, `vcalendar`, `checkup`, `handoff`, `problem`, `solution` all advertise a real grammar (see `pnpm cli lane --help`) but every subcommand currently returns `{"status":"pending_daemon_writer"}`. The CLI grammar is registered; no daemon writer accepts the commands; no events land in SQLite; no projections feed a coordination view.
+`ema lane`, `queue`, `mission`, `campaign`, `agent`, `vcalendar`, `checkup`,
+`handoff`, `problem`, `solution` all advertise a real grammar (see
+`ema lane --help`). At the time this lane opened, every subcommand returned
+`{"status":"pending_daemon_writer"}`. That is no longer true for the lane and
+queue lifecycle: commands write daemon events and read `lane.registry` /
+`queue.registry`.
 
-This means coordination state still lives in markdown (`docs/orchestration/STATUS.md`, `lanes/*.md`). The `CLAUDE.md` desktop policy is explicit: *"Log later work to the queue with dependencies instead of burying it in chat. Log recurring blockers as problem/solution graph nodes."* That policy cannot be honored in code today — only in prose. This lane closes the gap for at least the minimum useful subset.
+Active coordination state no longer lives in markdown for Slice A. Markdown
+lane briefs and status files are historical/project-record context; the daemon
+registry is the live source for current lane and queue ownership. Remaining
+gaps live in the broader graph and surfaces, especially problem/solution,
+handoff depth, campaign/mission depth, agent-report projection, and exported
+markdown snapshots generated from daemon state.
 
 ## Read first
 
@@ -43,15 +53,17 @@ This means coordination state still lives in markdown (`docs/orchestration/STATU
 
 ## Scope (minimum useful slice — Slice A)
 
-Writable paths:
+Implemented write/read surface:
 
-- `apps/daemon/src/ema_lanes/` (new) — writer for `lane.open`, `lane.claim`, `lane.move`, `lane.release`, `lane.close`, `lane.block`.
-- `apps/daemon/src/ema_queue/` (new) — writer for `queue.add`, `queue.ready`, `queue.block`, `queue.close`.
-- `packages/contracts/events/lane.md` (new) and `queue.md` (new) — event family files with the new kinds.
-- `packages/contracts/events/catalog.v0.md` — register every new kind in the same change.
-- `packages/contracts/types/ids.md` — add `lane:` and `queue_item:` id prefixes.
-- `apps/cli/src/commands/lane.ts`, `queue.ts` — flip from `pending_daemon_writer` to a real IPC command path.
-- `tooling/m1-round-trip.mjs` or a new `tooling/agent-workspace-round-trip.mjs` — round-trip test for `lane open` and `queue add`.
+- `apps/daemon/src/ema_swarm_coordination/agent_workspace.gleam` handles
+  `lane.open`, `lane.claim`, `lane.move`, `lane.release`, `lane.close`,
+  `lane.block`, `queue.add`, `queue.ready`, `queue.block`, and `queue.close`.
+- `apps/daemon/src/ema_shell_ipc/ema_shell_ipc.gleam` routes the commands and
+  emits registry projection updates.
+- `apps/cli/src/commands/lane.ts` and `apps/cli/src/commands/queue.ts` use
+  real IPC command paths and daemon registry projections.
+- `lane.registry` and `queue.registry` are the live read models agents should
+  consult before markdown.
 
 Explicitly **out of scope** for Slice A:
 
@@ -66,11 +78,11 @@ Explicitly **out of scope** for Slice A:
 
 ## Exit criteria (Slice A)
 
-1. `pnpm cli lane open --title "..." --json` returns `{"ok":true,"lane":{"id":"lane:...","status":"idea",...}}` — not `pending_daemon_writer`.
-2. `pnpm cli lane claim --lane lane:... --actor ... --scope ... --goal ... --next ... --json` writes a `lane.claimed` event.
-3. `pnpm cli lane list --json` returns the open lanes from a real projection over `lane.*` events.
-4. `pnpm cli queue add --title "..." --why "..." --json` writes `queue_item.added`.
-5. `pnpm cli queue list --json` returns a real projection.
+1. `ema lane open --title "..." --json` returns `{"ok":true,"lane":{"id":"lane:...","status":"idea",...}}` — not `pending_daemon_writer`.
+2. `ema lane claim --lane lane:... --actor ... --scope ... --goal ... --next ... --json` writes a `lane.claimed` event.
+3. `ema lane list --json` returns the open lanes from a real projection over `lane.*` events.
+4. `ema queue add --title "..." --why "..." --json` writes `queue_item.added`.
+5. `ema queue list --json` returns a real projection.
 6. New event kinds appear in `packages/contracts/events/catalog.v0.md` and pass `bash scripts/contract-check.sh`.
 7. New id prefixes (`lane:`, `queue_item:`) appear in `packages/contracts/types/ids.md` and pass contract-check.
 8. Round-trip script (`node tooling/agent-workspace-round-trip.mjs` or equivalent) is green.
@@ -85,10 +97,10 @@ bash scripts/contract-check.sh
 cd apps/daemon && gleam build && gleam test && cd ../..
 node tooling/m1-round-trip.mjs
 node tooling/agent-workspace-round-trip.mjs   # new
-pnpm cli lane open --title "smoke" --json
-pnpm cli lane list --json
-pnpm cli queue add --title "smoke" --why "smoke" --json
-pnpm cli queue list --json
+ema lane open --title "smoke" --json
+ema lane list --json
+ema queue add --title "smoke" --why "smoke" --json
+ema queue list --json
 ```
 
 ## Reporting template

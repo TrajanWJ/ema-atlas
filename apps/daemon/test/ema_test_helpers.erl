@@ -1,5 +1,5 @@
 -module(ema_test_helpers).
--export([tmp_path/1, delete_file/1, event_kind_org_rows/1]).
+-export([tmp_path/1, delete_file/1, event_kind_org_rows/1, table_count/2]).
 
 tmp_path(Suffix) when is_binary(Suffix) ->
     Base = integer_to_binary(erlang:system_time(microsecond)),
@@ -19,6 +19,31 @@ event_kind_org_rows(Path) when is_binary(Path) ->
             Rows;
         {error, _Reason} ->
             []
+    end.
+
+table_count(Path, Table) when is_binary(Path), is_binary(Table) ->
+    case esqlite3:open(binary_to_list(Path)) of
+        {ok, Db} ->
+            Count = select_table_count(Db, Table),
+            _ = esqlite3:close(Db),
+            Count;
+        {error, _Reason} ->
+            0
+    end.
+
+select_table_count(Db, Table) ->
+    Sql = iolist_to_binary([<<"SELECT COUNT(*) FROM ">>, Table]),
+    case esqlite3:prepare(Db, Sql) of
+        {ok, Stmt} -> count_row(Stmt);
+        _ -> 0
+    end.
+
+count_row(Stmt) ->
+    case esqlite3:step(Stmt) of
+        [Count] when is_integer(Count) -> Count;
+        {row, {Count}} when is_integer(Count) -> Count;
+        {row, [Count]} when is_integer(Count) -> Count;
+        _ -> 0
     end.
 
 select_event_kind_org_rows(Db) ->

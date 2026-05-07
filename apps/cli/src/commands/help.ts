@@ -16,6 +16,7 @@ export const COMMANDS: CommandInfo[] = [
   { name: "tl about", summary: "Show daemon-backed lane/queue records, fallback workspace records, and current vCalendar phase." },
   { name: "/tl about", summary: "Alias for `ema tl about`; matches slash-command muscle memory." },
   { name: "agent orient", summary: "Print the enforced agent orientation checklist and workspace summary." },
+  { name: "next", summary: "Recommend the next lane, queue item, or orientation command." },
   { name: "campaign create/list/show", summary: "Manage long-running initiatives. (pending daemon writer)" },
   { name: "mission create/list/show", summary: "Manage mission bundles under campaigns. (pending daemon writer)" },
   { name: "lane open/list", summary: "Open and list daemon-backed lane ownership records." },
@@ -29,6 +30,9 @@ export const COMMANDS: CommandInfo[] = [
   { name: "hermes orient/plan/sweep", summary: "Preview the future Hermes orchestrator packet and plan shape. (projection seed)" },
   { name: "harness providers/donors/dispatch", summary: "Prepare Chronicle + Duct Tape Harness Glue rails. (simulated provider ready)" },
   { name: "peer add/doctor/tunnel", summary: "Manage trusted-dev peer rails. (local registry first, SSH first)" },
+  { name: "desktop presence", summary: "Show, join, and publish shared vDesktop presence." },
+  { name: "recovery scan", summary: "Read-only desktop-wide donor, worktree, stale-lane, and lost-work scan." },
+  { name: "cwt status/ingest", summary: "Inspect current-work-tracker shared-files projection and dry-run EMA promotion." },
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
   { name: "swarm list", summary: "List swarms for a project. (wave 1: stubbed)" },
   { name: "swarm show", summary: "Show a single swarm. (wave 1: stubbed)" },
@@ -40,6 +44,7 @@ export const COMMANDS: CommandInfo[] = [
   { name: "vcalendar phase set", summary: "Set the current weekly phase label for an actor." },
   { name: "checkup schedule", summary: "Schedule a cadence-based checkup on a lane." },
   { name: "checkup complete", summary: "Mark a checkup complete with a result." },
+  { name: "doctor", summary: "Run a daemon/workspace cohesion diagnostic and report drift." },
   { name: "help", summary: "Show this help." },
 ];
 

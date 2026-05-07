@@ -776,6 +776,7 @@ export function CanvasCore({ fullPage }: CanvasCoreProps) {
 							touchAction: "none",
 						}}
 					/>
+					{elements.length === 0 ? <CanvasStarterOverlay /> : null}
 
 					{/* Inline text editor overlay */}
 					{editingElement && (
@@ -793,6 +794,84 @@ export function CanvasCore({ fullPage }: CanvasCoreProps) {
 
 			{/* Bottom bar */}
 			<CanvasBottomBar />
+		</div>
+	);
+}
+
+function CanvasStarterOverlay() {
+	return (
+		<div
+			className="pointer-events-none absolute inset-0 flex items-center justify-center p-8"
+			aria-hidden="true"
+		>
+			<div
+				className="grid w-full max-w-3xl gap-3 sm:grid-cols-3"
+				style={{ opacity: 0.74 }}
+			>
+				<SampleCanvasCard
+					label="Desktop"
+					lines={["Dock actions", "Window memory", "Widget states"]}
+					accent="var(--place-primary-400)"
+				/>
+				<SampleCanvasCard
+					label="Holodeck"
+					lines={["Sidebar routes", "Panel samples", "Mode switch"]}
+					accent="var(--place-secondary-400)"
+				/>
+				<SampleCanvasCard
+					label="Next"
+					lines={["Refine desktop", "Wire missing functions", "Promote canon"]}
+					accent="var(--place-tertiary-400)"
+				/>
+			</div>
+		</div>
+	);
+}
+
+function SampleCanvasCard({
+	label,
+	lines,
+	accent,
+}: {
+	readonly label: string;
+	readonly lines: readonly string[];
+	readonly accent: string;
+}) {
+	return (
+		<div
+			className="rounded-lg border p-4"
+			style={{
+				background: "rgba(14,16,23,0.68)",
+				borderColor: "var(--place-border-default)",
+				boxShadow: "0 12px 32px rgba(0,0,0,0.28)",
+			}}
+		>
+			<div className="mb-3 flex items-center gap-2">
+				<span
+					className="h-2.5 w-2.5 rounded-full"
+					style={{ background: accent }}
+				/>
+				<strong
+					className="text-sm"
+					style={{ color: "var(--place-text-primary)" }}
+				>
+					{label}
+				</strong>
+			</div>
+			<div className="flex flex-col gap-2">
+				{lines.map((line) => (
+					<span
+						key={line}
+						className="rounded px-2 py-1 text-xs"
+						style={{
+							background: "rgba(255,255,255,0.05)",
+							color: "var(--place-text-secondary)",
+						}}
+					>
+						{line}
+					</span>
+				))}
+			</div>
 		</div>
 	);
 }

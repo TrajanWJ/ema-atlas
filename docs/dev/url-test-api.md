@@ -13,11 +13,13 @@ Implementation: `apps/web/src/lib/url-nav.ts` + `apps/web/src/lib/use-url-nav.ts
 
 ```
 /?vapp=blueprint                         # open Blueprint
+/?vapp=cwt                               # open Current Work in the desktop shell
 /?theme=dracula                          # apply Dracula theme
 /?theme=tokyo-night&contrast=high        # tokyo-night + high contrast
 /?windows=blueprint:120,80,860,540;hq:1020,80,500,540
-/?vapps=hq,blueprint,brain-dump          # open three vApps at default sizes
+/?vapps=hq,cwt,blueprint                 # open three vApps at default sizes
 /?panel=blueprint                        # render Blueprint full-bleed
+/?panel=cwt                              # render Current Work full-bleed
 /?mode=panel&vapp=wiki                   # same panel mode alias used by popouts
 /blueprint                               # direct panel route
 /?theme=monochrome&titlebar=compact&test=1
@@ -27,7 +29,7 @@ Implementation: `apps/web/src/lib/url-nav.ts` + `apps/web/src/lib/use-url-nav.ts
 
 | Param      | Values                                                                                  | Purpose                                                                 |
 | ---------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `vapp`     | `blueprint`, `hq`, `brain-dump`, `git-ema`, `agent-work`, `wiki`, `threads`, `settings`, `launchpad` | Open this vApp (or focus it if already open). Legacy `braindump` maps to `brain-dump`. |
+| `vapp`     | `blueprint`, `hq`, `cwt`, `brain-dump`, `git-ema`, `agent-work`, `wiki`, `threads`, `settings`, `launchpad` | Open this vApp (or focus it if already open). Legacy `braindump` maps to `brain-dump`. |
 | `vapps`    | comma-separated vApp ids                                                                | Open multiple vApps in order at their default windows                   |
 | `theme`    | `default`, `nord`, `catppuccin-mocha`, `dracula`, `tokyo-night`, `rose-pine`, `solarized-dark`, `gruvbox-dark`, `one-dark`, `monochrome` | Apply a theme preset by id |
 | `contrast` | `increased`, `high`                                                                     | Increase text/border contrast (sets `[data-contrast]` on `<html>`)      |
@@ -68,7 +70,7 @@ const qs = encodeUrlState({
 ## Validation rules
 
 - Unknown vApp ids are dropped silently (the URL never crashes the shell).
-- Direct panel routes exist for the EMA vApps, e.g. `/blueprint`, `/agent-work`,
+- Direct panel routes exist for the EMA vApps, e.g. `/blueprint`, `/cwt`, `/agent-work`,
   `/git-ema`, and the legacy `/braindump` alias.
 - Unknown theme ids are ignored; the previous theme remains active.
 - Negative or non-finite coordinates are dropped per-window.

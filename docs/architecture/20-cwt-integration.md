@@ -71,6 +71,34 @@ records/checkups/index.json
 `local-n-sync/current-state.md` is the human/agent-readable summary. JSON record
 files are the machine-readable source for promotion previews.
 
+## Holodeck Launch Bridge
+
+CWT also has a shell-level launch bridge in the EMA web surface:
+
+```text
+http://localhost:5173/cwt
+http://localhost:5173/?vapp=cwt
+```
+
+The EMA vApp id is `cwt`, label `Current Work`. It registers with the same app
+registry used by the Dock, Launchpad, URL router, direct panel routes, and the
+holodeck left rail. The rendered surface is an iframe pointing at the standalone
+CWT web server, which defaults to:
+
+```text
+http://localhost:3015
+```
+
+The URL can be overridden in the EMA web build with:
+
+```bash
+NEXT_PUBLIC_CWT_WEB_URL=http://localhost:3015
+```
+
+This bridge is intentionally a launcher/embedder, not a data authority. The CWT
+SQLite store and shared-files projection continue to own CWT-side truth until
+the daemon import/mirroring writer exists.
+
 ## EMA CLI
 
 Readiness:

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useContext } from "react";
 import { motion } from "motion/react";
-import { useAuthStore } from "@/src/stores/auth-store";
-import { useTopbar } from "@/src/projections/use-topbar";
+import { useEffect, useState } from "react";
 import { useIpcConnection } from "@/src/lib/ipc";
+import { useTopbar } from "@/src/projections/use-topbar";
+import { useAuthStore } from "@/src/stores/auth-store";
+import { EntryChooser, type EntryTarget } from "./EntryChooser";
 
 interface EmaIdentityPanelProps {
 	readonly onContinue: () => void;
@@ -37,7 +38,9 @@ export function EmaIdentityPanel({ onContinue }: EmaIdentityPanelProps) {
 		if (typeof window === "undefined") return;
 		try {
 			const w = window as unknown as {
-				__TAURI_INTERNALS__?: { metadata?: { currentWebview?: { label?: string } } };
+				__TAURI_INTERNALS__?: {
+					metadata?: { currentWebview?: { label?: string } };
+				};
 				navigator?: Navigator;
 			};
 			// Best-effort: prefer macOS default form. We don't have an OS
@@ -55,9 +58,26 @@ export function EmaIdentityPanel({ onContinue }: EmaIdentityPanelProps) {
 	const spaceName = scope.space?.name ?? "EMA Studio";
 	const projectName = scope.project?.name ?? "EMA 0.0.5";
 
-	function handleEnter() {
+	function handleEntry(target: EntryTarget) {
+		// In Tauri the user's already on their machine; quickLogin keeps the
+		// pre-existing UX (auto-bind to dev-trajan) until Wave II identity.
 		quickLogin("dev-trajan");
-		onContinue();
+		if (target === "vdesktop") {
+			onContinue();
+			return;
+		}
+		if (typeof window === "undefined") {
+			onContinue();
+			return;
+		}
+		// Holodeck inside Tauri is the launchpad surface. Portfolio is hidden
+		// inside Tauri (the immersive routes block themselves there), but if
+		// it's ever surfaced we route through the same boot event.
+		if (target === "holodeck") {
+			window.dispatchEvent(new CustomEvent("boot-holodeck"));
+			return;
+		}
+		window.dispatchEvent(new CustomEvent("boot-portfolio"));
 	}
 
 	const daemonOnline = ipcState === "open";
@@ -67,114 +87,53 @@ export function EmaIdentityPanel({ onContinue }: EmaIdentityPanelProps) {
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 6 }}
+			initial={{ opacity: 0, y: 4 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.32, ease: [0.65, 0.05, 0, 1] }}
+			transition={{ duration: 0.22, ease: [0.65, 0.05, 0, 1] }}
 			className="ema-identity-panel"
 			style={{
 				background: "var(--place-surface-1)",
 				border: "1px solid var(--place-border-default)",
 				borderRadius: 12,
-				padding: "28px 30px",
-				width: 340,
+				padding: "24px 26px",
+				width: 360,
 				color: "var(--place-text-primary)",
-				boxShadow: "0 12px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset",
+				boxShadow:
+					"0 12px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset",
 				display: "flex",
 				flexDirection: "column",
-				gap: 18,
+				gap: 16,
 			}}
 		>
 			<header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
 				<span
 					style={{
-						fontSize: "0.7rem",
-						letterSpacing: "0.12em",
+						fontSize: "0.62rem",
+						letterSpacing: "0.14em",
 						textTransform: "uppercase",
 						color: "var(--place-secondary-400)",
 					}}
 				>
-					EMA · workspace
+					Step 02 · choose entry
 				</span>
-				<h1 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 600 }}>
-					Welcome to EMA
+				<h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 600 }}>
+					Where do you want to land?
 				</h1>
-			</header>
-
-			<section
-				style={{
-					display: "flex",
-					flexDirection: "column",
-					gap: 6,
-					padding: "12px 14px",
-					background: "var(--place-surface-2)",
-					borderRadius: 8,
-					border: "1px solid var(--place-border-subtle)",
-				}}
-			>
-				<div
+				<p
 					style={{
-						fontSize: "0.65rem",
-						letterSpacing: "0.1em",
-						textTransform: "uppercase",
-						color: "var(--place-text-tertiary)",
+						margin: 0,
+						fontSize: "0.72rem",
+						color: "var(--place-text-secondary)",
+						lineHeight: 1.4,
 					}}
 				>
-					identity
-				</div>
-				<div style={{ fontSize: "0.95rem", fontWeight: 500 }}>
-					Trajan{" "}
-					<span style={{ color: "var(--place-text-secondary)", fontWeight: 400 }}>
-						@ {hostname}
-					</span>
-				</div>
-			</section>
+					Trajan @ {hostname} · {orgName} / {spaceName} / {projectName}
+				</p>
+			</header>
 
-			<section
-				style={{
-					display: "grid",
-					gridTemplateColumns: "60px 1fr",
-					gap: "4px 12px",
-					padding: "12px 14px",
-					background: "var(--place-surface-2)",
-					borderRadius: 8,
-					border: "1px solid var(--place-border-subtle)",
-					fontSize: "0.85rem",
-				}}
-			>
-				<span style={{ color: "var(--place-text-tertiary)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>org</span>
-				<span style={{ color: "var(--place-text-primary)" }}>{orgName}</span>
-				<span style={{ color: "var(--place-text-tertiary)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>space</span>
-				<span style={{ color: "var(--place-text-primary)" }}>{spaceName}</span>
-				<span style={{ color: "var(--place-text-tertiary)", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>project</span>
-				<span style={{ color: "var(--place-text-primary)" }}>{projectName}</span>
-			</section>
-
-			<button
-				type="button"
-				onClick={handleEnter}
-				style={{
-					padding: "0.7rem 1rem",
-					fontSize: "0.9rem",
-					fontWeight: 600,
-					letterSpacing: "0.02em",
-					borderRadius: 8,
-					cursor: "pointer",
-					border: "1px solid var(--place-primary-400)",
-					background: "var(--place-primary-subtle)",
-					color: "var(--place-primary-400)",
-					transition: "background 0.15s, transform 0.1s",
-				}}
-				onMouseEnter={(e) => {
-					(e.currentTarget as HTMLButtonElement).style.background =
-						"var(--place-primary-glow)";
-				}}
-				onMouseLeave={(e) => {
-					(e.currentTarget as HTMLButtonElement).style.background =
-						"var(--place-primary-subtle)";
-				}}
-			>
-				→ Enter workspace
-			</button>
+			{/* Headline action — entry chooser. Portfolio hidden inside Tauri:
+			    immersive routes self-block there anyway, so it'd be a dead end. */}
+			<EntryChooser onSelect={handleEntry} showPortfolio={false} />
 
 			<footer
 				style={{
@@ -184,6 +143,7 @@ export function EmaIdentityPanel({ onContinue }: EmaIdentityPanelProps) {
 					alignItems: "center",
 					gap: 6,
 					justifyContent: "space-between",
+					marginTop: 4,
 				}}
 			>
 				<span>{daemonLine}</span>
@@ -192,7 +152,9 @@ export function EmaIdentityPanel({ onContinue }: EmaIdentityPanelProps) {
 						width: 6,
 						height: 6,
 						borderRadius: "50%",
-						background: daemonOnline ? "var(--place-success)" : "var(--place-text-muted)",
+						background: daemonOnline
+							? "var(--place-success)"
+							: "var(--place-text-muted)",
 					}}
 				/>
 			</footer>

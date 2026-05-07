@@ -24,17 +24,22 @@ export function getBootLines(
 	entryCount?: number,
 	username?: string,
 ): readonly BootLine[] {
+	// Trimmed from 6+ lines to 3. The boot terminal is a pre-flight check,
+	// not a feature tour — every extra line adds delay without adding info
+	// the user reads. We collapse scope/architecture into one EMA line, keep
+	// the time-aware greeting (it's the only personal touch), then "ready.".
+	const dbDetail =
+		entryCount !== undefined && entryCount > 0
+			? `db v${dbVersion} · ${entryCount} entries`
+			: `db v${dbVersion}`;
+
 	return [
-		{ text: 'EMA workspace · local-first', color: 'success' },
-		{ text: 'daemon-owned architecture', color: 'accent' },
-		{ text: 'scope: EMA / EMA Studio / 0.0.5', color: 'muted' },
-		{ text: `database ready (v${dbVersion})`, color: 'muted' },
-		...(entryCount !== undefined && entryCount > 0
-			? [{ text: `${entryCount} entries restored`, color: 'muted' as const }]
-			: []),
-		...(username
-			? [{ text: `identity: ${username}`, color: 'success' as const }]
-			: []),
+		{
+			text: username
+				? `EMA · ${username} · ${dbDetail}`
+				: `EMA workspace · ${dbDetail}`,
+			color: 'success',
+		},
 		{ text: getGreeting(hour), color: 'accent' },
 		{ text: 'ready.', color: 'success' },
 	];

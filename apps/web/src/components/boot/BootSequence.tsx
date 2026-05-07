@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import { getDbClient } from "@/src/db/client";
-import { getBootLines } from "@/src/lib/boot-messages";
-import type { BootLine } from "@/src/lib/boot-messages";
 import { getUnprocessedCount } from "@/src/db/queries/inbox";
 import { getSetting } from "@/src/db/queries/settings";
 import { useTypewriter } from "@/src/hooks/use-typewriter";
+import type { BootLine } from "@/src/lib/boot-messages";
+import { getBootLines } from "@/src/lib/boot-messages";
 import { useAuthStore } from "@/src/stores/auth-store";
 import { AuthPanel } from "./AuthPanel";
 import { EmaIdentityPanel } from "./EmaIdentityPanel";
@@ -73,15 +73,20 @@ function BootTerminal({
 					{completedLines.map((bootLine, i) => (
 						<motion.div
 							key={`${i}-${bootLine.text}`}
-							initial={{ opacity: 0, y: 4 }}
+							initial={{ opacity: 0, y: 3 }}
 							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.25 }}
+							transition={{ duration: 0.10 }}
 							style={{
 								color: getColorForLine(bootLine),
 								fontSize: "0.875rem",
 							}}
 						>
-							<span style={{ color: "var(--place-secondary-400)", marginRight: "0.5rem" }}>
+							<span
+								style={{
+									color: "var(--place-secondary-400)",
+									marginRight: "0.5rem",
+								}}
+							>
 								{">"}
 							</span>
 							{bootLine.text}
@@ -90,15 +95,20 @@ function BootTerminal({
 					{currentLine && (
 						<motion.div
 							key={`current-${currentLineIndex}`}
-							initial={{ opacity: 0, y: 4 }}
+							initial={{ opacity: 0, y: 3 }}
 							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.25 }}
+							transition={{ duration: 0.10 }}
 							style={{
 								color: getColorForLine(currentLine),
 								fontSize: "0.875rem",
 							}}
 						>
-							<span style={{ color: "var(--place-secondary-400)", marginRight: "0.5rem" }}>
+							<span
+								style={{
+									color: "var(--place-secondary-400)",
+									marginRight: "0.5rem",
+								}}
+							>
 								{">"}
 							</span>
 							{displayedText}
@@ -117,96 +127,29 @@ function BootTerminal({
 				</AnimatePresence>
 				{ready && (
 					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ delay: 0.3, duration: 0.4 }}
+						initial={{ opacity: 0, x: -4 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ delay: 0.05, duration: 0.18 }}
 						style={{
-							marginTop: "1.25rem",
+							marginTop: "1rem",
 							display: "flex",
-							flexDirection: "column",
+							alignItems: "center",
 							gap: "0.5rem",
+							fontSize: "0.75rem",
+							color: "var(--place-text-tertiary)",
+							letterSpacing: "0.04em",
 						}}
 					>
-						<div style={{ display: "flex", gap: "0.5rem" }}>
-							<BootButton
-								label="Go to Desktop"
-								primary
-								onClick={() => window.dispatchEvent(new CustomEvent('boot-desktop'))}
-							/>
-							{!isTauriBoot() && (
-								<BootButton
-									label="View Portfolio"
-									onClick={() => window.dispatchEvent(new CustomEvent('boot-portfolio'))}
-								/>
-							)}
-						</div>
+						<span style={{ color: "var(--place-success)" }}>✓</span>
+						<span>boot complete</span>
+						<span style={{ color: "var(--place-text-muted)" }}>·</span>
+						<span style={{ color: "var(--place-secondary-400)" }}>
+							choose entry →
+						</span>
 					</motion.div>
 				)}
 			</div>
 		</div>
-	);
-}
-
-// ----------------------------------------------------------------------------
-// Tauri detection helper used by BootTerminal (the inner component renders
-// before Main BootSequence mounts state, so we read window directly).
-// ----------------------------------------------------------------------------
-
-function isTauriBoot(): boolean {
-	if (typeof window === "undefined") return false;
-	return "__TAURI__" in window || "__TAURI_INTERNALS__" in window;
-}
-
-// ----------------------------------------------------------------------------
-// Boot buttons
-// ----------------------------------------------------------------------------
-
-function BootButton({
-	label,
-	primary,
-	onClick,
-}: {
-	readonly label: string;
-	readonly primary?: boolean;
-	readonly onClick: () => void;
-}) {
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			style={{
-				padding: "0.4rem 0.85rem",
-				fontSize: "0.7rem",
-				fontWeight: 600,
-				letterSpacing: "0.03em",
-				borderRadius: "6px",
-				cursor: "default",
-				transition: "background 0.15s, border-color 0.15s",
-				border: primary
-					? "1px solid var(--place-primary-400, #2DD4A8)"
-					: "1px solid var(--place-border-strong, rgba(255,255,255,0.15))",
-				background: primary
-					? "var(--place-primary-subtle, rgba(13,147,115,0.10))"
-					: "transparent",
-				color: primary
-					? "var(--place-primary-400, #2DD4A8)"
-					: "var(--place-text-secondary, rgba(255,255,255,0.6))",
-			}}
-			onMouseEnter={(e) => {
-				const el = e.currentTarget as HTMLElement;
-				el.style.background = primary
-					? "var(--place-primary-glow, rgba(13,147,115,0.25))"
-					: "rgba(255,255,255,0.04)";
-			}}
-			onMouseLeave={(e) => {
-				const el = e.currentTarget as HTMLElement;
-				el.style.background = primary
-					? "var(--place-primary-subtle, rgba(13,147,115,0.10))"
-					: "transparent";
-			}}
-		>
-			{label}
-		</button>
 	);
 }
 
@@ -243,8 +186,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 		const sp = new URLSearchParams(window.location.search);
-		const isTauri =
-			"__TAURI__" in window || "__TAURI_INTERNALS__" in window;
+		const isTauri = "__TAURI__" in window || "__TAURI_INTERNALS__" in window;
 		setIsTauriRuntime(isTauri);
 		// ALSO write data-runtime here as a belt-and-suspenders for the
 		// useTauriRuntime hook — guarantees CSS scoping is set even if the
@@ -265,7 +207,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 	const currentLine = allLines[currentLineIndex];
 	const { displayedText, isComplete, cursorVisible } = useTypewriter(
 		currentLine?.text || "",
-		{ speed: 17 },
+		{ speed: 8 },
 	);
 
 	// Load auth session on mount
@@ -296,9 +238,12 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 				await db.init();
 				if (cancelled) return;
 
-				const accentColor = await getSetting(db, 'accent-color');
+				const accentColor = await getSetting(db, "accent-color");
 				if (accentColor && !cancelled) {
-					document.documentElement.style.setProperty('--accent-blue', accentColor);
+					document.documentElement.style.setProperty(
+						"--accent-blue",
+						accentColor,
+					);
 				}
 				if (cancelled) return;
 
@@ -331,10 +276,14 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 			}
 		}, 0);
 
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, []);
 
-	// Progress to next line when current is complete
+	// Progress to next line when current is complete. With only 3 boot lines
+	// (the trimmed set), 60ms keeps each one legible while letting the whole
+	// terminal land in well under a second.
 	useEffect(() => {
 		if (!isComplete || !currentLine) return;
 
@@ -347,7 +296,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 				setCurrentLineIndex(allLines.length);
 				setReady(true);
 			}
-		}, 100);
+		}, 60);
 
 		return () => clearTimeout(timer);
 	}, [isComplete, currentLineIndex, currentLine, allLines.length]);
@@ -371,7 +320,10 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 			</div>
 
 			{/* Right side — EMA identity panel (Tauri) or place.org auth panel (browser) */}
-			<div ref={authPanelRef} className="flex w-[40%] items-center justify-center p-8">
+			<div
+				ref={authPanelRef}
+				className="flex w-[40%] items-center justify-center p-8"
+			>
 				{ready && isTauriRuntime ? (
 					<EmaIdentityPanel onContinue={onComplete} />
 				) : ready ? (
@@ -392,7 +344,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
 
 function loadStoredSessionDirect(): { name: string } | null {
 	try {
-		const raw = localStorage.getItem('place-auth-session');
+		const raw = localStorage.getItem("place-auth-session");
 		if (!raw) return null;
 		const parsed = JSON.parse(raw) as { name?: string };
 		return parsed.name ? { name: parsed.name } : null;

@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from "react";
 import { motion } from "motion/react";
-import { useAuthStore, getDevUsers } from "@/src/stores/auth-store";
-import { useToastStore } from "@/src/stores/toast-store";
+import { useCallback, useState } from "react";
 import type { AuthUser } from "@/src/stores/auth-store";
+import { getDevUsers, useAuthStore } from "@/src/stores/auth-store";
+import { useToastStore } from "@/src/stores/toast-store";
+import { EntryChooser, type EntryTarget } from "./EntryChooser";
 
 // ----------------------------------------------------------------------------
 // Types
 // ----------------------------------------------------------------------------
 
-type AuthMode = 'login' | 'signup';
+type AuthMode = "login" | "signup";
 
 interface AuthPanelProps {
 	readonly onContinue: () => void;
@@ -19,7 +20,81 @@ interface AuthPanelProps {
 }
 
 // ----------------------------------------------------------------------------
-// Sub-components
+// Shared step header — frames the right panel as "Step 02 · choose entry".
+// The boot terminal on the left is implicit step 01 (the system booting).
+// ----------------------------------------------------------------------------
+
+function StepHeader({ user }: { readonly user: AuthUser | null }) {
+	return (
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				gap: 4,
+				marginBottom: 4,
+			}}
+		>
+			<span
+				style={{
+					fontSize: "0.62rem",
+					letterSpacing: "0.14em",
+					textTransform: "uppercase",
+					color: "var(--place-secondary-400)",
+				}}
+			>
+				Step 02 · choose entry
+			</span>
+			<h2
+				style={{
+					margin: 0,
+					fontSize: "1.05rem",
+					fontWeight: 600,
+					color: "var(--place-text-primary)",
+				}}
+			>
+				{user ? `Welcome back, ${user.name}` : "Where do you want to land?"}
+			</h2>
+			<p
+				style={{
+					margin: 0,
+					fontSize: "0.72rem",
+					color: "var(--place-text-secondary)",
+					lineHeight: 1.4,
+				}}
+			>
+				{user
+					? "Pick a surface — sign-in already done."
+					: "Pick a surface. Sign in below if you want your work synced."}
+			</p>
+		</div>
+	);
+}
+
+// ----------------------------------------------------------------------------
+// Entry dispatcher — translates EntryTarget into the existing boot events
+// ----------------------------------------------------------------------------
+
+function dispatchEntry(target: EntryTarget, onContinue: () => void): void {
+	if (typeof window === "undefined") {
+		onContinue();
+		return;
+	}
+	switch (target) {
+		case "vdesktop":
+			window.dispatchEvent(new CustomEvent("boot-desktop"));
+			onContinue();
+			return;
+		case "holodeck":
+			window.dispatchEvent(new CustomEvent("boot-holodeck"));
+			return;
+		case "portfolio":
+			window.dispatchEvent(new CustomEvent("boot-portfolio"));
+			return;
+	}
+}
+
+// ----------------------------------------------------------------------------
+// Authenticated branch — compact identity badge + entry chooser
 // ----------------------------------------------------------------------------
 
 function WelcomeBack({
@@ -31,123 +106,168 @@ function WelcomeBack({
 	readonly onContinue: () => void;
 	readonly isNewUser: boolean;
 }) {
+	void isNewUser;
 	const logout = useAuthStore((s) => s.logout);
 	const initial = user.name.charAt(0).toUpperCase();
 	const lastLogin = user.lastLogin
 		? new Date(user.lastLogin).toLocaleString()
 		: null;
 
-	const greeting = isNewUser
-		? `Welcome, ${user.name}!`
-		: `Welcome back, ${user.name}`;
-
 	return (
-		<div className="flex flex-col items-center gap-6 text-center">
+		<div className="flex flex-col gap-4">
+			<StepHeader user={user} />
+
+			<EntryChooser
+				onSelect={(t) => dispatchEntry(t, onContinue)}
+				showPortfolio
+			/>
+
+			<IdentityBadge
+				initial={initial}
+				name={user.name}
+				lastLogin={lastLogin}
+				onLogout={logout}
+			/>
+		</div>
+	);
+}
+
+function IdentityBadge({
+	initial,
+	name,
+	lastLogin,
+	onLogout,
+}: {
+	readonly initial: string;
+	readonly name: string;
+	readonly lastLogin: string | null;
+	readonly onLogout: () => void;
+}) {
+	return (
+		<div
+			style={{
+				display: "flex",
+				alignItems: "center",
+				gap: 10,
+				padding: "8px 10px",
+				borderRadius: 8,
+				border: "1px solid var(--place-border-subtle, rgba(255,255,255,0.06))",
+				background: "rgba(255,255,255,0.02)",
+			}}
+		>
 			<div
-				className="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-semibold"
 				style={{
-					background: 'rgba(91, 156, 245, 0.15)',
-					border: '1px solid var(--place-border-strong)',
-					color: 'var(--place-secondary-400)',
+					width: 28,
+					height: 28,
+					borderRadius: "50%",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					fontSize: "0.78rem",
+					fontWeight: 600,
+					background: "rgba(91,156,245,0.15)",
+					border: "1px solid var(--place-border-strong)",
+					color: "var(--place-secondary-400)",
+					flexShrink: 0,
 				}}
 			>
 				{initial}
 			</div>
-
-			<div className="flex flex-col gap-1">
-				<h2
-					className="text-lg font-medium"
-					style={{ color: 'var(--place-text-primary)' }}
-				>
-					{greeting}
-				</h2>
-				{!isNewUser && lastLogin && (
-					<p
-						className="text-xs"
-						style={{ color: 'var(--place-text-secondary)' }}
-					>
-						Last login: {lastLogin}
-					</p>
-				)}
-			</div>
-
-			<button
-				type="button"
-				onClick={onContinue}
-				className="cursor-pointer rounded-lg px-6 py-2.5 text-sm font-medium transition-all duration-200 hover:scale-[1.02]"
+			<div
 				style={{
-					background: 'var(--place-secondary-400)',
-					color: '#fff',
-					border: 'none',
+					display: "flex",
+					flexDirection: "column",
+					flex: 1,
+					minWidth: 0,
 				}}
 			>
-				Continue to Desktop
-			</button>
-
+				<span
+					style={{
+						fontSize: "0.78rem",
+						color: "var(--place-text-primary)",
+						fontWeight: 500,
+					}}
+				>
+					{name}
+				</span>
+				{lastLogin && (
+					<span
+						style={{
+							fontSize: "0.65rem",
+							color: "var(--place-text-muted)",
+						}}
+					>
+						last login {lastLogin}
+					</span>
+				)}
+			</div>
 			<button
 				type="button"
-				onClick={logout}
+				onClick={onLogout}
 				className="cursor-pointer border-none bg-transparent p-0 text-xs underline"
-				style={{ color: 'var(--place-text-muted)' }}
+				style={{ color: "var(--place-text-muted)" }}
 			>
-				Not you? Switch account
+				switch
 			</button>
 		</div>
 	);
 }
 
-function GuestAuthPanel({
-	onContinue,
-}: {
-	readonly onContinue: () => void;
-}) {
-	const [mode, setMode] = useState<AuthMode>('login');
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [name, setName] = useState('');
-	const [error, setError] = useState('');
+// ----------------------------------------------------------------------------
+// Guest branch — entry chooser is the headline; auth is plumbing below
+// ----------------------------------------------------------------------------
+
+function GuestAuthPanel({ onContinue }: { readonly onContinue: () => void }) {
+	const [mode, setMode] = useState<AuthMode>("login");
+	const [showAuth, setShowAuth] = useState(false);
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [name, setName] = useState("");
+	const [error, setError] = useState("");
 
 	const login = useAuthStore((s) => s.login);
 	const signup = useAuthStore((s) => s.signup);
 	const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
 	const isLoading = useAuthStore((s) => s.isLoading);
+	const quickLogin = useAuthStore((s) => s.quickLogin);
 	const addToast = useToastStore((s) => s.addToast);
 
+	const devUsers = getDevUsers();
+
 	const resetForm = useCallback(() => {
-		setEmail('');
-		setPassword('');
-		setName('');
-		setError('');
+		setEmail("");
+		setPassword("");
+		setName("");
+		setError("");
 	}, []);
 
 	const toggleMode = useCallback(() => {
-		setMode((m) => (m === 'login' ? 'signup' : 'login'));
+		setMode((m) => (m === "login" ? "signup" : "login"));
 		resetForm();
 	}, [resetForm]);
 
 	const handleSubmit = useCallback(async () => {
-		setError('');
+		setError("");
 
 		if (!email.trim() || !password.trim()) {
-			setError('Email and password are required');
+			setError("Email and password are required");
 			return;
 		}
 
-		if (mode === 'signup' && !name.trim()) {
-			setError('Name is required');
+		if (mode === "signup" && !name.trim()) {
+			setError("Name is required");
 			return;
 		}
 
 		try {
-			if (mode === 'login') {
+			if (mode === "login") {
 				await login(email.trim(), password);
 			} else {
 				await signup(email.trim(), password, name.trim());
 			}
 		} catch (err: unknown) {
-			const message = err instanceof Error
-				? err.message
-				: 'Something went wrong';
+			const message =
+				err instanceof Error ? err.message : "Something went wrong";
 			setError(message);
 		}
 	}, [email, password, name, mode, login, signup]);
@@ -156,13 +276,13 @@ function GuestAuthPanel({
 		try {
 			await loginWithGoogle();
 		} catch {
-			addToast('Google sign-in coming soon', 'info');
+			addToast("Google sign-in coming soon", "info");
 		}
 	}, [loginWithGoogle, addToast]);
 
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent) => {
-			if (e.key === 'Enter') {
+			if (e.key === "Enter") {
 				e.stopPropagation();
 				void handleSubmit();
 			}
@@ -170,183 +290,183 @@ function GuestAuthPanel({
 		[handleSubmit],
 	);
 
-	const quickLogin = useAuthStore((s) => s.quickLogin);
-	const devUsers = getDevUsers();
-
 	return (
-		<div className="flex flex-col gap-5">
-			{/* Quick Dev Login */}
-			<div className="flex flex-col gap-2">
-				<span
-					className="text-xs font-medium"
-					style={{ color: 'var(--place-text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}
-				>
-					Quick Login
-				</span>
-				<div className="flex gap-2">
-					{devUsers.map((u) => (
-						<button
-							key={u.id}
-							type="button"
-							onClick={() => quickLogin(u.id)}
-							className="flex-1 cursor-pointer rounded-md px-3 py-2 text-sm font-medium transition-all duration-150 hover:scale-[1.01]"
-							style={{
-								background: 'var(--place-primary-subtle, rgba(13,147,115,0.10))',
-								border: '1px solid var(--place-primary-border, rgba(45,212,168,0.20))',
-								color: 'var(--place-primary-400, #2DD4A8)',
-							}}
-						>
-							{u.name}
-						</button>
-					))}
-				</div>
-			</div>
+		<div className="flex flex-col gap-4">
+			<StepHeader user={null} />
 
-			{/* Guest continue */}
-			<button
-				type="button"
-				onClick={onContinue}
-				className="w-full cursor-pointer rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 hover:scale-[1.01]"
-				style={{
-					background: 'transparent',
-					border: '1px solid var(--place-border-strong)',
-					color: 'var(--place-text-primary)',
-				}}
-			>
-				Continue as Guest
-			</button>
+			{/* Headline action — pick a surface */}
+			<EntryChooser
+				onSelect={(t) => dispatchEntry(t, onContinue)}
+				showPortfolio
+			/>
 
-			{/* Divider */}
-			<div className="flex items-center gap-3">
+			{/* Divider — auth is intentionally below the entry choices */}
+			<div className="flex items-center gap-3" style={{ marginTop: 4 }}>
 				<div
 					className="h-px flex-1"
-					style={{ background: 'var(--place-border-default)' }}
+					style={{ background: "var(--place-border-default)" }}
 				/>
 				<span
 					className="text-xs"
-					style={{ color: 'var(--place-text-secondary)' }}
+					style={{
+						color: "var(--place-text-muted)",
+						fontSize: "0.65rem",
+						letterSpacing: "0.08em",
+						textTransform: "uppercase",
+					}}
 				>
-					or
+					optional · sign in
 				</span>
 				<div
 					className="h-px flex-1"
-					style={{ background: 'var(--place-border-default)' }}
+					style={{ background: "var(--place-border-default)" }}
 				/>
 			</div>
 
-			{/* Auth form */}
-			<div className="flex flex-col gap-3">
-				<h3
-					className="text-sm font-medium"
-					style={{ color: 'var(--place-text-primary)' }}
-				>
-					{mode === 'login' ? 'Log In' : 'Create Account'}
-				</h3>
+			{/* Quick dev login row — always visible, single-click */}
+			<div className="flex gap-2">
+				{devUsers.map((u) => (
+					<button
+						key={u.id}
+						type="button"
+						onClick={() => quickLogin(u.id)}
+						className="flex-1 cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150 hover:scale-[1.01]"
+						style={{
+							background: "var(--place-primary-subtle, rgba(13,147,115,0.10))",
+							border:
+								"1px solid var(--place-primary-border, rgba(45,212,168,0.20))",
+							color: "var(--place-primary-400, #2DD4A8)",
+						}}
+					>
+						{u.name}
+					</button>
+				))}
+			</div>
 
-				{mode === 'signup' && (
+			{/* Email/password — collapsed by default to keep the panel calm */}
+			{!showAuth ? (
+				<button
+					type="button"
+					onClick={() => setShowAuth(true)}
+					className="cursor-pointer text-center text-xs underline"
+					style={{
+						background: "transparent",
+						border: "none",
+						color: "var(--place-text-secondary)",
+						padding: "4px 0",
+					}}
+				>
+					email / password
+				</button>
+			) : (
+				<div className="flex flex-col gap-2">
+					<h3
+						className="text-xs font-medium"
+						style={{
+							color: "var(--place-text-secondary)",
+							letterSpacing: "0.06em",
+							textTransform: "uppercase",
+						}}
+					>
+						{mode === "login" ? "Log In" : "Create Account"}
+					</h3>
+
+					{mode === "signup" && (
+						<input
+							type="text"
+							placeholder="Name"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							onKeyDown={handleKeyDown}
+							className="w-full rounded-md px-3 py-2 text-sm outline-none transition-colors"
+							style={{
+								background: "rgba(255, 255, 255, 0.04)",
+								border: "1px solid var(--place-border-default)",
+								color: "var(--place-text-primary)",
+							}}
+						/>
+					)}
+
 					<input
-						type="text"
-						placeholder="Name"
-						value={name}
-						onChange={(e) => setName(e.target.value)}
+						type="email"
+						placeholder="Email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
 						onKeyDown={handleKeyDown}
 						className="w-full rounded-md px-3 py-2 text-sm outline-none transition-colors"
 						style={{
-							background: 'rgba(255, 255, 255, 0.04)',
-							border: '1px solid var(--place-border-default)',
-							color: 'var(--place-text-primary)',
+							background: "rgba(255, 255, 255, 0.04)",
+							border: "1px solid var(--place-border-default)",
+							color: "var(--place-text-primary)",
 						}}
 					/>
-				)}
 
-				<input
-					type="email"
-					placeholder="Email"
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					onKeyDown={handleKeyDown}
-					className="w-full rounded-md px-3 py-2 text-sm outline-none transition-colors"
-					style={{
-						background: 'rgba(255, 255, 255, 0.04)',
-						border: '1px solid var(--place-border-default)',
-						color: 'var(--place-text-primary)',
-					}}
-				/>
+					<input
+						type="password"
+						placeholder="Password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						onKeyDown={handleKeyDown}
+						className="w-full rounded-md px-3 py-2 text-sm outline-none transition-colors"
+						style={{
+							background: "rgba(255, 255, 255, 0.04)",
+							border: "1px solid var(--place-border-default)",
+							color: "var(--place-text-primary)",
+						}}
+					/>
 
-				<input
-					type="password"
-					placeholder="Password"
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
-					onKeyDown={handleKeyDown}
-					className="w-full rounded-md px-3 py-2 text-sm outline-none transition-colors"
-					style={{
-						background: 'rgba(255, 255, 255, 0.04)',
-						border: '1px solid var(--place-border-default)',
-						color: 'var(--place-text-primary)',
-					}}
-				/>
+					{error && (
+						<p className="text-xs" style={{ color: "var(--place-error)" }}>
+							{error}
+						</p>
+					)}
 
-				{error && (
-					<p
-						className="text-xs"
-						style={{ color: 'var(--place-error)' }}
-					>
-						{error}
-					</p>
-				)}
-
-				<button
-					type="button"
-					onClick={() => void handleSubmit()}
-					disabled={isLoading}
-					className="w-full cursor-pointer rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-[1.01] disabled:opacity-50"
-					style={{
-						background: 'var(--place-secondary-400)',
-						color: '#fff',
-						border: 'none',
-					}}
-				>
-					{isLoading
-						? 'Loading...'
-						: mode === 'login'
-							? 'Log In'
-							: 'Sign Up'}
-				</button>
-
-				{/* Google OAuth placeholder */}
-				<button
-					type="button"
-					onClick={() => void handleGoogleClick()}
-					className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 text-sm transition-all duration-200 hover:scale-[1.01]"
-					style={{
-						background: 'rgba(255, 255, 255, 0.06)',
-						border: '1px solid var(--place-border-default)',
-						color: 'var(--place-text-secondary)',
-					}}
-				>
-					<GoogleIcon />
-					Continue with Google
-				</button>
-
-				{/* Toggle mode */}
-				<p
-					className="text-center text-xs"
-					style={{ color: 'var(--place-text-secondary)' }}
-				>
-					{mode === 'login'
-						? "Don't have an account? "
-						: 'Already have an account? '}
 					<button
 						type="button"
-						onClick={toggleMode}
-						className="cursor-pointer border-none bg-transparent p-0 underline"
-						style={{ color: 'var(--place-secondary-400)' }}
+						onClick={() => void handleSubmit()}
+						disabled={isLoading}
+						className="w-full cursor-pointer rounded-md px-4 py-2 text-sm font-medium transition-all duration-150 hover:scale-[1.01] disabled:opacity-50"
+						style={{
+							background: "var(--place-secondary-400)",
+							color: "#fff",
+							border: "none",
+						}}
 					>
-						{mode === 'login' ? 'Sign Up' : 'Log In'}
+						{isLoading ? "Loading..." : mode === "login" ? "Log In" : "Sign Up"}
 					</button>
-				</p>
-			</div>
+
+					<button
+						type="button"
+						onClick={() => void handleGoogleClick()}
+						className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-1.5 text-xs transition-all duration-150 hover:scale-[1.01]"
+						style={{
+							background: "rgba(255, 255, 255, 0.06)",
+							border: "1px solid var(--place-border-default)",
+							color: "var(--place-text-secondary)",
+						}}
+					>
+						<GoogleIcon />
+						Continue with Google
+					</button>
+
+					<p
+						className="text-center text-xs"
+						style={{ color: "var(--place-text-secondary)" }}
+					>
+						{mode === "login"
+							? "Don't have an account? "
+							: "Already have an account? "}
+						<button
+							type="button"
+							onClick={toggleMode}
+							className="cursor-pointer border-none bg-transparent p-0 underline"
+							style={{ color: "var(--place-secondary-400)" }}
+						>
+							{mode === "login" ? "Sign Up" : "Log In"}
+						</button>
+					</p>
+				</div>
+			)}
 		</div>
 	);
 }
@@ -354,8 +474,8 @@ function GuestAuthPanel({
 function GoogleIcon() {
 	return (
 		<svg
-			width="16"
-			height="16"
+			width="14"
+			height="14"
 			viewBox="0 0 24 24"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
@@ -387,16 +507,20 @@ function GoogleIcon() {
 export function AuthPanel({ onContinue, user, justSignedUp }: AuthPanelProps) {
 	return (
 		<motion.div
-			initial={{ opacity: 0, x: 20 }}
+			initial={{ opacity: 0, x: 12 }}
 			animate={{ opacity: 1, x: 0 }}
-			transition={{ duration: 0.6, ease: [0.65, 0.05, 0, 1] }}
-			className="glass flex h-full w-full flex-col items-center justify-center rounded-2xl p-8"
+			transition={{ duration: 0.22, ease: [0.65, 0.05, 0, 1] }}
+			className="glass flex h-full w-full flex-col rounded-2xl p-6"
 			style={{
-				maxWidth: '360px',
+				maxWidth: "380px",
 			}}
 		>
 			{user ? (
-				<WelcomeBack user={user} onContinue={onContinue} isNewUser={justSignedUp} />
+				<WelcomeBack
+					user={user}
+					onContinue={onContinue}
+					isNewUser={justSignedUp}
+				/>
 			) : (
 				<GuestAuthPanel onContinue={onContinue} />
 			)}

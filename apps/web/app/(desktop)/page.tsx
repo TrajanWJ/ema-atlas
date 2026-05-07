@@ -290,11 +290,20 @@ export default function DesktopPage() {
 			// Navigate to portfolio after a tick so desktop mounts first
 			setTimeout(() => { window.location.href = '/portfolio'; }, 50);
 		};
+		const handleHolodeck = () => {
+			// Holodeck = the sidebar workspace surface. Land in /launchpad,
+			// which the SurfaceModeSwitch treats as the canonical Holodeck
+			// path (and remembers as last-holodeck-path on subsequent visits).
+			setBooted(true);
+			setTimeout(() => { window.location.href = '/launchpad'; }, 50);
+		};
 		window.addEventListener('boot-desktop', handleDesktop);
 		window.addEventListener('boot-portfolio', handlePortfolio);
+		window.addEventListener('boot-holodeck', handleHolodeck);
 		return () => {
 			window.removeEventListener('boot-desktop', handleDesktop);
 			window.removeEventListener('boot-portfolio', handlePortfolio);
+			window.removeEventListener('boot-holodeck', handleHolodeck);
 		};
 	}, []);
 

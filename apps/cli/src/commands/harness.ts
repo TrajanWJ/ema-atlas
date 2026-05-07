@@ -674,8 +674,21 @@ function timeline(executionId: string, lane: string | null, cwd: string, prompt:
 }
 
 
+// Harness file-backed registry lives at a stable location independent of cwd
+// so workers started from one directory remain visible from another. Resolution
+// order: EMA_HARNESS_ROOT (explicit override) -> EMA_HOME/.ema-dev/harness-glue
+// (set by the ema wrapper) -> cwd/.ema-dev/harness-glue (backwards-compat
+// fallback for in-tree runs without the wrapper).
+function harnessGlueRoot(): string {
+	const override = process.env.EMA_HARNESS_ROOT?.trim();
+	if (override) return override;
+	const home = process.env.EMA_HOME?.trim();
+	if (home) return join(home, ".ema-dev", "harness-glue");
+	return join(process.cwd(), ".ema-dev", "harness-glue");
+}
+
 function registryDir(): string {
-	return join(process.cwd(), ".ema-dev", "harness-glue", "executions");
+	return join(harnessGlueRoot(), "executions");
 }
 
 function registryPath(executionId: string): string {
@@ -702,7 +715,7 @@ function readRecords(): any[] {
 }
 
 function laneAssignmentsDir(): string {
-	return join(process.cwd(), ".ema-dev", "harness-glue", "lane-sessions");
+	return join(harnessGlueRoot(), "lane-sessions");
 }
 
 function laneAssignmentPath(lane: string): string {
@@ -710,11 +723,11 @@ function laneAssignmentPath(lane: string): string {
 }
 
 function eventLogPath(): string {
-	return join(process.cwd(), ".ema-dev", "harness-glue", "events.ndjson");
+	return join(harnessGlueRoot(), "events.ndjson");
 }
 
 function searchDir(): string {
-	return join(process.cwd(), ".ema-dev", "harness-glue", "search-bundles");
+	return join(harnessGlueRoot(), "search-bundles");
 }
 
 function upsertLaneAssignment(lane: string, record: any): void {
@@ -748,7 +761,7 @@ function readLaneAssignments(): any[] {
 }
 
 function appendEvents(events: any[]): void {
-	mkdirSync(join(process.cwd(), ".ema-dev", "harness-glue"), { recursive: true });
+	mkdirSync(harnessGlueRoot(), { recursive: true });
 	const now = new Date().toISOString();
 	const lines = events.map((event) => JSON.stringify({ recorded_at: event.recorded_at ?? now, ...event })).join("\n");
 	if (lines) writeFileSync(eventLogPath(), lines + "\n", { flag: "a" });

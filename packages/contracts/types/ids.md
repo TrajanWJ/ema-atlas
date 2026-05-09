@@ -18,6 +18,7 @@ Example: `project:01JFYV6W2H7K9Z8XR3BDQG4T5P`.
 | `pairing_offer`   | temporary manual device pairing offer     |
 | `org`             | organization                              |
 | `space`           | space inside an org                       |
+| `client`          | client/account record                     |
 | `project`         | project inside a space                    |
 | `invite`          | invite                                    |
 | `event`           | any event in the log                      |

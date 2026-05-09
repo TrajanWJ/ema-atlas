@@ -71,6 +71,11 @@ Scoped grants (`secret_ref:<ulid>`) ride on `dispatch.started`
 payloads. Execution-side writers MUST NOT log the dereferenced secret
 value; `tool.invoked` args MUST redact any field carrying a secret.
 
+External MCP-backed toolkits such as Argent use the same seam. They are
+represented as provider/tool metadata on `tool.*` events, not new event
+families. See `25-mobile-agent-toolkits.md` for the mobile-agent-toolkit
+projection direction.
+
 When real external agents are wired (Hermes orchestrator), the same
 seam is the wire contract: external runners subscribe to `dispatch.*`
 and publish `execution.*` / `tool.*` back. See the future

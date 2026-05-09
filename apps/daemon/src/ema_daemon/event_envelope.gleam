@@ -165,6 +165,11 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "problem.logged" -> True
     "problem.solution_added" -> True
     "problem.linked" -> True
+    "swarm.created" -> True
+    "swarm.started" -> True
+    "swarm.paused" -> True
+    "swarm.stopped" -> True
+    "swarm.report_generated" -> True
     "agent.reported" -> True
     "proposal.drafted" -> True
     "proposal.submitted" -> True

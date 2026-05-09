@@ -5,7 +5,93 @@ the 2026-05-07 cut). One coordinator, many workers. Every session — Codex,
 Claude CLI, or human — reads this file on cold start.
 
 Coordinator: Claude (replacement orchestrator, consolidated role).
-Last coordinator sweep: 2026-05-07T19:00-04:00.
+Last coordinator sweep: 2026-05-09T03:45-04:00.
+
+## Session update 2026-05-09 - Active progress and lost-work sweep
+
+Codex refreshed the active-progress summary for the in-flight 0.0.6 build and
+checked the desktop recovery scanner plus daemon meta-progress output.
+
+**Current active build:** `/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6`
+on branch `bootstrap/m2-m3-shell-port`, head `daa3d7a`.
+
+**Daemon meta-progress snapshot:**
+
+- vCalendar phase: `handoff and next-day queue`.
+- Registry totals: 27 lanes, 16 queue items, 6 agent reports.
+- Lane status: 13 idea, 7 active, 7 done.
+- Queue status: 12 ready, 4 blocked.
+- No active lane is currently claimed in the meta-progress projection.
+- Daemon-recommended next action:
+  `queue_item:01KR1XBE8G009S4RYSJMDYB5WY` - surface uncommitted
+  in-flight swarm/handoff/contracts work on `bootstrap/m2-m3-shell-port`.
+
+### Found Active Work
+
+The local worktree contains one coherent uncommitted implementation slice, not
+random dirt:
+
+- CLI: `apps/cli/src/commands/swarm.ts` moves swarm commands from stubbed
+  projection seed to daemon-backed create/list/show/start/pause/stop/report
+  commands; `help.ts` and `handoff.ts` are touched; `apps/cli/dist/bin.js`
+  was rebuilt.
+- Daemon: `apps/daemon/src/ema_shell_ipc/ema_shell_ipc.gleam` adds swarm
+  command handling and `swarm.registry` projection pushes; bus/sqlite/event
+  helpers are touched.
+- Contracts: `packages/contracts/events/swarm.md` is new; catalog/README/tool
+  event docs and `packages/contracts/types/ids.md` include swarm/tool updates.
+- Architecture: `docs/architecture/25-mobile-agent-toolkits.md` is new,
+  capturing Argent/Proslync mobile-agent toolkit doctrine and queueing native
+  toolkit registry support.
+
+This matches existing queue item `queue_item:01KR1XBE8G009S4RYSJMDYB5WY`;
+preserve it until it is either committed, stashed with a durable handoff, or
+explicitly abandoned with rationale.
+
+### Lost-Work Scan
+
+`node tooling/recovery/desktop-recovery-scan.mjs --json` found:
+
+- 250 high-confidence donor/recovery candidates.
+- 1 dirty worktree: the active EMA 0.0.6 worktree above.
+- Candidate classes: 241 atlas-doctrine, 6 harness-donor, 3 vApp-sketch.
+
+Interpretation: the immediate lost-work risk is not a missing external folder;
+it is the uncommitted 0.0.6 swarm/handoff/contracts slice. The large candidate
+pool is useful for future recovery, but most entries are donor doctrine and
+should not be bulk-ported without a lane.
+
+### Next Up
+
+- Finish or shelve `queue_item:01KR1XBE8G009S4RYSJMDYB5WY` first so the current
+  dirty swarm/handoff/contracts slice cannot be accidentally overwritten.
+- Verify the swarm slice with `pnpm --filter @ema/cli build`,
+  `cd apps/daemon && gleam check`, and live `ema swarm --help` /
+  `ema swarm create/list/show --json` smoke checks.
+- Then pull one ready daemon-observability item: harness daemon writers,
+  harness provider dispatch adapters, or handoff scoping/hygiene.
+- Keep `docs/architecture/25-mobile-agent-toolkits.md` tied to the queued
+  Argent/toolkit registry work instead of broadening active implementation.
+
+### Deferred
+
+- Bulk recovery of the 250 scanner candidates; use the scanner output as a
+  lane input, not as automatic migration authority.
+- Full native mobile toolkit registry implementation (`ema toolkit ...`) until
+  the swarm/contracts slice is settled.
+- Place-companion LX1 path A/B decision remains operator-gated by the lane plan.
+- cmux/t3code cockpit work remains blocked until repo/license and integration
+  choices are confirmed.
+
+### Ignored
+
+- Generated/build duplicate artifacts under `node_modules`, daemon build
+  directories, Tauri `target`, `.bin/* 2`, and SQLite WAL/SHM copies are not
+  considered recoverable product work.
+- Superseded 0.0.5 scratchpad artifacts are ignored unless a lane explicitly
+  asks for lineage comparison.
+- Donor/client-specific project code is ignored as EMA truth; only reusable
+  doctrine, contracts, and surface patterns should be promoted.
 
 ## Session update 2026-05-07 — 0.0.6 architecture audit + rearch campaign opened
 

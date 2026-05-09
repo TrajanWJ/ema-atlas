@@ -76,6 +76,8 @@ pub type Msg {
 
   AgentReportsProjection(reply: Subject(String))
 
+  SwarmRegistryProjection(reply: Subject(String))
+
   BlueprintProjection(reply: Subject(String))
 
   BlueprintPlannerProjection(reply: Subject(String))
@@ -513,6 +515,11 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
 
     AgentReportsProjection(reply) -> {
       process.send(reply, sqlite_ffi.agent_reports_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    SwarmRegistryProjection(reply) -> {
+      process.send(reply, sqlite_ffi.swarm_registry_projection_json(state.db))
       actor.continue(state)
     }
 
@@ -1220,6 +1227,10 @@ pub fn problem_graph_projection_json(bus: Subject(Msg)) -> String {
 
 pub fn agent_reports_projection_json(bus: Subject(Msg)) -> String {
   process.call(bus, 5000, fn(reply) { AgentReportsProjection(reply) })
+}
+
+pub fn swarm_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { SwarmRegistryProjection(reply) })
 }
 
 pub fn blueprint_projection_json(bus: Subject(Msg)) -> String {

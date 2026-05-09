@@ -108,6 +108,7 @@ event {
 | mission       | `mission.md`        | ema_swarm_coordination |
 | handoff       | `handoff.md`        | ema_swarm_coordination |
 | problem       | `problem.md`        | ema_swarm_coordination |
+| swarm         | `swarm.md`          | ema_swarm_coordination |
 | proposal      | `proposal.md`       | (future) ema_swarm_coordination    |
 | incident      | `incident.md`       | (future) ema_swarm_coordination    |
 | dispatch      | `dispatch.md`       | ema_control seam      |

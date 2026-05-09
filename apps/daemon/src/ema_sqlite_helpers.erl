@@ -57,6 +57,7 @@
     handoff_registry_projection_json/1,
     problem_graph_projection_json/1,
     agent_reports_projection_json/1,
+    swarm_registry_projection_json/1,
     blueprint_projection_json/1,
     blueprint_planner_projection_json/1,
     vcalendar_projection_json/1,
@@ -633,6 +634,13 @@ agent_reports_projection_json(Db) ->
     Reports = [agent_report_event_json(E) || E <- Events],
     Array = join_json(lists:reverse(Reports)),
     iolist_to_binary([<<"{\"source\":\"daemon_events\",\"reports\":[">>, Array, <<"]}">>]).
+
+swarm_registry_projection_json(Db) ->
+    Events = select_events_like(Db, <<"swarm.%">>, 500),
+    Map = lists:foldl(fun apply_swarm_event/2, #{}, Events),
+    Items = sort_by_updated(maps:values(Map)),
+    Array = join_json([workspace_record_json(swarm_id, Item) || Item <- Items]),
+    iolist_to_binary([<<"{\"source\":\"daemon_events\",\"swarms\":[">>, Array, <<"]}">>]).
 
 blueprint_projection_json(Db) ->
     Events = select_events_like(Db, <<"blueprint.%">>, 2000),
@@ -2720,6 +2728,30 @@ apply_handoff_event({_Txid, Kind, Ts, Payload}, Acc) ->
                 <<"handoff.accepted">> -> Next0#{status => <<"accepted">>, accepted_by => extract_json_string(Payload, <<"accepted_by">>)};
                 <<"handoff.rejected">> -> Next0#{status => <<"rejected">>, reason => extract_json_string(Payload, <<"reason">>)};
                 <<"handoff.completed">> -> Next0#{status => <<"completed">>, outcome => extract_json_string(Payload, <<"outcome">>), verify => extract_json_string(Payload, <<"verify">>)};
+                _ -> Next0
+            end,
+            Acc#{Id => Next}
+    end.
+
+apply_swarm_event({_Txid, Kind, Ts, Payload}, Acc) ->
+    Id = extract_json_string(Payload, <<"swarm_id">>),
+    case Id of
+        <<>> -> Acc;
+        _ ->
+            Current = maps:get(Id, Acc, workspace_default(Id)),
+            Next0 = Current#{
+                id => Id,
+                title => non_empty(extract_json_string(Payload, <<"name">>), maps:get(title, Current, <<>>)),
+                project_id => non_empty(extract_json_string(Payload, <<"project_id">>), maps:get(project_id, Current, <<>>)),
+                campaign_id => non_empty(extract_json_string(Payload, <<"campaign_id">>), maps:get(campaign_id, Current, <<>>)),
+                updated_at => Ts
+            },
+            Next = case Kind of
+                <<"swarm.created">> -> Next0#{status => <<"created">>, created_at => Ts};
+                <<"swarm.started">> -> Next0#{status => <<"started">>, started_by => extract_json_string(Payload, <<"started_by">>)};
+                <<"swarm.paused">> -> Next0#{status => <<"paused">>, reason => extract_json_string(Payload, <<"reason">>)};
+                <<"swarm.stopped">> -> Next0#{status => <<"stopped">>, reason => extract_json_string(Payload, <<"reason">>)};
+                <<"swarm.report_generated">> -> Next0#{result => extract_json_string(Payload, <<"summary">>)};
                 _ -> Next0
             end,
             Acc#{Id => Next}

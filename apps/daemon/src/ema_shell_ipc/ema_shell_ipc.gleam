@@ -434,6 +434,36 @@ fn handle_bus_delivery(
             "agent.reports",
             bus.agent_reports_projection_json(state.bus_subject),
           )
+        "swarm.created" ->
+          send_projection(
+            conn,
+            "swarm.registry",
+            bus.swarm_registry_projection_json(state.bus_subject),
+          )
+        "swarm.started" ->
+          send_projection(
+            conn,
+            "swarm.registry",
+            bus.swarm_registry_projection_json(state.bus_subject),
+          )
+        "swarm.paused" ->
+          send_projection(
+            conn,
+            "swarm.registry",
+            bus.swarm_registry_projection_json(state.bus_subject),
+          )
+        "swarm.stopped" ->
+          send_projection(
+            conn,
+            "swarm.registry",
+            bus.swarm_registry_projection_json(state.bus_subject),
+          )
+        "swarm.report_generated" ->
+          send_projection(
+            conn,
+            "swarm.registry",
+            bus.swarm_registry_projection_json(state.bus_subject),
+          )
         "blueprint.document.created" -> {
           send_projection(
             conn,
@@ -2450,6 +2480,7 @@ fn handle_text(
                 Some("handoff.registry"),
                 [
                   #("handoff_id", json.string(handoff_id)),
+                  #("project_id", agent_workspace.opt(incoming.project_id)),
                   #("from", agent_workspace.opt(incoming.from_actor)),
                   #("to", agent_workspace.opt(incoming.to_actor)),
                   #("needed", agent_workspace.opt(incoming.needed)),
@@ -2587,6 +2618,89 @@ fn handle_text(
                   #("verified", agent_workspace.opt(incoming.verified)),
                   #("risks", agent_workspace.opt(incoming.risks)),
                   #("next", agent_workspace.opt(incoming.next)),
+                ],
+              )
+            }
+            Some("swarm.create") -> {
+              let swarm_id = agent_workspace.new_id("swarm")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "swarm.created",
+                "swarm_id",
+                Some(swarm_id),
+                Some("swarm.registry"),
+                [
+                  #("swarm_id", json.string(swarm_id)),
+                  #("name", title_json(incoming)),
+                  #("project_id", agent_workspace.opt(incoming.project_id)),
+                  #("mission_id", agent_workspace.opt(incoming.mission_id)),
+                  #("campaign_id", agent_workspace.opt(incoming.campaign_id)),
+                  #("created_by", json.string(actor_or_default(incoming))),
+                  #("status", json.string("created")),
+                ],
+              )
+            }
+            Some("swarm.start") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "swarm.started",
+                "swarm_id",
+                incoming.swarm_id,
+                Some("swarm.registry"),
+                [
+                  #("swarm_id", required_json(incoming.swarm_id)),
+                  #("started_by", json.string(actor_or_default(incoming))),
+                ],
+              )
+            Some("swarm.pause") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "swarm.paused",
+                "swarm_id",
+                incoming.swarm_id,
+                Some("swarm.registry"),
+                [
+                  #("swarm_id", required_json(incoming.swarm_id)),
+                  #("paused_by", json.string(actor_or_default(incoming))),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                ],
+              )
+            Some("swarm.stop") ->
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "swarm.stopped",
+                "swarm_id",
+                incoming.swarm_id,
+                Some("swarm.registry"),
+                [
+                  #("swarm_id", required_json(incoming.swarm_id)),
+                  #("stopped_by", json.string(actor_or_default(incoming))),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                ],
+              )
+            Some("swarm.report") -> {
+              let report_id = agent_workspace.new_id("swarm_report")
+              handle_workspace_event(
+                conn,
+                state,
+                incoming,
+                "swarm.report_generated",
+                "report_id",
+                Some(report_id),
+                Some("swarm.registry"),
+                [
+                  #("swarm_id", required_json(incoming.swarm_id)),
+                  #("report_id", json.string(report_id)),
+                  #("generated_by", json.string(actor_or_default(incoming))),
+                  #("summary", agent_workspace.opt(incoming.body)),
                 ],
               )
             }
@@ -4258,6 +4372,7 @@ type Incoming {
     handoff_id: Option(String),
     problem_id: Option(String),
     solution_id: Option(String),
+    swarm_id: Option(String),
     status: Option(String),
     goal: Option(String),
     next: Option(String),
@@ -4393,6 +4508,7 @@ type IncomingArgs {
     handoff_id: Option(String),
     problem_id: Option(String),
     solution_id: Option(String),
+    swarm_id: Option(String),
     status: Option(String),
     goal: Option(String),
     next: Option(String),
@@ -4841,6 +4957,11 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
+    use swarm_id <- decode.optional_field(
+      "swarm_id",
+      None,
+      decode.optional(decode.string),
+    )
     use status <- decode.optional_field(
       "status",
       None,
@@ -5176,6 +5297,7 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       handoff_id: handoff_id,
       problem_id: problem_id,
       solution_id: solution_id,
+      swarm_id: swarm_id,
       status: status,
       goal: goal,
       next: next,
@@ -5319,6 +5441,7 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         handoff_id: None,
         problem_id: None,
         solution_id: None,
+        swarm_id: None,
         status: None,
         goal: None,
         next: None,
@@ -5456,6 +5579,7 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       handoff_id: args.handoff_id,
       problem_id: args.problem_id,
       solution_id: args.solution_id,
+      swarm_id: args.swarm_id,
       status: args.status,
       goal: args.goal,
       next: args.next,
@@ -6559,6 +6683,12 @@ fn send_projection_snapshot_scoped(
         conn,
         "agent.reports",
         bus.agent_reports_projection_json(bus_subj),
+      )
+    Some("swarm.registry") ->
+      send_projection(
+        conn,
+        "swarm.registry",
+        bus.swarm_registry_projection_json(bus_subj),
       )
     Some("blueprint.sections") ->
       send_projection(

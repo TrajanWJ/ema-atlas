@@ -59,15 +59,16 @@ var COMMANDS = [
   { name: "tl about", summary: "Show daemon-backed lane/queue records, fallback workspace records, and current vCalendar phase." },
   { name: "/tl about", summary: "Alias for `ema tl about`; matches slash-command muscle memory." },
   { name: "agent orient", summary: "Print the enforced agent orientation checklist and workspace summary." },
+  { name: "agent prompt/report/meta-progress", summary: "Generate handoff prompts, record agent reports, and inspect meta-progress." },
   { name: "next", summary: "Recommend the next lane, queue item, or orientation command." },
-  { name: "campaign create/list/show", summary: "Manage long-running initiatives. (pending daemon writer)" },
-  { name: "mission create/list/show", summary: "Manage mission bundles under campaigns. (pending daemon writer)" },
+  { name: "campaign create/list/show/archive", summary: "Manage long-running initiatives." },
+  { name: "mission create/list/show/start/pause/complete", summary: "Manage mission bundles under campaigns." },
   { name: "lane open/list", summary: "Open and list daemon-backed lane ownership records." },
   { name: "lane claim/block/show", summary: "Claim, block, inspect, and close lanes." },
   { name: "queue add/list", summary: "Add and list daemon-backed follow-up work with dependencies." },
   { name: "queue show/ready/block/close", summary: "Inspect and move queue items through lifecycle states." },
-  { name: "handoff request/list", summary: "Record transfer contracts between actors. (pending daemon writer)" },
-  { name: "problem log/solution/link", summary: "Graph recursive problems, solutions, and dependencies. (pending daemon writer)" },
+  { name: "handoff request/list/accept/reject/complete", summary: "Record transfer contracts between actors and lanes." },
+  { name: "problem log/list/show/solution/link", summary: "Graph recursive problems, solutions, and dependencies." },
   { name: "blueprint status/list", summary: "Show current Blueprint daemon state and explicit projection/writer gaps." },
   { name: "wiki search/get/list", summary: "Search and read the project atlas/QMD second-brain layer." },
   { name: "hermes orient/plan/sweep", summary: "Preview the future Hermes orchestrator packet and plan shape. (projection seed)" },
@@ -77,8 +78,7 @@ var COMMANDS = [
   { name: "recovery scan", summary: "Read-only desktop-wide donor, worktree, stale-lane, and lost-work scan." },
   { name: "cwt status/ingest", summary: "Inspect current-work-tracker shared-files projection and dry-run EMA promotion." },
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
-  { name: "swarm list", summary: "List swarms for a project. (wave 1: stubbed)" },
-  { name: "swarm show", summary: "Show a single swarm. (wave 1: stubbed)" },
+  { name: "swarm create/list/show/start/pause/stop/report", summary: "Coordinate daemon-backed swarms over missions, lanes, and queue items." },
   { name: "vcalendar show", summary: "Show an actor's calendar (filtered from the recent event_trail)." },
   { name: "vcalendar week", summary: "Show this week's vcalendar events (filtered from the recent event_trail)." },
   { name: "vcalendar tick", summary: "Compute the current self-controlled planning/execution/review phase." },
@@ -1213,57 +1213,213 @@ async function runEvents(args) {
   }
 }
 
+// src/commands/workspace-daemon.ts
+var DEFAULT_ORG = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR = "actor:dev-console";
+async function workspaceScopeContext(args) {
+  return {
+    scope: await resolveWorkspaceScope({ args }),
+    allProjects: flagBool(args, "all-projects")
+  };
+}
+function filterProjectScopedRecords(records, context) {
+  if (context.allProjects) return [...records];
+  const projectId = context.scope.project_id;
+  if (!projectId) return [];
+  return records.filter((record) => record.project_id === projectId);
+}
+function withResolvedWorkspaceScope(argsObj, context) {
+  if (context.allProjects) return argsObj;
+  const scoped = { ...argsObj };
+  if ("org_id" in scoped && context.scope.org_id) scoped.org_id = context.scope.org_id;
+  if ("space_id" in scoped && context.scope.space_id) scoped.space_id = context.scope.space_id;
+  if ("project_id" in scoped && context.scope.project_id) scoped.project_id = context.scope.project_id;
+  return scoped;
+}
+async function sendWorkspaceCommand(args, op, argsObj, out) {
+  const json = flagBool(args, "json");
+  try {
+    const scopeContext = await workspaceScopeContext(args);
+    const c = await connect({ surface: "desktop" });
+    const result = await c.command(op, withResolvedWorkspaceScope(argsObj, scopeContext));
+    c.close();
+    if (result.ok !== true) {
+      if (json) {
+        emitJson({
+          ok: false,
+          command: op,
+          op,
+          source: "daemon_command",
+          daemon_authority: "canonical_events",
+          events: [],
+          resource: null,
+          workspace_scope: scopeContext.scope,
+          all_projects: scopeContext.allProjects,
+          error: result.error,
+          blocked_by: result.error?.class === "not_found" ? "missing_resource" : void 0
+        });
+      } else emitError(`ema ${op}: ${result.error.class}: ${result.error.message}`);
+      return 1;
+    }
+    const events = result.events ?? [];
+    const resource = typeof result.resource === "string" ? result.resource : null;
+    const warning = result.warning ?? null;
+    if (json) {
+      emitJson({
+        ok: true,
+        command: op,
+        op,
+        source: "daemon_command",
+        daemon_authority: "canonical_events",
+        events,
+        resource,
+        warning,
+        workspace_scope: scopeContext.scope,
+        all_projects: scopeContext.allProjects
+      });
+    } else {
+      emitPretty(out.human);
+      if (resource) emitPretty(`${out.resourceLabel ?? "resource"}: ${resource}`);
+      emitPretty(`events: ${events.join(", ") || "(none returned)"}`);
+      if (warning?.message) emitPretty(`[warn] ${warning.class ?? "warning"}: ${warning.message}`);
+    }
+    return 0;
+  } catch (err) {
+    return reportError(err, json);
+  }
+}
+async function readProjection(args, spec) {
+  const json = flagBool(args, "json");
+  try {
+    const scopeContext = await workspaceScopeContext(args);
+    const projectId = !scopeContext.allProjects && scopeContext.scope.project_id ? scopeContext.scope.project_id : null;
+    const c = await connect({ surface: "desktop" });
+    const value = await new Promise((resolve2) => {
+      const timer = setTimeout(() => resolve2(spec.pick({})), 1200);
+      c.onMessage((msg) => {
+        if (msg.type === "projection" && msg.name === spec.name) {
+          clearTimeout(timer);
+          resolve2(spec.pick(msg.data ?? {}));
+        }
+      });
+      c.subscribe(spec.name, projectId ? { project_id: projectId } : void 0);
+    });
+    c.close();
+    return value;
+  } catch (err) {
+    await reportError(err, json);
+    return null;
+  }
+}
+
 // src/commands/swarm.ts
 var DOC_REF = "docs/cli/see-agent-work.md";
 async function runSwarm(args) {
-  const sub = args.positional[0];
-  const json = flagBool(args, "json");
-  if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
-    return runStubContract(args, {
-      noun: "swarm",
-      status: "stubbed_projection_seed",
-      docRef: DOC_REF,
-      commands: [
-        { verb: "list", flags: ["project"], summary: "List swarms for a project." },
-        { verb: "show", flags: ["swarm"], summary: "Show one swarm." },
-        { verb: "start", flags: ["swarm"], summary: "Start a swarm when the backend writer exists." },
-        { verb: "pause", flags: ["swarm"], summary: "Pause a swarm when the backend writer exists." },
-        { verb: "stop", flags: ["swarm"], summary: "Stop a swarm when the backend writer exists." },
-        { verb: "status", flags: ["swarm"], summary: "Show swarm status from the current projection seed." },
-        { verb: "report", flags: ["swarm"], summary: "Generate a swarm report from available state." }
-      ]
-    });
-  }
-  switch (sub) {
-    case "list":
-      return stub("swarm list", { project: flagString(args, "project") ?? null }, json);
-    case "show":
-      return stub("swarm show", { swarm: flagString(args, "swarm") ?? null }, json);
-    case "start":
-    case "pause":
-    case "stop":
-    case "status":
-    case "report":
-      return stub(`swarm ${sub}`, { swarm: flagString(args, "swarm") ?? null }, json);
-    default:
-      emitError(
-        `ema swarm: unknown subcommand "${sub ?? ""}" (expected: list | show | start | pause | stop | status | report)`
-      );
-      emitError(`See ${DOC_REF} for the full grammar.`);
-      return 64;
-  }
+  const verb = args.positional[0];
+  if (flagBool(args, "help") || args.flags.h === true || verb === "help") return runSwarmHelp(args);
+  if (verb === "create") return createSwarm(args);
+  if (verb === "start") return changeSwarm(args, "swarm.start", "started");
+  if (verb === "pause") return changeSwarm(args, "swarm.pause", "paused");
+  if (verb === "stop") return changeSwarm(args, "swarm.stop", "stopped");
+  if (verb === "report") return reportSwarm(args);
+  if (verb === "status") return showSwarm(args);
+  if (verb === "show") return showSwarm(args);
+  return listSwarms(args);
 }
-function stub(name, args, json) {
-  const note = `not yet implemented; command grammar defined in ${DOC_REF}`;
-  if (json) {
-    emitJson({ ok: true, command: name, args, note });
-  } else {
-    emitPretty(`ema ${name}: ${note}`);
-    for (const [k, v] of Object.entries(args)) {
-      if (v !== null && v !== void 0) emitPretty(`  --${k} ${String(v)}`);
-    }
+function runSwarmHelp(args) {
+  return runStubContract(args, {
+    noun: "swarm",
+    status: "available",
+    docRef: DOC_REF,
+    commands: [
+      { verb: "create", flags: ["name", "project", "mission", "campaign"], required: ["name"], summary: "Create a coordinated swarm under the resolved workspace scope." },
+      { verb: "list", flags: ["project", "all-projects", "json"], summary: "List swarms in the resolved workspace scope." },
+      { verb: "show", flags: ["swarm"], required: ["swarm"], summary: "Show one swarm from swarm.registry." },
+      { verb: "status", flags: ["swarm"], required: ["swarm"], summary: "Show current status for a swarm (alias of show)." },
+      { verb: "start", flags: ["swarm"], required: ["swarm"], summary: "Move a swarm to started." },
+      { verb: "pause", flags: ["swarm", "reason"], required: ["swarm"], summary: "Pause a swarm with an optional reason." },
+      { verb: "stop", flags: ["swarm", "reason"], required: ["swarm"], summary: "Stop a swarm with an optional reason." },
+      { verb: "report", flags: ["swarm", "summary"], required: ["swarm"], summary: "Append a swarm report event with an optional summary." }
+    ]
+  });
+}
+async function createSwarm(args) {
+  const name = flagString(args, "name") ?? flagString(args, "title");
+  if (!name) {
+    emitError("ema swarm create: --name is required");
+    return 64;
+  }
+  return sendWorkspaceCommand(args, "swarm.create", {
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
+    name,
+    title: name,
+    project_id: flagString(args, "project") ?? null,
+    mission_id: flagString(args, "mission") ?? null,
+    campaign_id: flagString(args, "campaign") ?? null
+  }, { human: `created swarm "${name}"`, resourceLabel: "swarm" });
+}
+async function changeSwarm(args, op, label) {
+  const swarm = flagString(args, "swarm");
+  if (!swarm) {
+    emitError(`ema swarm ${args.positional[0] ?? "change"}: --swarm is required`);
+    return 64;
+  }
+  return sendWorkspaceCommand(args, op, {
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
+    swarm_id: swarm,
+    reason: flagString(args, "reason") ?? null
+  }, { human: `${label} swarm ${swarm}` });
+}
+async function reportSwarm(args) {
+  const swarm = flagString(args, "swarm");
+  if (!swarm) {
+    emitError("ema swarm report: --swarm is required");
+    return 64;
+  }
+  return sendWorkspaceCommand(args, "swarm.report", {
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
+    swarm_id: swarm,
+    body: flagString(args, "summary") ?? flagString(args, "body") ?? null
+  }, { human: `recorded swarm report for ${swarm}`, resourceLabel: "swarm_report" });
+}
+async function listSwarms(args) {
+  const json = flagBool(args, "json");
+  const swarms = await loadSwarms(args);
+  if (!swarms) return 1;
+  if (json) emitJson({ ok: true, source: "swarm.registry", swarms });
+  else {
+    emitPretty("# swarms");
+    if (swarms.length === 0) emitPretty("  (none)");
+    for (const swarm of swarms) emitPretty(`  ${swarm.id} [${swarm.status ?? "unknown"}] ${swarm.title ?? ""}`);
   }
   return 0;
+}
+async function showSwarm(args) {
+  const json = flagBool(args, "json");
+  const id = flagString(args, "swarm");
+  if (!id) {
+    emitError("ema swarm show: --swarm is required");
+    return 64;
+  }
+  const swarms = await loadSwarms(args);
+  if (!swarms) return 1;
+  const swarm = swarms.find((item) => item.id === id || item.swarm_id === id) ?? null;
+  if (json) emitJson({ ok: true, source: "swarm.registry", swarm });
+  else if (swarm) emitPretty(JSON.stringify(swarm, null, 2));
+  else emitPretty(`swarm not found: ${id}`);
+  return swarm ? 0 : 1;
+}
+async function loadSwarms(args) {
+  const context = await workspaceScopeContext(args);
+  const items = await readProjection(args, {
+    name: "swarm.registry",
+    pick: (data) => data.swarms ?? []
+  });
+  if (!items) return null;
+  return filterProjectScopedRecords(items, context);
 }
 
 // src/commands/org.ts
@@ -1415,8 +1571,8 @@ async function runProject(args) {
 }
 
 // src/commands/vcalendar.ts
-var DEFAULT_ORG = "org:01J00000000000000000000001";
-var DEFAULT_ACTOR = "actor:dev-console";
+var DEFAULT_ORG2 = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR2 = "actor:dev-console";
 async function runVcalendar(args) {
   const sub = args.positional[0];
   if (flagBool(args, "help") || args.flags.h === true || sub === "help") return runVcalendarHelp(args);
@@ -1460,8 +1616,8 @@ function runVcalendarHelp(args) {
 async function runBlock(args) {
   const verb = args.positional[1];
   const json = flagBool(args, "json");
-  const org = flagString(args, "org") ?? DEFAULT_ORG;
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
+  const org = flagString(args, "org") ?? DEFAULT_ORG2;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR2;
   if (verb === "add") {
     const kind = flagString(args, "kind");
     const label = flagString(args, "label");
@@ -1514,8 +1670,8 @@ async function runBlock(args) {
 async function runPhase(args) {
   const verb = args.positional[1];
   const json = flagBool(args, "json");
-  const org = flagString(args, "org") ?? DEFAULT_ORG;
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
+  const org = flagString(args, "org") ?? DEFAULT_ORG2;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR2;
   if (verb === "set") {
     const label = flagString(args, "label");
     if (!label) {
@@ -1833,8 +1989,8 @@ async function send(op, argsObj, out) {
 }
 
 // src/commands/checkup.ts
-var DEFAULT_ORG2 = "org:01J00000000000000000000001";
-var DEFAULT_ACTOR2 = "actor:dev-console";
+var DEFAULT_ORG3 = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR3 = "actor:dev-console";
 async function runCheckup(args) {
   const sub = args.positional[0];
   if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
@@ -1863,8 +2019,8 @@ async function runCheckup(args) {
 }
 async function runSchedule(args) {
   const json = flagBool(args, "json");
-  const org = flagString(args, "org") ?? DEFAULT_ORG2;
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR2;
+  const org = flagString(args, "org") ?? DEFAULT_ORG3;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
   const lane = flagString(args, "lane");
   const cadence = flagString(args, "cadence");
   if (!lane || !cadence) {
@@ -1887,8 +2043,8 @@ async function runSchedule(args) {
 }
 async function runComplete(args) {
   const json = flagBool(args, "json");
-  const org = flagString(args, "org") ?? DEFAULT_ORG2;
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR2;
+  const org = flagString(args, "org") ?? DEFAULT_ORG3;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
   const checkupId = flagString(args, "checkup");
   const result = flagString(args, "result");
   if (!checkupId || !result) {
@@ -1929,105 +2085,6 @@ async function send2(op, argsObj, out) {
   }
 }
 
-// src/commands/workspace-daemon.ts
-var DEFAULT_ORG3 = "org:01J00000000000000000000001";
-var DEFAULT_ACTOR3 = "actor:dev-console";
-async function workspaceScopeContext(args) {
-  return {
-    scope: await resolveWorkspaceScope({ args }),
-    allProjects: flagBool(args, "all-projects")
-  };
-}
-function filterProjectScopedRecords(records, context) {
-  if (context.allProjects) return [...records];
-  const projectId = context.scope.project_id;
-  if (!projectId) return [];
-  return records.filter((record) => record.project_id === projectId);
-}
-function withResolvedWorkspaceScope(argsObj, context) {
-  if (context.allProjects) return argsObj;
-  const scoped = { ...argsObj };
-  if ("org_id" in scoped && context.scope.org_id) scoped.org_id = context.scope.org_id;
-  if ("space_id" in scoped && context.scope.space_id) scoped.space_id = context.scope.space_id;
-  if ("project_id" in scoped && context.scope.project_id) scoped.project_id = context.scope.project_id;
-  return scoped;
-}
-async function sendWorkspaceCommand(args, op, argsObj, out) {
-  const json = flagBool(args, "json");
-  try {
-    const scopeContext = await workspaceScopeContext(args);
-    const c = await connect({ surface: "desktop" });
-    const result = await c.command(op, withResolvedWorkspaceScope(argsObj, scopeContext));
-    c.close();
-    if (result.ok !== true) {
-      if (json) {
-        emitJson({
-          ok: false,
-          command: op,
-          op,
-          source: "daemon_command",
-          daemon_authority: "canonical_events",
-          events: [],
-          resource: null,
-          workspace_scope: scopeContext.scope,
-          all_projects: scopeContext.allProjects,
-          error: result.error,
-          blocked_by: result.error?.class === "not_found" ? "missing_resource" : void 0
-        });
-      } else emitError(`ema ${op}: ${result.error.class}: ${result.error.message}`);
-      return 1;
-    }
-    const events = result.events ?? [];
-    const resource = typeof result.resource === "string" ? result.resource : null;
-    const warning = result.warning ?? null;
-    if (json) {
-      emitJson({
-        ok: true,
-        command: op,
-        op,
-        source: "daemon_command",
-        daemon_authority: "canonical_events",
-        events,
-        resource,
-        warning,
-        workspace_scope: scopeContext.scope,
-        all_projects: scopeContext.allProjects
-      });
-    } else {
-      emitPretty(out.human);
-      if (resource) emitPretty(`${out.resourceLabel ?? "resource"}: ${resource}`);
-      emitPretty(`events: ${events.join(", ") || "(none returned)"}`);
-      if (warning?.message) emitPretty(`[warn] ${warning.class ?? "warning"}: ${warning.message}`);
-    }
-    return 0;
-  } catch (err) {
-    return reportError(err, json);
-  }
-}
-async function readProjection(args, spec) {
-  const json = flagBool(args, "json");
-  try {
-    const scopeContext = await workspaceScopeContext(args);
-    const projectId = !scopeContext.allProjects && scopeContext.scope.project_id ? scopeContext.scope.project_id : null;
-    const c = await connect({ surface: "desktop" });
-    const value = await new Promise((resolve2) => {
-      const timer = setTimeout(() => resolve2(spec.pick({})), 1200);
-      c.onMessage((msg) => {
-        if (msg.type === "projection" && msg.name === spec.name) {
-          clearTimeout(timer);
-          resolve2(spec.pick(msg.data ?? {}));
-        }
-      });
-      c.subscribe(spec.name, projectId ? { project_id: projectId } : void 0);
-    });
-    c.close();
-    return value;
-  } catch (err) {
-    await reportError(err, json);
-    return null;
-  }
-}
-
 // src/commands/campaign.ts
 async function runCampaign(args) {
   const verb = args.positional[0];
@@ -2057,8 +2114,8 @@ async function createCampaign(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "campaign.create", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     title,
     project_id: flagString(args, "project") ?? null,
     depends_on: flagString(args, "depends-on") ?? null,
@@ -2072,8 +2129,8 @@ async function archiveCampaign(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "campaign.archive", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     campaign_id: campaign,
     reason: flagString(args, "reason") ?? null
   }, { human: `archived campaign ${campaign}` });
@@ -2148,8 +2205,8 @@ async function createMission(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "mission.create", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     campaign_id: flagString(args, "campaign") ?? null,
     title,
     project_id: flagString(args, "project") ?? null,
@@ -2164,8 +2221,8 @@ async function changeMission(args, op, label) {
     return 64;
   }
   return sendWorkspaceCommand(args, op, {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     mission_id: mission,
     reason: flagString(args, "reason") ?? null,
     result: flagString(args, "result") ?? null,
@@ -2283,8 +2340,8 @@ async function runOpen(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "lane.open", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     name: title,
     project_id: flagString(args, "project") ?? null,
     mission_id: flagString(args, "mission") ?? null,
@@ -2310,8 +2367,8 @@ async function runClaim(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "lane.claim", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     lane_id: lane,
     scope,
@@ -2329,8 +2386,8 @@ async function runMove(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "lane.move", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     lane_id: lane,
     status
@@ -2344,8 +2401,8 @@ async function runBlock2(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "lane.block", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     lane_id: lane,
     reason,
@@ -2360,8 +2417,8 @@ async function runRelease(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "lane.release", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     lane_id: lane,
     handoff_id: flagString(args, "handoff") ?? null,
@@ -2375,8 +2432,8 @@ async function runClose(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "lane.close", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     lane_id: lane,
     reason: flagString(args, "reason") ?? null,
@@ -2530,8 +2587,8 @@ async function runAdd(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "queue.add", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     name: title,
     reason: why,
     project_id: flagString(args, "project") ?? null,
@@ -2556,8 +2613,8 @@ async function runReady(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "queue.ready", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     queue_item_id: item,
     reason: flagString(args, "reason") ?? null
@@ -2571,8 +2628,8 @@ async function runBlock3(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "queue.block", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     queue_item_id: item,
     blocked_by: blockedBy,
@@ -2586,8 +2643,8 @@ async function runClose2(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "queue.close", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     project_id: flagString(args, "project") ?? null,
     queue_item_id: item,
     result: flagString(args, "result") ?? null,
@@ -2715,8 +2772,9 @@ async function requestHandoff(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "handoff.request", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
     actor_id: flagString(args, "actor") ?? from,
+    project_id: flagString(args, "project") ?? null,
     from,
     to,
     needed,
@@ -2733,8 +2791,8 @@ async function changeHandoff(args, op, label) {
     return 64;
   }
   return sendWorkspaceCommand(args, op, {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     handoff_id: handoff,
     reason: flagString(args, "reason") ?? null,
     outcome: flagString(args, "outcome") ?? null,
@@ -2790,8 +2848,8 @@ async function logProblem(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "problem.log", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     title,
     project_id: flagString(args, "project") ?? null,
     lane_id: flagString(args, "lane") ?? null,
@@ -2809,8 +2867,8 @@ async function addSolution(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "problem.solution", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     problem_id: problem,
     title,
     depends_on: flagString(args, "depends-on") ?? null,
@@ -2828,8 +2886,8 @@ async function linkProblem(args) {
   }
   const problem = from.startsWith("problem:") ? from : to.startsWith("problem:") ? to : from;
   return sendWorkspaceCommand(args, "problem.link", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     problem_id: problem,
     target_kind: from,
     target_value: to,
@@ -2977,7 +3035,7 @@ function firstNonEmpty(...values) {
 }
 async function runPrompt(args) {
   const json = flagBool(args, "json");
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
   const mode = promptMode(args);
   const provider = flagString(args, "provider") ?? (mode === "handoff" ? "codex" : "simulated");
   const target = flagString(args, "target") ?? flagString(args, "to") ?? (provider === "claude-code" ? "actor:claude-code" : "actor:codex");
@@ -3128,7 +3186,7 @@ function filterResolvedProjectRecords(records, projectId, allProjects) {
 }
 async function runMetaProgress(args) {
   const json = flagBool(args, "json");
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
   const daemonRecent = await loadRecentWorkspaceTrail(args);
   const reports = await readProjection(args, {
     name: "agent.reports",
@@ -3222,8 +3280,8 @@ async function runAgentLog(args) {
       return 64;
     }
     return sendWorkspaceCommand(args, "blueprint.decision.lock", {
-      org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+      org_id: flagString(args, "org") ?? DEFAULT_ORG,
+      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
       title,
       body,
       source: flagString(args, "supersedes"),
@@ -3237,8 +3295,8 @@ async function runAgentLog(args) {
       return 64;
     }
     return sendWorkspaceCommand(args, "blueprint.aspiration.capture", {
-      org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+      org_id: flagString(args, "org") ?? DEFAULT_ORG,
+      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
       title,
       body: flagString(args, "body") ?? flagString(args, "description"),
       status: flagString(args, "timeframe") ?? "near_term",
@@ -3255,8 +3313,8 @@ async function runAgentLog(args) {
       return 64;
     }
     return sendWorkspaceCommand(args, "blueprint.gac.create", {
-      org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+      org_id: flagString(args, "org") ?? DEFAULT_ORG,
+      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
       document_id: document,
       section_id: flagString(args, "section"),
       target_kind: flagString(args, "category") ?? "assumption",
@@ -3275,8 +3333,8 @@ async function runReport(args) {
     return 64;
   }
   return sendWorkspaceCommand(args, "agent.report", {
-    org_id: flagString(args, "org") ?? DEFAULT_ORG3,
-    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR3,
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
     lane_id: lane,
     changed: flagString(args, "changed") ?? null,
     verified: flagString(args, "verified") ?? flagString(args, "verify") ?? null,
@@ -3321,7 +3379,7 @@ function runAgentContract(args) {
 }
 async function runOrient(args) {
   const json = flagBool(args, "json");
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
   const scope = await resolveWorkspaceScope({ args });
   const allProjects = flagBool(args, "all-projects");
   const daemonRecent = await loadRecentWorkspaceTrail(args);
@@ -3433,7 +3491,7 @@ async function runNext(args) {
     });
   }
   const json = flagBool(args, "json");
-  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+  const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
   const daemonRecent = await loadRecentWorkspaceTrail(args);
   const activeLane = daemonRecent.lanes.find(
     (lane) => lane.actor_id === actor && lane.status !== "done"
@@ -3512,7 +3570,7 @@ async function runTl(args) {
   });
   if (json) {
     if (flagBool(args, "summary") || flagBool(args, "compact")) {
-      const actor = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+      const actor = flagString(args, "actor") ?? DEFAULT_ACTOR;
       const activeLane = daemonRecent.lanes.find(
         (lane) => lane.actor_id === actor && lane.status !== "done" && lane.status !== "closed"
       ) ?? null;
@@ -4718,7 +4776,7 @@ async function runHermesOrient(args, verb) {
     name: "agent.reports",
     pick: (data) => Array.isArray(data.reports) ? data.reports : []
   }) ?? [];
-  const activeLane = daemonRecent.lanes.find((lane) => lane.actor_id === actor && lane.status !== "done") ?? daemonRecent.lanes.find((lane) => lane.actor_id === DEFAULT_ACTOR3 && lane.title.toLowerCase().includes("hermes") && lane.status !== "done") ?? null;
+  const activeLane = daemonRecent.lanes.find((lane) => lane.actor_id === actor && lane.status !== "done") ?? daemonRecent.lanes.find((lane) => lane.actor_id === DEFAULT_ACTOR && lane.title.toLowerCase().includes("hermes") && lane.status !== "done") ?? null;
   const recommendedLane = activeLane ?? daemonRecent.lanes.find((lane) => lane.status === "ready" && !lane.actor_id) ?? daemonRecent.lanes.find((lane) => lane.status === "idea" && !lane.actor_id) ?? null;
   const blockedWork = daemonRecent.queue.filter((item) => item.status === "blocked");
   const activeRisks = [
@@ -5457,8 +5515,15 @@ function timeline(executionId, lane, cwd, prompt) {
     { ...base, type: "dispatch.ended", status: "completed" }
   ];
 }
+function harnessGlueRoot() {
+  const override = process.env.EMA_HARNESS_ROOT?.trim();
+  if (override) return override;
+  const home = process.env.EMA_HOME?.trim();
+  if (home) return join3(home, ".ema-dev", "harness-glue");
+  return join3(process.cwd(), ".ema-dev", "harness-glue");
+}
 function registryDir() {
-  return join3(process.cwd(), ".ema-dev", "harness-glue", "executions");
+  return join3(harnessGlueRoot(), "executions");
 }
 function registryPath(executionId) {
   return join3(registryDir(), `${sanitizeFile(executionId)}.json`);
@@ -5478,16 +5543,16 @@ function readRecords2() {
   return readdirSync3(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync3(join3(dir, file), "utf8")));
 }
 function laneAssignmentsDir() {
-  return join3(process.cwd(), ".ema-dev", "harness-glue", "lane-sessions");
+  return join3(harnessGlueRoot(), "lane-sessions");
 }
 function laneAssignmentPath(lane) {
   return join3(laneAssignmentsDir(), `${sanitizeFile(lane)}.json`);
 }
 function eventLogPath() {
-  return join3(process.cwd(), ".ema-dev", "harness-glue", "events.ndjson");
+  return join3(harnessGlueRoot(), "events.ndjson");
 }
 function searchDir() {
-  return join3(process.cwd(), ".ema-dev", "harness-glue", "search-bundles");
+  return join3(harnessGlueRoot(), "search-bundles");
 }
 function upsertLaneAssignment(lane, record) {
   mkdirSync(laneAssignmentsDir(), { recursive: true });
@@ -5517,7 +5582,7 @@ function readLaneAssignments() {
   return readdirSync3(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync3(join3(dir, file), "utf8")));
 }
 function appendEvents(events) {
-  mkdirSync(join3(process.cwd(), ".ema-dev", "harness-glue"), { recursive: true });
+  mkdirSync(harnessGlueRoot(), { recursive: true });
   const now = (/* @__PURE__ */ new Date()).toISOString();
   const lines = events.map((event) => JSON.stringify({ recorded_at: event.recorded_at ?? now, ...event })).join("\n");
   if (lines) writeFileSync(eventLogPath(), lines + "\n", { flag: "a" });
@@ -6404,7 +6469,7 @@ function emitDryRun(json, root, manifest, snapshot) {
 }
 async function commit(args, root, manifest, snapshot, only) {
   const json = flagBool(args, "json");
-  const actorId = flagString(args, "actor") ?? DEFAULT_ACTOR3;
+  const actorId = flagString(args, "actor") ?? DEFAULT_ACTOR;
   const results = [];
   const laneMirror = /* @__PURE__ */ new Map();
   let client = null;
@@ -6489,7 +6554,7 @@ async function importLane(client, lane, resolveProject, actorId, daemonLanes) {
   const project = resolveProject(lane.project_id);
   if (!project.ok) return failed("lane", cwtId, title, project.reason);
   const result = await commandOrFailure(client, "lane.open", {
-    org_id: lane.org_id ?? project.org_id ?? DEFAULT_ORG3,
+    org_id: lane.org_id ?? project.org_id ?? DEFAULT_ORG,
     actor_id: actorId,
     name: title,
     project_id: project.project_id,
@@ -6513,7 +6578,7 @@ async function importQueue(client, item, resolveProject, actorId, daemonQueue, l
   const project = resolveProject(item.project_id);
   if (!project.ok) return failed("queue_item", cwtId, title, project.reason);
   const result = await commandOrFailure(client, "queue.add", {
-    org_id: item.org_id ?? project.org_id ?? DEFAULT_ORG3,
+    org_id: item.org_id ?? project.org_id ?? DEFAULT_ORG,
     actor_id: actorId,
     name: title,
     reason: item.why,
@@ -6538,7 +6603,7 @@ async function importProblem(client, problem, resolveProject, actorId, daemonPro
   const project = resolveProject(problem.project_id);
   if (!project.ok) return failed("problem", cwtId, title, project.reason);
   const result = await commandOrFailure(client, "problem.log", {
-    org_id: problem.org_id ?? project.org_id ?? DEFAULT_ORG3,
+    org_id: problem.org_id ?? project.org_id ?? DEFAULT_ORG,
     actor_id: actorId,
     title,
     project_id: project.project_id,

@@ -136,6 +136,14 @@ or surface code must appear in this list.
 - `problem.solution_added`
 - `problem.linked`
 
+## swarm
+
+- `swarm.created`
+- `swarm.started`
+- `swarm.paused`
+- `swarm.stopped`
+- `swarm.report_generated`
+
 ## agent
 
 - `agent.reported`

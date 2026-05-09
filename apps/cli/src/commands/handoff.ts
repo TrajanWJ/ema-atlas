@@ -42,6 +42,7 @@ async function requestHandoff(args: ParsedArgs): Promise<number> {
   return sendWorkspaceCommand(args, "handoff.request", {
     org_id: flagString(args, "org") ?? DEFAULT_ORG,
     actor_id: flagString(args, "actor") ?? from,
+    project_id: flagString(args, "project") ?? null,
     from,
     to,
     needed,

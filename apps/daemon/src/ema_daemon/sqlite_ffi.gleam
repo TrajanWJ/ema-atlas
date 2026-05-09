@@ -528,6 +528,10 @@ pub fn agent_reports_projection_json(db: Db) -> String {
   agent_reports_projection_json_raw(db)
 }
 
+pub fn swarm_registry_projection_json(db: Db) -> String {
+  swarm_registry_projection_json_raw(db)
+}
+
 pub fn blueprint_projection_json(db: Db) -> String {
   blueprint_projection_json_raw(db)
 }
@@ -856,6 +860,9 @@ fn problem_graph_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "agent_reports_projection_json")
 fn agent_reports_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "swarm_registry_projection_json")
+fn swarm_registry_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "blueprint_projection_json")
 fn blueprint_projection_json_raw(db: Db) -> String

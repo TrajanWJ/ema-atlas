@@ -159,6 +159,7 @@ const APP_ICON_MAP: Record<AppId, React.ReactNode> = {
 	// EMA additions
 	hq: <ChartIcon size={24} />,
 	cwt: <CheckIcon size={24} />,
+	cockpit: <MonitorIcon size={24} />,
 	clients: <UserIcon size={24} />,
 	"git-ema": <FolderIcon size={24} />,
 	"agent-work": <TargetIcon size={24} />,
@@ -208,6 +209,7 @@ const APP_DESCRIPTIONS: Record<AppId, string> = {
 	// EMA additions
 	hq: 'EMA · operations control room',
 	cwt: 'Current work, clients, projects, lanes, and queue',
+	cockpit: 'Holodeck cockpit for current EMA work',
 	clients: 'Client record boundary and CWT launch targets',
 	"git-ema": 'Connectors, repos, attachments — daemon-owned',
 	"agent-work": 'Lanes, missions, queues, vcalendar',

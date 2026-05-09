@@ -17,8 +17,7 @@ import { useSound } from "@/src/hooks/use-sound";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { SPRINGS, getTransition } from "@/src/lib/springs";
 import { detectSnapZone, getWindowPositionForZone } from "@/src/hooks/use-snap-zones";
-import { getPopoutLauncher } from "@/src/lib/popout-launcher";
-import { companionBridge } from "@/src/lib/companion-bridge";
+import { getPopoutLauncher, hasNativePopoutRuntime } from "@/src/lib/popout-launcher";
 import type { HandleClasses } from "react-rnd";
 import type { ProcessWindow } from "@/src/types/window";
 
@@ -363,7 +362,7 @@ export function Window({ win, children }: WindowProps) {
 			</AnimatePresence>
 			<SnapZones dragPosition={dragPosition} />
 			<EdgeGlowOverlay edge={edgeGlow} />
-			<PopoutConfirmOverlay visible={outsideViewport} companionConnected={companionBridge.isAvailable()} />
+			<PopoutConfirmOverlay visible={outsideViewport} companionConnected={hasNativePopoutRuntime()} />
 		</>
 	);
 }

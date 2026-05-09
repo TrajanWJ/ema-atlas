@@ -17,9 +17,9 @@ pub struct CompanionCapabilities {
 pub fn companion_capabilities() -> CompanionCapabilities {
     CompanionCapabilities {
         available: true,
-        native_drag_out_windows: false,
+        native_drag_out_windows: true,
         transparent_windows: true,
         package: "apps/desktop/src-tauri",
-        intent: "Tauri-owned transparent shell; future native pop-out vApp windows use the same alpha contract.",
+        intent: "Tauri-owned transparent shell with place-companion-derived native pop-out vApp windows.",
     }
 }

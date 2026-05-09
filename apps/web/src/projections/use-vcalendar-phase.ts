@@ -15,7 +15,7 @@
 
 import { useMemo } from "react";
 
-import type { SeeAgentWorkProjection } from "@ema/surface-core/adapter";
+import type { SeeAgentWorkProjection } from "@ema/surface-core/projections";
 
 import { useProjection } from "@/src/lib/ipc";
 

@@ -48,6 +48,15 @@ function windowName(windowId: string): string {
 	return `${WINDOW_NAME_PREFIX}${windowId}`;
 }
 
+function isTauriRuntime(): boolean {
+	if (typeof window === "undefined") return false;
+	return "__TAURI__" in window || "__TAURI_INTERNALS__" in window;
+}
+
+export function hasNativePopoutRuntime(): boolean {
+	return isTauriRuntime() || companionBridge.isAvailable();
+}
+
 // ----------------------------------------------------------------------------
 // Position calculation
 // ----------------------------------------------------------------------------
@@ -127,6 +136,48 @@ function brokerCompanionWindowOpen(
 	});
 }
 
+function buildPopoutUrl(appId: AppId, windowId: string, companion = false): string {
+	const suffix = companion ? "&companion=true" : "";
+	if (typeof window === "undefined") return `/popout/${appId}?windowId=${windowId}${suffix}`;
+	return `${window.location.origin}/popout/${appId}?windowId=${windowId}${suffix}`;
+}
+
+function openTauriCompanionWindow(
+	windowId: string,
+	appId: AppId,
+	position: WindowPosition,
+): boolean {
+	if (!isTauriRuntime()) return false;
+
+	const popoutSize = POPOUT_WINDOW_SIZES[appId];
+	const bounds = {
+		x: Math.max(50, position.x),
+		y: Math.max(50, position.y),
+		width: popoutSize?.width ?? position.width,
+		height: popoutSize?.height ?? position.height,
+	};
+
+	void import("@tauri-apps/api/core")
+		.then(({ invoke }) =>
+			invoke("companion_open_window", {
+				windowId,
+				appId,
+				url: buildPopoutUrl(appId, windowId, true),
+				bounds,
+				transparent: true,
+			}),
+		)
+		.catch((error) => {
+			console.debug("[popout-launcher] Tauri companion open failed", error);
+			useToastStore
+				.getState()
+				.addToast("Native popout failed; window stayed on the desktop", "error");
+		});
+
+	updatePersistedMode(windowId, "popout", bounds.x, bounds.y);
+	return true;
+}
+
 // ----------------------------------------------------------------------------
 // Persistence helpers
 // ----------------------------------------------------------------------------
@@ -192,6 +243,10 @@ function createPopoutAPI(): PopoutAPI {
 			// companion.status/windows projections before falling back to the donor bridge
 			// or browser popout path.
 			brokerCompanionWindowOpen(windowId, appId, position);
+
+			if (openTauriCompanionWindow(windowId, appId, position)) {
+				return "companion" as unknown as Window;
+			}
 
 			const companionAvailable = companionBridge.isAvailable();
 			console.log("[popout-launcher] detach:", windowId, "companion:", companionAvailable);
@@ -295,6 +350,11 @@ function createPopoutAPI(): PopoutAPI {
 			sendCompanionBrokerCommand("companion.window.focus", {
 				window_id: windowId,
 			});
+			if (isTauriRuntime()) {
+				void import("@tauri-apps/api/core").then(({ invoke }) =>
+					invoke("companion_focus_window", { windowId }),
+				);
+			}
 			const ref = popupRefs.get(windowId);
 			if (ref && !ref.closed) ref.focus();
 		},
@@ -303,6 +363,11 @@ function createPopoutAPI(): PopoutAPI {
 			sendCompanionBrokerCommand("companion.window.close", {
 				window_id: windowId,
 			});
+			if (isTauriRuntime()) {
+				void import("@tauri-apps/api/core").then(({ invoke }) =>
+					invoke("companion_close_window", { windowId }),
+				);
+			}
 			const ref = popupRefs.get(windowId);
 			if (ref && !ref.closed) ref.close();
 			popupRefs.delete(windowId);

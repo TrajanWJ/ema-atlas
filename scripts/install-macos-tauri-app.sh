@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 SOURCE_APP="$ROOT/apps/desktop/src-tauri/target/release/bundle/macos/EMA.app"
-TARGET_APP="${EMA_TAURI_DESKTOP_APP_PATH:-$HOME/Desktop/EMA 0.0.5.app}"
+TARGET_APP="${EMA_TAURI_DESKTOP_APP_PATH:-$HOME/Desktop/EMA 0.0.6.app}"
 
 if [[ ! -d "$SOURCE_APP" ]]; then
   echo "Built Tauri app not found: $SOURCE_APP"

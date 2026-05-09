@@ -15,7 +15,7 @@
 /// Allowlist:
 ///   - http://localhost:5173 (EMA web dev server)
 ///   - http://localhost:PORT for PORT in 3000..=3009 (legacy place dev range)
-///   - tauri://localhost (Tauri 2 bundled custom-protocol)
+///   - tauri://localhost / http(s)://tauri.localhost (Tauri bundled origin)
 pub fn is_allowed_origin(origin: &str) -> bool {
     let origin = origin.trim();
 
@@ -23,7 +23,10 @@ pub fn is_allowed_origin(origin: &str) -> bool {
         return true;
     }
 
-    if origin == "tauri://localhost" || origin == "https://tauri.localhost" {
+    if origin == "tauri://localhost"
+        || origin == "http://tauri.localhost"
+        || origin == "https://tauri.localhost"
+    {
         return true;
     }
 
@@ -49,6 +52,7 @@ mod tests {
     #[test]
     fn allows_tauri_localhost() {
         assert!(is_allowed_origin("tauri://localhost"));
+        assert!(is_allowed_origin("http://tauri.localhost"));
         assert!(is_allowed_origin("https://tauri.localhost"));
     }
 

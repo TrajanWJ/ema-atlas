@@ -1,23 +1,29 @@
 # Follow-ups deferred from commit hygiene pass - 2026-05-10
 
-## Codex roundtrip proof TTL
+## Codex roundtrip proof TTL — RESOLVED 2026-05-10
 
 Current: `CODEX_ROUNDTRIP_PROOF_TTL_MS = 7 * 24 * 60 * 60 * 1000` (7 days).
 
-Status: 7-day proof cache is readiness evidence, not a liveness guarantee.
+Status: 7-day proof cache remains as readiness evidence (not a liveness
+guarantee). The decision among "keep / shorten / add a force-fresh option" was
+resolved by adding the `--force-fresh` flag, which is the most flexible and
+least disruptive option:
 
-Failure mode: `capability assert --required codex` returns `ready` until cache
-expiry even if Codex has been removed, auth has rotated, or network is down,
-unless a fresh dispatch forces re-validation.
+- Default (`ema capability assert --required codex --json`) reads the 7-day
+  cache. Fast-path readiness check; correct for orientation/dashboards.
+- Forced (`ema capability assert --required codex --force-fresh --json`)
+  bypasses the cache and runs a smoke dispatch every time. Right for
+  mission-gate hardening, pre-swarm-launch, and CI gates that must prove the
+  Codex pipeline is currently live.
 
-Decision needed before Proslync mission gating relies on it:
+Mechanism: `apps/cli/src/commands/capability.ts` `assertRequired` reads
+`flagBool(args, "force-fresh")` and threads it into `CapabilityReportOptions`.
+`codexCapability` skips the early cache return when `forceFresh` is set, so
+the smoke dispatch always runs on `--force-fresh`.
 
-- Keep 7 days as evidence-not-liveness.
-- Shorten to a duration that approximates session validity.
-- Add a forced re-roundtrip command such as `capability assert --force-fresh`.
-
-Not a Lane 2 change. Revisit during mission-gate hardening or as a dedicated
-follow-up sprint.
+Mission-gate hardening should adopt `--force-fresh` in the gate's verification
+script. Document the flag in any agent-bootstrap recipe that requires
+liveness, not just evidence.
 
 ## apps/web build artifact drift
 

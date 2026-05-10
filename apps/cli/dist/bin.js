@@ -7434,8 +7434,12 @@ async function list(args) {
 }
 async function assertRequired(args) {
   const required = (flagString(args, "required") ?? "").split(",").map((item) => item.trim()).filter(Boolean);
-  const cached = required.includes("codex") ? readFreshRoundtrip("codex").ok : false;
-  const report = await capabilityReport(args, { checkRoundtripProviders: required.includes("codex") ? ["codex"] : [] });
+  const forceFresh = flagBool(args, "force-fresh");
+  const cached = !forceFresh && required.includes("codex") ? readFreshRoundtrip("codex").ok : false;
+  const report = await capabilityReport(args, {
+    checkRoundtripProviders: required.includes("codex") ? ["codex"] : [],
+    forceFresh
+  });
   const capabilityMap = new Map(report.capabilities.map((capability) => [capability.id, capability]));
   const failures = required.map((id) => capabilityMap.get(id) ?? { id, state: "missing", commands: [], evidence: "not registered", blocks_proslync_swarm: true }).filter(isFailureState);
   const payload = {
@@ -7443,6 +7447,7 @@ async function assertRequired(args) {
     command: "capability.assert",
     required,
     cached,
+    force_fresh: forceFresh,
     failures,
     report
   };
@@ -7486,24 +7491,26 @@ function codexCapability(options) {
   if (!commandExists("codex")) {
     return cap("codex", "missing", commands, "Codex CLI is not on PATH; no executable roundtrip can run.", true);
   }
-  const fresh = readFreshRoundtrip("codex");
-  if (fresh.ok) {
-    return cap(
-      "codex",
-      "daemon-backed",
-      commands,
-      `recent successful Codex roundtrip at ${fresh.entry.completed_at} (${Math.round(fresh.age_ms / 1e3)}s old): ${fresh.entry.evidence}`,
-      false
-    );
-  }
-  if (!options.checkRoundtripProviders?.includes("codex")) {
-    return cap(
-      "codex",
-      "roundtrip-failed",
-      commands,
-      `Codex CLI detected, but ${fresh.reason}; capability assert --required codex must run a smoke roundtrip before this can pass.`,
-      true
-    );
+  if (!options.forceFresh) {
+    const fresh = readFreshRoundtrip("codex");
+    if (fresh.ok) {
+      return cap(
+        "codex",
+        "daemon-backed",
+        commands,
+        `recent successful Codex roundtrip at ${fresh.entry.completed_at} (${Math.round(fresh.age_ms / 1e3)}s old): ${fresh.entry.evidence}`,
+        false
+      );
+    }
+    if (!options.checkRoundtripProviders?.includes("codex")) {
+      return cap(
+        "codex",
+        "roundtrip-failed",
+        commands,
+        `Codex CLI detected, but ${fresh.reason}; capability assert --required codex must run a smoke roundtrip before this can pass.`,
+        true
+      );
+    }
   }
   const smoke = runCodexCapabilitySmoke();
   if (smoke.ok) {

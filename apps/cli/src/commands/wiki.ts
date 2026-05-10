@@ -4,8 +4,9 @@ import path from "node:path";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
+import { DESKTOP_ROOT } from "../workspace-state.js";
 
-const ATLAS_ROOT = path.resolve(process.cwd(), "../../Projects/EMA/atlas");
+const ATLAS_ROOT = path.join(DESKTOP_ROOT, "Projects", "EMA", "atlas");
 const DOC_REF = "Projects/EMA/atlas/knowledge/ROOT-MAP.md";
 const MAX_FILES = 2_500;
 
@@ -101,8 +102,9 @@ async function runGet(args: ParsedArgs): Promise<number> {
     return 64;
   }
   const safePath = path.normalize(rel).replace(/^(\.\.[/\\])+/, "");
-  const abs = path.join(ATLAS_ROOT, safePath);
-  if (!abs.startsWith(ATLAS_ROOT)) {
+  const abs = path.resolve(ATLAS_ROOT, safePath);
+  const rootWithSep = `${path.resolve(ATLAS_ROOT)}${path.sep}`;
+  if (abs !== path.resolve(ATLAS_ROOT) && !abs.startsWith(rootWithSep)) {
     emitError("ema wiki get: path must stay inside Projects/EMA/atlas");
     return 64;
   }

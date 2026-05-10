@@ -2,7 +2,7 @@ import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitJson, emitPretty } from "../output.js";
 import { loadRecentWorkspaceTrail } from "../workspace-trail.js";
-import { DEFAULT_ACTOR } from "./workspace-daemon.js";
+import { DEFAULT_ACTOR, renderScopedEmaCommand } from "./workspace-daemon.js";
 import { runStubContract } from "./stub-contract.js";
 
 export async function runNext(args: ParsedArgs): Promise<number> {
@@ -10,10 +10,10 @@ export async function runNext(args: ParsedArgs): Promise<number> {
     return runStubContract(args, {
       noun: "next",
       status: "available",
-      usage: "Usage: ema next [--actor actor:<id>] [--json]",
+      usage: "Usage: ema next [--project <name-or-id>] [--actor actor:<id>] [--json]",
       docRef: "docs/cli/agent-workspace.md",
       commands: [
-        { verb: "recommend", flags: ["actor", "json"], summary: "Recommend the next lane, queue item, or orientation command." },
+        { verb: "recommend", flags: ["project", "all-projects", "actor", "json"], summary: "Recommend the next lane, queue item, or orientation command." },
       ],
     });
   }
@@ -28,13 +28,17 @@ export async function runNext(args: ParsedArgs): Promise<number> {
   ) ?? null;
   const readyQueueItem = daemonRecent.queue.find((item) => item.status === "ready") ?? null;
   const phase = currentPhase();
+  const commandContext = {
+    scope: daemonRecent.workspace_scope,
+    allProjects: daemonRecent.all_projects,
+  };
   const nextCommand = activeLane
-    ? `ema lane show --lane ${activeLane.id} --json`
+    ? renderScopedEmaCommand(commandContext, ["lane", "show", "--lane", activeLane.id, "--json"])
     : recommendedLane
-      ? `ema lane claim --lane ${recommendedLane.id} --actor ${actor} --scope "<scope>" --goal "<goal>" --next "<next>" --json`
+      ? renderScopedEmaCommand(commandContext, ["lane", "claim", "--lane", recommendedLane.id, "--actor", actor, "--scope", "<scope>", "--goal", "<goal>", "--next", "<next>", "--json"])
       : readyQueueItem
-        ? `ema queue show --queue-item ${readyQueueItem.id} --json`
-        : "ema agent orient --json";
+        ? renderScopedEmaCommand(commandContext, ["queue", "show", "--queue-item", readyQueueItem.id, "--json"])
+        : renderScopedEmaCommand(commandContext, ["agent", "orient", "--json"]);
 
   const payload = {
     ok: true,

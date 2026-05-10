@@ -9,9 +9,12 @@ import { connect, type ProjectionEnvelope } from "../ws-client.js";
 import { emitJson, emitPretty } from "../output.js";
 import { reportError } from "./ping.js";
 import { runStubContract } from "./stub-contract.js";
+import { buildReadiness, type ReadinessBlocker } from "./readiness.js";
 
 interface DoctorReport {
 	ok: boolean;
+	health_ok: boolean;
+	readiness_ok: boolean;
 	daemon: string;
 	canonical_phase: string | null;
 	blueprint: {
@@ -38,6 +41,9 @@ interface DoctorReport {
 		by_alley: Record<string, { open: number; closed: number }>;
 	};
 	subsystems: Array<{ id: string; status: "ok" | "partial" | "missing"; note: string }>;
+	roadmap_gaps: Array<{ id: string; status: "partial" | "missing"; note: string }>;
+	blocking_failures: Array<{ id: string; message: string }>;
+	readiness_blockers: ReadinessBlocker[];
 }
 
 async function readChannel<T>(channel: string, timeoutMs: number): Promise<T | null> {
@@ -107,14 +113,15 @@ export async function runDoctor(args: ParsedArgs): Promise<number> {
 		return runStubContract(args, {
 			noun: "doctor",
 			status: "available",
-			usage: "Usage: ema doctor [--json]",
+			usage: "Usage: ema doctor [--strict] [--json]",
 			docRef: "docs/cli/agent-workspace.md",
 			commands: [
-				{ verb: "run", flags: ["json"], summary: "Check daemon projections, Blueprint, workspace, gaps, and subsystem readiness." },
+				{ verb: "run", flags: ["strict", "json"], summary: "Check daemon health separately from execution readiness blockers." },
 			],
 		});
 	}
 	const json = flagBool(args, "json");
+	const strict = flagBool(args, "strict");
 	try {
 		const [bp, planner, graph, vcal, laneReg, queueReg] = await Promise.all([
 			readChannel<BlueprintProj>("blueprint.sections", 1500),
@@ -166,12 +173,25 @@ export async function runDoctor(args: ParsedArgs): Promise<number> {
 		];
 
 		const phase = (vcal?.current_phase ?? null) || null;
-		const subsystemStatuses = subsystems.map((s) => s.status);
-		const overallOk =
-			subsystemStatuses.filter((s) => s === "missing").length === 0 && phase !== null;
+		const projectionFailures: DoctorReport["blocking_failures"] = [];
+		const allProjectionReadsTimedOut = [bp, planner, graph, vcal, laneReg, queueReg].every((value) => value === null);
+		if (allProjectionReadsTimedOut) {
+			projectionFailures.push({ id: "daemon.websocket", message: "no daemon projections received before timeout" });
+		}
+		if (!vcal) projectionFailures.push({ id: "vcalendar.state", message: "missing vcalendar.state projection" });
+		if (!laneReg) projectionFailures.push({ id: "lane.registry", message: "missing lane.registry projection" });
+		if (!queueReg) projectionFailures.push({ id: "queue.registry", message: "missing queue.registry projection" });
+		const roadmapGaps = subsystems
+			.filter((s): s is { id: string; status: "partial" | "missing"; note: string } => s.status === "partial" || s.status === "missing")
+			.map((s) => ({ id: s.id, status: s.status, note: s.note }));
+		const readiness = await buildReadiness(args);
+		const healthOk = projectionFailures.length === 0;
+		const readinessOk = healthOk && readiness.report.blockers.length === 0;
 
 		const report: DoctorReport = {
-			ok: overallOk,
+			ok: healthOk,
+			health_ok: healthOk,
+			readiness_ok: readinessOk,
 			daemon: "ws://127.0.0.1:49555",
 			canonical_phase: phase,
 			blueprint: {
@@ -198,11 +218,14 @@ export async function runDoctor(args: ParsedArgs): Promise<number> {
 				by_alley: gapsByAlley,
 			},
 			subsystems,
+			roadmap_gaps: roadmapGaps,
+			blocking_failures: projectionFailures,
+			readiness_blockers: readiness.report.blockers,
 		};
 
 		if (json) {
 			emitJson(report);
-			return overallOk ? 0 : 1;
+			return strict ? (readinessOk ? 0 : 1) : (healthOk ? 0 : 1);
 		}
 
 		emitPretty(`# ema doctor`);
@@ -221,8 +244,20 @@ export async function runDoctor(args: ParsedArgs): Promise<number> {
 			emitPretty(`  [${emoji(s.status)}] ${s.id.padEnd(38)} ${s.note}`);
 		}
 		emitPretty("");
-		emitPretty(`overall:          ${overallOk ? "ok" : "needs attention"}`);
-		return overallOk ? 0 : 1;
+		if (projectionFailures.length > 0) {
+			emitPretty("blocking failures:");
+			for (const failure of projectionFailures) emitPretty(`  - ${failure.id}: ${failure.message}`);
+			emitPretty("");
+		}
+		if (report.readiness_blockers.length > 0) {
+			emitPretty("readiness blockers:");
+			for (const blocker of report.readiness_blockers) emitPretty(`  - ${blocker.id}: ${blocker.reason}`);
+			emitPretty("");
+		}
+		emitPretty(`health:           ${healthOk ? "ok" : "blocked"}`);
+		emitPretty(`readiness:        ${readinessOk ? "ok" : "execution blockers remain"}`);
+		if (!strict && report.readiness_blockers.length > 0) emitPretty("strict mode:      `ema doctor --strict` exits nonzero while readiness blockers remain");
+		return strict ? (readinessOk ? 0 : 1) : (healthOk ? 0 : 1);
 	} catch (err) {
 		return reportError(err, json);
 	}

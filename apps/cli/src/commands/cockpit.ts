@@ -8,7 +8,7 @@ import { emitError, emitJson, emitPretty } from "../output.js";
 import { DESKTOP_ROOT } from "../workspace-state.js";
 import { resolveWorkspaceScope, type WorkspaceScope } from "../workspace-scope.js";
 import { loadIntentionProjection } from "./intention.js";
-import { readProjectionBatch } from "./workspace-daemon.js";
+import { readProjectionBatch, renderEmaCommand } from "./workspace-daemon.js";
 
 const execFileAsync = promisify(execFile);
 const ACTIVE_BUILDS_ROOT = join(DESKTOP_ROOT, "Active builds");
@@ -661,8 +661,8 @@ function agentWorkpackFor(projection: CockpitProjection) {
   const readyQueue = projection.queue.filter((item) => item.status === "ready").slice(0, 8);
   const projectName = projection.project.name ?? "proslync-app-ios-final";
   const claimCommand = activeOrReadyLane
-    ? `ema lane claim --lane ${activeOrReadyLane.id} --actor actor:codex --scope "<paths>" --goal "<goal>" --next "<next step>"`
-    : `ema lane open --project ${projectName} --title "<slice title>" --scope "<paths>" --done-when "<done criteria>"`;
+    ? renderEmaCommand(["lane", "claim", "--project", projectName, "--lane", activeOrReadyLane.id, "--actor", "actor:codex", "--scope", "<paths>", "--goal", "<goal>", "--next", "<next step>"])
+    : renderEmaCommand(["lane", "open", "--project", projectName, "--title", "<slice title>", "--scope", "<paths>", "--done-when", "<done criteria>"]);
 
   return {
     mode: "multi-repo-agent-work",
@@ -690,8 +690,8 @@ function agentWorkpackFor(projection: CockpitProjection) {
       local_url: surface.local_url,
     })),
     kickoff_commands: [
-      `ema cockpit projection --project ${projectName} --json`,
-      `ema cockpit intentions --project ${projectName} --json`,
+      renderEmaCommand(["cockpit", "projection", "--project", projectName, "--json"]),
+      renderEmaCommand(["cockpit", "intentions", "--project", projectName, "--json"]),
       claimCommand,
     ],
     verification_commands: [

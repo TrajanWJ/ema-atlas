@@ -60,8 +60,8 @@ export async function runLane(args: ParsedArgs): Promise<number> {
       },
       {
         verb: "show",
-        flags: ["lane"],
-        required: ["lane"],
+        flags: ["project", "all-projects", "lane", "id"],
+        required: ["lane or id"],
         summary: "Show lane owner, scope, protected paths, queue items, blockers, and handoffs.",
       },
       {
@@ -214,9 +214,9 @@ async function runClose(args: ParsedArgs): Promise<number> {
 
 async function runShow(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
-  const laneId = flagString(args, "lane");
+  const laneId = flagString(args, "lane") ?? flagString(args, "id");
   if (!laneId) {
-    emitError("ema lane show: --lane is required");
+    emitError("ema lane show: --lane or --id is required");
     return 64;
   }
   const lanes = await loadLanes(args);
@@ -224,13 +224,17 @@ async function runShow(args: ParsedArgs): Promise<number> {
   const lane = lanes.items.find((item) => item.id === laneId || item.lane_id === laneId) ?? null;
   if (json) {
     emitJson({
-      ok: true,
+      ok: lane !== null,
       source: "lane.registry",
       daemon_authority: "canonical_events",
       workspace_scope: lanes.context.scope,
       all_projects: lanes.context.allProjects,
       filter: lanes.context.allProjects ? "all_projects" : "project",
       lane,
+      error: lane ? null : {
+        class: "not_found",
+        message: `lane not found in resolved workspace scope: ${laneId}`,
+      },
     });
   }
   else if (!lane) emitPretty(`lane not found: ${laneId}`);

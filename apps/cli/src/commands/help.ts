@@ -10,13 +10,25 @@ export interface CommandInfo {
 export const COMMANDS: CommandInfo[] = [
   { name: "ping", summary: "Handshake with the daemon and print round-trip ms." },
   { name: "status", summary: "Print home-current topbar selection plus resolved workspace scope." },
+  { name: "bootstrap status", summary: "Run the fast CLI/daemon/data readiness gate for agent work." },
+  { name: "readiness", summary: "Report current substrate translation and Proslync execution readiness truth." },
+  { name: "capability list/assert", summary: "Classify substrate capabilities and fail on missing required rails." },
+  { name: "db status/events/snapshot", summary: "Inspect canonical SQLite tables, row counts, and event rows." },
+  { name: "workspace artifact add/update/list/show/link/archive", summary: "Manage shared workspace artifacts through daemon-canonical artifact events." },
+  { name: "execution list/show/timeline", summary: "Read canonical dispatch/execution/tool event timelines." },
+  { name: "dispatch list", summary: "List dispatch records from canonical events." },
+  { name: "proslync bootstrap", summary: "Return the Proslync-first bootstrap workpack and readiness gate." },
   { name: "org create", summary: "Create an organization and its same-name default space." },
   { name: "space create", summary: "Create a space inside an organization." },
   { name: "project create", summary: "Create a project inside an organization space." },
+  { name: "actor register/list/show", summary: "Register and inspect canonical actors." },
+  { name: "intent create/list/show/update", summary: "Create and advance canonical pipeline-floor intents." },
+  { name: "proposal create/list/show/approve/reject", summary: "Create and decide proposals under intents." },
+  { name: "canon write/list/show/supersede", summary: "Write and inspect canonical execution result and doctrine nodes." },
   { name: "cockpit summary/projection", summary: "Inspect project/client cockpit state, active builds, vApp surfaces, lanes, and queue." },
   { name: "cockpit builds/surfaces/lanes/queue/open", summary: "List active builds, surfaces, lanes, queue, or print the cockpit URL." },
-  { name: "intention harvest/projection/list/show", summary: "Mine sessions/docs for reviewable lost intentions." },
-  { name: "intention backfeed", summary: "Convert an approved harvested intention into queue/lane work." },
+  { name: "intention harvest/projection/list/show/review", summary: "Mine sessions/docs for reviewable lost intentions." },
+  { name: "intention backfeed", summary: "Convert an approved harvested intention into queue/artifact work." },
   { name: "tl about", summary: "Show daemon-backed lane/queue records, fallback workspace records, and current vCalendar phase." },
   { name: "/tl about", summary: "Alias for `ema tl about`; matches slash-command muscle memory." },
   { name: "agent orient", summary: "Print the enforced agent orientation checklist and workspace summary." },
@@ -78,7 +90,7 @@ export async function runHelp(args: ParsedArgs): Promise<number> {
   }
   emitPretty("");
   emitPretty(
-    "Orientation: ema cockpit summary --json; ema intention projection --json; ema tl about --json; ema status --json; ema agent orient --json; ema vcalendar tick --json",
+    "Orientation: ema ping --json; ema status --json; ema tl about --summary --json; ema vcalendar tick --json; ema doctor --json; add --project <name-or-id> when the task names a project.",
   );
   emitPretty("Full command grammar: docs/cli/agent-workspace.md and docs/cli/see-agent-work.md");
   return 0;

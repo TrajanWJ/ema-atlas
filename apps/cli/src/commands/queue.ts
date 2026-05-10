@@ -60,8 +60,8 @@ export async function runQueue(args: ParsedArgs): Promise<number> {
       },
       {
         verb: "show",
-        flags: ["queue-item"],
-        required: ["queue-item"],
+        flags: ["project", "all-projects", "queue-item", "id"],
+        required: ["queue-item or id"],
         summary: "Show a queue item, its dependencies, evidence, and ready condition.",
       },
       {
@@ -165,9 +165,9 @@ async function runClose(args: ParsedArgs): Promise<number> {
 
 async function runShow(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
-  const itemId = flagString(args, "queue-item");
+  const itemId = flagString(args, "queue-item") ?? flagString(args, "id");
   if (!itemId) {
-    emitError("ema queue show: --queue-item is required");
+    emitError("ema queue show: --queue-item or --id is required");
     return 64;
   }
   const queue = await loadQueue(args);
@@ -175,13 +175,17 @@ async function runShow(args: ParsedArgs): Promise<number> {
   const item = queue.items.find((record) => record.id === itemId || record.queue_item_id === itemId) ?? null;
   if (json) {
     emitJson({
-      ok: true,
+      ok: item !== null,
       source: "queue.registry",
       daemon_authority: "canonical_events",
       workspace_scope: queue.context.scope,
       all_projects: queue.context.allProjects,
       filter: queue.context.allProjects ? "all_projects" : "project",
       queue_item: item,
+      error: item ? null : {
+        class: "not_found",
+        message: `queue item not found in resolved workspace scope: ${itemId}`,
+      },
     });
   }
   else if (!item) emitPretty(`queue item not found: ${itemId}`);

@@ -89,7 +89,8 @@ export function workspaceSummary(opts: WorkspaceSummaryOptions = {}): WorkspaceS
     records,
     tick: vcalendarTick(now),
     enforcement: [
-      "Start every agent session with `ema next --json`, `ema tl about --summary --json`, and `ema vcalendar tick --json`.",
+      "Start every agent session with `ema ping --json`, `ema status --json`, `ema tl about --summary --json`, `ema vcalendar tick --json`, and `ema doctor --json`.",
+      "When a task names a project, run task-layer commands with `--project <name-or-id>`; use unscoped `next` only for environment-level work.",
       "Claim or open a lane before broad edits; keep work inside that scope.",
       "When later work appears, log it as a queue item with why, dependency, done-when, and source.",
       "When a blocker recurs, log a problem and candidate solution edge.",
@@ -211,7 +212,7 @@ function phaseFor(minutes: number): {
       mode: "planning",
       instructions: [
         "Read orientation docs.",
-        "Run `ema status --json` and `ema agent orient --json`.",
+        "Run `ema status --json`; when the task names a project, run `ema agent orient --project <project> --json`.",
         "Pick or open the lane before editing.",
       ],
     };

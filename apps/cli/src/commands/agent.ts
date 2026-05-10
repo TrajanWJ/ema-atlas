@@ -5,7 +5,7 @@ import { withDaemonWorkspaceRecords, workspaceSummary } from "../workspace-state
 import { resolveWorkspaceScope } from "../workspace-scope.js";
 import { loadRecentWorkspaceTrail } from "../workspace-trail.js";
 import { runStubContract } from "./stub-contract.js";
-import { DEFAULT_ACTOR, DEFAULT_ORG, readProjection, sendWorkspaceCommand } from "./workspace-daemon.js";
+import { DEFAULT_ACTOR, DEFAULT_ORG, readProjection, renderScopedEmaCommand, sendWorkspaceCommand } from "./workspace-daemon.js";
 
 const DOC_REF = "docs/cli/agent-workspace.md";
 
@@ -286,6 +286,10 @@ async function runMetaProgress(args: ParsedArgs): Promise<number> {
   const blockedQueue = daemonRecent.queue.filter((item) => item.status === "blocked");
   const readyQueue = daemonRecent.queue.filter((item) => item.status === "ready");
   const latestReports = reports.slice(0, 5);
+  const commandContext = {
+    scope: daemonRecent.workspace_scope,
+    allProjects: daemonRecent.all_projects,
+  };
   const nextAction = activeLane
     ? `continue ${activeLane.id}: ${activeLane.title}`
     : readyLanes[0]
@@ -294,7 +298,7 @@ async function runMetaProgress(args: ParsedArgs): Promise<number> {
         ? `pull ${readyQueue[0].id}: ${readyQueue[0].title}`
         : blockedQueue[0]
           ? `unblock ${blockedQueue[0].id}: ${blockedQueue[0].title}`
-          : "run ema next --json";
+          : `run ${renderScopedEmaCommand(commandContext, ["next", "--json"])}`;
   const summary = {
     source: daemonRecent.source,
     daemon_authority: daemonRecent.daemon_authority,
@@ -325,11 +329,13 @@ async function runMetaProgress(args: ParsedArgs): Promise<number> {
     latest_reports: latestReports,
     next_action: nextAction,
     commands: [
-      "ema tl about --json",
-      "ema agent meta-progress --json",
-      activeLane ? `ema lane show --lane ${activeLane.id} --json` : "ema lane list --json",
-      "ema queue list --json",
-      "ema vcalendar tick --json",
+      renderScopedEmaCommand(commandContext, ["tl", "about", "--json"]),
+      renderScopedEmaCommand(commandContext, ["agent", "meta-progress", "--json"]),
+      activeLane
+        ? renderScopedEmaCommand(commandContext, ["lane", "show", "--lane", activeLane.id, "--json"])
+        : renderScopedEmaCommand(commandContext, ["lane", "list", "--json"]),
+      renderScopedEmaCommand(commandContext, ["queue", "list", "--json"]),
+      renderScopedEmaCommand(commandContext, ["vcalendar", "tick", "--json"]),
     ],
   };
 
@@ -503,14 +509,17 @@ async function runOrient(args: ParsedArgs): Promise<number> {
       path: `daemon://queue.registry/${item.id}`,
     })),
   });
+  const commandContext = { scope, allProjects };
   const commands = [
-    "ema tl about --json",
-    "ema status --json",
-    "ema next --json",
+    renderScopedEmaCommand(commandContext, ["ping", "--json"]),
+    renderScopedEmaCommand(commandContext, ["status", "--json"]),
+    renderScopedEmaCommand(commandContext, ["tl", "about", "--summary", "--json"]),
+    renderScopedEmaCommand(commandContext, ["vcalendar", "tick", "--json"]),
+    renderScopedEmaCommand(commandContext, ["doctor", "--json"]),
+    renderScopedEmaCommand(commandContext, ["next", "--json"]),
     "ema lane --help",
     "ema queue --help",
     "ema problem --help",
-    "ema vcalendar tick --json",
   ];
   const activeLane = daemonRecent.lanes.find(
     (lane) => lane.actor_id === actor && lane.status !== "done",
@@ -523,12 +532,12 @@ async function runOrient(args: ParsedArgs): Promise<number> {
   );
   const blockedQueueItems = daemonRecent.queue.filter((item) => item.status === "blocked");
   const nextSuggestedCliCommand = activeLane
-    ? `ema lane show --lane ${activeLane.id} --json`
+    ? renderScopedEmaCommand(commandContext, ["lane", "show", "--lane", activeLane.id, "--json"])
     : recommendedNextLane
-      ? `ema lane claim --lane ${recommendedNextLane.id} --actor ${actor} --scope "<scope>" --goal "<goal>" --next "<next>" --json`
+      ? renderScopedEmaCommand(commandContext, ["lane", "claim", "--lane", recommendedNextLane.id, "--actor", actor, "--scope", "<scope>", "--goal", "<goal>", "--next", "<next>", "--json"])
       : blockedQueueItems[0]
-        ? `ema queue show --queue-item ${blockedQueueItems[0].id} --json`
-        : "ema next --json";
+        ? renderScopedEmaCommand(commandContext, ["queue", "show", "--queue-item", blockedQueueItems[0].id, "--json"])
+        : renderScopedEmaCommand(commandContext, ["next", "--json"]);
 
   if (json) {
     emitJson({

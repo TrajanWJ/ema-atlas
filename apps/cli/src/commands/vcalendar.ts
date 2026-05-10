@@ -217,7 +217,7 @@ function instructionsForPhase(phase: string, fallback: string[]): string[] {
     case "intake and orientation":
       return [
         "Read orientation docs.",
-        "Run `ema status --json` and `ema agent orient --json`.",
+        "Run `ema status --json`; when the task names a project, run `ema agent orient --project <project> --json`.",
         "Pick or open the lane before editing.",
       ];
     case "planning and lane claim":

@@ -2,8 +2,8 @@
 // Positional args are collected in order. Good enough for wave-1 grammar.
 
 export interface ParsedArgs {
-  positional: string[];
-  flags: Record<string, string | boolean>;
+	positional: string[];
+	flags: Record<string, string | boolean | string[]>;
 }
 
 export function parseArgs(argv: string[]): ParsedArgs {
@@ -18,25 +18,52 @@ export function parseArgs(argv: string[]): ParsedArgs {
     const body = tok.slice(2);
     const eq = body.indexOf("=");
     if (eq !== -1) {
-      flags[body.slice(0, eq)] = body.slice(eq + 1);
-      continue;
-    }
-    const next = argv[i + 1];
-    if (next !== undefined && !next.startsWith("--")) {
-      flags[body] = next;
-      i += 1;
-    } else {
-      flags[body] = true;
-    }
-  }
-  return { positional, flags };
+			setFlag(flags, body.slice(0, eq), body.slice(eq + 1));
+			continue;
+		}
+		const next = argv[i + 1];
+		if (next !== undefined && !next.startsWith("--")) {
+			setFlag(flags, body, next);
+			i += 1;
+		} else {
+			setFlag(flags, body, true);
+		}
+	}
+	return { positional, flags };
 }
 
 export function flagString(args: ParsedArgs, name: string): string | undefined {
-  const v = args.flags[name];
-  return typeof v === "string" ? v : undefined;
+	const v = args.flags[name];
+	if (Array.isArray(v)) return v.at(-1);
+	return typeof v === "string" ? v : undefined;
 }
 
 export function flagBool(args: ParsedArgs, name: string): boolean {
-  return args.flags[name] === true || args.flags[name] === "true";
+	return args.flags[name] === true || args.flags[name] === "true";
+}
+
+export function flagStrings(args: ParsedArgs, name: string): string[] {
+	const v = args.flags[name];
+	if (Array.isArray(v)) return v;
+	if (typeof v === "string") return [v];
+	return [];
+}
+
+function setFlag(
+	flags: Record<string, string | boolean | string[]>,
+	name: string,
+	value: string | boolean,
+): void {
+	const current = flags[name];
+	if (current === undefined) {
+		flags[name] = value;
+		return;
+	}
+	const currentValues = Array.isArray(current)
+		? current
+		: typeof current === "string"
+			? [current]
+			: [];
+	if (typeof value === "string") flags[name] = [...currentValues, value];
+	else flags[name] = value;
 }

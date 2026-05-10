@@ -36,6 +36,17 @@ import { runRecovery } from "./commands/recovery.js";
 import { runCwt } from "./commands/cwt.js";
 import { runCockpit } from "./commands/cockpit.js";
 import { runIntention } from "./commands/intention.js";
+import { runActor } from "./commands/actor.js";
+import { runIntent } from "./commands/intent.js";
+import { runProposal } from "./commands/proposal.js";
+import { runCanon } from "./commands/canon.js";
+import { runBootstrap } from "./commands/bootstrap.js";
+import { runCapability } from "./commands/capability.js";
+import { runDb } from "./commands/db.js";
+import { runWorkspace } from "./commands/workspace.js";
+import { runExecution, runDispatch } from "./commands/execution.js";
+import { runProslync } from "./commands/proslync.js";
+import { runReadiness } from "./commands/readiness.js";
 
 async function main(): Promise<number> {
   const [, , cmd, ...rest] = process.argv;
@@ -108,6 +119,30 @@ async function main(): Promise<number> {
       return runCockpit(args);
     case "intention":
       return runIntention(args);
+    case "actor":
+      return runActor(args);
+    case "intent":
+      return runIntent(args);
+    case "proposal":
+      return runProposal(args);
+    case "canon":
+      return runCanon(args);
+    case "bootstrap":
+      return runBootstrap(args);
+    case "capability":
+      return runCapability(args);
+    case "db":
+      return runDb(args);
+    case "workspace":
+      return runWorkspace(args);
+    case "execution":
+      return runExecution(args);
+    case "dispatch":
+      return runDispatch(args);
+    case "proslync":
+      return runProslync(args);
+    case "readiness":
+      return runReadiness(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

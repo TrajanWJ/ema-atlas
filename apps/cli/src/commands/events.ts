@@ -4,6 +4,22 @@ import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { reportError } from "./ping.js";
 import { runStubContract } from "./stub-contract.js";
+import { CANONICAL_DB, parseLimit, sqlEscape, sqliteJson } from "./substrate-utils.js";
+
+type EventRow = {
+  txid: number;
+  event_id: string;
+  kind: string;
+  ts?: string | null;
+  actor?: string | null;
+  org_id?: string | null;
+  space_id?: string | null;
+  project_id?: string | null;
+  dispatch_id?: string | null;
+  execution_id?: string | null;
+  payload_json?: unknown;
+  payload?: unknown;
+};
 
 export async function runEvents(args: ParsedArgs): Promise<number> {
   const sub = args.positional[0];
@@ -14,11 +30,13 @@ export async function runEvents(args: ParsedArgs): Promise<number> {
       docRef: "packages/contracts/ipc/shell-protocol.md",
       commands: [
         { verb: "tail", flags: ["family", "kind", "since", "json"], summary: "Stream daemon events line-by-line until interrupted." },
+        { verb: "list", flags: ["kind", "limit", "project", "json"], summary: "Read recent canonical event rows from SQLite." },
       ],
     });
   }
+  if (sub === "list") return listEvents(args);
   if (sub !== "tail") {
-    emitError(`ema events: unknown subcommand "${sub ?? ""}" (expected: tail)`);
+    emitError(`ema events: unknown subcommand "${sub ?? ""}" (expected: tail | list)`);
     return 64;
   }
   const json = flagBool(args, "json");
@@ -90,5 +108,49 @@ export async function runEvents(args: ParsedArgs): Promise<number> {
     return 0;
   } catch (err) {
     return reportError(err, json);
+  }
+}
+
+function listEvents(args: ParsedArgs): number {
+  const json = flagBool(args, "json");
+  const kind = flagString(args, "kind");
+  const project = flagString(args, "project");
+  const limit = parseLimit(flagString(args, "limit"), 50);
+  const clauses = [
+    kind ? `kind like '${sqlEscape(kind.replace(/\*$/, "%"))}'` : "",
+    project ? `(project_id = '${sqlEscape(project)}' or project_id is null or project_id = '')` : "",
+  ].filter(Boolean);
+  const rows = sqliteJson<EventRow>(CANONICAL_DB, `
+    select txid, event_id, kind, ts, actor, org_id, space_id, project_id,
+           dispatch_id, execution_id, payload_json
+    from events
+    ${clauses.length ? `where ${clauses.join(" and ")}` : ""}
+    order by txid desc
+    limit ${limit};
+  `).map((row) => ({
+    ...row,
+    payload: parsePayload(row.payload_json),
+  }));
+  const payload = {
+    ok: true,
+    command: "events.list",
+    source: "canonical_sqlite",
+    daemon_authority: "canonical_events",
+    kind: kind ?? null,
+    project: project ?? null,
+    limit,
+    events: rows,
+  };
+  if (json) emitJson(payload);
+  else for (const row of rows) emitPretty(`${row.txid} ${row.kind} ${row.event_id}`);
+  return 0;
+}
+
+function parsePayload(value: unknown): unknown {
+  if (typeof value !== "string") return null;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
   }
 }

@@ -29,6 +29,37 @@ export async function workspaceScopeContext(args: ParsedArgs): Promise<Workspace
   };
 }
 
+export function shellArg(value: string): string {
+  return /^[A-Za-z0-9_./:@%+=,-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\"'\"'")}'`;
+}
+
+export function workspaceScopeFlagParts(
+  scope: WorkspaceScope | null | undefined,
+  allProjects = false,
+): string[] {
+  if (allProjects) return ["--all-projects"];
+  const project = scope?.project_name ?? scope?.project_id ?? null;
+  return project ? ["--project", project] : [];
+}
+
+export function renderEmaCommand(parts: readonly string[]): string {
+  return ["ema", ...parts].map(shellArg).join(" ");
+}
+
+export function renderScopedEmaCommand(
+  context: WorkspaceScopeContext | { scope: WorkspaceScope | null | undefined; allProjects?: boolean },
+  parts: readonly string[],
+): string {
+  const scopeParts = workspaceScopeFlagParts(context.scope, context.allProjects ?? false);
+  const firstFlag = parts.findIndex((part) => part.startsWith("--"));
+  const insertAt = firstFlag === -1 ? parts.length : firstFlag;
+  return renderEmaCommand([
+    ...parts.slice(0, insertAt),
+    ...scopeParts,
+    ...parts.slice(insertAt),
+  ]);
+}
+
 export function filterProjectScopedRecords<T extends ProjectScopedRecord>(
   records: readonly T[],
   context: WorkspaceScopeContext,

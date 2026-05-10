@@ -1,8 +1,10 @@
 import { execFile } from "node:child_process";
+import { join } from "node:path";
 import { promisify } from "node:util";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
+import { DESKTOP_ROOT, EMA_ACTIVE_BUILD } from "../workspace-state.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -32,7 +34,7 @@ function runHelp(args: ParsedArgs): number {
 }
 
 async function runScan(args: ParsedArgs): Promise<number> {
-  const script = "tooling/recovery/desktop-recovery-scan.mjs";
+  const script = join(EMA_ACTIVE_BUILD, "tooling", "recovery", "desktop-recovery-scan.mjs");
   const argv = [script];
   if (flagBool(args, "json")) argv.push("--json");
   const limit = flagString(args, "limit");
@@ -47,7 +49,11 @@ async function runScan(args: ParsedArgs): Promise<number> {
   if (confidence) argv.push("--confidence", confidence);
   try {
     const { stdout } = await execFileAsync("node", argv, {
-      cwd: process.cwd(),
+      cwd: EMA_ACTIVE_BUILD,
+      env: {
+        ...process.env,
+        EMA_DESKTOP_ROOT: DESKTOP_ROOT,
+      },
       maxBuffer: 20 * 1024 * 1024,
     });
     process.stdout.write(stdout);

@@ -7,6 +7,7 @@ import { emitError, emitJson, emitPretty } from "../output.js";
 import { DESKTOP_ROOT } from "../workspace-state.js";
 import { resolveWorkspaceScope } from "../workspace-scope.js";
 import { runQueue } from "./queue.js";
+import { runWorkspace } from "./workspace.js";
 
 type SourceType =
   | "codex_session"
@@ -90,12 +91,13 @@ export async function runIntention(args: ParsedArgs): Promise<number> {
   if (verb === "list") return list(args);
   if (verb === "show") return show(args);
   if (verb === "backfeed") return backfeed(args);
+  if (verb === "review") return reviewFromVerb(args);
   if (verb === "accept") return reviewIntent(args, "accepted");
   if (verb === "reject") return reviewIntent(args, "rejected");
   if (verb === "defer") return reviewIntent(args, "deferred");
 
   emitError(`ema intention: unknown subcommand "${verb}"`);
-  emitError("Usage: ema intention [harvest|projection|list|show|accept|reject|defer|backfeed] [--project <name>] [--json]");
+  emitError("Usage: ema intention [harvest|projection|list|show|review|accept|reject|defer|backfeed] [--project <name>] [--json]");
   return 64;
 }
 
@@ -177,8 +179,8 @@ async function backfeed(args: ParsedArgs): Promise<number> {
     return 64;
   }
   const destination = flagString(args, "destination") ?? "queue";
-  if (destination !== "queue") {
-    emitError("ema intention backfeed: only --destination queue is supported in this slice");
+  if (destination !== "queue" && destination !== "artifact") {
+    emitError("ema intention backfeed: --destination must be queue or artifact");
     return 64;
   }
 
@@ -190,11 +192,20 @@ async function backfeed(args: ParsedArgs): Promise<number> {
   }
   const { projection: value, intent } = found;
 
-  const targetProject = targetProjectForIntent(value.project ?? DEFAULT_PROJECT, intent);
+  const targetProject = flagString(args, "project") ?? targetProjectForIntent(value.project ?? DEFAULT_PROJECT, intent);
   const queueCommand = queueAddCommand(targetProject, intent);
   if (flagBool(args, "dry-run")) {
-    emit(args, { ok: true, command: "intention.backfeed", mode: "dry_run", target_project: targetProject, queue_command: queueCommand, intent }, () => {
-      emitPretty(queueCommand.join(" "));
+    emit(args, {
+      ok: true,
+      command: "intention.backfeed",
+      mode: "dry_run",
+      destination,
+      target_project: targetProject,
+      queue_command: destination === "queue" ? queueCommand : null,
+      artifact_preview: destination === "artifact" ? artifactBody(intent) : null,
+      intent,
+    }, () => {
+      emitPretty(destination === "queue" ? queueCommand.join(" ") : artifactBody(intent));
     });
     return 0;
   }
@@ -208,6 +219,20 @@ async function backfeed(args: ParsedArgs): Promise<number> {
     return 64;
   }
 
+  if (destination === "artifact") {
+    const bodyPath = writeBackfeedBody(intent);
+    return runWorkspace({
+      positional: ["artifact", "add"],
+      flags: {
+        ...args.flags,
+        project: targetProject,
+        kind: "note",
+        title: intent.title,
+        "body-file": bodyPath,
+      },
+    });
+  }
+
   return runQueue({
     positional: ["add"],
     flags: {
@@ -219,6 +244,15 @@ async function backfeed(args: ParsedArgs): Promise<number> {
       source: intent.evidence_ref,
     },
   });
+}
+
+async function reviewFromVerb(args: ParsedArgs): Promise<number> {
+  const raw = flagString(args, "state") as ReviewState | undefined;
+  if (raw !== "accepted" && raw !== "rejected" && raw !== "deferred") {
+    emitError("ema intention review: --state must be accepted, rejected, or deferred");
+    return 64;
+  }
+  return reviewIntent(args, raw);
 }
 
 async function reviewIntent(args: ParsedArgs, state: Exclude<ReviewState, "new">): Promise<number> {
@@ -271,8 +305,9 @@ function printHelp(): void {
   emitPretty("  ema intention accept --intent <id> --reason <text> --reviewer actor:trajan [--json]");
   emitPretty("  ema intention reject --intent <id> --reason <text> --reviewer actor:trajan [--json]");
   emitPretty("  ema intention defer --intent <id> --reason <text> --reviewer actor:trajan [--json]");
+  emitPretty("  ema intention review --intent <id> --state accepted|rejected|deferred --reason <text> [--json]");
   emitPretty("  ema intention backfeed --intent <id> --destination queue --dry-run [--json]");
-  emitPretty("  ema intention backfeed --intent <id> --destination queue --approve reviewed [--json]");
+  emitPretty("  ema intention backfeed --intent <id> --destination queue|artifact --approve reviewed [--json]");
 }
 
 function printProjection(value: IntentionProjection): void {
@@ -711,6 +746,34 @@ function queueAddCommand(project: string, intent: IntentionCard): string[] {
     "--source",
     shellQuote(intent.evidence_ref),
   ];
+}
+
+function artifactBody(intent: IntentionCard): string {
+  return [
+    `# ${intent.title}`,
+    "",
+    `Intent ID: \`${intent.id}\``,
+    `Review state: \`${intent.review_state}\``,
+    `Recommended destination: \`${intent.recommended_destination}\``,
+    `Evidence: \`${intent.evidence_ref}\``,
+    `Source: \`${intent.source_path}\``,
+    "",
+    "## Raw Text",
+    "",
+    intent.raw_text,
+    "",
+    "## Tags",
+    "",
+    intent.tags.map((tag) => `- ${tag}`).join("\n") || "- none",
+  ].join("\n");
+}
+
+function writeBackfeedBody(intent: IntentionCard): string {
+  const dir = join(STORE_ROOT, "backfeed-bodies");
+  mkdirSync(dir, { recursive: true });
+  const path = join(dir, `${safeName(intent.id)}.md`);
+  writeFileSync(path, artifactBody(intent) + "\n");
+  return path;
 }
 
 function safeName(value: string): string {

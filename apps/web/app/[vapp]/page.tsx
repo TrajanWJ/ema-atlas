@@ -7,9 +7,10 @@ import type { AppId } from "@/src/types/window";
 
 const LEGACY_PANEL_ALIASES = {
 	braindump: "brain-dump",
+	"active-builds": "git-ema",
 } as const satisfies Record<string, AppId>;
 
-const PANEL_ROUTE_IDS = ["braindump", ...APP_IDS] as const;
+const PANEL_ROUTE_IDS = ["braindump", "active-builds", ...APP_IDS] as const;
 
 type PageProps = {
 	readonly params: Promise<{ readonly vapp: string }>;

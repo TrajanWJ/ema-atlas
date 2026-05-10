@@ -47,7 +47,7 @@ const CASES: readonly VappCase[] = [
 	{
 		appId: "git-ema",
 		path: "/git-ema?test=1",
-		assertions: [/git-ema/i, /Attachments/i],
+		assertions: [/Active builds/i, /Source attachments/i],
 	},
 	{
 		appId: "clients",

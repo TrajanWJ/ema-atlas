@@ -26,6 +26,7 @@ export type VAppId = AppId;
 
 const URL_VAPP_ALIASES = {
 	braindump: "brain-dump",
+	"active-builds": "git-ema",
 	// `?vapp=cwt` historically targeted the cwt iframe stub; Slice 4 of
 	// the EMA-absorbs-cwt migration replaced it with the in-process
 	// `cockpit` vApp. The alias keeps the existing deep-link working.

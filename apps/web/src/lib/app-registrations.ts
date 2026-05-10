@@ -976,7 +976,7 @@ export function registerAllApps(): void {
 
 	registerApp({
 		id: "git-ema",
-		name: "git-ema",
+		name: "Active builds",
 		icon: icon(FolderIcon),
 		defaultSize: sizeOf("git-ema"),
 		titlebarDotColor: "#ec4899",

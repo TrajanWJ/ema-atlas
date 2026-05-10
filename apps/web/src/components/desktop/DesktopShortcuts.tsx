@@ -211,7 +211,7 @@ const APP_DESCRIPTIONS: Record<AppId, string> = {
 	cwt: 'Current work, clients, projects, lanes, and queue',
 	cockpit: 'Client cockpit for Proslync builds, lanes, queue, intentions, and surfaces',
 	clients: 'Client record boundary and CWT launch targets',
-	"git-ema": 'Connectors, repos, attachments — daemon-owned',
+	"git-ema": 'Desktop active builds, project records, and source attachments',
 	"agent-work": 'Lanes, missions, queues, vcalendar',
 	chronicle: 'Daemon event stream, sessions, and replay',
 	launchpad: 'Start surface — open a project, switch a space',

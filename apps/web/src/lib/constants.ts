@@ -159,7 +159,7 @@ export const APP_LABELS: Record<AppId, string> = {
 	cwt: "Current Work",
 	cockpit: "Client Cockpit",
 	clients: "Clients",
-	"git-ema": "git-ema",
+	"git-ema": "Active builds",
 	"agent-work": "Agent Work",
 	chronicle: "Chronicle",
 	launchpad: "Launchpad",

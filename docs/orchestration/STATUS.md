@@ -1137,3 +1137,56 @@ Repaired the doctrine and plan-hierarchy network so the live spine resolves clea
 - **Atlas spine**: `Projects/EMA/atlas/PROJECT-ATLAS.md` now lists the live doctrine spine (canon current, redirect stub, build README, workspace entry, master plan, STATUS, durable transcripts). `Projects/EMA/atlas/canon/current/ema-0-0-6-current-canon.md` adds Controlling Plan and Master Design Doc Note sections.
 
 Verified by inspection of all modified files; no source code changes in this pass, only docs and project records. EMA repo working tree is clean except for the modified docs and the two new plan READMEs.
+
+## Proslync pilot — current state (2026-05-10)
+
+EMA's first cross-program pilot is Proslync. This section is the live ledger
+pointer; the canonical agent entrypoint and sprint sequencing live in the
+Proslync repo, not here.
+
+**Product posture (Mrs. Wilson directive 2026-04-06):**
+
+- Brand-first → AD/school → athlete sequence. Brand HQ + NIL deal evidence
+  ships before athlete-side work.
+- Wedge: revenue share with the athletic department (not SaaS, per-deal, or
+  retainer). Named competitors: Opendorse, INFLCR, Athliance, MOGL.
+- Disclosure exemplar: NIL Go (College Sports Commission).
+- Authoritative requirements:
+  `Active builds/proslync-presentation-assets-final/docs/research/prep-capture-2026-05-09/mrs-wilson-asks-extracted.md`
+  (W1–W39 + P1–P9 + S1–S7).
+
+**Active EMA lanes for Proslync** (verified via
+`ema lane list --project proslync-app-ios-final --json` 2026-05-10):
+
+| Lane | Title | Status |
+|---|---|---|
+| `lane:01KR7K0ZGA009YGND4AHPRJ9BN` | Sprint 2 — Brand back-office MVP | active |
+| `lane:01KR7K1ARD00B24MDAZFQVCEFN` | Sprint 3 — AD revenue-share + compliance | idea |
+| `lane:01KR7K1B4Q00CNGW965NX52J5A` | Demolition tail cleanup | idea |
+| `lane:01KR7KN7XV0185XD90VVV2YPBJ` | Proslync EMA modeling refinement | active |
+| `lane:01KR8G817Q00HWB0G3D206H2N8` | Cross-repo salvage 2026-05-10 | idea |
+| `lane:01KR7HPFFV000QCZ4XCQY718VB` | Real backend + iOS vertical slice | active |
+| `lane:01KR5H1JJK00KN3TR7QDWDKE8C` | iOS sim QA — extensive route sweep | active |
+
+**Proslync surfaces (per `ema cockpit projection`):** master-plan, brand-hq,
+nil-deal-detail, nil-manager, ad-cockpit, backend-api, hero-website (queued).
+Cockpit projection reports 4 active builds, 6 surfaces, 18 lanes (6 active),
+56 queue items (30 ready).
+
+**Source of truth — Proslync agent entry:**
+`Active builds/proslync-app-ios-final/ORCHESTRATOR.md` (read first), then
+`Active builds/proslync-app-ios-final/PLAN.md` (canonical sprint sequencing).
+Prompt-form briefing for an agent acting AS the orchestrator:
+`Active builds/proslync-app-ios-final/docs/orchestration/prompts/master-orchestrator.md`.
+
+**Swarm gate:** Proslync swarm dispatch (parallel multi-agent through Duct
+Tape/Harness) is blocked behind EMA Sprints 1–4 in
+`docs/superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`.
+Single-agent claimed-lane work via the existing `ema lane claim → … → ema agent
+report` loop is allowed now.
+
+**Cross-repo salvage 2026-05-10 (`lane:01KR8G817Q00HWB0G3D206H2N8`):** doc-side
+items closed by this STATUS section, the Desktop AGENTS.md update, the
+presentation-assets README pointer, and the prompt-form
+`master-orchestrator.md`. Remaining lane scope is non-doc dirty-tree
+reconciliation across nine Proslync-ecosystem repos.

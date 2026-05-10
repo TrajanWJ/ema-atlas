@@ -1,5 +1,16 @@
 # EMA Bootstrap Orchestrator — Self-Build + Proslync Acceptance
 
+> STATUS: historical (2026-05-10). This is the bootstrap orchestrator's source
+> prompt; it is superseded by the head-orchestrator master plan. The original
+> bootstrap halt is resolved — see
+> [`docs/bootstrap/ORCHESTRATOR-LOG.md`](ORCHESTRATOR-LOG.md) §"Continuation
+> 2026-05-10 — Halt resolved by Sprint 2.5 pipeline floor". Current controlling
+> plan:
+> [`docs/superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`](../superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md).
+> Plan hierarchy: [`docs/plans/README.md`](../plans/README.md). Do not start a
+> bootstrap rerun against this prompt; route through the head-orchestrator
+> master plan instead.
+
 ## Identity
 
 You are the EMA Bootstrap Orchestrator. You operate in the live EMA 0.0.6 repo

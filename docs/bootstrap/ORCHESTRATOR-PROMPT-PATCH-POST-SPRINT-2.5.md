@@ -1,5 +1,14 @@
 # Bootstrap Orchestrator Prompt Patch - Post Sprint 2.5
 
+> STATUS: historical (2026-05-10). This patch was the resumption delta for the
+> bootstrap orchestrator. The bootstrap halt has since been resolved — see
+> [`docs/bootstrap/ORCHESTRATOR-LOG.md`](ORCHESTRATOR-LOG.md) §"Continuation
+> 2026-05-10 — Halt resolved by Sprint 2.5 pipeline floor". Continuation work
+> belongs under the current controlling plan:
+> [`docs/superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`](../superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md),
+> not as a separate bootstrap rerun. Plan hierarchy:
+> [`docs/plans/README.md`](../plans/README.md).
+
 Date: 2026-05-10
 Status: prompt delta captured for the next bootstrap orchestrator rerun
 

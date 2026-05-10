@@ -1,3 +1,4 @@
+<!-- wiki-id: ema:workspace-entrypoint -->
 # 0.0.6 Workspace Entrypoint
 
 Use this repo as the implementation root for EMA `0.0.6`.
@@ -104,11 +105,24 @@ gate.
 - Event catalog is versioned contract; pre-commit check enforces.
 - Attachments are a canonical first-class concept (git-ema);
   no other vApp owns file storage.
+- **Org accessibility (locked 2026-05-10):** binary — ≥1 host node online
+  → accessible; 0 host nodes online → dark. No uptime gradient. See
+  `decisions/2026-05-10-host-node-doctrine.md`.
+- **Multi-host write topology (locked 2026-05-10):** all hosts accept
+  writes; conflicts resolve per entity family. See
+  `decisions/2026-05-10-multi-host-conflict-policy.md`.
+- **DERP relay default (locked 2026-05-10):** Iroh public DERP mesh;
+  self-host is later opt-in.
+- **Web auth gate addressing (locked 2026-05-10):** DERP-stable identity
+  on a host node (no DNS provisioning).
+- **Multi-org cockpit UX (locked 2026-05-10):** single-org context +
+  switcher (Slack-style).
+- **Recovery packet format (locked 2026-05-10):** BIP-39 seed words. See
+  `decisions/2026-05-10-recovery-bip39.md`.
 
 **Open** (decisions a later wave will make):
 
 - Device pairing ceremony details (QR+BLE inspired by WebAuthn hybrid).
-- Recovery packet format (seed words vs Shamir vs both).
 - Collaborative-prose CRDT choice for Blueprint (BEAM-native preferred:
   `delta_crdt` / Automerge-BEAM adapter; Yjs/Hocuspocus is not the default).
 - Real OAuth flows replacing git-ema demo stubs.

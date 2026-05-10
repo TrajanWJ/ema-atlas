@@ -63,3 +63,32 @@ Every entity uses a ULID under a typed prefix: `org:<ulid>`, `space:<ulid>`,
 
 Path addressability (`<org>/<space>/<project>/…`) is a **query concern**,
 not a registry key.
+
+## Org → HostingEnabledNodes (≥1 required)
+
+Locked 2026-05-10 by [`../decisions/2026-05-10-host-node-doctrine.md`](../decisions/2026-05-10-host-node-doctrine.md).
+
+Every org has a one-to-many relation to **host nodes** (one or more
+hosting-enabled devices). The cardinality is `≥1 required`: an org with
+zero host nodes online is not accessible — operations halt at the boundary.
+Org accessibility is **binary**, not a uptime gradient:
+
+- **Accessible** — ≥1 host node online. All operations available;
+  per-entity merge handles concurrency (see
+  [`../decisions/2026-05-10-multi-host-conflict-policy.md`](../decisions/2026-05-10-multi-host-conflict-policy.md)).
+- **Dark** — 0 host nodes online. Org is unreachable; no reads, no writes,
+  no auth.
+
+The host flag is per-(device, org), recorded as
+`device.hosting_enabled {device, org_id}`. A device may host any number of
+orgs; an org may have any number of host nodes. There is no "primary
+host" — every host accepts writes for its connected clients and conflicts
+resolve per entity family.
+
+`ema org create` MUST designate at least one hosting-enabled node before
+the org becomes accessible; `ema device demote-from-host --org <id>` is
+rejected if the device is the only host (would push the org dark).
+
+Topology stays non-negotiable: there is no "flat project", no
+"organization-less space", no "project spanning multiple spaces", and no
+"org without a host node."

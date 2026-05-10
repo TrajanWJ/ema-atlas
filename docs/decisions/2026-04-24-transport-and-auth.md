@@ -4,6 +4,26 @@
 2026-05-07 to match `WORKSPACE-ENTRYPOINT.md`, which already calls Iroh "the
 default."
 
+> **2026-05-10 addendum — Q1–Q6 + host-node locks layered on top.**
+>
+> | # | Question | Answer |
+> |---|---|---|
+> | 1 | Org accessibility model | Binary: ≥1 host online OR dark. No uptime gradient. |
+> | 2 | Multi-org cockpit UX | Single-org context + switcher (Slack-style). |
+> | 3' | DERP relay default | **Iroh public mesh**; self-host as later opt-in. |
+> | 4 | Web auth gate addressing | **DERP-stable identity** (no DNS provisioning). |
+> | 5 | Multi-host write topology | All hosts accept writes; per-entity merge. |
+> | 6 | Recovery packet format | **BIP-39 seed words.** |
+>
+> See:
+> - [`2026-05-10-host-node-doctrine.md`](./2026-05-10-host-node-doctrine.md)
+> - [`2026-05-10-multi-host-conflict-policy.md`](./2026-05-10-multi-host-conflict-policy.md)
+> - [`2026-05-10-recovery-bip39.md`](./2026-05-10-recovery-bip39.md)
+>
+> Q5 collapses prior "primary tier" framing: every host accepts writes for
+> its connected clients; conflicts resolve per the entity-family table in
+> the multi-host conflict policy ADR.
+
 **Decision summary:**
 
 - **Replication transport:** Iroh sidecar (QUIC + magicsock + DERP relay).
@@ -143,9 +163,12 @@ Three distinct concerns, frequently conflated:
 - **Local/native primary: passkeys (WebAuthn / FIDO2).** Platform passkeys on
   macOS / iOS / Windows give us per-user, per-device credentials with built-in
   biometric gating. The daemon validates passkey assertions locally.
-- **Recovery: signed recovery packet.** Either BIP-39 seed words or
-  Shamir-split words. Format is the wave-open question from
-  `WORKSPACE-ENTRYPOINT.md`; the choice does not affect transport.
+- **Recovery: BIP-39 seed words (locked 2026-05-10).** 12 or 24 word
+  phrase, deterministically deriving the recovery keypair, stored
+  out-of-band. Recovery packet metadata also carries the opaque org-id
+  list. Shamir-split is not the default; reserved as a later additive
+  opt-in for org-level recovery. See
+  [`./2026-05-10-recovery-bip39.md`](./2026-05-10-recovery-bip39.md).
 - **No passwords in the canonical log ever.** Auth proofs are verified,
   not stored.
 
@@ -297,7 +320,9 @@ storage by the time this wave starts:
 - Exact Iroh sidecar wire framing (wave-start decision).
 - LiveKit vs mediasoup pick (later).
 - Biscuit vs UCAN final lock (Biscuit preferred; not locked).
-- Recovery packet format (already a wave-open question elsewhere).
+- ~~Recovery packet format (already a wave-open question elsewhere).~~
+  **CLOSED 2026-05-10:** BIP-39. See
+  [`./2026-05-10-recovery-bip39.md`](./2026-05-10-recovery-bip39.md).
 - Whether RDP / Moonlight support is ever in scope (currently: no).
 
 ## 6. Status

@@ -141,3 +141,34 @@ Later, when daemon peer identity exists, these become daemon commands and events
 This is not production remote administration. It is the trusted-dev bridge that
 lets the first two EMA machines collaborate while the real device pairing,
 Iroh transport, signed events, and Hermes capability grants are being built.
+
+## Graduation path: EMA-native host nodes
+
+Locked 2026-05-10 by
+[`../decisions/2026-05-10-host-node-doctrine.md`](../decisions/2026-05-10-host-node-doctrine.md).
+The product target this rail bridges to is **host-node ceremonies** — track
+`6E` in the strategic stack. Once 6E lands, the first-class path becomes:
+
+```text
+ema device promote-to-host --org <id>
+  → flags device with hosting_enabled_for_org: [<id>]
+  → emits device.hosting_enabled
+  → adjusts uptime monitoring + DERP-presence broadcast
+
+ema device demote-from-host --org <id>
+  → blocked if this is the only host (org would go dark)
+  → emits device.hosting_disabled
+```
+
+That is the EMA-native replacement for "set up an SSH peer." A host node:
+
+- accepts writes for its connected clients (per-entity merge handles
+  conflicts when multiple hosts are online);
+- broadcasts presence on the org's DERP-stable address so other devices
+  and the web surface can find it;
+- is the OIDC callback target for browser sign-in (see
+  [`../architecture/15-web-org-access-point.md`](../architecture/15-web-org-access-point.md)).
+
+Until 6E ships, SSH remains the trusted-dev rail. Once 6E ships, SSH
+demotes to "operator escape hatch for OS-level work" — not the org-level
+peer model.

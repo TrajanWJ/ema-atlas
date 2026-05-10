@@ -111,6 +111,34 @@ capability ceremony:
 - enabling replication placement;
 - issuing long-lived agent/tool capabilities.
 
+## OIDC callback wiring — host-node DERP-stable identity
+
+Locked 2026-05-10 by
+[`../decisions/2026-05-10-host-node-doctrine.md`](../decisions/2026-05-10-host-node-doctrine.md).
+The Google authorization-code callback URL is served by a host node, not
+by a per-user DNS deployment. The browser is told the redirect URI at
+login start; that redirect URI is rooted on a host node's DERP-stable
+identity (the Iroh/DERP node id derived from the host's Ed25519 pubkey).
+
+Practical shape:
+
+1. The web surface asks the daemon: "for org X, give me the OIDC start
+   URL." The daemon's `ema_access_sessions` writer picks an online host
+   node from the org's host set.
+2. The host node serves the callback over an HTTP-over-DERP shim,
+   addressed by its DERP node id. No bring-your-own-DNS is required.
+3. After Google returns the auth code, the host completes the
+   authorization-code exchange, verifies the ID token, and writes the
+   `access_session.created` event on the canonical log.
+4. If the org's host set goes dark mid-flow, the callback is unreachable
+   and the browser sees a transport-level failure — surfaced as
+   "organization is currently dark, try again when a host is online."
+
+Self-host DERP and bring-your-own-DNS remain later opt-ins. The default
+path uses the Iroh public DERP mesh
+([`../decisions/2026-04-24-transport-and-auth.md`](../decisions/2026-04-24-transport-and-auth.md))
+and requires no DNS provisioning per org.
+
 ## References
 
 - Google OpenID Connect: <https://developers.google.com/identity/openid-connect/openid-connect>

@@ -64,6 +64,29 @@ membership, peer machines, or project truth.
 This lets the browser be everywhere without pretending every browser is part of
 the trusted machine mesh.
 
+## OIDC callback addressing — DERP-stable identity
+
+Locked 2026-05-10 by
+[`../decisions/2026-05-10-host-node-doctrine.md`](../decisions/2026-05-10-host-node-doctrine.md).
+The browser logs in via Google Identity Services / OIDC. The OAuth
+authorization-code callback redirects to a URL bound to a **host node's
+DERP-stable identity**, not a per-user DNS name. Concretely:
+
+- Each org has at least one host node (≥1 required); the host node's
+  Iroh/DERP node id is the stable rendezvous point.
+- The OIDC callback URL is served by an HTTP-over-DERP shim on the host
+  node, addressed by the host's DERP identity. There is no DNS
+  provisioning step per user or per org — DERP plus the host's Ed25519
+  pubkey are the addressing primitives.
+- If an org's host set is dark (zero hosts online), the OIDC callback path
+  is unreachable. This matches the binary accessibility rule: a dark org
+  cannot authenticate browser users.
+
+Rationale: this keeps `Q3'` (Iroh public DERP mesh as default) and `Q4`
+(web auth gate addressed via DERP-stable identity) co-decided. We do not
+require DNS, ACME, or per-user TLS certs in the default path; self-host
+DERP and bring-your-own-DNS remain later opt-ins.
+
 ## Ceremonies Stay Separate
 
 - Organization invites add people to organizations, spaces, or projects.

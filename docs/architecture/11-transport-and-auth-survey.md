@@ -5,6 +5,21 @@ don't fly yet (per `08-vanilla-workspace.md` out-of-scope list). This doc
 exists so the replication, auth-hardening, and remote-surface waves start
 from a pre-agreed shortlist rather than re-opening the whole field.
 
+> **2026-05-10 locks** layered on top of this survey:
+>
+> - Q3' (DERP relay default) — **Iroh public mesh**; self-host as later opt-in.
+> - Q4 (Web auth gate addressing) — **DERP-stable identity** (no DNS provisioning).
+> - Recovery packet format — **BIP-39 seed words**. See
+>   [`../decisions/2026-05-10-recovery-bip39.md`](../decisions/2026-05-10-recovery-bip39.md).
+> - Host nodes — see
+>   [`../decisions/2026-05-10-host-node-doctrine.md`](../decisions/2026-05-10-host-node-doctrine.md).
+>   The earlier "always-on node" framing has evolved into "host node" with
+>   binary org accessibility and three load-bearing roles (state availability,
+>   per-entity concurrency arbitration, auth + web access gate).
+> - Multi-host write topology — all hosts accept writes; per-entity merge.
+>   Per-entity classification in
+>   [`../decisions/2026-05-10-multi-host-conflict-policy.md`](../decisions/2026-05-10-multi-host-conflict-policy.md).
+
 It covers three concerns that all touch the same wire:
 
 1. **Cross-device replication transport** — how two EMA daemons on different
@@ -114,9 +129,13 @@ Three distinct concerns, frequently conflated:
 - **Local/native primary: passkeys (WebAuthn / FIDO2).** Platform passkeys on
   macOS / iOS / Windows give us per-user, per-device credentials with built-in
   biometric gating. The daemon validates passkey assertions locally.
-- **Recovery: signed recovery packet.** Either BIP-39 seed words or
-  Shamir-split words. Format is the wave-open question from
-  `WORKSPACE-ENTRYPOINT.md`; the choice does not affect transport.
+- **Recovery: BIP-39 seed words (locked 2026-05-10).** 12 or 24 word
+  phrase, derived deterministically into a recovery keypair, stored
+  out-of-band by the user. Recovery packet metadata also carries an opaque
+  list of org IDs the user belongs to so a fresh device can find DERP
+  hosts. Shamir-split is not the default; it stays a later additive
+  opt-in for org-level recovery. See
+  [`../decisions/2026-05-10-recovery-bip39.md`](../decisions/2026-05-10-recovery-bip39.md).
 - **No passwords in the canonical log ever.** Auth proofs are verified,
   not stored.
 
@@ -140,8 +159,31 @@ Three distinct concerns, frequently conflated:
   `lineage_proof`, the daemon signs the lineage proof from that local device's
   macOS Keychain private key. The ceremony still needs the QR exchange and
   signature verification UI before it is a friendly two-Mac pairing flow.
-- Cross-org trust is deliberately not a thing in wave 1: each org is its
-  own trust domain.
+- Cross-org trust stays compositional, not transitive: each org is its own
+  trust domain, but a single device can be hosting-enabled for any number
+  of orgs (`device.hosting_enabled {device, org_id}` is per-(device, org)).
+  Trust roots are per-org; one device participating in multiple orgs holds
+  multiple independent peer-trust records, never a merged super-root.
+
+## Host nodes
+
+Locked 2026-05-10 by
+[`../decisions/2026-05-10-host-node-doctrine.md`](../decisions/2026-05-10-host-node-doctrine.md).
+The earlier "always-on node" framing has been replaced by **host node**.
+Three load-bearing roles:
+
+1. **State availability** — host nodes hold the canonical event tail; new
+   devices catch up FROM them.
+2. **Per-entity concurrency arbitration** — each host serializes its
+   connected clients' writes for an entity; cross-host conflicts resolve
+   per the entity-family table in
+   [`../decisions/2026-05-10-multi-host-conflict-policy.md`](../decisions/2026-05-10-multi-host-conflict-policy.md).
+3. **Auth + web access gate** — hosts bind to DERP-stable identities and
+   serve OIDC callbacks; browser users log in to a host and get brokered
+   into org state.
+
+Org accessibility is binary: ≥1 host online → accessible; 0 hosts online
+→ dark. There is no primary-host tier and no uptime gradient.
 
 ### Delegated capability (agents + connectors)
 
@@ -268,7 +310,9 @@ storage by the time this wave starts:
 - Exact Iroh sidecar wire framing (wave-start decision).
 - LiveKit vs mediasoup pick (later).
 - Biscuit vs UCAN final lock (Biscuit preferred; not locked).
-- Recovery packet format (already a wave-open question elsewhere).
+- ~~Recovery packet format (already a wave-open question elsewhere).~~
+  **CLOSED 2026-05-10:** BIP-39 seed words. See
+  [`../decisions/2026-05-10-recovery-bip39.md`](../decisions/2026-05-10-recovery-bip39.md).
 - Whether RDP / Moonlight support is ever in scope (currently: no).
 
 ## 6. Status

@@ -106,3 +106,25 @@ The canonical name is `ema_swarm_coordination`. Earlier doctrine drafts used
 
 Each context's public API is exposed via one module that only the
 corresponding supervisor and the IPC server are expected to call.
+
+## Host-flag handling at boot
+
+Locked 2026-05-10 by
+[`../decisions/2026-05-10-host-node-doctrine.md`](../decisions/2026-05-10-host-node-doctrine.md).
+At daemon start, `identity_sup` reads each `device.hosting_enabled` record
+and decides which orgs this device is acting as a host node for. For each
+such org:
+
+- The replication context broadcasts DERP presence under the device's
+  Ed25519 public key, so other peers can discover the host.
+- The IPC layer marks the org as **accessible** in the local accessibility
+  projection. Orgs with zero host records are projected as **dark**.
+- The org's writer actors (lanes, queue, blueprint, etc.) accept writes
+  from connected clients. There is no "primary" host; cross-host conflicts
+  resolve per the entity-family table in
+  [`../decisions/2026-05-10-multi-host-conflict-policy.md`](../decisions/2026-05-10-multi-host-conflict-policy.md).
+
+A device that is hosting-enabled for zero orgs still runs the full
+supervisor tree — it just doesn't broadcast presence or accept org-scoped
+writes. That is the expected mode for non-host clients (laptops, phones)
+that consume an org's state via a paired host.

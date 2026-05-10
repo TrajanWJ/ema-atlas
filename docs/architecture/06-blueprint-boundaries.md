@@ -102,6 +102,28 @@ A retry of the same command re-runs validation; if the canonical event
 already matches the requested intent, the writer MUST be idempotent
 (no duplicate `attachment.linked`) and emit only the missing mirror.
 
+## Per-entity conflict resolution
+
+Locked 2026-05-10 by
+[`../decisions/2026-05-10-multi-host-conflict-policy.md`](../decisions/2026-05-10-multi-host-conflict-policy.md).
+Every host node in an org accepts writes for its connected clients;
+conflicts across hosts resolve per entity family. Blueprint sits across
+several rows of that table:
+
+| Entity family | Conflict strategy | Notes |
+|---|---|---|
+| Blueprint prose (section bodies) | **CRDT (delta_crdt)** | Long-form text needs character-level merge; ships as part of the BEAM-native collab path above. |
+| Blueprint section tree (canonical structural plane) | Append-only with vector-clock ordering | Structural ops replay deterministically. |
+| Blueprint comments | Append-only | Each comment is its own event; resolution is a separate event. |
+| Blueprint section → proposal promotion | Append-only with admin-signed authoritative event | Mirrors the cross-system ownership rule. |
+| Blueprint attachment links (mirror events) | Append-only mirror; canonical lives in `ema_attachments` | See "Mirror events" below. |
+| Project records / atlas | CRDT for prose, append-only for facts | Same as Blueprint prose vs structural split. |
+
+The full per-entity table for non-Blueprint families lives in the conflict
+policy ADR. Blueprint's CRDT direction (`delta_crdt` first, Automerge
+adapter second) is the implementation expression of the "Blueprint prose"
+row.
+
 ## What this wave ships
 
 - Canonical event stubs in the catalog.

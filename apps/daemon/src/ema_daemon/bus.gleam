@@ -14,6 +14,7 @@
 import ema_companion/ema_companion
 import ema_daemon/event_envelope.{type Envelope}
 import ema_daemon/sqlite_ffi
+import ema_daemon/telemetry
 import ema_presence/ema_presence
 import gleam/erlang/process.{type Subject}
 import gleam/list
@@ -148,6 +149,15 @@ pub type Msg {
     org_id: String,
     reply: Subject(Bool),
   )
+
+  /// Wire the telemetry actor's subject after both start. Called once by
+  /// the supervisor so the bus can broker `telemetry.snapshot` requests
+  /// without coupling the IPC layer to the telemetry module directly.
+  RegisterTelemetry(target: Subject(telemetry.Msg))
+
+  /// Render the rolling-window snapshot from the registered telemetry
+  /// actor. Returns `{}` if no telemetry actor has been registered yet.
+  TelemetrySnapshot(reply: Subject(String))
 }
 
 /// Messages sent to subscribers.
@@ -177,6 +187,7 @@ type State {
     subs: List(Subscriber),
     companion: ema_companion.State,
     presence: ema_presence.State,
+    telemetry: Option(Subject(telemetry.Msg)),
   )
 }
 
@@ -197,6 +208,7 @@ pub fn start(
           subs: [],
           companion: ema_companion.new(),
           presence: ema_presence.new(),
+          telemetry: None,
         )
         |> actor.initialised
         |> actor.returning(self)
@@ -769,6 +781,20 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
           org_id,
         ),
       )
+      actor.continue(state)
+    }
+
+    RegisterTelemetry(target) -> {
+      actor.continue(State(..state, telemetry: Some(target)))
+    }
+
+    TelemetrySnapshot(reply) -> {
+      let payload = case state.telemetry {
+        Some(t) -> telemetry.snapshot_json(t)
+        None ->
+          "{\"window_seconds\":0,\"sample_interval_ms\":0,\"tracked_pids\":0,\"top\":[]}"
+      }
+      process.send(reply, payload)
       actor.continue(state)
     }
   }
@@ -1588,4 +1614,15 @@ pub fn workspace_resource_exists(
   process.call(bus, 5000, fn(reply) {
     WorkspaceResourceExists(resource_kind, resource_id, org_id, reply)
   })
+}
+
+pub fn register_telemetry(
+  bus: Subject(Msg),
+  target: Subject(telemetry.Msg),
+) -> Nil {
+  process.send(bus, RegisterTelemetry(target))
+}
+
+pub fn telemetry_snapshot_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { TelemetrySnapshot(reply) })
 }

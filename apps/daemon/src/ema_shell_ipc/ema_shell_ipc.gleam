@@ -723,6 +723,16 @@ fn handle_text(
               send_projection(conn, "companion.status", status)
               mist.continue(state)
             }
+            Some("telemetry.snapshot") -> {
+              let snapshot = bus.telemetry_snapshot_projection_json(bus_subj)
+              let _ =
+                mist.send_text_frame(
+                  conn,
+                  command_data(incoming.id, "telemetry.snapshot", snapshot),
+                )
+              send_projection(conn, "telemetry.snapshot", snapshot)
+              mist.continue(state)
+            }
             Some("companion.window.open") -> {
               let windows =
                 bus.companion_open_window(

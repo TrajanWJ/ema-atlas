@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useWindowStore } from "@/src/stores/window-store";
 import { eventBus } from "@/src/lib/event-bus";
 import { getApp } from "@/src/lib/app-registry";
 import { APP_LABELS } from "@/src/lib/constants";
+import { useCommand } from "@/src/lib/ipc/use-command";
 import type { AppEvent } from "@/src/lib/event-bus";
 import type { AppId, ProcessWindow } from "@/src/types/window";
 
@@ -15,13 +16,16 @@ import type { AppId, ProcessWindow } from "@/src/types/window";
 const REFRESH_INTERVAL_MS = 2_000;
 const MAX_EVENTS = 50;
 const MAX_PAYLOAD_LENGTH = 60;
+const TELEMETRY_REFRESH_MS = 2_000;
+const SPARKLINE_HISTORY = 30;
 
-type MonitorTab = "windows" | "events" | "stats";
+type MonitorTab = "windows" | "events" | "stats" | "daemon";
 
 const TABS: readonly { id: MonitorTab; label: string }[] = [
 	{ id: "windows", label: "Windows" },
 	{ id: "events", label: "Events" },
 	{ id: "stats", label: "Stats" },
+	{ id: "daemon", label: "Daemon" },
 ];
 
 // ----------------------------------------------------------------------------
@@ -479,6 +483,304 @@ function BarRow({
 }
 
 // ----------------------------------------------------------------------------
+// Daemon Telemetry panel — Option 1 observability surface
+// ----------------------------------------------------------------------------
+
+interface TelemetryRow {
+	pid: string;
+	name: string;
+	mailbox_max: number;
+	mailbox_avg: number;
+	reductions_per_sec: number;
+	sample_count: number;
+}
+
+interface TelemetrySnapshot {
+	window_seconds: number;
+	sample_interval_ms: number;
+	tracked_pids: number;
+	top: TelemetryRow[];
+}
+
+interface TelemetryHistory {
+	mailbox: number[];
+	reductions: number[];
+}
+
+function parseSnapshot(result: Record<string, unknown> | null): TelemetrySnapshot | null {
+	if (!result) return null;
+	const data = (result as { data?: unknown }).data;
+	if (!data || typeof data !== "object") return null;
+	const value = (data as { value?: unknown }).value;
+	if (!value || typeof value !== "object") return null;
+	const v = value as Record<string, unknown>;
+	if (
+		typeof v.window_seconds !== "number" ||
+		typeof v.sample_interval_ms !== "number" ||
+		typeof v.tracked_pids !== "number" ||
+		!Array.isArray(v.top)
+	) {
+		return null;
+	}
+	const rows: TelemetryRow[] = [];
+	for (const row of v.top) {
+		if (!row || typeof row !== "object") continue;
+		const r = row as Record<string, unknown>;
+		if (
+			typeof r.pid !== "string" ||
+			typeof r.name !== "string" ||
+			typeof r.mailbox_max !== "number" ||
+			typeof r.mailbox_avg !== "number" ||
+			typeof r.reductions_per_sec !== "number" ||
+			typeof r.sample_count !== "number"
+		) {
+			continue;
+		}
+		rows.push({
+			pid: r.pid,
+			name: r.name,
+			mailbox_max: r.mailbox_max,
+			mailbox_avg: r.mailbox_avg,
+			reductions_per_sec: r.reductions_per_sec,
+			sample_count: r.sample_count,
+		});
+	}
+	return {
+		window_seconds: v.window_seconds,
+		sample_interval_ms: v.sample_interval_ms,
+		tracked_pids: v.tracked_pids,
+		top: rows,
+	};
+}
+
+function DaemonTelemetryPanel() {
+	const dispatch = useCommand();
+	const [snapshot, setSnapshot] = useState<TelemetrySnapshot | null>(null);
+	const [error, setError] = useState<string | null>(null);
+	const historyRef = useRef<Map<string, TelemetryHistory>>(new Map());
+	const [tick, setTick] = useState(0);
+
+	useEffect(() => {
+		let cancelled = false;
+		const refresh = async () => {
+			const result = await dispatch("telemetry.snapshot", {});
+			if (cancelled) return;
+			if (!result.ok) {
+				setError(result.error.message);
+				setSnapshot(null);
+				return;
+			}
+			setError(null);
+			const parsed = parseSnapshot(result as Record<string, unknown>);
+			if (!parsed) {
+				setError("malformed snapshot payload");
+				return;
+			}
+			// Append to per-pid history (capped) for sparklines.
+			const next = new Map(historyRef.current);
+			for (const row of parsed.top) {
+				const prev = next.get(row.pid) ?? { mailbox: [], reductions: [] };
+				const mailbox = [...prev.mailbox, row.mailbox_max].slice(-SPARKLINE_HISTORY);
+				const reductions = [...prev.reductions, row.reductions_per_sec].slice(-SPARKLINE_HISTORY);
+				next.set(row.pid, { mailbox, reductions });
+			}
+			// Drop pids that fell out of the top-N window after a while to bound memory.
+			const seen = new Set(parsed.top.map((r) => r.pid));
+			for (const pid of Array.from(next.keys())) {
+				if (!seen.has(pid)) next.delete(pid);
+			}
+			historyRef.current = next;
+			setSnapshot(parsed);
+			setTick((t) => t + 1);
+		};
+		void refresh();
+		const id = setInterval(refresh, TELEMETRY_REFRESH_MS);
+		return () => {
+			cancelled = true;
+			clearInterval(id);
+		};
+	}, [dispatch]);
+
+	if (error) {
+		return <EmptyState message={`telemetry: ${error}`} />;
+	}
+	if (!snapshot) {
+		return <EmptyState message="contacting daemon…" />;
+	}
+	if (snapshot.top.length === 0) {
+		return <EmptyState message="no telemetry samples yet" />;
+	}
+
+	const summary =
+		`${snapshot.tracked_pids} pids tracked · ` +
+		`${snapshot.window_seconds}s window · ` +
+		`${snapshot.sample_interval_ms}ms tick`;
+
+	return (
+		<div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+			<div
+				style={{
+					padding: "0.3rem 0.75rem",
+					fontSize: "0.6rem",
+					color: "var(--place-text-tertiary)",
+					fontFamily: "monospace",
+				}}
+			>
+				{summary} (refresh #{tick})
+			</div>
+			{snapshot.top.map((row) => {
+				const history = historyRef.current.get(row.pid) ?? { mailbox: [], reductions: [] };
+				return <TelemetryRowView key={row.pid} row={row} history={history} />;
+			})}
+		</div>
+	);
+}
+
+function TelemetryRowView({
+	row,
+	history,
+}: {
+	readonly row: TelemetryRow;
+	readonly history: TelemetryHistory;
+}) {
+	return (
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				gap: "0.15rem",
+				padding: "0.4rem 0.75rem",
+				borderRadius: "4px",
+				background: "rgba(255,255,255,0.03)",
+			}}
+		>
+			<div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+				<span
+					style={{
+						fontSize: "0.7rem",
+						color: "var(--place-text-primary)",
+						fontWeight: 500,
+						overflow: "hidden",
+						textOverflow: "ellipsis",
+						whiteSpace: "nowrap",
+						flex: 1,
+					}}
+				>
+					{row.name}
+				</span>
+				<span
+					style={{
+						fontSize: "0.55rem",
+						color: "var(--place-text-tertiary)",
+						fontFamily: "monospace",
+					}}
+				>
+					{row.pid}
+				</span>
+			</div>
+			<div
+				style={{
+					display: "grid",
+					gridTemplateColumns: "1fr 1fr",
+					gap: "0.5rem",
+					alignItems: "center",
+				}}
+			>
+				<MetricCell
+					label="mailbox"
+					value={`${row.mailbox_max} max · ${row.mailbox_avg.toFixed(2)} avg`}
+					sparkline={history.mailbox}
+					tone="rgba(255, 180, 100, 0.85)"
+				/>
+				<MetricCell
+					label="reductions/s"
+					value={row.reductions_per_sec.toLocaleString()}
+					sparkline={history.reductions}
+					tone="rgba(120, 200, 255, 0.85)"
+				/>
+			</div>
+		</div>
+	);
+}
+
+function MetricCell({
+	label,
+	value,
+	sparkline,
+	tone,
+}: {
+	readonly label: string;
+	readonly value: string;
+	readonly sparkline: readonly number[];
+	readonly tone: string;
+}) {
+	return (
+		<div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+			<div
+				style={{
+					display: "flex",
+					justifyContent: "space-between",
+					gap: "0.4rem",
+					fontSize: "0.6rem",
+				}}
+			>
+				<span style={{ color: "var(--place-text-tertiary)" }}>{label}</span>
+				<span
+					style={{
+						color: "var(--place-text-primary)",
+						fontFamily: "monospace",
+						fontVariantNumeric: "tabular-nums",
+					}}
+				>
+					{value}
+				</span>
+			</div>
+			<Sparkline values={sparkline} tone={tone} />
+		</div>
+	);
+}
+
+function Sparkline({
+	values,
+	tone,
+}: {
+	readonly values: readonly number[];
+	readonly tone: string;
+}) {
+	const width = 100;
+	const height = 18;
+	if (values.length < 2) {
+		return (
+			<svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`}>
+				<line
+					x1={0}
+					y1={height - 1}
+					x2={width}
+					y2={height - 1}
+					stroke={tone}
+					strokeOpacity={0.3}
+					strokeWidth={1}
+				/>
+			</svg>
+		);
+	}
+	const max = Math.max(...values, 1);
+	const stepX = width / Math.max(1, values.length - 1);
+	const points = values
+		.map((v, i) => {
+			const x = i * stepX;
+			const y = height - 1 - (v / max) * (height - 2);
+			return `${x.toFixed(2)},${y.toFixed(2)}`;
+		})
+		.join(" ");
+	return (
+		<svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+			<polyline points={points} fill="none" stroke={tone} strokeWidth={1.2} strokeLinejoin="round" />
+		</svg>
+	);
+}
+
+// ----------------------------------------------------------------------------
 // Empty state
 // ----------------------------------------------------------------------------
 
@@ -527,6 +829,7 @@ export function SystemMonitorApp() {
 				{activeTab === "windows" && <OpenWindowsPanel />}
 				{activeTab === "events" && <EventActivityPanel />}
 				{activeTab === "stats" && <UsageStatsPanel />}
+				{activeTab === "daemon" && <DaemonTelemetryPanel />}
 			</div>
 		</div>
 	);

@@ -17,6 +17,7 @@ import ema_collab/ema_collab
 import ema_daemon/bus
 import ema_daemon/ema_env
 import ema_daemon/registry
+import ema_daemon/telemetry
 import ema_exec/restart_recovery
 import ema_shell_ipc/ema_shell_ipc
 import ema_swarm_coordination/first_boot
@@ -30,6 +31,7 @@ pub type StartedTree {
     bus: Subject(bus.Msg),
     collab: Subject(ema_collab.Msg),
     registry: Subject(registry.Msg),
+    telemetry: Subject(telemetry.Msg),
   )
 }
 
@@ -74,22 +76,34 @@ pub fn start() -> Result(StartedTree, SupervisorError) {
                       ))
                     Ok(registry_started) -> {
                       let registry_subject = registry_started.data
-                      case
-                        ema_shell_ipc.start(
-                          bus_subject,
-                          collab_subject,
-                          bind_addr,
-                          port,
-                        )
-                      {
-                        Error(reason) ->
-                          Error(ChildFailedToStart("shell_ipc", reason))
-                        Ok(_ipc) ->
-                          Ok(StartedTree(
-                            bus: bus_subject,
-                            collab: collab_subject,
-                            registry: registry_subject,
+                      case telemetry.start() {
+                        Error(e) ->
+                          Error(ChildFailedToStart(
+                            "telemetry",
+                            describe_start_error(e),
                           ))
+                        Ok(telemetry_started) -> {
+                          let telemetry_subject = telemetry_started.data
+                          bus.register_telemetry(bus_subject, telemetry_subject)
+                          case
+                            ema_shell_ipc.start(
+                              bus_subject,
+                              collab_subject,
+                              bind_addr,
+                              port,
+                            )
+                          {
+                            Error(reason) ->
+                              Error(ChildFailedToStart("shell_ipc", reason))
+                            Ok(_ipc) ->
+                              Ok(StartedTree(
+                                bus: bus_subject,
+                                collab: collab_subject,
+                                registry: registry_subject,
+                                telemetry: telemetry_subject,
+                              ))
+                          }
+                        }
                       }
                     }
                   }
@@ -110,5 +124,5 @@ fn describe_start_error(e: actor.StartError) -> String {
 }
 
 pub fn children() -> List(String) {
-  ["bus", "collab", "registry", "shell_ipc"]
+  ["bus", "collab", "registry", "telemetry", "shell_ipc"]
 }

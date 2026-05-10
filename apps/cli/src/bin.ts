@@ -47,6 +47,7 @@ import { runWorkspace } from "./commands/workspace.js";
 import { runExecution, runDispatch } from "./commands/execution.js";
 import { runProslync } from "./commands/proslync.js";
 import { runReadiness } from "./commands/readiness.js";
+import { runObserver } from "./commands/observer.js";
 
 async function main(): Promise<number> {
   const [, , cmd, ...rest] = process.argv;
@@ -143,6 +144,8 @@ async function main(): Promise<number> {
       return runProslync(args);
     case "readiness":
       return runReadiness(args);
+    case "observer":
+      return runObserver(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

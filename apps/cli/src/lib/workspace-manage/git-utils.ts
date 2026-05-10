@@ -43,6 +43,8 @@ export async function isGitRepo(dir: string): Promise<boolean> {
 
 // Walk a top-level directory and return absolute paths to every immediate
 // child that is a git repo. Mirrors the IGNORE set used by the audit kernel.
+// Resolves symlinks so that repo paths compare-equal to the values git
+// reports via `worktree list --porcelain` (git canonicalizes its own paths).
 export async function listGitRepos(root: string): Promise<string[]> {
 	let entries: import("node:fs").Dirent[];
 	try {
@@ -51,11 +53,22 @@ export async function listGitRepos(root: string): Promise<string[]> {
 		return [];
 	}
 	const out: string[] = [];
+	const seen = new Set<string>();
 	for (const e of entries) {
 		if (IGNORE_DIR_NAMES.has(e.name)) continue;
 		if (!e.isDirectory() && !e.isSymbolicLink()) continue;
 		const dir = path.join(root, e.name);
-		if (await isGitRepo(dir)) out.push(dir);
+		if (await isGitRepo(dir)) {
+			let resolved = dir;
+			try {
+				resolved = await fs.realpath(dir);
+			} catch {
+				resolved = dir;
+			}
+			if (seen.has(resolved)) continue; // dedupe symlinked clones
+			seen.add(resolved);
+			out.push(resolved);
+		}
 	}
 	return out;
 }

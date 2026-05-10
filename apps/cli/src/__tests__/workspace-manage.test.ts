@@ -83,10 +83,10 @@ describe("workspace-manage kernel", () => {
 
 	it("worktree prune detects path-gone worktree (Class A) and removes under --apply", async () => {
 		const fix = await scaffoldFixture(path.join(root, "wt-prune"));
-		const repo = path.join(fix.activeBuildsRoot, "wt-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "wt-host"));
 		await gitCommit(repo, "init");
-		const wtPath = path.join(root, "external-worktree-target");
+		const wtParent = await fs.realpath(root);
+		const wtPath = path.join(wtParent, "external-worktree-target");
 		await execFileP("git", ["-C", repo, "worktree", "add", "-b", "feature/x", wtPath]);
 		// kill the worktree directory to simulate stale registration
 		await rmrf(wtPath);
@@ -113,8 +113,7 @@ describe("workspace-manage kernel", () => {
 
 	it("branch clean refuses without --with-branches; deletes with the flag", async () => {
 		const fix = await scaffoldFixture(path.join(root, "br-clean"));
-		const repo = path.join(fix.activeBuildsRoot, "br-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "br-host"));
 		await gitCommit(repo, "init");
 		await execFileP("git", ["-C", repo, "branch", "claude/dazzling-tulip"]);
 		// Default-mode plan: Class B with requires_flag
@@ -154,8 +153,7 @@ describe("workspace-manage kernel", () => {
 
 	it("remote sync reports no-origin clones and never pushes without --with-remotes", async () => {
 		const fix = await scaffoldFixture(path.join(root, "rsync"));
-		const repo = path.join(fix.activeBuildsRoot, "noorigin");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "noorigin"));
 		await gitCommit(repo, "init");
 		const ctx = await buildContext({
 			desktopRoot: fix.desktopRoot,
@@ -172,8 +170,7 @@ describe("workspace-manage kernel", () => {
 
 	it("remote ensure proposes adding origin under --with-remotes (Class B) without it being a push", async () => {
 		const fix = await scaffoldFixture(path.join(root, "rensure"));
-		const repo = path.join(fix.activeBuildsRoot, "ensure-me");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "ensure-me"));
 		await gitCommit(repo, "init");
 		const ctx = await buildContext({
 			desktopRoot: fix.desktopRoot,
@@ -215,8 +212,7 @@ describe("workspace-manage kernel", () => {
 
 	it("dirty-tree gate blocks Class B branch deletion even with --with-branches", async () => {
 		const fix = await scaffoldFixture(path.join(root, "dirty"));
-		const repo = path.join(fix.activeBuildsRoot, "dirty-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "dirty-host"));
 		await gitCommit(repo, "init");
 		await execFileP("git", ["-C", repo, "branch", "claude/sparkly-fern"]);
 		// dirty the worktree
@@ -237,8 +233,7 @@ describe("workspace-manage kernel", () => {
 
 	it("worktree add refuses if target path already exists", async () => {
 		const fix = await scaffoldFixture(path.join(root, "wt-add"));
-		const repo = path.join(fix.activeBuildsRoot, "wt-add-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "wt-add-host"));
 		await gitCommit(repo, "init");
 		const wtPath = path.join(root, "wt-add-target-exists");
 		await fs.mkdir(wtPath, { recursive: true });
@@ -253,8 +248,7 @@ describe("workspace-manage kernel", () => {
 
 	it("branch list returns one row per local branch per clone", async () => {
 		const fix = await scaffoldFixture(path.join(root, "br-list"));
-		const repo = path.join(fix.activeBuildsRoot, "list-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "list-host"));
 		await gitCommit(repo, "init");
 		await execFileP("git", ["-C", repo, "branch", "feature/a"]);
 		await execFileP("git", ["-C", repo, "branch", "feature/b"]);
@@ -270,8 +264,7 @@ describe("workspace-manage kernel", () => {
 
 	it("worktree list returns the primary worktree at minimum", async () => {
 		const fix = await scaffoldFixture(path.join(root, "wt-list"));
-		const repo = path.join(fix.activeBuildsRoot, "wt-list-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "wt-list-host"));
 		await gitCommit(repo, "init");
 		const ctx = await buildContext({
 			desktopRoot: fix.desktopRoot,
@@ -284,8 +277,7 @@ describe("workspace-manage kernel", () => {
 
 	it("remote status emits one action per clone with origin presence", async () => {
 		const fix = await scaffoldFixture(path.join(root, "rstatus"));
-		const repo = path.join(fix.activeBuildsRoot, "rs-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "rs-host"));
 		await gitCommit(repo, "init");
 		const ctx = await buildContext({
 			desktopRoot: fix.desktopRoot,
@@ -300,8 +292,7 @@ describe("workspace-manage kernel", () => {
 
 	it("buildStatus json shape is parseable and stable", async () => {
 		const fix = await scaffoldFixture(path.join(root, "json-shape"));
-		const repo = path.join(fix.activeBuildsRoot, "shape-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "shape-host"));
 		await gitCommit(repo, "init");
 		const ctx = await buildContext({
 			desktopRoot: fix.desktopRoot,
@@ -318,8 +309,7 @@ describe("workspace-manage kernel", () => {
 
 	it("worktree prune is idempotent when no stale worktrees exist", async () => {
 		const fix = await scaffoldFixture(path.join(root, "idem"));
-		const repo = path.join(fix.activeBuildsRoot, "clean-host");
-		await gitInit(repo);
+		const repo = await gitInit(path.join(fix.activeBuildsRoot, "clean-host"));
 		await gitCommit(repo, "init");
 		const ctx = await buildContext({
 			desktopRoot: fix.desktopRoot,

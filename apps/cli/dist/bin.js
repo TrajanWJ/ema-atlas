@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+var __defProp = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 
 // src/args.ts
 function parseArgs(argv) {
@@ -111,7 +116,7 @@ var COMMANDS = [
   { name: "recovery scan", summary: "Read-only desktop-wide donor, worktree, stale-lane, and lost-work scan." },
   { name: "cwt status/ingest", summary: "Inspect current-work-tracker shared-files projection and dry-run EMA promotion." },
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
-  { name: "swarm create/list/show/start/pause/stop/report", summary: "Coordinate daemon-backed swarms over missions, lanes, and queue items." },
+  { name: "swarm create/list/show/start/pause/stop/report/scope-claim", summary: "Coordinate daemon-backed swarms and daemon-enforced edit scope claims." },
   { name: "vcalendar show", summary: "Show an actor's calendar (filtered from the recent event_trail)." },
   { name: "vcalendar week", summary: "Show this week's vcalendar events (filtered from the recent event_trail)." },
   { name: "vcalendar tick", summary: "Compute the current self-controlled planning/execution/review phase." },
@@ -630,19 +635,19 @@ function readRecords(dir) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir).filter((name) => name.endsWith(".md") && name !== "README.md").map((name) => parseRecord(join(dir, name))).filter((record) => record != null);
 }
-function parseRecord(path2) {
+function parseRecord(path22) {
   try {
-    if (!statSync(path2).isFile()) return null;
-    const raw = readFileSync(path2, "utf8");
+    if (!statSync(path22).isFile()) return null;
+    const raw = readFileSync(path22, "utf8");
     const frontmatter = raw.match(/^---\n([\s\S]*?)\n---/);
-    const title = raw.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? fileTitle(path2);
+    const title = raw.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? fileTitle(path22);
     const meta = frontmatter ? parseFrontmatter(frontmatter[1] ?? "") : {};
     return {
-      id: meta.id ?? fileTitle(path2),
+      id: meta.id ?? fileTitle(path22),
       title,
       type: meta.type ?? "markdown_record",
       status: meta.status ?? "unknown",
-      path: relative(DESKTOP_ROOT, path2)
+      path: relative(DESKTOP_ROOT, path22)
     };
   } catch {
     return null;
@@ -659,8 +664,8 @@ function parseFrontmatter(raw) {
   }
   return out;
 }
-function fileTitle(path2) {
-  return path2.split("/").pop()?.replace(/\.md$/, "") ?? path2;
+function fileTitle(path22) {
+  return path22.split("/").pop()?.replace(/\.md$/, "") ?? path22;
 }
 function phaseFor(minutes) {
   if (minutes < 9 * 60) {
@@ -956,15 +961,15 @@ function parseBuildName(buildName) {
 function sameProjectName(a, b) {
   return a.toLowerCase() === b.toLowerCase();
 }
-function ensureTrailingSep(path2) {
-  return path2.endsWith(sep) ? path2 : `${path2}${sep}`;
+function ensureTrailingSep(path22) {
+  return path22.endsWith(sep) ? path22 : `${path22}${sep}`;
 }
-function stripTrailingSep(path2) {
-  return path2.endsWith(sep) ? path2.slice(0, -1) : path2;
+function stripTrailingSep(path22) {
+  return path22.endsWith(sep) ? path22.slice(0, -1) : path22;
 }
-function isDirectory(path2) {
+function isDirectory(path22) {
   try {
-    return statSync2(path2).isDirectory();
+    return statSync2(path22).isDirectory();
   } catch {
     return false;
   }
@@ -1000,27 +1005,27 @@ function loadFileProjects() {
 function projectRecordPaths(root) {
   if (!existsSync2(root)) return [];
   try {
-    return readdirSync2(root).map((name) => join2(root, name)).filter((path2) => isDirectory(path2) && existsSync2(join2(path2, "project.md")));
+    return readdirSync2(root).map((name) => join2(root, name)).filter((path22) => isDirectory(path22) && existsSync2(join2(path22, "project.md")));
   } catch {
     return [];
   }
 }
-function readFileProject(path2) {
+function readFileProject(path22) {
   try {
-    const raw = readFileSync2(join2(path2, "project.md"), "utf8");
+    const raw = readFileSync2(join2(path22, "project.md"), "utf8");
     const meta = {
       ...parseMarkdownFields(raw),
       ...parseFrontmatter2(raw)
     };
-    const name = meta.name ?? path2.split(sep).pop() ?? "";
+    const name = meta.name ?? path22.split(sep).pop() ?? "";
     if (!name) return null;
     return {
       id: meta.project_id ?? "",
       name,
       org_id: meta.org_id ?? "",
       space_id: meta.space_id ?? "",
-      local_path: path2,
-      active_build: meta.active_build ? resolveMetadataPath(path2, meta.active_build) : void 0,
+      local_path: path22,
+      active_build: meta.active_build ? resolveMetadataPath(path22, meta.active_build) : void 0,
       materialization_status: meta.status ?? "file_record"
     };
   } catch {
@@ -1034,18 +1039,25 @@ function mergeProjects(daemon, fileProjects) {
   }
   for (const project of daemon) {
     const existing = merged.get(projectKey(project));
+    const orgId = preferTypedId(project.org_id, existing?.org_id, "org:");
+    const spaceId = preferTypedId(project.space_id, existing?.space_id, "space:");
     merged.set(projectKey(project), {
       ...existing,
       ...project,
       id: project.id || existing?.id || "",
-      org_id: project.org_id || existing?.org_id || "",
-      space_id: project.space_id || existing?.space_id || "",
+      org_id: orgId,
+      space_id: spaceId,
       local_path: project.local_path || existing?.local_path || "",
       active_build: project.active_build || existing?.active_build,
       materialization_status: project.materialization_status || existing?.materialization_status || ""
     });
   }
   return [...merged.values()];
+}
+function preferTypedId(primary, fallback, prefix) {
+  if (primary.startsWith(prefix)) return primary;
+  if (fallback?.startsWith(prefix)) return fallback;
+  return primary || fallback || "";
 }
 function resolveMetadataPath(projectRecord, raw) {
   const clean = raw.replaceAll("\\ ", " ");
@@ -1219,8 +1231,8 @@ function stableId(prefix, value) {
 function sqlEscape(value) {
   return value.replaceAll("'", "''");
 }
-function readText(path2) {
-  return readFileSync3(path2, "utf8");
+function readText(path22) {
+  return readFileSync3(path22, "utf8");
 }
 function parseLimit(raw, fallback, max = 500) {
   const parsed = Number.parseInt(raw ?? "", 10);
@@ -1319,16 +1331,16 @@ function projectRegistry(project = "proslync-app-ios-final") {
     authority: "file_backed_registry",
     project,
     client: project === "proslync-app-ios-final" ? "Ms. Wilson / Proslync" : null,
-    active_builds: Object.entries(roots).map(([id, path2]) => ({
+    active_builds: Object.entries(roots).map(([id, path22]) => ({
       id,
-      path: path2,
-      exists: existsSync3(path2)
+      path: path22,
+      exists: existsSync3(path22)
     })),
     canonical_docs: [
       join3(roots.app, "PLAN.md"),
       join3(roots.app, "research-plane", "cross-pollinators", "identity-absorption-product-plan-2026-05-09.md"),
       join3(roots.assets, "docs", "plans", "proslync-role-happiness-master-plan-2026-05-09", "README.md")
-    ].map((path2) => ({ path: path2, exists: existsSync3(path2) })),
+    ].map((path22) => ({ path: path22, exists: existsSync3(path22) })),
     acceptance_commands: [
       "ema bootstrap status --project proslync-app-ios-final --json",
       "ema capability assert --required lane,queue,agent,harness,intention,db,artifact,execution --project proslync-app-ios-final --json",
@@ -1622,6 +1634,8 @@ async function runSwarm(args) {
   const verb = args.positional[0];
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return runSwarmHelp(args);
   if (verb === "create") return createSwarm(args);
+  if (verb === "scope-claim") return scopeClaim(args);
+  if (verb === "scope-registry" || verb === "scope") return listScopeClaims(args);
   if (verb === "start") return changeSwarm(args, "swarm.start", "started");
   if (verb === "pause") return changeSwarm(args, "swarm.pause", "paused");
   if (verb === "stop") return changeSwarm(args, "swarm.stop", "stopped");
@@ -1643,7 +1657,9 @@ function runSwarmHelp(args) {
       { verb: "start", flags: ["swarm"], required: ["swarm"], summary: "Move a swarm to started." },
       { verb: "pause", flags: ["swarm", "reason"], required: ["swarm"], summary: "Pause a swarm with an optional reason." },
       { verb: "stop", flags: ["swarm", "reason"], required: ["swarm"], summary: "Stop a swarm with an optional reason." },
-      { verb: "report", flags: ["swarm", "summary"], required: ["swarm"], summary: "Append a swarm report event with an optional summary." }
+      { verb: "report", flags: ["swarm", "summary"], required: ["swarm"], summary: "Append a swarm report event with an optional summary." },
+      { verb: "scope-claim", flags: ["path", "scope", "swarm", "project"], required: ["path"], summary: "Claim an edit path through daemon-enforced scope.registry overlap checks." },
+      { verb: "scope-registry", flags: ["project", "all-projects", "json"], summary: "List active edit path claims from scope.registry." }
     ]
   });
 }
@@ -1689,6 +1705,41 @@ async function reportSwarm(args) {
     body: flagString(args, "summary") ?? flagString(args, "body") ?? null
   }, { human: `recorded swarm report for ${swarm}`, resourceLabel: "swarm_report" });
 }
+async function scopeClaim(args) {
+  const path22 = flagString(args, "path") ?? flagString(args, "scope");
+  if (!path22) {
+    emitError("ema swarm scope-claim: --path is required");
+    return 64;
+  }
+  return sendWorkspaceCommand(args, "swarm.scope_claim", {
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
+    swarm_id: flagString(args, "swarm") ?? null,
+    project_id: flagString(args, "project") ?? null,
+    scope: path22
+  }, { human: `claimed edit scope ${path22}`, resourceLabel: "scope_claim" });
+}
+async function listScopeClaims(args) {
+  const json = flagBool(args, "json");
+  const context = await workspaceScopeContext(args);
+  const claims = await readProjection(args, {
+    name: "scope.registry",
+    pick: (data) => data.claims ?? []
+  });
+  if (!claims) return 1;
+  const scoped = filterProjectScopedRecords(claims, context);
+  if (json) emitJson({ ok: true, source: "scope.registry", claims: scoped });
+  else {
+    emitPretty("# scope claims");
+    if (scoped.length === 0) emitPretty("  (none)");
+    for (const claim of scoped) {
+      emitPretty(`  ${claim.id} [${claim.status ?? "unknown"}] ${claim.path ?? ""}`);
+      if (claim.actor_id) emitPretty(`    actor: ${claim.actor_id}`);
+      if (claim.owner_id) emitPretty(`    owner: ${claim.owner_kind ?? "owner"} ${claim.owner_id}`);
+    }
+  }
+  return 0;
+}
 async function listSwarms(args) {
   const json = flagBool(args, "json");
   const swarms = await loadSwarms(args);
@@ -1727,6 +1778,48 @@ async function loadSwarms(args) {
 }
 
 // src/commands/org.ts
+var ORG_ENTITY_CONFLICT_STRATEGIES = [
+  {
+    entity_class: "Blueprint prose",
+    conflict_strategy: "CRDT prose",
+    source: "docs/orchestration/source-intake/pattern-routing-2026-05-10.md"
+  },
+  {
+    entity_class: "Audit events / agent reports",
+    conflict_strategy: "append-only events",
+    source: "docs/decisions/2026-05-10-multi-host-conflict-policy.md"
+  },
+  {
+    entity_class: "Lane status fields",
+    conflict_strategy: "LWW status fields",
+    source: "docs/decisions/2026-05-10-multi-host-conflict-policy.md"
+  },
+  {
+    entity_class: "Lane claims",
+    conflict_strategy: "distributed mutex",
+    source: "docs/decisions/2026-05-10-multi-host-conflict-policy.md"
+  },
+  {
+    entity_class: "Queue item state advances",
+    conflict_strategy: "LWW + state-machine validation",
+    source: "docs/decisions/2026-05-10-multi-host-conflict-policy.md"
+  },
+  {
+    entity_class: "Approval queue advances",
+    conflict_strategy: "distributed sequencer",
+    source: "docs/decisions/2026-05-10-multi-host-conflict-policy.md"
+  },
+  {
+    entity_class: "Source records",
+    conflict_strategy: "append-only + supersede",
+    source: "packages/contracts/workspace/v0/source-intake.md"
+  },
+  {
+    entity_class: "Donor patterns",
+    conflict_strategy: "CRDT prose",
+    source: "packages/contracts/workspace/v0/schema.md"
+  }
+];
 async function runOrg(args) {
   const sub = args.positional[0];
   if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
@@ -1735,12 +1828,14 @@ async function runOrg(args) {
       status: "available",
       docRef: "docs/cli/agent-workspace.md",
       commands: [
-        { verb: "create", flags: ["name"], required: ["name"], summary: "Create an organization and its same-name default space." }
+        { verb: "create", flags: ["name"], required: ["name"], summary: "Create an organization and its same-name default space." },
+        { verb: "status", flags: ["org", "json"], summary: "Read daemon org status, host-set doctrine, and entity conflict strategies." }
       ]
     });
   }
+  if (sub === "status") return runOrgStatus(args);
   if (sub !== "create") {
-    emitError(`ema org: unknown subcommand "${sub ?? ""}" (expected: create)`);
+    emitError(`ema org: unknown subcommand "${sub ?? ""}" (expected: create | status)`);
     return 64;
   }
   const json = flagBool(args, "json");
@@ -1770,6 +1865,66 @@ async function runOrg(args) {
   } catch (err) {
     return reportError(err, json);
   }
+}
+async function runOrgStatus(args) {
+  const json = flagBool(args, "json");
+  const projection2 = await readProjection(args, {
+    name: "topbar",
+    pick: (data) => data
+  });
+  if (!projection2) return 1;
+  const targetOrg = flagString(args, "org") ?? projection2.current_org?.id ?? "";
+  if (!targetOrg) {
+    emitError("ema org status: --org is required when the daemon has no current org");
+    return 64;
+  }
+  const status2 = orgStatusFromTopbar(projection2, targetOrg);
+  if (json) emitJson(status2);
+  else if (status2.org) {
+    emitPretty(`${status2.org.name} (${status2.org.id})`);
+    emitPretty(`accessibility: ${status2.host_set.accessibility}`);
+    emitPretty(`host_set: required_min=${status2.host_set.required_min}, online_count=${status2.host_set.online_count ?? "unknown"}`);
+    emitPretty("entity conflict strategies:");
+    for (const row of status2.entity_classes) {
+      emitPretty(`  ${row.entity_class}: ${row.conflict_strategy}`);
+    }
+  } else {
+    emitError(`ema org status: unknown org ${targetOrg}`);
+  }
+  return status2.ok ? 0 : 1;
+}
+function orgStatusFromTopbar(projection2, targetOrg) {
+  const orgs = projection2.orgs ?? [];
+  const current = projection2.current_org ?? null;
+  const org = orgs.find((item) => item.id === targetOrg) ?? null;
+  if (!org) {
+    return {
+      ok: false,
+      source: "topbar_projection",
+      org: null,
+      host_set: {
+        required_min: 1,
+        doctrine: "binary_accessibility",
+        online_count: null,
+        accessibility: "unknown"
+      },
+      entity_classes: ORG_ENTITY_CONFLICT_STRATEGIES,
+      error: "unknown_org"
+    };
+  }
+  const isCurrentOrg = current?.id === org.id;
+  return {
+    ok: true,
+    source: "topbar_projection",
+    org,
+    host_set: {
+      required_min: 1,
+      doctrine: "binary_accessibility",
+      online_count: isCurrentOrg ? 1 : null,
+      accessibility: isCurrentOrg ? "accessible" : "known_but_not_current"
+    },
+    entity_classes: ORG_ENTITY_CONFLICT_STRATEGIES
+  };
 }
 
 // src/commands/space.ts
@@ -4964,26 +5119,26 @@ async function runMine(args) {
     emitError("ema blueprint mine: --transcript <path> is required");
     return 64;
   }
-  const path2 = resolve(transcript);
-  if (!existsSync4(path2)) {
-    emitError(`ema blueprint mine: transcript not found: ${path2}`);
+  const path22 = resolve(transcript);
+  if (!existsSync4(path22)) {
+    emitError(`ema blueprint mine: transcript not found: ${path22}`);
     return 1;
   }
   let body;
   try {
-    body = readFileSync4(path2, "utf8");
+    body = readFileSync4(path22, "utf8");
   } catch (err) {
     emitError(`ema blueprint mine: cannot read transcript: ${err.message}`);
     return 1;
   }
-  const sections = mineTranscript(body, path2);
+  const sections = mineTranscript(body, path22);
   if (dryRun) {
     const payload = {
       ok: true,
       command: "blueprint mine",
       mode: "dry_run",
-      transcript_path: path2,
-      transcript_node_id: stableHash(path2),
+      transcript_path: path22,
+      transcript_node_id: stableHash(path22),
       section_count: sections.length,
       sections,
       doc: DOC_REF5
@@ -4991,7 +5146,7 @@ async function runMine(args) {
     if (json) emitJson(payload);
     else {
       emitPretty(`# blueprint mine (dry-run)`);
-      emitPretty(`transcript: ${path2}`);
+      emitPretty(`transcript: ${path22}`);
       emitPretty(`sections: ${sections.length}`);
       for (const s of sections) {
         emitPretty(
@@ -5006,13 +5161,13 @@ async function runMine(args) {
     optionalArgs({
       org_id: flagString(args, "org") ?? DEFAULT_ORG4,
       actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR4,
-      transcript_path: path2,
-      transcript_node_id: stableHash(path2),
+      transcript_path: path22,
+      transcript_node_id: stableHash(path22),
       section_count: sections.length
     }),
     {
       json,
-      human: `submitted ${sections.length} mined section(s) from ${path2}`,
+      human: `submitted ${sections.length} mined section(s) from ${path22}`,
       resourceLabel: "transcript"
     }
   );
@@ -5395,8 +5550,8 @@ async function runBacklinks(args) {
 async function runCheck(args) {
   const json = flagBool(args, "json");
   const registry2 = await loadRegistry();
-  const audit = await auditRegistry(registry2);
-  const ok = audit.issues.length === 0;
+  const audit13 = await auditRegistry(registry2);
+  const ok = audit13.issues.length === 0;
   if (json) {
     emitJson({
       ok,
@@ -5404,18 +5559,18 @@ async function runCheck(args) {
       source: "doc_registry",
       registry_path: REGISTRY_PATH,
       entries: Object.keys(registry2.docs).length,
-      markdown_count: audit.markdownCount,
-      stamped_count: audit.stamped.length,
-      unstamped: audit.unstamped,
-      issues: audit.issues
+      markdown_count: audit13.markdownCount,
+      stamped_count: audit13.stamped.length,
+      unstamped: audit13.unstamped,
+      issues: audit13.issues
     });
   } else {
     emitPretty(
       `wiki check: ${Object.keys(registry2.docs).length} entries in registry`
     );
     emitPretty("---");
-    if (audit.missingCount === 0) emitPretty("  all paths resolve cleanly");
-    for (const issue of audit.issues) {
+    if (audit13.missingCount === 0) emitPretty("  all paths resolve cleanly");
+    for (const issue of audit13.issues) {
       if (issue.kind === "missing_path")
         emitPretty(`  MISSING  ${issue.id}  (${issue.path})`);
       if (issue.kind === "read_error")
@@ -5428,16 +5583,16 @@ async function runCheck(args) {
     }
     emitPretty("---");
     emitPretty(
-      `stamped:    ${audit.stamped.length} / ${audit.markdownCount} markdown docs`
+      `stamped:    ${audit13.stamped.length} / ${audit13.markdownCount} markdown docs`
     );
-    if (audit.unstamped.length > 0) {
+    if (audit13.unstamped.length > 0) {
       emitPretty(
-        `unstamped:  ${audit.unstamped.length} docs (no <!-- wiki-id: ... --> at top)`
+        `unstamped:  ${audit13.unstamped.length} docs (no <!-- wiki-id: ... --> at top)`
       );
-      for (const id of audit.unstamped) emitPretty(`  - ${id}`);
+      for (const id of audit13.unstamped) emitPretty(`  - ${id}`);
     }
     emitPretty("---");
-    emitPretty(`issues: ${audit.issues.length}`);
+    emitPretty(`issues: ${audit13.issues.length}`);
   }
   return ok ? 0 : 1;
 }
@@ -5965,10 +6120,10 @@ function readFreshRoundtrip(provider, ttlMs = CODEX_ROUNDTRIP_PROOF_TTL_MS) {
       age_ms: proof.age_ms
     };
   }
-  const path2 = roundtripCachePath(provider);
-  if (!existsSync6(path2)) return { ok: false, reason: "missing recent successful roundtrip", entry: null };
+  const path22 = roundtripCachePath(provider);
+  if (!existsSync6(path22)) return { ok: false, reason: "missing recent successful roundtrip", entry: null };
   try {
-    const entry = JSON.parse(readFileSync5(path2, "utf8"));
+    const entry = JSON.parse(readFileSync5(path22, "utf8"));
     const completedAt = Date.parse(entry.completed_at);
     if (!Number.isFinite(completedAt)) return { ok: false, reason: "cached roundtrip timestamp is invalid", entry };
     const age = Date.now() - completedAt;
@@ -6855,8 +7010,8 @@ async function runCodexDispatch(args, spec) {
   });
   const ended = (/* @__PURE__ */ new Date()).toISOString();
   const timedOut = isTimeoutResult(result);
-  const exitCode = typeof result.status === "number" ? result.status : timedOut ? -1 : 1;
-  const ok = !timedOut && exitCode === 0;
+  const exitCode2 = typeof result.status === "number" ? result.status : timedOut ? -1 : 1;
+  const ok = !timedOut && exitCode2 === 0;
   const outcome = timedOut ? "timeout" : ok ? "completed" : "failed";
   const stdout = result.stdout ?? "";
   const stderr = result.stderr ?? "";
@@ -6872,7 +7027,7 @@ async function runCodexDispatch(args, spec) {
       dispatchId,
       executionId,
       outcome,
-      exitCode,
+      exitCode: exitCode2,
       timeoutMs,
       durationMs,
       stdout,
@@ -6907,7 +7062,7 @@ async function runCodexDispatch(args, spec) {
     stderr,
     error: result.error ? String(result.error) : null,
     canonical_close_error: canonicalCloseError,
-    exit_code: exitCode,
+    exit_code: exitCode2,
     duration_ms: durationMs,
     stdout_bytes: byteLength(stdout),
     stderr_bytes: byteLength(stderr),
@@ -7335,9 +7490,9 @@ function codexSessionDir() {
 function codexSessionFilePath(executionId) {
   return join5(codexSessionDir(), `${sanitizeFile(executionId)}.jsonl`);
 }
-function writeCodexJsonl(path2, stdout) {
+function writeCodexJsonl(path22, stdout) {
   mkdirSync3(codexSessionDir(), { recursive: true });
-  const fd = openSync(path2, "a");
+  const fd = openSync(path22, "a");
   try {
     const lines = stdout.trim().length > 0 ? stdout.trimEnd().split("\n") : [];
     for (const line of lines) {
@@ -7536,9 +7691,9 @@ function writeRecord(record) {
   writeFileSync3(registryPath(record.execution.id), JSON.stringify({ ...record, updated_at: (/* @__PURE__ */ new Date()).toISOString() }, null, 2) + "\n");
 }
 function readRecord(executionId) {
-  const path2 = registryPath(executionId);
-  if (!existsSync7(path2)) return null;
-  return JSON.parse(readFileSync6(path2, "utf8"));
+  const path22 = registryPath(executionId);
+  if (!existsSync7(path22)) return null;
+  return JSON.parse(readFileSync6(path22, "utf8"));
 }
 function readRecords2() {
   const dir = registryDir();
@@ -7575,9 +7730,9 @@ function upsertLaneAssignment(lane, record) {
   writeFileSync3(laneAssignmentPath(lane), JSON.stringify({ lane_id: lane, backend: "file_backed_lane_session_registry", daemon_authority: "file_backed_harness_registry", sessions }, null, 2) + "\n");
 }
 function readLaneAssignment(lane) {
-  const path2 = laneAssignmentPath(lane);
-  if (!existsSync7(path2)) return null;
-  return JSON.parse(readFileSync6(path2, "utf8"));
+  const path22 = laneAssignmentPath(lane);
+  if (!existsSync7(path22)) return null;
+  return JSON.parse(readFileSync6(path22, "utf8"));
 }
 function readLaneAssignments() {
   const dir = laneAssignmentsDir();
@@ -7591,10 +7746,10 @@ function appendEvents(events2) {
   if (lines) writeFileSync3(eventLogPath(), lines + "\n", { flag: "a" });
 }
 function readEvents(selector) {
-  const path2 = eventLogPath();
+  const path22 = eventLogPath();
   let events2 = [];
-  if (existsSync7(path2)) {
-    events2 = readFileSync6(path2, "utf8").split("\n").filter(Boolean).map((line) => {
+  if (existsSync7(path22)) {
+    events2 = readFileSync6(path22, "utf8").split("\n").filter(Boolean).map((line) => {
       try {
         return JSON.parse(line);
       } catch {
@@ -7632,7 +7787,7 @@ function captureTmux(session, lines) {
 }
 function writeSearchBundle(records) {
   mkdirSync3(searchDir(), { recursive: true });
-  const path2 = join5(searchDir(), `bundle-${Date.now()}.txt`);
+  const path22 = join5(searchDir(), `bundle-${Date.now()}.txt`);
   const chunks = [];
   chunks.push(`# Harness Glue search bundle ${(/* @__PURE__ */ new Date()).toISOString()}
 `);
@@ -7649,8 +7804,8 @@ ${JSON.stringify(record, null, 2)}
 ${captureTmux(session, 500).output}
 `);
   }
-  writeFileSync3(path2, chunks.join(""));
-  return path2;
+  writeFileSync3(path22, chunks.join(""));
+  return path22;
 }
 function providerCommand(provider, cwd, prompt) {
   const quotedCwd = shellQuote2(cwd);
@@ -8115,7 +8270,7 @@ async function capabilityReport(args, options = {}) {
     join7(EMA_ACTIVE_BUILD, "docs", "WORKSPACE-ENTRYPOINT.md"),
     "/Users/trajanm4air/Desktop/Projects/EMA/atlas/canon/current/ema-0-0-5-current-canon.md",
     "/Users/trajanm4air/Desktop/Projects/EMA/atlas/workspace/README.md"
-  ].map((path2) => ({ path: path2, exists: existsSync9(path2), stale_marker: existsSync9(path2) ? containsStaleMarker(path2) : false }));
+  ].map((path22) => ({ path: path22, exists: existsSync9(path22), stale_marker: existsSync9(path22) ? containsStaleMarker(path22) : false }));
   return {
     ok: daemon.ok && db.ok,
     command: "capability.list",
@@ -8316,9 +8471,9 @@ function cliFreshness() {
     dist_older_than_source: srcMtime !== null && distMtime !== null ? distMtime < srcMtime : null
   };
 }
-function containsStaleMarker(path2) {
+function containsStaleMarker(path22) {
   try {
-    const text = readFileSync8(path2, "utf8");
+    const text = readFileSync8(path22, "utf8");
     return /0\.0\.5|EMA-0\.0\.5|Founding-Fathers-EMA/.test(text);
   } catch {
     return false;
@@ -8460,10 +8615,10 @@ function classifyArtifactWriter() {
   if (hasLegacyLocalWritePath) return "node";
   return "absent";
 }
-function readSourceIfPresent(path2) {
-  if (!existsSync10(path2)) return null;
+function readSourceIfPresent(path22) {
+  if (!existsSync10(path22)) return null;
   try {
-    return readFileSync9(path2, "utf8");
+    return readFileSync9(path22, "utf8");
   } catch {
     return null;
   }
@@ -8611,6 +8766,1240 @@ function readRestartProofState() {
   }
 }
 
+// src/lib/workspace-audit/index.ts
+import os from "os";
+import path14 from "path";
+import { promises as fs14 } from "fs";
+
+// src/lib/workspace-audit/active-projects-symmetry.ts
+var active_projects_symmetry_exports = {};
+__export(active_projects_symmetry_exports, {
+  audit: () => audit
+});
+import { promises as fs2 } from "fs";
+import path2 from "path";
+var IGNORE = /* @__PURE__ */ new Set([
+  ".DS_Store",
+  "README.md",
+  ".git",
+  "_archive",
+  "_archive_old"
+]);
+async function listDirs(root) {
+  let entries;
+  try {
+    entries = await fs2.readdir(root, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const e of entries) {
+    if (IGNORE.has(e.name)) continue;
+    if (e.isDirectory() || e.isSymbolicLink()) out.push(e.name);
+  }
+  return out;
+}
+function canonicalProjectName(name) {
+  const m = name.match(/^(.+?)-\d+\.\d+\.\d+$/);
+  return m ? m[1] : name;
+}
+async function audit(ctx) {
+  const t0 = Date.now();
+  const active = await listDirs(ctx.activeBuildsRoot);
+  const projects = await listDirs(ctx.projectsRoot);
+  const findings = [];
+  const projectSet = new Set(projects);
+  for (const name of active) {
+    const canon = canonicalProjectName(name);
+    if (projectSet.has(name) || projectSet.has(canon)) continue;
+    findings.push({
+      category: "active-projects-symmetry",
+      severity: "warn",
+      fix_class: "C",
+      id: `orphan-active:${name}`,
+      path: path2.join(ctx.activeBuildsRoot, name),
+      note: `Active build "${name}" has no Projects/ entry`,
+      suggested_fix: `Either promote to Projects/${canon} or move under Active builds/_archive/`
+    });
+  }
+  const activeCanonSet = new Set(active.map(canonicalProjectName));
+  const activeRawSet = new Set(active);
+  for (const name of projects) {
+    if (activeRawSet.has(name) || activeCanonSet.has(name)) continue;
+    findings.push({
+      category: "active-projects-symmetry",
+      severity: "info",
+      fix_class: "C",
+      id: `dormant-project:${name}`,
+      path: path2.join(ctx.projectsRoot, name),
+      note: `Project "${name}" has no in-flight Active builds entry`,
+      suggested_fix: `Either spin up Active builds/${name} or accept dormant status`
+    });
+  }
+  return {
+    category: "active-projects-symmetry",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+
+// src/lib/workspace-audit/naming-drift.ts
+var naming_drift_exports = {};
+__export(naming_drift_exports, {
+  audit: () => audit2
+});
+import { promises as fs3 } from "fs";
+import path3 from "path";
+var IGNORE2 = /* @__PURE__ */ new Set([".DS_Store", "README.md", ".git", "_archive"]);
+async function listEntries(root) {
+  try {
+    const entries = await fs3.readdir(root, { withFileTypes: true });
+    return entries.filter((e) => !IGNORE2.has(e.name)).filter((e) => e.isDirectory() || e.isSymbolicLink()).map((e) => e.name);
+  } catch {
+    return [];
+  }
+}
+var DUP_SUFFIX = / (?:\d+|copy|backup|old|final|FINAL|tmp|temp|TEMP|new|NEW)$/;
+async function audit2(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  for (const root of [ctx.activeBuildsRoot, ctx.projectsRoot]) {
+    const names = await listEntries(root);
+    const lowerMap = /* @__PURE__ */ new Map();
+    for (const n of names) {
+      const lc = n.toLowerCase();
+      const arr = lowerMap.get(lc) ?? [];
+      arr.push(n);
+      lowerMap.set(lc, arr);
+    }
+    for (const n of names) {
+      if (n !== n.trim()) {
+        findings.push({
+          category: "naming-drift",
+          severity: "warn",
+          fix_class: "C",
+          id: `whitespace:${root}:${n}`,
+          path: path3.join(root, n),
+          note: `Directory name has leading/trailing whitespace: "${n}"`,
+          suggested_fix: `Rename to "${n.trim()}"`
+        });
+      }
+      if (DUP_SUFFIX.test(n)) {
+        findings.push({
+          category: "naming-drift",
+          severity: "warn",
+          fix_class: "C",
+          id: `dup-suffix:${root}:${n}`,
+          path: path3.join(root, n),
+          note: `Directory name carries duplicate-style suffix: "${n}"`,
+          suggested_fix: `Confirm intent; rename or move into _archive/`
+        });
+      }
+      const lc = n.toLowerCase();
+      const siblings = lowerMap.get(lc) ?? [];
+      if (siblings.length > 1) {
+        findings.push({
+          category: "naming-drift",
+          severity: "error",
+          fix_class: "C",
+          id: `case-collision:${root}:${lc}`,
+          path: root,
+          note: `Case-insensitive collision: ${siblings.join(", ")}`,
+          suggested_fix: `Pick one canonical name; case-folding filesystems break here`
+        });
+      }
+    }
+    if (root === ctx.projectsRoot) {
+      for (const n of names) {
+        if (/[A-Z\s_]/.test(n)) {
+          findings.push({
+            category: "naming-drift",
+            severity: "info",
+            fix_class: "C",
+            id: `non-kebab:${n}`,
+            path: path3.join(root, n),
+            note: `Project "${n}" is not kebab-case`,
+            suggested_fix: `Rename to ${n.replace(/[\s_]+/g, "-").toLowerCase()}`
+          });
+        }
+      }
+    }
+  }
+  const seen = /* @__PURE__ */ new Set();
+  const unique = findings.filter((f) => {
+    if (seen.has(f.id)) return false;
+    seen.add(f.id);
+    return true;
+  });
+  return {
+    category: "naming-drift",
+    findings: unique,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+
+// src/lib/workspace-audit/unborn-projects.ts
+var unborn_projects_exports = {};
+__export(unborn_projects_exports, {
+  audit: () => audit3
+});
+import { promises as fs4 } from "fs";
+import path4 from "path";
+import { execFile } from "child_process";
+import { promisify } from "util";
+var execFileP = promisify(execFile);
+async function isDir(p) {
+  try {
+    const s = await fs4.stat(p);
+    return s.isDirectory();
+  } catch {
+    return false;
+  }
+}
+async function isGitRepo(dir) {
+  const gitPath = path4.join(dir, ".git");
+  try {
+    const s = await fs4.lstat(gitPath);
+    return s.isDirectory() || s.isFile();
+  } catch {
+    return false;
+  }
+}
+async function hasCommits(dir) {
+  try {
+    await execFileP("git", ["-C", dir, "rev-parse", "--verify", "HEAD"], {
+      timeout: 5e3
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function audit3(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  let entries;
+  try {
+    entries = await fs4.readdir(ctx.projectsRoot, { withFileTypes: true });
+  } catch {
+    return { category: "unborn-projects", findings, scan_ms: ctx.verbose ? Date.now() - t0 : void 0 };
+  }
+  for (const e of entries) {
+    if (!e.isDirectory()) continue;
+    if (e.name.startsWith(".") || e.name === "_archive") continue;
+    const dir = path4.join(ctx.projectsRoot, e.name);
+    if (!await isDir(dir)) continue;
+    if (!await isGitRepo(dir)) continue;
+    if (await hasCommits(dir)) continue;
+    findings.push({
+      category: "unborn-projects",
+      severity: "warn",
+      fix_class: "B",
+      id: `unborn:${e.name}`,
+      path: dir,
+      note: `Projects/${e.name} is a git repo with no commits (unborn HEAD)`,
+      suggested_fix: `cd "${dir}" && git add -A && git commit -m "init: ${e.name}"`,
+      requires_flag: "with-branches"
+    });
+  }
+  return {
+    category: "unborn-projects",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+
+// src/lib/workspace-audit/stale-worktrees.ts
+var stale_worktrees_exports = {};
+__export(stale_worktrees_exports, {
+  audit: () => audit4,
+  pruneRepo: () => pruneRepo
+});
+import { promises as fs5 } from "fs";
+import path5 from "path";
+import { execFile as execFile2 } from "child_process";
+import { promisify as promisify2 } from "util";
+var execFileP2 = promisify2(execFile2);
+async function listGitRepos(activeRoot) {
+  let entries;
+  try {
+    entries = await fs5.readdir(activeRoot, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const e of entries) {
+    if (!e.isDirectory() && !e.isSymbolicLink()) continue;
+    const dir = path5.join(activeRoot, e.name);
+    try {
+      const gitPath = path5.join(dir, ".git");
+      const s = await fs5.lstat(gitPath);
+      if (s.isDirectory() || s.isFile()) out.push(dir);
+    } catch {
+    }
+  }
+  return out;
+}
+async function listWorktrees(repo) {
+  try {
+    const { stdout } = await execFileP2("git", ["-C", repo, "worktree", "list", "--porcelain"], {
+      timeout: 5e3
+    });
+    const out = [];
+    let current = null;
+    for (const line of stdout.split("\n")) {
+      if (line.startsWith("worktree ")) {
+        if (current) out.push(current);
+        current = { path: line.slice("worktree ".length).trim() };
+      } else if (current && line.startsWith("HEAD ")) {
+        current.commit = line.slice("HEAD ".length).trim();
+      } else if (current && line.startsWith("branch ")) {
+        current.branch = line.slice("branch ".length).trim();
+      } else if (current && line === "bare") {
+        current.bare = true;
+      } else if (current && line.startsWith("prunable")) {
+        current.prunable = line.slice("prunable".length).trim() || "prunable";
+      }
+    }
+    if (current) out.push(current);
+    return out;
+  } catch {
+    return [];
+  }
+}
+async function audit4(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  const repos = await listGitRepos(ctx.activeBuildsRoot);
+  for (const repo of repos) {
+    const wts = await listWorktrees(repo);
+    for (const wt of wts) {
+      if (wt.path === repo) continue;
+      if (wt.bare) continue;
+      let exists4 = true;
+      try {
+        const s = await fs5.stat(wt.path);
+        exists4 = s.isDirectory();
+      } catch {
+        exists4 = false;
+      }
+      if (!exists4 || wt.prunable) {
+        findings.push({
+          category: "stale-worktrees",
+          severity: "warn",
+          fix_class: "A",
+          id: `stale-wt:${repo}:${wt.path}`,
+          path: wt.path,
+          note: `Worktree registered in ${path5.basename(repo)} but path is gone${wt.branch ? ` (branch ${wt.branch})` : ""}`,
+          suggested_fix: `git -C "${repo}" worktree prune`
+        });
+      }
+    }
+  }
+  return {
+    category: "stale-worktrees",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+async function pruneRepo(repo) {
+  await execFileP2("git", ["-C", repo, "worktree", "prune"], { timeout: 5e3 });
+}
+
+// src/lib/workspace-audit/old-stashes.ts
+var old_stashes_exports = {};
+__export(old_stashes_exports, {
+  audit: () => audit5,
+  dropStash: () => dropStash
+});
+import { promises as fs6 } from "fs";
+import path6 from "path";
+import { execFile as execFile3 } from "child_process";
+import { promisify as promisify3 } from "util";
+var execFileP3 = promisify3(execFile3);
+var STALE_MS = 30 * 24 * 60 * 60 * 1e3;
+async function listGitRepos2(root) {
+  let entries;
+  try {
+    entries = await fs6.readdir(root, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const e of entries) {
+    if (!e.isDirectory() && !e.isSymbolicLink()) continue;
+    const dir = path6.join(root, e.name);
+    try {
+      const s = await fs6.lstat(path6.join(dir, ".git"));
+      if (s.isDirectory() || s.isFile()) out.push(dir);
+    } catch {
+    }
+  }
+  return out;
+}
+async function listStashes(repo) {
+  try {
+    const { stdout } = await execFileP3(
+      "git",
+      ["-C", repo, "stash", "list", "--format=%gd|%ct|%gs"],
+      { timeout: 5e3 }
+    );
+    const out = [];
+    for (const line of stdout.split("\n")) {
+      if (!line.trim()) continue;
+      const [ref, ts, ...rest] = line.split("|");
+      const subject = rest.join("|");
+      const timestamp = Number(ts) * 1e3;
+      if (!ref || !Number.isFinite(timestamp)) continue;
+      out.push({ ref, subject: subject.trim(), timestamp });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+async function audit5(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  const now = Date.now();
+  const repos = await listGitRepos2(ctx.activeBuildsRoot);
+  for (const repo of repos) {
+    const stashes = await listStashes(repo);
+    for (const s of stashes) {
+      const age = now - s.timestamp;
+      if (age < STALE_MS) continue;
+      const ageDays = Math.floor(age / (24 * 60 * 60 * 1e3));
+      findings.push({
+        category: "old-stashes",
+        severity: "info",
+        fix_class: "B",
+        id: `stash:${repo}:${s.ref}`,
+        path: repo,
+        note: `${path6.basename(repo)} ${s.ref} is ${ageDays}d old: "${s.subject}"`,
+        suggested_fix: `Promote to branch (git stash branch <name> ${s.ref}) or drop with --with-stash`,
+        requires_flag: "with-stash"
+      });
+    }
+  }
+  return {
+    category: "old-stashes",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+async function dropStash(repo, ref) {
+  await execFileP3("git", ["-C", repo, "stash", "drop", ref], { timeout: 5e3 });
+}
+
+// src/lib/workspace-audit/broken-symlinks.ts
+var broken_symlinks_exports = {};
+__export(broken_symlinks_exports, {
+  audit: () => audit6,
+  removeLink: () => removeLink
+});
+import { promises as fs7 } from "fs";
+import path7 from "path";
+async function walkForSymlinks(root, maxDepth) {
+  const out = [];
+  async function recurse(dir, depth) {
+    if (depth > maxDepth) return;
+    let entries;
+    try {
+      entries = await fs7.readdir(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      const full = path7.join(dir, e.name);
+      if (e.isSymbolicLink()) {
+        try {
+          await fs7.stat(full);
+        } catch {
+          try {
+            const target = await fs7.readlink(full);
+            out.push({ linkPath: full, target });
+          } catch {
+            out.push({ linkPath: full, target: "<unreadable>" });
+          }
+        }
+      } else if (e.isDirectory()) {
+        if (e.name === "node_modules" || e.name === ".git") continue;
+        await recurse(full, depth + 1);
+      }
+    }
+  }
+  await recurse(root, 0);
+  return out;
+}
+async function audit6(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  for (const root of [ctx.activeBuildsRoot, ctx.projectsRoot, ctx.desktopRoot]) {
+    const broken = await walkForSymlinks(root, root === ctx.desktopRoot ? 1 : 2);
+    for (const b of broken) {
+      findings.push({
+        category: "broken-symlinks",
+        severity: "warn",
+        fix_class: "A",
+        id: `broken-link:${b.linkPath}`,
+        path: b.linkPath,
+        note: `Symlink target does not resolve: ${b.linkPath} \u2192 ${b.target}`,
+        suggested_fix: `rm "${b.linkPath}" (or repoint to a live target)`
+      });
+    }
+  }
+  return {
+    category: "broken-symlinks",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+async function removeLink(linkPath) {
+  await fs7.unlink(linkPath);
+}
+
+// src/lib/workspace-audit/untracked-cruft.ts
+var untracked_cruft_exports = {};
+__export(untracked_cruft_exports, {
+  audit: () => audit7
+});
+import { promises as fs8 } from "fs";
+import path8 from "path";
+import { execFile as execFile4 } from "child_process";
+import { promisify as promisify4 } from "util";
+var execFileP4 = promisify4(execFile4);
+var RELEVANT_EXT = /* @__PURE__ */ new Set([".md", ".ts", ".tsx", ".json", ".toml", ".sh", ".mjs"]);
+async function listEmaBuilds(activeRoot) {
+  try {
+    const entries = await fs8.readdir(activeRoot, { withFileTypes: true });
+    return entries.filter((e) => e.isDirectory() && /^EMA-/i.test(e.name)).map((e) => path8.join(activeRoot, e.name));
+  } catch {
+    return [];
+  }
+}
+async function untrackedRootFiles(repo) {
+  try {
+    const { stdout } = await execFileP4(
+      "git",
+      ["-C", repo, "status", "--porcelain", "--untracked-files=normal"],
+      { timeout: 5e3 }
+    );
+    const out = [];
+    for (const line of stdout.split("\n")) {
+      if (!line.startsWith("??")) continue;
+      const rel = line.slice(3).trim();
+      if (rel.includes("/")) continue;
+      if (rel.startsWith(".")) continue;
+      out.push(rel);
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+async function audit7(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  const builds = await listEmaBuilds(ctx.activeBuildsRoot);
+  for (const repo of builds) {
+    const files = await untrackedRootFiles(repo);
+    for (const rel of files) {
+      const ext = path8.extname(rel).toLowerCase();
+      if (!RELEVANT_EXT.has(ext)) continue;
+      findings.push({
+        category: "untracked-cruft",
+        severity: "info",
+        fix_class: "C",
+        id: `untracked:${repo}:${rel}`,
+        path: path8.join(repo, rel),
+        note: `Untracked top-level ${ext} file in ${path8.basename(repo)}: ${rel}`,
+        suggested_fix: `Decide: commit, gitignore, or delete`
+      });
+    }
+  }
+  return {
+    category: "untracked-cruft",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+
+// src/lib/workspace-audit/cross-clone-dups.ts
+var cross_clone_dups_exports = {};
+__export(cross_clone_dups_exports, {
+  audit: () => audit8
+});
+import { promises as fs9 } from "fs";
+import path9 from "path";
+import { execFile as execFile5 } from "child_process";
+import { promisify as promisify5 } from "util";
+var execFileP5 = promisify5(execFile5);
+async function listGitRepos3(roots) {
+  const out = [];
+  for (const root of roots) {
+    let entries;
+    try {
+      entries = await fs9.readdir(root, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const e of entries) {
+      if (!e.isDirectory()) continue;
+      if (e.name.startsWith(".") || e.name === "_archive") continue;
+      const dir = path9.join(root, e.name);
+      try {
+        const s = await fs9.lstat(path9.join(dir, ".git"));
+        if (s.isDirectory() || s.isFile()) out.push(dir);
+      } catch {
+      }
+    }
+  }
+  return out;
+}
+async function originUrl(repo) {
+  try {
+    const { stdout } = await execFileP5(
+      "git",
+      ["-C", repo, "config", "--get", "remote.origin.url"],
+      { timeout: 5e3 }
+    );
+    return stdout.trim() || null;
+  } catch {
+    return null;
+  }
+}
+function normalizeUrl(u) {
+  let url = u.trim().toLowerCase();
+  url = url.replace(/\.git$/, "");
+  url = url.replace(/^git@([^:]+):/, "$1/");
+  url = url.replace(/^https?:\/\//, "");
+  url = url.replace(/^ssh:\/\/[^/]+\//, "");
+  return url;
+}
+async function audit8(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  const repos = await listGitRepos3([ctx.activeBuildsRoot, ctx.projectsRoot]);
+  const byUrl = /* @__PURE__ */ new Map();
+  for (const repo of repos) {
+    const url = await originUrl(repo);
+    if (!url) continue;
+    const key = normalizeUrl(url);
+    const arr = byUrl.get(key) ?? [];
+    arr.push(repo);
+    byUrl.set(key, arr);
+  }
+  for (const [url, repos2] of byUrl) {
+    if (repos2.length < 2) continue;
+    findings.push({
+      category: "cross-clone-dups",
+      severity: "warn",
+      fix_class: "C",
+      id: `dup-clone:${url}`,
+      path: repos2[0],
+      note: `${repos2.length} clones share origin ${url}: ${repos2.map((r) => path9.basename(r)).join(", ")}`,
+      suggested_fix: `Pick one canonical clone; archive the others`
+    });
+  }
+  return {
+    category: "cross-clone-dups",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+
+// src/lib/workspace-audit/branch-hygiene.ts
+var branch_hygiene_exports = {};
+__export(branch_hygiene_exports, {
+  audit: () => audit9,
+  deleteBranch: () => deleteBranch
+});
+import { promises as fs10 } from "fs";
+import path10 from "path";
+import { execFile as execFile6 } from "child_process";
+import { promisify as promisify6 } from "util";
+var execFileP6 = promisify6(execFile6);
+async function listGitRepos4(root) {
+  let entries;
+  try {
+    entries = await fs10.readdir(root, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const e of entries) {
+    if (!e.isDirectory() && !e.isSymbolicLink()) continue;
+    const dir = path10.join(root, e.name);
+    try {
+      const s = await fs10.lstat(path10.join(dir, ".git"));
+      if (s.isDirectory() || s.isFile()) out.push(dir);
+    } catch {
+    }
+  }
+  return out;
+}
+async function listLocalBranches(repo) {
+  try {
+    const { stdout } = await execFileP6(
+      "git",
+      [
+        "-C",
+        repo,
+        "for-each-ref",
+        "--format=%(refname:short)|%(upstream:short)|%(upstream:track)",
+        "refs/heads"
+      ],
+      { timeout: 5e3 }
+    );
+    const out = [];
+    for (const line of stdout.split("\n")) {
+      if (!line.trim()) continue;
+      const [name, upstream, track] = line.split("|");
+      out.push({
+        name: name ?? "",
+        upstream: upstream ?? "",
+        upstreamGone: (track ?? "").includes("gone")
+      });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+async function defaultBranch(repo) {
+  for (const cand of ["main", "master"]) {
+    try {
+      await execFileP6("git", ["-C", repo, "rev-parse", "--verify", cand], { timeout: 5e3 });
+      return cand;
+    } catch {
+    }
+  }
+  return null;
+}
+async function isMerged(repo, branch, into) {
+  try {
+    const { stdout } = await execFileP6(
+      "git",
+      ["-C", repo, "branch", "--merged", into],
+      { timeout: 5e3 }
+    );
+    return stdout.split("\n").map((l) => l.replace(/^[*\s]+/, "").trim()).includes(branch);
+  } catch {
+    return false;
+  }
+}
+async function audit9(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  const repos = await listGitRepos4(ctx.activeBuildsRoot);
+  for (const repo of repos) {
+    const branches = await listLocalBranches(repo);
+    const def = await defaultBranch(repo);
+    for (const b of branches) {
+      if (b.name === def) continue;
+      if (/^claude\/[a-z]+(-[a-z]+)+$/.test(b.name)) {
+        const merged = def ? await isMerged(repo, b.name, def) : false;
+        findings.push({
+          category: "branch-hygiene",
+          severity: merged ? "info" : "warn",
+          fix_class: "B",
+          id: `claude-branch:${repo}:${b.name}`,
+          path: repo,
+          note: `${path10.basename(repo)} has Claude session branch "${b.name}"${merged ? " (merged)" : " (NOT merged)"}`,
+          suggested_fix: merged ? `git -C "${repo}" branch -d ${b.name}` : `Review work, then delete with --with-branches`,
+          requires_flag: "with-branches"
+        });
+      }
+      if (b.upstreamGone) {
+        findings.push({
+          category: "branch-hygiene",
+          severity: "info",
+          fix_class: "B",
+          id: `gone-upstream:${repo}:${b.name}`,
+          path: repo,
+          note: `${path10.basename(repo)} branch "${b.name}" tracks gone upstream ${b.upstream}`,
+          suggested_fix: `git -C "${repo}" branch -D ${b.name} (under --with-branches)`,
+          requires_flag: "with-branches"
+        });
+      }
+    }
+  }
+  return {
+    category: "branch-hygiene",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+async function deleteBranch(repo, branch, force) {
+  await execFileP6(
+    "git",
+    ["-C", repo, "branch", force ? "-D" : "-d", branch],
+    { timeout: 5e3 }
+  );
+}
+
+// src/lib/workspace-audit/push-lag.ts
+var push_lag_exports = {};
+__export(push_lag_exports, {
+  audit: () => audit10
+});
+import { promises as fs11 } from "fs";
+import path11 from "path";
+import { execFile as execFile7 } from "child_process";
+import { promisify as promisify7 } from "util";
+var execFileP7 = promisify7(execFile7);
+async function listGitRepos5(root) {
+  let entries;
+  try {
+    entries = await fs11.readdir(root, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const e of entries) {
+    if (!e.isDirectory() && !e.isSymbolicLink()) continue;
+    const dir = path11.join(root, e.name);
+    try {
+      const s = await fs11.lstat(path11.join(dir, ".git"));
+      if (s.isDirectory() || s.isFile()) out.push(dir);
+    } catch {
+    }
+  }
+  return out;
+}
+async function aheadBranches(repo) {
+  try {
+    const { stdout } = await execFileP7(
+      "git",
+      [
+        "-C",
+        repo,
+        "for-each-ref",
+        "--format=%(refname:short)|%(upstream:short)|%(upstream:track)",
+        "refs/heads"
+      ],
+      { timeout: 5e3 }
+    );
+    const out = [];
+    for (const line of stdout.split("\n")) {
+      if (!line.trim()) continue;
+      const [name, upstream, track] = line.split("|");
+      if (!upstream) continue;
+      const m = (track ?? "").match(/ahead (\d+)/);
+      if (!m) continue;
+      out.push({
+        branch: name ?? "",
+        upstream: upstream ?? "",
+        ahead: Number(m[1])
+      });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+async function audit10(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  const repos = await listGitRepos5(ctx.activeBuildsRoot);
+  for (const repo of repos) {
+    const ahead = await aheadBranches(repo);
+    for (const a of ahead) {
+      findings.push({
+        category: "push-lag",
+        severity: a.ahead >= 5 ? "warn" : "info",
+        fix_class: "C",
+        id: `ahead:${repo}:${a.branch}`,
+        path: repo,
+        note: `${path11.basename(repo)} ${a.branch} is ${a.ahead} commits ahead of ${a.upstream}`,
+        suggested_fix: `git -C "${repo}" push (operator-driven; no --apply path)`
+      });
+    }
+  }
+  return {
+    category: "push-lag",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+
+// src/lib/workspace-audit/ds-store.ts
+var ds_store_exports = {};
+__export(ds_store_exports, {
+  audit: () => audit11,
+  removePath: () => removePath
+});
+import { promises as fs12 } from "fs";
+import path12 from "path";
+var SKIP_DIR = /* @__PURE__ */ new Set([
+  "node_modules",
+  ".git",
+  "_build",
+  ".next",
+  "dist",
+  "build",
+  ".turbo",
+  ".cache",
+  ".pnpm-store",
+  "target"
+]);
+async function walkForDsStore(root, maxDepth) {
+  const out = [];
+  async function recurse(dir, depth) {
+    if (depth > maxDepth) return;
+    let entries;
+    try {
+      entries = await fs12.readdir(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const e of entries) {
+      if (e.name === ".DS_Store") {
+        out.push(path12.join(dir, e.name));
+        continue;
+      }
+      if (e.isDirectory()) {
+        if (SKIP_DIR.has(e.name)) continue;
+        if (e.name.startsWith(".")) continue;
+        await recurse(path12.join(dir, e.name), depth + 1);
+      }
+    }
+  }
+  await recurse(root, 0);
+  return out;
+}
+async function findEmptyDesktopDirs(desktopRoot) {
+  const out = [];
+  let entries;
+  try {
+    entries = await fs12.readdir(desktopRoot, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const e of entries) {
+    if (!e.isDirectory()) continue;
+    if (e.name.startsWith(".")) continue;
+    if (e.name === "Active builds" || e.name === "Projects" || e.name === "inbox")
+      continue;
+    const dir = path12.join(desktopRoot, e.name);
+    try {
+      const sub = await fs12.readdir(dir);
+      if (sub.length === 0 || sub.length === 1 && sub[0] === ".DS_Store") {
+        out.push(dir);
+      }
+    } catch {
+    }
+  }
+  return out;
+}
+async function audit11(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  for (const root of [ctx.desktopRoot, ctx.activeBuildsRoot, ctx.projectsRoot]) {
+    const depth = root === ctx.desktopRoot ? 1 : 4;
+    const hits = await walkForDsStore(root, depth);
+    for (const p of hits) {
+      findings.push({
+        category: "ds-store",
+        severity: "info",
+        fix_class: "A",
+        id: `ds:${p}`,
+        path: p,
+        note: `.DS_Store at ${p}`,
+        suggested_fix: `rm "${p}"`
+      });
+    }
+  }
+  const emptyDirs = await findEmptyDesktopDirs(ctx.desktopRoot);
+  for (const p of emptyDirs) {
+    findings.push({
+      category: "ds-store",
+      severity: "info",
+      fix_class: "A",
+      id: `empty-dir:${p}`,
+      path: p,
+      note: `Empty top-level desktop dir: ${p}`,
+      suggested_fix: `rmdir "${p}"`
+    });
+  }
+  return {
+    category: "ds-store",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+async function removePath(p) {
+  const st = await fs12.lstat(p);
+  if (st.isDirectory()) {
+    await fs12.rmdir(p);
+  } else {
+    await fs12.unlink(p);
+  }
+}
+
+// src/lib/workspace-audit/wiki-coverage.ts
+var wiki_coverage_exports = {};
+__export(wiki_coverage_exports, {
+  audit: () => audit12
+});
+import { promises as fs13 } from "fs";
+import path13 from "path";
+async function loadRegistry2(emaRoot) {
+  const candidates = [
+    path13.join(emaRoot, "docs/registry/registry.json"),
+    path13.join(emaRoot, "docs/registry.json"),
+    path13.join(emaRoot, "packages/doc-registry/registry.json")
+  ];
+  for (const p of candidates) {
+    try {
+      const raw = await fs13.readFile(p, "utf8");
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === "object") {
+        const record = parsed;
+        if (Array.isArray(record.entries)) return record.entries;
+        if (Array.isArray(record.documents)) return record.documents;
+      }
+    } catch {
+    }
+  }
+  return null;
+}
+async function exists2(p) {
+  try {
+    await fs13.stat(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function audit12(ctx) {
+  const t0 = Date.now();
+  const findings = [];
+  const registry2 = await loadRegistry2(ctx.emaRoot);
+  if (!registry2) {
+    return {
+      category: "wiki-coverage",
+      skipped: true,
+      skip_reason: "no doc-registry found at any known path",
+      findings: [],
+      scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+    };
+  }
+  for (const e of registry2) {
+    if (!e || typeof e !== "object") continue;
+    if (!e.id) {
+      findings.push({
+        category: "wiki-coverage",
+        severity: "warn",
+        fix_class: "C",
+        id: `wiki-no-id:${e.path ?? "<no-path>"}`,
+        path: e.path,
+        note: `Doc-registry entry missing canonical id (${e.path ?? "<no-path>"})`,
+        suggested_fix: `Assign a stable id in registry.json`
+      });
+    }
+    if (e.path) {
+      const abs = path13.isAbsolute(e.path) ? e.path : path13.join(ctx.emaRoot, e.path);
+      if (!await exists2(abs)) {
+        findings.push({
+          category: "wiki-coverage",
+          severity: "error",
+          fix_class: "C",
+          id: `wiki-missing:${e.id ?? e.path}`,
+          path: abs,
+          note: `Doc-registry references missing file: ${e.path}`,
+          suggested_fix: `Restore the file or remove the entry`
+        });
+      }
+    }
+  }
+  return {
+    category: "wiki-coverage",
+    findings,
+    scan_ms: ctx.verbose ? Date.now() - t0 : void 0
+  };
+}
+
+// src/lib/workspace-audit/index.ts
+var ALL_CATEGORIES = [
+  "active-projects-symmetry",
+  "naming-drift",
+  "unborn-projects",
+  "stale-worktrees",
+  "old-stashes",
+  "broken-symlinks",
+  "untracked-cruft",
+  "cross-clone-dups",
+  "branch-hygiene",
+  "push-lag",
+  "ds-store",
+  "wiki-coverage"
+];
+var MODULES = {
+  "active-projects-symmetry": active_projects_symmetry_exports,
+  "naming-drift": naming_drift_exports,
+  "unborn-projects": unborn_projects_exports,
+  "stale-worktrees": stale_worktrees_exports,
+  "old-stashes": old_stashes_exports,
+  "broken-symlinks": broken_symlinks_exports,
+  "untracked-cruft": untracked_cruft_exports,
+  "cross-clone-dups": cross_clone_dups_exports,
+  "branch-hygiene": branch_hygiene_exports,
+  "push-lag": push_lag_exports,
+  "ds-store": ds_store_exports,
+  "wiki-coverage": wiki_coverage_exports
+};
+async function buildContext(opts) {
+  const home = os.homedir();
+  const desktopRoot = opts.desktopRoot ?? path14.join(home, "Desktop");
+  const activeBuildsRoot = path14.join(desktopRoot, "Active builds");
+  const projectsRoot = path14.join(desktopRoot, "Projects");
+  const emaRoot = opts.emaRoot ?? path14.join(activeBuildsRoot, "EMA-0.0.6");
+  return {
+    desktopRoot,
+    emaRoot,
+    activeBuildsRoot,
+    projectsRoot,
+    apply: !!opts.apply,
+    withStash: !!opts.withStash,
+    withRemotes: !!opts.withRemotes,
+    withBranches: !!opts.withBranches,
+    verbose: !!opts.verbose
+  };
+}
+async function runAudit(ctx) {
+  const moduleResults = await Promise.all(
+    ALL_CATEGORIES.map(async (cat) => {
+      try {
+        return await MODULES[cat].audit(ctx);
+      } catch (err) {
+        return {
+          category: cat,
+          skipped: true,
+          skip_reason: `module crashed: ${err instanceof Error ? err.message : String(err)}`,
+          findings: []
+        };
+      }
+    })
+  );
+  const allFindings = moduleResults.flatMap((m) => m.findings);
+  const bySeverity = { info: 0, warn: 0, error: 0 };
+  const byCategory = ALL_CATEGORIES.reduce((acc, c) => {
+    acc[c] = 0;
+    return acc;
+  }, {});
+  let classA = 0;
+  for (const f of allFindings) {
+    bySeverity[f.severity] += 1;
+    byCategory[f.category] += 1;
+    if (f.fix_class === "A") classA += 1;
+  }
+  const ok = bySeverity.error === 0 && bySeverity.warn === 0;
+  const report = {
+    ok,
+    desktop_root: ctx.desktopRoot,
+    scanned_at: (/* @__PURE__ */ new Date()).toISOString(),
+    modules: moduleResults,
+    totals: {
+      findings: allFindings.length,
+      by_severity: bySeverity,
+      by_category: byCategory,
+      auto_fixable_class_a: classA
+    },
+    gates: {
+      apply: ctx.apply,
+      with_stash: ctx.withStash,
+      with_remotes: ctx.withRemotes,
+      with_branches: ctx.withBranches
+    }
+  };
+  if (ctx.apply) {
+    report.applied = await applyFixes(ctx, allFindings);
+  }
+  return report;
+}
+async function applyFixes(ctx, findings) {
+  const results = [];
+  for (const f of findings) {
+    if (f.fix_class === "C") {
+      results.push({
+        finding_id: f.id,
+        category: f.category,
+        applied: false,
+        skipped_reason: "fix_class C requires operator action"
+      });
+      continue;
+    }
+    if (f.fix_class === "B") {
+      const flag = f.requires_flag;
+      const ok = flag === "with-stash" && ctx.withStash || flag === "with-remotes" && ctx.withRemotes || flag === "with-branches" && ctx.withBranches;
+      if (!ok) {
+        results.push({
+          finding_id: f.id,
+          category: f.category,
+          applied: false,
+          skipped_reason: `requires --${flag ?? "<unknown>"}`
+        });
+        continue;
+      }
+    }
+    try {
+      await applySingleFix(f);
+      results.push({ finding_id: f.id, category: f.category, applied: true });
+    } catch (err) {
+      results.push({
+        finding_id: f.id,
+        category: f.category,
+        applied: false,
+        error: err instanceof Error ? err.message : String(err)
+      });
+    }
+  }
+  return results;
+}
+async function applySingleFix(f) {
+  switch (f.category) {
+    case "ds-store": {
+      if (!f.path) throw new Error("missing path");
+      await removePath(f.path);
+      return;
+    }
+    case "broken-symlinks": {
+      if (!f.path) throw new Error("missing path");
+      await removeLink(f.path);
+      return;
+    }
+    case "stale-worktrees": {
+      if (!f.path) throw new Error("missing path");
+      const idParts = f.id.split(":");
+      const repo = idParts[1];
+      if (!repo) throw new Error("repo missing from finding id");
+      await pruneRepo(repo);
+      return;
+    }
+    case "old-stashes": {
+      const idParts = f.id.split(":");
+      const repo = idParts[1];
+      const ref = idParts.slice(2).join(":");
+      if (!repo || !ref) throw new Error("repo/ref missing from finding id");
+      await dropStash(repo, ref);
+      return;
+    }
+    case "branch-hygiene": {
+      const idParts = f.id.split(":");
+      const repo = idParts[1];
+      const branch = idParts.slice(2).join(":");
+      if (!repo || !branch) throw new Error("repo/branch missing from finding id");
+      const force = f.id.startsWith("gone-upstream:") || f.id.startsWith("claude-branch:") && f.severity === "warn";
+      await deleteBranch(repo, branch, force);
+      return;
+    }
+    default:
+      throw new Error(`no apply path for category ${f.category}`);
+  }
+}
+
 // src/commands/doctor.ts
 async function readChannel(channel, timeoutMs) {
   try {
@@ -8647,15 +10036,23 @@ async function runDoctor2(args) {
     return runStubContract(args, {
       noun: "doctor",
       status: "available",
-      usage: "Usage: ema doctor [--strict] [--json]",
+      usage: "Usage: ema doctor [--strict] [--json] [--workspace [--apply] [--with-stash] [--with-remotes] [--with-branches]]",
       docRef: "docs/cli/agent-workspace.md",
       commands: [
-        { verb: "run", flags: ["strict", "json"], summary: "Check daemon health separately from execution readiness blockers." }
+        { verb: "run", flags: ["strict", "json"], summary: "Check daemon health separately from execution readiness blockers." },
+        {
+          verb: "workspace",
+          flags: ["workspace", "apply", "with-stash", "with-remotes", "with-branches", "json", "verbose", "desktop-root"],
+          summary: "Audit the desktop workspace (Active builds + Projects) for drift across 12 categories. --apply fixes Class A only."
+        }
       ]
     });
   }
   const json = flagBool(args, "json");
   const strict = flagBool(args, "strict");
+  if (flagBool(args, "workspace")) {
+    return runWorkspaceDoctor(args, json);
+  }
   try {
     const [bp, planner, graph, vcal, laneReg, queueReg] = await Promise.all([
       readChannel("blueprint.sections", 1500),
@@ -8791,6 +10188,90 @@ async function runDoctor2(args) {
     return reportError(err, json);
   }
 }
+async function runWorkspaceDoctor(args, json) {
+  try {
+    const ctx = await buildContext({
+      desktopRoot: flagString(args, "desktop-root"),
+      emaRoot: flagString(args, "ema-root"),
+      apply: flagBool(args, "apply"),
+      withStash: flagBool(args, "with-stash"),
+      withRemotes: flagBool(args, "with-remotes"),
+      withBranches: flagBool(args, "with-branches"),
+      verbose: flagBool(args, "verbose")
+    });
+    const report = await runAudit(ctx);
+    if (json) {
+      emitJson(report);
+    } else {
+      emitWorkspacePretty(report);
+    }
+    return report.totals.by_severity.error > 0 || report.totals.by_severity.warn > 0 ? 1 : 0;
+  } catch (err) {
+    return reportError(err, json);
+  }
+}
+function emitWorkspacePretty(report) {
+  emitPretty(`# ema doctor --workspace`);
+  emitPretty(`scanned:          ${report.scanned_at}`);
+  emitPretty(`desktop root:     ${report.desktop_root}`);
+  emitPretty(`gates:            apply=${report.gates.apply} stash=${report.gates.with_stash} remotes=${report.gates.with_remotes} branches=${report.gates.with_branches}`);
+  emitPretty("");
+  emitPretty(`findings:         ${report.totals.findings} (${report.totals.by_severity.error} error \xB7 ${report.totals.by_severity.warn} warn \xB7 ${report.totals.by_severity.info} info)`);
+  emitPretty(`auto-fixable (A): ${report.totals.auto_fixable_class_a}`);
+  emitPretty("");
+  for (const m of report.modules) {
+    const tag = m.skipped ? "skipped" : `${m.findings.length} finding${m.findings.length === 1 ? "" : "s"}`;
+    emitPretty(`[${m.category}] ${tag}${m.skipped && m.skip_reason ? ` (${m.skip_reason})` : ""}`);
+    for (const f of m.findings) {
+      const sev = f.severity === "error" ? "!" : f.severity === "warn" ? "~" : ".";
+      emitPretty(`  ${sev} [${f.fix_class}] ${f.note}`);
+      if (f.suggested_fix) emitPretty(`      \u2192 ${f.suggested_fix}`);
+    }
+  }
+  if (report.applied) {
+    const ok = report.applied.filter((a) => a.applied).length;
+    const skipped2 = report.applied.filter((a) => !a.applied).length;
+    emitPretty("");
+    emitPretty(`applied:          ${ok} fixed \xB7 ${skipped2} skipped`);
+    for (const a of report.applied) {
+      if (a.applied) emitPretty(`  + ${a.finding_id}`);
+      else emitPretty(`  - ${a.finding_id}: ${a.skipped_reason ?? a.error ?? "skipped"}`);
+    }
+  }
+  emitPretty("");
+  emitPretty(`status:           ${report.ok ? "clean" : "drift detected"}`);
+  if (!report.ok) {
+    const hints = workspaceManagementHints(report);
+    if (hints.length > 0) {
+      emitPretty("");
+      emitPretty("fix-me hints (see `ema workspace ...`):");
+      for (const h of hints) emitPretty(`  \u2192 ${h}`);
+    }
+  }
+}
+function workspaceManagementHints(report) {
+  const hints = /* @__PURE__ */ new Set();
+  for (const m of report.modules) {
+    if (m.findings.length === 0) continue;
+    switch (m.category) {
+      case "stale-worktrees":
+        hints.add("ema workspace worktree prune --apply");
+        break;
+      case "branch-hygiene":
+        hints.add("ema workspace branch clean --with-branches --apply");
+        break;
+      case "push-lag":
+        hints.add("ema workspace remote sync (review ahead/behind; --with-remotes to push)");
+        break;
+      case "active-projects-symmetry":
+        hints.add("ema workspace pair (review orphan-active / dormant-project findings)");
+        break;
+      default:
+        break;
+    }
+  }
+  return Array.from(hints);
+}
 
 // src/commands/desktop.ts
 async function runDesktop(args) {
@@ -8905,10 +10386,10 @@ function intFlag(args, name, fallback) {
 }
 
 // src/commands/recovery.ts
-import { execFile } from "child_process";
+import { execFile as execFile8 } from "child_process";
 import { join as join9 } from "path";
-import { promisify } from "util";
-var execFileAsync = promisify(execFile);
+import { promisify as promisify8 } from "util";
+var execFileAsync = promisify8(execFile8);
 async function runRecovery(args) {
   const verb = args.positional[0] ?? "scan";
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") {
@@ -9258,9 +10739,9 @@ async function readProjection3(client, name, key) {
     client.subscribe(name);
   });
 }
-async function readJson(path2) {
+async function readJson(path22) {
   try {
-    return JSON.parse(await readFile(path2, "utf8"));
+    return JSON.parse(await readFile(path22, "utf8"));
   } catch {
     return null;
   }
@@ -9404,7 +10885,7 @@ async function runStatus4(args) {
     return 1;
   }
   const statePath = join11(root, manifest.local_n_sync?.current_state ?? "local-n-sync/current-state.md");
-  const stateExists = await exists2(statePath);
+  const stateExists = await exists3(statePath);
   const result = {
     ok: true,
     source: "cwt.shared_files",
@@ -9460,16 +10941,16 @@ function projectionRoot(args) {
 async function readManifest(root) {
   return readJson2(join11(root, "manifest.json"));
 }
-async function readJson2(path2) {
+async function readJson2(path22) {
   try {
-    return JSON.parse(await readFile2(path2, "utf8"));
+    return JSON.parse(await readFile2(path22, "utf8"));
   } catch {
     return null;
   }
 }
-async function exists2(path2) {
+async function exists3(path22) {
   try {
-    await access(path2);
+    await access(path22);
     return true;
   } catch {
     return false;
@@ -9477,10 +10958,10 @@ async function exists2(path2) {
 }
 
 // src/commands/cockpit.ts
-import { execFile as execFile2 } from "child_process";
+import { execFile as execFile10 } from "child_process";
 import { existsSync as existsSync13, readFileSync as readFileSync11 } from "fs";
 import { basename as basename2, join as join14 } from "path";
-import { promisify as promisify2 } from "util";
+import { promisify as promisify10 } from "util";
 
 // src/project-registry/proslync.ts
 var ACTIVE_BUILDS_ROOT = "/Users/trajanm4air/Desktop/Active builds";
@@ -9638,6 +11119,1064 @@ import { basename, dirname as dirname5, join as join13 } from "path";
 // src/commands/workspace.ts
 import { existsSync as existsSync11 } from "fs";
 import { join as join12 } from "path";
+
+// src/commands/workspace-manage-commands.ts
+import path21 from "path";
+
+// src/lib/workspace-manage/index.ts
+import os2 from "os";
+import path20 from "path";
+import { promises as fs18 } from "fs";
+
+// src/lib/workspace-manage/worktree.ts
+var worktree_exports = {};
+__export(worktree_exports, {
+  applyAdd: () => applyAdd,
+  applyMove: () => applyMove,
+  applyPrune: () => applyPrune,
+  listAll: () => listAll,
+  planAdd: () => planAdd,
+  planMove: () => planMove,
+  planPrune: () => planPrune,
+  resolveBranch: () => resolveBranch
+});
+import { promises as fs16 } from "fs";
+import path16 from "path";
+
+// src/lib/workspace-manage/git-utils.ts
+import { promises as fs15 } from "fs";
+import path15 from "path";
+import { execFile as execFile9 } from "child_process";
+import { promisify as promisify9 } from "util";
+
+// src/lib/workspace-manage/types.ts
+var IGNORE_DIR_NAMES = /* @__PURE__ */ new Set([
+  ".DS_Store",
+  ".git",
+  "_archive",
+  "_archive_old",
+  "README.md"
+]);
+
+// src/lib/workspace-manage/git-utils.ts
+var execFileP8 = promisify9(execFile9);
+async function git(repo, args, timeoutMs = 8e3) {
+  try {
+    const { stdout, stderr } = await execFileP8("git", ["-C", repo, ...args], {
+      timeout: timeoutMs,
+      maxBuffer: 8 * 1024 * 1024
+    });
+    return { stdout: stdout.toString(), stderr: stderr.toString(), code: 0 };
+  } catch (err) {
+    const e = err;
+    const stdout = e.stdout ? e.stdout.toString() : "";
+    const stderr = e.stderr ? e.stderr.toString() : e.message ?? "";
+    const code = typeof e.code === "number" ? e.code : 1;
+    return { stdout, stderr, code };
+  }
+}
+async function isGitRepo2(dir) {
+  try {
+    const s = await fs15.lstat(path15.join(dir, ".git"));
+    return s.isDirectory() || s.isFile();
+  } catch {
+    return false;
+  }
+}
+async function listGitRepos6(root) {
+  let entries;
+  try {
+    entries = await fs15.readdir(root, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const e of entries) {
+    if (IGNORE_DIR_NAMES.has(e.name)) continue;
+    if (!e.isDirectory() && !e.isSymbolicLink()) continue;
+    const dir = path15.join(root, e.name);
+    if (await isGitRepo2(dir)) {
+      let resolved = dir;
+      try {
+        resolved = await fs15.realpath(dir);
+      } catch {
+        resolved = dir;
+      }
+      if (seen.has(resolved)) continue;
+      seen.add(resolved);
+      out.push(resolved);
+    }
+  }
+  return out;
+}
+async function defaultBranch2(repo) {
+  for (const cand of ["main", "master"]) {
+    const r = await git(repo, ["rev-parse", "--verify", cand]);
+    if (r.code === 0) return cand;
+  }
+  return null;
+}
+async function currentBranch(repo) {
+  const r = await git(repo, ["rev-parse", "--abbrev-ref", "HEAD"]);
+  if (r.code !== 0) return null;
+  const name = r.stdout.trim();
+  if (!name || name === "HEAD") return null;
+  return name;
+}
+async function isDirty(repo) {
+  const r = await git(repo, ["status", "--porcelain"]);
+  if (r.code !== 0) return false;
+  return r.stdout.trim().length > 0;
+}
+async function originUrl2(repo) {
+  const r = await git(repo, ["config", "--get", "remote.origin.url"]);
+  if (r.code !== 0) return null;
+  const u = r.stdout.trim();
+  return u || null;
+}
+async function listLocalBranches2(repo) {
+  const r = await git(repo, [
+    "for-each-ref",
+    "--format=%(refname:short)|%(upstream:short)|%(upstream:track)",
+    "refs/heads"
+  ]);
+  if (r.code !== 0) return [];
+  const out = [];
+  for (const line of r.stdout.split("\n")) {
+    if (!line.trim()) continue;
+    const [name, upstream, track] = line.split("|");
+    const aheadM = (track ?? "").match(/ahead (\d+)/);
+    const behindM = (track ?? "").match(/behind (\d+)/);
+    out.push({
+      name: name ?? "",
+      upstream: upstream && upstream.length > 0 ? upstream : null,
+      upstream_gone: (track ?? "").includes("gone"),
+      ahead: aheadM ? Number(aheadM[1]) : 0,
+      behind: behindM ? Number(behindM[1]) : 0
+    });
+  }
+  return out;
+}
+async function listWorktrees2(repo) {
+  const r = await git(repo, ["worktree", "list", "--porcelain"]);
+  if (r.code !== 0) return [];
+  const out = [];
+  let cur = null;
+  for (const line of r.stdout.split("\n")) {
+    if (line.startsWith("worktree ")) {
+      if (cur) out.push(await materializeWorktree(cur));
+      cur = { path: line.slice("worktree ".length).trim(), branch: null, prunable: false };
+    } else if (cur && line.startsWith("branch ")) {
+      cur.branch = line.slice("branch ".length).trim();
+    } else if (cur && line.startsWith("prunable")) {
+      cur.prunable = true;
+    }
+  }
+  if (cur) out.push(await materializeWorktree(cur));
+  return out;
+}
+async function materializeWorktree(cur) {
+  let exists4 = true;
+  try {
+    const s = await fs15.stat(cur.path);
+    exists4 = s.isDirectory();
+  } catch {
+    exists4 = false;
+  }
+  return { path: cur.path, branch: cur.branch, exists: exists4, prunable: cur.prunable };
+}
+function repoName(repo) {
+  return path15.basename(repo);
+}
+
+// src/lib/workspace-manage/worktree.ts
+async function rootRepos(ctx) {
+  const a = await listGitRepos6(ctx.activeBuildsRoot);
+  const p = await listGitRepos6(ctx.projectsRoot);
+  return [...a, ...p];
+}
+async function listAll(ctx) {
+  const repos = await rootRepos(ctx);
+  const out = [];
+  for (const repo of repos) {
+    const wts = await listWorktrees2(repo);
+    for (const wt of wts) {
+      out.push({ repo, ...wt });
+    }
+  }
+  return out;
+}
+async function planPrune(ctx) {
+  const repos = await rootRepos(ctx);
+  const actions = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const repo of repos) {
+    const wts = await listWorktrees2(repo);
+    let needsPrune = false;
+    for (const wt of wts) {
+      if (wt.path === repo) continue;
+      if (!wt.exists || wt.prunable) {
+        needsPrune = true;
+        actions.push({
+          id: `worktree-prune:${repo}:${wt.path}`,
+          category: "worktree-prune",
+          severity: "warn",
+          fix_class: "A",
+          repo,
+          target: wt.path,
+          note: `${repoName(repo)}: stale worktree ${wt.path}${wt.branch ? ` (branch ${wt.branch})` : ""}`,
+          command: `git -C "${repo}" worktree prune`
+        });
+      }
+    }
+    if (needsPrune) seen.add(repo);
+  }
+  return actions;
+}
+async function applyPrune(_ctx, actions) {
+  const reposToPrune = /* @__PURE__ */ new Set();
+  for (const a of actions) {
+    if (a.category !== "worktree-prune" || !a.repo) continue;
+    reposToPrune.add(a.repo);
+  }
+  for (const repo of reposToPrune) {
+    const r = await git(repo, ["worktree", "prune"]);
+    if (r.code !== 0) {
+      for (const a of actions) {
+        if (a.repo === repo) {
+          a.applied = false;
+          a.error = r.stderr.trim() || `git worktree prune failed (code ${r.code})`;
+        }
+      }
+      continue;
+    }
+    for (const a of actions) {
+      if (a.repo === repo && a.category === "worktree-prune") {
+        a.applied = true;
+      }
+    }
+  }
+}
+async function planAdd(_ctx, repo, wtPath, branch) {
+  const abs = path16.isAbsolute(wtPath) ? wtPath : path16.resolve(repo, wtPath);
+  let exists4 = false;
+  try {
+    await fs16.access(abs);
+    exists4 = true;
+  } catch {
+    exists4 = false;
+  }
+  if (exists4) {
+    return [{
+      id: `worktree-add:${repo}:${abs}`,
+      category: "worktree-add",
+      severity: "error",
+      fix_class: "C",
+      repo,
+      target: abs,
+      note: `Refused: ${abs} already exists`,
+      skipped_reason: "target path exists"
+    }];
+  }
+  return [{
+    id: `worktree-add:${repo}:${abs}`,
+    category: "worktree-add",
+    severity: "info",
+    fix_class: "A",
+    repo,
+    target: abs,
+    note: `${repoName(repo)}: would add worktree at ${abs} on branch ${branch}`,
+    command: `git -C "${repo}" worktree add "${abs}" "${branch}"`
+  }];
+}
+async function applyAdd(repo, wtPath, branch) {
+  const r = await git(repo, ["worktree", "add", wtPath, branch]);
+  if (r.code !== 0) return { ok: false, error: r.stderr.trim() };
+  return { ok: true };
+}
+async function planMove(repo, from, to) {
+  const dirty = await isDirty(from).catch(() => false);
+  if (dirty) {
+    return [{
+      id: `worktree-move:${repo}:${from}`,
+      category: "worktree-move",
+      severity: "error",
+      fix_class: "C",
+      repo,
+      target: from,
+      note: `Refused: source worktree ${from} is dirty`,
+      skipped_reason: "source worktree is dirty"
+    }];
+  }
+  return [{
+    id: `worktree-move:${repo}:${from}`,
+    category: "worktree-move",
+    severity: "info",
+    fix_class: "A",
+    repo,
+    target: `${from} \u2192 ${to}`,
+    note: `${repoName(repo)}: would move worktree ${from} \u2192 ${to}`,
+    command: `git -C "${repo}" worktree move "${from}" "${to}"`
+  }];
+}
+async function applyMove(repo, from, to) {
+  const r = await git(repo, ["worktree", "move", from, to]);
+  if (r.code !== 0) return { ok: false, error: r.stderr.trim() };
+  return { ok: true };
+}
+async function resolveBranch(repo, branch) {
+  if (branch && branch !== "-") return branch;
+  const def = await defaultBranch2(repo);
+  if (def) return def;
+  const cur = await currentBranch(repo);
+  return cur ?? "HEAD";
+}
+
+// src/lib/workspace-manage/branch.ts
+var branch_exports = {};
+__export(branch_exports, {
+  applyClean: () => applyClean,
+  applySync: () => applySync,
+  listAll: () => listAll2,
+  path: () => path17,
+  planClean: () => planClean,
+  planSync: () => planSync,
+  rootRepos: () => rootRepos2
+});
+import path17 from "path";
+async function rootRepos2(ctx) {
+  const a = await listGitRepos6(ctx.activeBuildsRoot);
+  const p = await listGitRepos6(ctx.projectsRoot);
+  return [...a, ...p];
+}
+async function listAll2(ctx) {
+  const repos = await rootRepos2(ctx);
+  const out = [];
+  for (const repo of repos) {
+    const branches = await listLocalBranches2(repo);
+    for (const b of branches) {
+      out.push({ repo, repo_name: repoName(repo), branch: b });
+    }
+  }
+  return out;
+}
+var CLAUDE_BRANCH_RE = /^claude\/[a-z]+(-[a-z]+)+$/;
+async function planClean(ctx) {
+  const repos = await rootRepos2(ctx);
+  const actions = [];
+  for (const repo of repos) {
+    const def = await defaultBranch2(repo);
+    const cur = await currentBranch(repo);
+    const branches = await listLocalBranches2(repo);
+    for (const b of branches) {
+      if (b.name === def) continue;
+      if (b.name === cur) continue;
+      const isClaude = CLAUDE_BRANCH_RE.test(b.name);
+      const isGone = b.upstream_gone;
+      if (!isClaude && !isGone) continue;
+      const merged = def ? await isMerged2(repo, b.name, def) : false;
+      actions.push({
+        id: `${isGone ? "gone-upstream" : "claude-branch"}:${repo}:${b.name}`,
+        category: "branch-clean",
+        severity: merged ? "info" : "warn",
+        fix_class: "B",
+        repo,
+        target: b.name,
+        note: `${repoName(repo)}: ${isGone ? "gone-upstream" : "Claude session"} branch "${b.name}"${merged ? " (merged)" : " (NOT merged)"}`,
+        command: `git -C "${repo}" branch -${merged ? "d" : "D"} ${b.name}`,
+        requires_flag: "with-branches"
+      });
+    }
+  }
+  return actions;
+}
+async function isMerged2(repo, branch, into) {
+  const r = await git(repo, ["branch", "--merged", into]);
+  if (r.code !== 0) return false;
+  return r.stdout.split("\n").map((l) => l.replace(/^[*\s]+/, "").trim()).includes(branch);
+}
+async function applyClean(ctx, actions) {
+  if (!ctx.withBranches) {
+    for (const a of actions) {
+      if (a.category !== "branch-clean") continue;
+      a.applied = false;
+      a.skipped_reason = "requires --with-branches";
+    }
+    return;
+  }
+  for (const a of actions) {
+    if (a.category !== "branch-clean" || !a.repo || !a.target) continue;
+    if (await isDirty(a.repo)) {
+      a.applied = false;
+      a.skipped_reason = `worktree ${a.repo} is dirty`;
+      continue;
+    }
+    const force = a.severity === "warn";
+    const r = await git(a.repo, ["branch", force ? "-D" : "-d", a.target]);
+    if (r.code !== 0) {
+      a.applied = false;
+      a.error = r.stderr.trim() || `branch delete failed (code ${r.code})`;
+      continue;
+    }
+    a.applied = true;
+  }
+}
+async function planSync(ctx) {
+  const repos = await rootRepos2(ctx);
+  const actions = [];
+  for (const repo of repos) {
+    const dirty = await isDirty(repo);
+    const branches = await listLocalBranches2(repo);
+    for (const b of branches) {
+      if (!b.upstream || b.upstream_gone) continue;
+      if (b.behind === 0) continue;
+      actions.push({
+        id: `branch-sync:${repo}:${b.name}`,
+        category: "branch-sync",
+        severity: "info",
+        fix_class: dirty ? "C" : "A",
+        repo,
+        target: b.name,
+        note: `${repoName(repo)}: ${b.name} is ${b.behind} behind ${b.upstream}${dirty ? " (dirty \u2014 refused)" : ""}`,
+        command: `git -C "${repo}" merge --ff-only ${b.upstream}`,
+        skipped_reason: dirty ? "worktree is dirty" : void 0
+      });
+    }
+  }
+  return actions;
+}
+async function applySync(_ctx, actions) {
+  const fetched = /* @__PURE__ */ new Set();
+  for (const a of actions) {
+    if (a.category !== "branch-sync" || !a.repo || !a.target) continue;
+    if (a.fix_class !== "A") {
+      a.applied = false;
+      continue;
+    }
+    if (await isDirty(a.repo)) {
+      a.applied = false;
+      a.skipped_reason = "worktree is dirty";
+      continue;
+    }
+    if (!fetched.has(a.repo)) {
+      await git(a.repo, ["fetch", "--prune", "--all"]);
+      fetched.add(a.repo);
+    }
+    const cur = await currentBranch(a.repo);
+    if (cur === a.target) {
+      const r2 = await git(a.repo, ["merge", "--ff-only"]);
+      if (r2.code !== 0) {
+        a.applied = false;
+        a.error = r2.stderr.trim() || "ff-only merge refused";
+        continue;
+      }
+      a.applied = true;
+      continue;
+    }
+    const branches = await listLocalBranches2(a.repo);
+    const info = branches.find((x) => x.name === a.target);
+    if (!info || !info.upstream) {
+      a.applied = false;
+      a.skipped_reason = "no upstream";
+      continue;
+    }
+    const r = await git(a.repo, ["fetch", ".", `${info.upstream}:${a.target}`]);
+    if (r.code !== 0) {
+      a.applied = false;
+      a.error = r.stderr.trim() || "ff fetch refused (would diverge)";
+      continue;
+    }
+    a.applied = true;
+  }
+}
+
+// src/lib/workspace-manage/remote.ts
+var remote_exports = {};
+__export(remote_exports, {
+  applyEnsure: () => applyEnsure,
+  applySync: () => applySync2,
+  path: () => path18,
+  planEnsure: () => planEnsure,
+  planSync: () => planSync2,
+  reportStatus: () => reportStatus
+});
+import path18 from "path";
+async function rootRepos3(ctx) {
+  const a = await listGitRepos6(ctx.activeBuildsRoot);
+  const p = await listGitRepos6(ctx.projectsRoot);
+  return [...a, ...p];
+}
+async function planSync2(ctx) {
+  const repos = await rootRepos3(ctx);
+  const actions = [];
+  for (const repo of repos) {
+    const url = await originUrl2(repo);
+    if (!url) {
+      actions.push({
+        id: `remote-sync:no-origin:${repo}`,
+        category: "remote-sync",
+        severity: "info",
+        fix_class: "C",
+        repo,
+        note: `${repoName(repo)}: no origin remote \u2014 cannot fetch`,
+        skipped_reason: "no origin remote configured"
+      });
+      continue;
+    }
+    actions.push({
+      id: `remote-sync:fetch:${repo}`,
+      category: "remote-sync",
+      severity: "info",
+      fix_class: "A",
+      repo,
+      target: "origin",
+      note: `${repoName(repo)}: fetch --prune origin`,
+      command: `git -C "${repo}" fetch --prune --all`
+    });
+    const branches = await listLocalBranches2(repo);
+    for (const b of branches) {
+      if (!b.upstream || b.upstream_gone) continue;
+      if (b.ahead === 0) continue;
+      actions.push({
+        id: `remote-sync:push:${repo}:${b.name}`,
+        category: "remote-sync",
+        severity: b.ahead >= 5 ? "warn" : "info",
+        fix_class: "B",
+        repo,
+        target: b.name,
+        note: `${repoName(repo)}: ${b.name} is ${b.ahead} ahead of ${b.upstream}`,
+        command: `git -C "${repo}" push`,
+        requires_flag: "with-remotes"
+      });
+    }
+  }
+  return actions;
+}
+async function applySync2(ctx, actions) {
+  const fetched = /* @__PURE__ */ new Set();
+  for (const a of actions) {
+    if (a.category !== "remote-sync" || !a.repo) continue;
+    if (a.fix_class === "A") {
+      if (fetched.has(a.repo)) {
+        a.applied = true;
+        continue;
+      }
+      const r = await git(a.repo, ["fetch", "--prune", "--all"]);
+      fetched.add(a.repo);
+      if (r.code !== 0) {
+        a.applied = false;
+        a.error = r.stderr.trim() || `fetch failed (code ${r.code})`;
+        continue;
+      }
+      a.applied = true;
+      continue;
+    }
+    if (a.fix_class === "B" && a.id.includes(":push:")) {
+      if (!ctx.withRemotes) {
+        a.applied = false;
+        a.skipped_reason = "requires --with-remotes";
+        continue;
+      }
+      if (await isDirty(a.repo)) {
+        a.applied = false;
+        a.skipped_reason = `worktree ${a.repo} is dirty`;
+        continue;
+      }
+      const r = await git(a.repo, ["push"]);
+      if (r.code !== 0) {
+        a.applied = false;
+        a.error = r.stderr.trim() || `push failed (code ${r.code})`;
+        continue;
+      }
+      a.applied = true;
+    }
+  }
+}
+async function planEnsure(ctx) {
+  const repos = await listGitRepos6(ctx.activeBuildsRoot);
+  const actions = [];
+  for (const repo of repos) {
+    const url = await originUrl2(repo);
+    const name = repoName(repo);
+    const wantUrl = `git@github.com:${ctx.githubOwner}/${name}.git`;
+    if (!url) {
+      actions.push({
+        id: `remote-ensure:add:${repo}`,
+        category: "remote-ensure",
+        severity: "warn",
+        fix_class: "B",
+        repo,
+        target: wantUrl,
+        note: `${name}: no origin \u2014 would add origin \u2192 ${wantUrl}`,
+        command: `git -C "${repo}" remote add origin "${wantUrl}"`,
+        requires_flag: "with-remotes"
+      });
+      if (ctx.withCreate) {
+        actions.push({
+          id: `remote-ensure:create:${repo}`,
+          category: "remote-ensure",
+          severity: "info",
+          fix_class: "B",
+          repo,
+          target: `${ctx.githubOwner}/${name}`,
+          note: `${name}: would call gh repo create ${ctx.githubOwner}/${name} --private --source "${repo}"`,
+          command: `gh repo create ${ctx.githubOwner}/${name} --private --source "${repo}"`,
+          requires_flag: "with-create"
+        });
+      }
+    } else if (!url.includes(`/${name}`)) {
+      actions.push({
+        id: `remote-ensure:mismatch:${repo}`,
+        category: "remote-ensure",
+        severity: "info",
+        fix_class: "C",
+        repo,
+        target: url,
+        note: `${name}: origin url ${url} does not contain canonical name`,
+        skipped_reason: "operator review required"
+      });
+    }
+  }
+  return actions;
+}
+async function applyEnsure(ctx, actions) {
+  if (!ctx.withRemotes) {
+    for (const a of actions) {
+      if (a.category !== "remote-ensure") continue;
+      if (a.fix_class === "B") {
+        a.applied = false;
+        a.skipped_reason = a.skipped_reason ?? "requires --with-remotes";
+      }
+    }
+    return;
+  }
+  for (const a of actions) {
+    if (a.category !== "remote-ensure" || !a.repo) continue;
+    if (a.fix_class !== "B") continue;
+    if (a.id.includes(":add:") && a.target) {
+      const r = await git(a.repo, ["remote", "add", "origin", a.target]);
+      if (r.code !== 0) {
+        a.applied = false;
+        a.error = r.stderr.trim() || `remote add failed (code ${r.code})`;
+        continue;
+      }
+      a.applied = true;
+      continue;
+    }
+    if (a.id.includes(":create:")) {
+      if (!ctx.withCreate) {
+        a.applied = false;
+        a.skipped_reason = "requires --with-create";
+        continue;
+      }
+      a.applied = false;
+      a.skipped_reason = "deferred to operator (gh repo create not auto-invoked)";
+    }
+  }
+}
+async function reportStatus(ctx) {
+  const repos = await rootRepos3(ctx);
+  const actions = [];
+  for (const repo of repos) {
+    const url = await originUrl2(repo);
+    const name = repoName(repo);
+    if (!url) {
+      actions.push({
+        id: `remote-status:no-origin:${repo}`,
+        category: "remote-status",
+        severity: "warn",
+        fix_class: "C",
+        repo,
+        note: `${name}: no origin remote`
+      });
+      continue;
+    }
+    const branches = await listLocalBranches2(repo);
+    const aheadCount = branches.filter((b) => b.ahead > 0 && !b.upstream_gone).length;
+    const behindCount = branches.filter((b) => b.behind > 0 && !b.upstream_gone).length;
+    const goneCount = branches.filter((b) => b.upstream_gone).length;
+    const sev = aheadCount > 0 || behindCount > 0 || goneCount > 0 ? "info" : "info";
+    actions.push({
+      id: `remote-status:${repo}`,
+      category: "remote-status",
+      severity: sev,
+      fix_class: "C",
+      repo,
+      target: url,
+      note: `${name}: origin ${url} \xB7 ${aheadCount} ahead \xB7 ${behindCount} behind \xB7 ${goneCount} gone-upstream`
+    });
+  }
+  return actions;
+}
+
+// src/lib/workspace-manage/sync.ts
+var sync_exports = {};
+__export(sync_exports, {
+  pairSymmetry: () => pairSymmetry,
+  summarizeClones: () => summarizeClones
+});
+import { promises as fs17 } from "fs";
+import path19 from "path";
+async function listDirs2(root) {
+  let entries;
+  try {
+    entries = await fs17.readdir(root, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const e of entries) {
+    if (IGNORE_DIR_NAMES.has(e.name)) continue;
+    if (e.isDirectory() || e.isSymbolicLink()) out.push(e.name);
+  }
+  return out;
+}
+function canonicalProjectName2(name) {
+  const m = name.match(/^(.+?)-\d+\.\d+\.\d+$/);
+  return m ? m[1] : name;
+}
+async function pairSymmetry(ctx) {
+  const active = await listDirs2(ctx.activeBuildsRoot);
+  const projects = await listDirs2(ctx.projectsRoot);
+  const findings = [];
+  const projectSet = new Set(projects);
+  for (const name of active) {
+    const canon = canonicalProjectName2(name);
+    if (projectSet.has(name) || projectSet.has(canon)) continue;
+    findings.push({
+      id: `orphan-active:${name}`,
+      severity: "warn",
+      kind: "orphan-active",
+      name,
+      path: path19.join(ctx.activeBuildsRoot, name),
+      note: `Active build "${name}" has no Projects/${canon} sibling`
+    });
+  }
+  const activeCanon = new Set(active.map(canonicalProjectName2));
+  const activeRaw = new Set(active);
+  for (const name of projects) {
+    if (activeRaw.has(name) || activeCanon.has(name)) continue;
+    findings.push({
+      id: `dormant-project:${name}`,
+      severity: "info",
+      kind: "dormant-project",
+      name,
+      path: path19.join(ctx.projectsRoot, name),
+      note: `Project "${name}" has no in-flight Active builds entry`
+    });
+  }
+  const actions = findings.map((f) => ({
+    id: `pair:${f.id}`,
+    category: "pair-symmetry",
+    severity: f.severity,
+    fix_class: "C",
+    target: f.path,
+    note: f.note,
+    skipped_reason: "operator-judgement only"
+  }));
+  return { findings, actions };
+}
+async function summarizeClones(ctx) {
+  const a = await listGitRepos6(ctx.activeBuildsRoot);
+  const p = await listGitRepos6(ctx.projectsRoot);
+  const all = [...a, ...p];
+  const out = [];
+  for (const repo of all) {
+    const [def, cur, dirty, url, branches, wts] = await Promise.all([
+      defaultBranch2(repo),
+      currentBranch(repo),
+      isDirty(repo),
+      originUrl2(repo),
+      listLocalBranches2(repo),
+      listWorktrees2(repo)
+    ]);
+    out.push({
+      repo,
+      name: repoName(repo),
+      default_branch: def,
+      current_branch: cur,
+      dirty,
+      has_origin: !!url,
+      origin_url: url,
+      branches,
+      worktrees: wts
+    });
+  }
+  return out;
+}
+
+// src/lib/workspace-manage/index.ts
+async function buildContext2(opts) {
+  const home = os2.homedir();
+  const desktopRoot = opts.desktopRoot ?? path20.join(home, "Desktop");
+  const activeBuildsRoot = path20.join(desktopRoot, "Active builds");
+  const projectsRoot = path20.join(desktopRoot, "Projects");
+  const emaRoot = opts.emaRoot ?? path20.join(activeBuildsRoot, "EMA-0.0.6");
+  return {
+    desktopRoot,
+    emaRoot,
+    activeBuildsRoot,
+    projectsRoot,
+    apply: !!opts.apply,
+    withStash: !!opts.withStash,
+    withRemotes: !!opts.withRemotes,
+    withBranches: !!opts.withBranches,
+    withCreate: !!opts.withCreate,
+    githubOwner: opts.githubOwner ?? "TrajanWJ",
+    verbose: !!opts.verbose
+  };
+}
+function totals(actions) {
+  let applied = 0;
+  let skipped2 = 0;
+  let errors = 0;
+  for (const a of actions) {
+    if (a.error) errors += 1;
+    else if (a.applied === true) applied += 1;
+    else if (a.applied === false || a.skipped_reason) skipped2 += 1;
+  }
+  return { actions: actions.length, applied, skipped: skipped2, errors };
+}
+function newReport(ctx, category, actions) {
+  return {
+    ok: actions.every((a) => !a.error && a.severity !== "error"),
+    category,
+    scanned_at: (/* @__PURE__ */ new Date()).toISOString(),
+    desktop_root: ctx.desktopRoot,
+    gates: {
+      apply: ctx.apply,
+      with_stash: ctx.withStash,
+      with_remotes: ctx.withRemotes,
+      with_branches: ctx.withBranches,
+      with_create: ctx.withCreate
+    },
+    actions,
+    totals: totals(actions)
+  };
+}
+async function buildStatus(ctx) {
+  const [clones, pair] = await Promise.all([
+    summarizeClones(ctx),
+    pairSymmetry(ctx)
+  ]);
+  const report = newReport(ctx, "status", pair.actions);
+  report.clones = clones;
+  report.pairs = pair.findings;
+  return report;
+}
+
+// src/commands/workspace-manage-commands.ts
+function readOpts(args) {
+  return {
+    json: flagBool(args, "json"),
+    verbose: flagBool(args, "verbose")
+  };
+}
+async function ctxFromArgs(args) {
+  return await buildContext2({
+    desktopRoot: flagString(args, "desktop-root"),
+    emaRoot: flagString(args, "ema-root"),
+    apply: flagBool(args, "apply"),
+    withStash: flagBool(args, "with-stash"),
+    withRemotes: flagBool(args, "with-remotes"),
+    withBranches: flagBool(args, "with-branches"),
+    withCreate: flagBool(args, "with-create"),
+    githubOwner: flagString(args, "github-owner"),
+    verbose: flagBool(args, "verbose")
+  });
+}
+function exitCode(report) {
+  if (report.totals.errors > 0) return 1;
+  const hasError = report.actions.some((a) => a.severity === "error");
+  return hasError ? 1 : 0;
+}
+function emitReport(opts, report) {
+  if (opts.json) {
+    emitJson(report);
+    return;
+  }
+  emitPretty(`# ema workspace ${report.category}`);
+  emitPretty(`scanned:          ${report.scanned_at}`);
+  emitPretty(`desktop root:     ${report.desktop_root}`);
+  emitPretty(
+    `gates:            apply=${report.gates.apply} stash=${report.gates.with_stash} remotes=${report.gates.with_remotes} branches=${report.gates.with_branches} create=${report.gates.with_create}`
+  );
+  emitPretty("");
+  if (report.clones && report.clones.length > 0) {
+    emitPretty(`clones:           ${report.clones.length}`);
+    for (const c of report.clones) {
+      emitPretty(
+        `  ${c.dirty ? "*" : " "} ${c.name.padEnd(28)} ${(c.current_branch ?? "(detached)").padEnd(28)} origin=${c.has_origin ? "y" : "n"} branches=${c.branches.length} worktrees=${c.worktrees.length}`
+      );
+    }
+    emitPretty("");
+  }
+  if (report.pairs && report.pairs.length > 0) {
+    emitPretty(`pair findings:    ${report.pairs.length}`);
+    for (const p of report.pairs) {
+      emitPretty(`  [${p.kind}] ${p.note}`);
+    }
+    emitPretty("");
+  }
+  emitPretty(`actions:          ${report.totals.actions} (${report.totals.applied} applied \xB7 ${report.totals.skipped} skipped \xB7 ${report.totals.errors} errors)`);
+  for (const a of report.actions) {
+    const sev = a.severity === "error" ? "!" : a.severity === "warn" ? "~" : ".";
+    const tag = a.applied === true ? "+" : a.applied === false ? "-" : "?";
+    emitPretty(`  ${tag}${sev} [${a.fix_class}] ${a.note}`);
+    if (a.command) emitPretty(`      $ ${a.command}`);
+    if (a.skipped_reason) emitPretty(`      skipped: ${a.skipped_reason}`);
+    if (a.error) emitPretty(`      error: ${a.error}`);
+  }
+  emitPretty("");
+  emitPretty(`status:           ${report.ok ? "ok" : "drift / errors"}`);
+}
+async function runWorkspaceStatus(args) {
+  const opts = readOpts(args);
+  const ctx = await ctxFromArgs(args);
+  const report = await buildStatus(ctx);
+  emitReport(opts, report);
+  return exitCode(report);
+}
+async function runWorkspaceWorktree(args) {
+  const verb = args.positional[1] ?? "list";
+  const opts = readOpts(args);
+  const ctx = await ctxFromArgs(args);
+  if (verb === "list") {
+    const rows = await worktree_exports.listAll(ctx);
+    const actions = rows.map((r) => ({
+      id: `worktree-list:${r.repo}:${r.path}`,
+      category: "worktree-list",
+      severity: "info",
+      fix_class: "C",
+      repo: r.repo,
+      target: r.path,
+      note: `${path21.basename(r.repo)}: ${r.path}${r.branch ? ` (${r.branch})` : ""}${r.exists ? "" : " [MISSING]"}${r.prunable ? " [prunable]" : ""}`
+    }));
+    const report = newReport(ctx, "worktree-list", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  if (verb === "prune") {
+    const actions = await worktree_exports.planPrune(ctx);
+    if (ctx.apply) await worktree_exports.applyPrune(ctx, actions);
+    const report = newReport(ctx, "worktree-prune", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  if (verb === "add") {
+    const repo = flagString(args, "repo") ?? ctx.emaRoot;
+    const wtPath = args.positional[2];
+    const branch = args.positional[3];
+    if (!wtPath || !branch) {
+      emitError("Usage: ema workspace worktree add <path> <branch> [--repo <abs-path>]");
+      return 64;
+    }
+    const actions = await worktree_exports.planAdd(ctx, repo, wtPath, branch);
+    if (ctx.apply && actions[0]?.fix_class === "A") {
+      const r = await worktree_exports.applyAdd(repo, wtPath, branch);
+      actions[0].applied = r.ok;
+      if (!r.ok) actions[0].error = r.error;
+    }
+    const report = newReport(ctx, "worktree-add", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  if (verb === "move") {
+    const repo = flagString(args, "repo") ?? ctx.emaRoot;
+    const from = args.positional[2];
+    const to = args.positional[3];
+    if (!from || !to) {
+      emitError("Usage: ema workspace worktree move <from> <to> [--repo <abs-path>]");
+      return 64;
+    }
+    const actions = await worktree_exports.planMove(repo, from, to);
+    if (ctx.apply && actions[0]?.fix_class === "A") {
+      const r = await worktree_exports.applyMove(repo, from, to);
+      actions[0].applied = r.ok;
+      if (!r.ok) actions[0].error = r.error;
+    }
+    const report = newReport(ctx, "worktree-move", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  emitError(`ema workspace worktree: unknown verb "${verb}" (expected: list | prune | add | move)`);
+  return 64;
+}
+async function runWorkspaceBranch(args) {
+  const verb = args.positional[1] ?? "list";
+  const opts = readOpts(args);
+  const ctx = await ctxFromArgs(args);
+  if (verb === "list") {
+    const rows = await branch_exports.listAll(ctx);
+    const actions = rows.map((r) => ({
+      id: `branch-list:${r.repo}:${r.branch.name}`,
+      category: "branch-list",
+      severity: "info",
+      fix_class: "C",
+      repo: r.repo,
+      target: r.branch.name,
+      note: `${r.repo_name}: ${r.branch.name}${r.branch.upstream ? ` -> ${r.branch.upstream}` : " (no upstream)"}${r.branch.upstream_gone ? " [gone]" : ""}${r.branch.ahead ? ` \u2191${r.branch.ahead}` : ""}${r.branch.behind ? ` \u2193${r.branch.behind}` : ""}`
+    }));
+    const report = newReport(ctx, "branch-list", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  if (verb === "clean") {
+    const actions = await branch_exports.planClean(ctx);
+    if (ctx.apply) await branch_exports.applyClean(ctx, actions);
+    const report = newReport(ctx, "branch-clean", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  if (verb === "sync") {
+    const actions = await branch_exports.planSync(ctx);
+    if (ctx.apply) await branch_exports.applySync(ctx, actions);
+    const report = newReport(ctx, "branch-sync", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  emitError(`ema workspace branch: unknown verb "${verb}" (expected: list | clean | sync)`);
+  return 64;
+}
+async function runWorkspaceRemote(args) {
+  const verb = args.positional[1] ?? "status";
+  const opts = readOpts(args);
+  const ctx = await ctxFromArgs(args);
+  if (verb === "sync") {
+    const actions = await remote_exports.planSync(ctx);
+    if (ctx.apply) await remote_exports.applySync(ctx, actions);
+    const report = newReport(ctx, "remote-sync", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  if (verb === "ensure") {
+    const actions = await remote_exports.planEnsure(ctx);
+    if (ctx.apply) await remote_exports.applyEnsure(ctx, actions);
+    const report = newReport(ctx, "remote-ensure", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  if (verb === "status") {
+    const actions = await remote_exports.reportStatus(ctx);
+    const report = newReport(ctx, "remote-status", actions);
+    emitReport(opts, report);
+    return exitCode(report);
+  }
+  emitError(`ema workspace remote: unknown verb "${verb}" (expected: sync | ensure | status)`);
+  return 64;
+}
+async function runWorkspacePair(args) {
+  const opts = readOpts(args);
+  const ctx = await ctxFromArgs(args);
+  const pair = await sync_exports.pairSymmetry(ctx);
+  const report = newReport(ctx, "pair-symmetry", pair.actions);
+  report.pairs = pair.findings;
+  emitReport(opts, report);
+  return exitCode(report);
+}
+
+// src/commands/workspace.ts
 var CONTRACT_KINDS = /* @__PURE__ */ new Set(["report", "note", "output", "session_log", "proof", "other"]);
 var LEGACY_KIND_ALIASES = /* @__PURE__ */ new Set(["plan", "handoff", "context_bundle", "session_export"]);
 var SOURCE = "daemon_canonical_events";
@@ -9646,8 +12185,13 @@ async function runWorkspace(args) {
   const noun = args.positional[0];
   const verb = args.positional[1] ?? "list";
   if (flagBool(args, "help") || args.flags.h === true || noun === "help") return help2(args);
+  if (noun === "status") return runWorkspaceStatus(args);
+  if (noun === "worktree") return runWorkspaceWorktree(args);
+  if (noun === "branch") return runWorkspaceBranch(args);
+  if (noun === "remote") return runWorkspaceRemote(args);
+  if (noun === "pair") return runWorkspacePair(args);
   if (noun !== "artifact" && noun !== "artifacts") {
-    emitError(`ema workspace: unknown subcommand "${noun ?? ""}" (expected: artifact)`);
+    emitError(`ema workspace: unknown subcommand "${noun ?? ""}" (expected: artifact | status | worktree | branch | remote | pair)`);
     return 64;
   }
   if (verb === "add") return addArtifact(args);
@@ -9666,7 +12210,12 @@ function help2(args) {
     { verb: "artifact list", summary: "List daemon-canonical workspace artifacts for the resolved project." },
     { verb: "artifact show", summary: "Show one artifact by --artifact." },
     { verb: "artifact link", summary: "Link an artifact to a lane, queue item, execution, dispatch, project, or intention." },
-    { verb: "artifact archive", summary: "Archive an artifact through the daemon writer." }
+    { verb: "artifact archive", summary: "Archive an artifact through the daemon writer." },
+    { verb: "status", summary: "Status snapshot of every clone under Active builds + Projects." },
+    { verb: "worktree list/prune/add/move", summary: "Manage git worktrees across the EMA root filesystem." },
+    { verb: "branch list/clean/sync", summary: "List branches, clean stale ones (--with-branches), ff-only sync." },
+    { verb: "remote sync/ensure/status", summary: "Fetch/prune origin, ensure origin URL, report ahead/behind." },
+    { verb: "pair", summary: "Active builds <-> Projects pair-symmetry findings (read-only)." }
   ];
   if (flagBool(args, "json")) emitJson({ noun: "workspace", status: "available", commands });
   else {
@@ -10150,10 +12699,10 @@ async function backfeed(args) {
     approve_token: "reviewed",
     requester_actor_id: requesterActor
   });
-  let exitCode;
+  let exitCode2;
   if (destination === "artifact") {
     const bodyPath = writeBackfeedBody(intent);
-    exitCode = await runWorkspace({
+    exitCode2 = await runWorkspace({
       positional: ["artifact", "add"],
       flags: {
         ...args.flags,
@@ -10164,7 +12713,7 @@ async function backfeed(args) {
       }
     });
   } else {
-    exitCode = await runQueue({
+    exitCode2 = await runQueue({
       positional: ["add"],
       flags: {
         ...args.flags,
@@ -10176,7 +12725,7 @@ async function backfeed(args) {
       }
     });
   }
-  if (exitCode === 0) {
+  if (exitCode2 === 0) {
     await tryEmitBackfeedCompleted({
       intent_id: intent.id,
       destination,
@@ -10188,12 +12737,12 @@ async function backfeed(args) {
       destination,
       target_project: targetProject,
       error_class: "backfeed_writer_error",
-      message: `${destination} writer exited with code ${exitCode}`
+      message: `${destination} writer exited with code ${exitCode2}`
     });
   }
   if (flagBool(args, "json")) {
     emitJson({
-      ok: exitCode === 0,
+      ok: exitCode2 === 0,
       command: "intention.backfeed",
       mode: "live",
       destination,
@@ -10203,7 +12752,7 @@ async function backfeed(args) {
       daemon_status: beforeOutcome.status
     });
   }
-  return exitCode;
+  return exitCode2;
 }
 async function reviewFromVerb(args) {
   const raw = flagString(args, "state");
@@ -10368,11 +12917,11 @@ function discoverSources(project) {
     ...expandGlob(join13(home, ".codex/archived_sessions"))
   ];
   const seen = /* @__PURE__ */ new Set();
-  return paths.filter((path2) => existsSync12(path2) && safeStat(path2)?.isFile()).filter((path2) => {
-    if (seen.has(path2)) return false;
-    seen.add(path2);
+  return paths.filter((path22) => existsSync12(path22) && safeStat(path22)?.isFile()).filter((path22) => {
+    if (seen.has(path22)) return false;
+    seen.add(path22);
     return true;
-  }).map((path2) => sourceForPath(path2, project));
+  }).map((path22) => sourceForPath(path22, project));
 }
 function expandGlob(root) {
   if (!existsSync12(root)) return [];
@@ -10403,7 +12952,7 @@ function projectDocs(root) {
     "blueprint/03-dual-fork-spike.md",
     "blueprint/04-t3code-relationship.md",
     "blueprint/05-stack-decision.md"
-  ].map((path2) => join13(root, path2));
+  ].map((path22) => join13(root, path22));
 }
 function proslyncDocs() {
   const roots = [
@@ -10560,22 +13109,22 @@ function queuePriority(intent) {
   if (intent.tags.includes("lost_followup")) score += 2;
   return score;
 }
-function sourceForPath(path2, project) {
-  const lower = path2.toLowerCase();
+function sourceForPath(path22, project) {
+  const lower = path22.toLowerCase();
   const source_family = lower.includes("proslync") ? "proslync" : lower.includes("ema-0.0.6") || lower.includes("/projects/ema/") ? "ema" : lower.includes("chronicle") ? "chronicle" : lower.includes("duct-tape") ? "duct_tape" : lower.includes("multiplexer") || lower.includes("cmux") || lower.includes("t3code") ? "session_manager" : "general";
   const source_type = lower.endsWith(".jsonl") && lower.includes("/.claude/") ? "claude_project" : lower.endsWith(".jsonl") && (lower.includes("/.codex/sessions/") || lower.includes("/.codex/archived_sessions/")) ? "codex_session" : lower.endsWith(".jsonl") && lower.includes("/.codex/") ? "codex_history" : lower.includes("/.codex/memories/") ? "codex_memory" : source_family === "proslync" ? "proslync_repo" : source_family === "ema" ? "ema_doc" : "donor_project";
   return {
-    path: path2,
+    path: path22,
     source_type,
     source_family,
-    project_hint: source_family === "proslync" ? project ?? DEFAULT_PROJECT : source_family === "ema" ? "EMA" : basename(dirname5(path2)) || null
+    project_hint: source_family === "proslync" ? project ?? DEFAULT_PROJECT : source_family === "ema" ? "EMA" : basename(dirname5(path22)) || null
   };
 }
 function readStoredProjection(project) {
-  const path2 = storePath(project);
-  if (!existsSync12(path2)) return null;
+  const path22 = storePath(project);
+  if (!existsSync12(path22)) return null;
   try {
-    return JSON.parse(readFileSync10(path2, "utf8"));
+    return JSON.parse(readFileSync10(path22, "utf8"));
   } catch {
     return null;
   }
@@ -10679,9 +13228,9 @@ function artifactBody(intent) {
 function writeBackfeedBody(intent) {
   const dir = join13(STORE_ROOT, "backfeed-bodies");
   mkdirSync5(dir, { recursive: true });
-  const path2 = join13(dir, `${safeName(intent.id)}.md`);
-  writeFileSync6(path2, artifactBody(intent) + "\n");
-  return path2;
+  const path22 = join13(dir, `${safeName(intent.id)}.md`);
+  writeFileSync6(path22, artifactBody(intent) + "\n");
+  return path22;
 }
 function safeName(value) {
   return value.replace(/[^a-zA-Z0-9._-]+/g, "_");
@@ -10689,17 +13238,17 @@ function safeName(value) {
 function shellQuote3(value) {
   return JSON.stringify(value);
 }
-function interestingFile(path2) {
-  const lower = path2.toLowerCase();
+function interestingFile(path22) {
+  const lower = path22.toLowerCase();
   return lower.endsWith(".jsonl") || lower.endsWith(".md");
 }
-function skipDir(path2) {
-  const lower = path2.toLowerCase();
+function skipDir(path22) {
+  const lower = path22.toLowerCase();
   return ["/node_modules", "/.next", "/dist", "/build", "/pods", "/deriveddata"].some((part) => lower.includes(part));
 }
-function safeStat(path2) {
+function safeStat(path22) {
   try {
-    return statSync5(path2);
+    return statSync5(path22);
   } catch {
     return null;
   }
@@ -10839,7 +13388,7 @@ function isDaemonReview(value) {
 }
 
 // src/commands/cockpit.ts
-var execFileAsync2 = promisify2(execFile2);
+var execFileAsync2 = promisify10(execFile10);
 var INTENTION_STORE_ROOT = join14(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
 var EMA_PIDS_ROOT = join14(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "pids");
 async function runCockpit(args) {
@@ -10961,6 +13510,7 @@ async function loadCockpitProjection(args, options = {}) {
     client,
     project: {
       id: scope.project_id,
+      org_id: scope.org_id,
       name: scope.project_name,
       kind: scope.project_id ? client ? "client" : "personal" : "unresolved",
       project_record: scope.project_record,
@@ -11047,7 +13597,7 @@ function printBuilds(builds) {
     return;
   }
   for (const build of builds) {
-    const git = [
+    const git2 = [
       build.git_status,
       build.branch ? `branch ${build.branch}` : null,
       build.head ? `HEAD ${build.head}` : null,
@@ -11055,7 +13605,7 @@ function printBuilds(builds) {
     ].filter(Boolean).join(" \xB7 ");
     emitPretty(`${build.label}`);
     emitPretty(`  ${build.path}`);
-    emitPretty(`  ${git}`);
+    emitPretty(`  ${git2}`);
     if (build.dev_command) emitPretty(`  dev: ${build.dev_command}`);
   }
 }
@@ -11148,35 +13698,35 @@ async function discoverBuilds(scope, registry2) {
     for (const build of registry2.activeBuilds) registryByPath.set(build.path, build);
   }
   const paths = /* @__PURE__ */ new Set();
-  for (const path2 of registryByPath.keys()) paths.add(path2);
+  for (const path22 of registryByPath.keys()) paths.add(path22);
   if (scope.active_build) paths.add(scope.active_build);
   const sorted = [...paths].sort();
-  return await Promise.all(sorted.map((path2) => gitFact(path2, registryByPath.get(path2) ?? null)));
+  return await Promise.all(sorted.map((path22) => gitFact(path22, registryByPath.get(path22) ?? null)));
 }
 function intentionProjectionAvailable(scope) {
   const project = scope.project_name ?? "unresolved";
   return existsSync13(join14(INTENTION_STORE_ROOT, `${safeName2(project)}.json`));
 }
-async function gitFact(path2, registryBuild) {
-  const id = registryBuild?.id ?? basename2(path2);
+async function gitFact(path22, registryBuild) {
+  const id = registryBuild?.id ?? basename2(path22);
   const base = {
     id,
     label: registryBuild?.label ?? id,
     role: registryBuild?.role ?? "active build",
-    path: path2,
+    path: path22,
     repo_url: registryBuild?.repoUrl ?? null,
     dev_command: registryBuild?.devCommand ?? null
   };
-  if (!existsSync13(path2)) {
+  if (!existsSync13(path22)) {
     return { ...base, branch: null, head: null, dirty_count: null, git_status: "missing" };
   }
-  if (!existsSync13(join14(path2, ".git"))) {
+  if (!existsSync13(join14(path22, ".git"))) {
     return { ...base, branch: null, head: null, dirty_count: null, git_status: "no_git" };
   }
   const [branch, head, status2] = await Promise.all([
-    run("git", ["branch", "--show-current"], path2).catch(() => ""),
-    run("git", ["rev-parse", "--short", "HEAD"], path2).catch(() => ""),
-    run("git", ["status", "--short"], path2).catch(() => "")
+    run("git", ["branch", "--show-current"], path22).catch(() => ""),
+    run("git", ["rev-parse", "--short", "HEAD"], path22).catch(() => ""),
+    run("git", ["status", "--short"], path22).catch(() => "")
   ]);
   const dirtyCount = status2.split("\n").filter(Boolean).length;
   return {
@@ -11205,10 +13755,10 @@ function pidAlive(pid) {
   }
 }
 function readPidFile(name) {
-  const path2 = join14(EMA_PIDS_ROOT, `${name}.pid`);
-  if (!existsSync13(path2)) return null;
+  const path22 = join14(EMA_PIDS_ROOT, `${name}.pid`);
+  if (!existsSync13(path22)) return null;
   try {
-    const raw = readFileSync11(path2, "utf8").trim();
+    const raw = readFileSync11(path22, "utf8").trim();
     if (!raw) return null;
     const pid = Number(raw);
     return Number.isFinite(pid) && pid > 0 ? pid : null;

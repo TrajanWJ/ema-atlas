@@ -2,6 +2,11 @@ import { execFile } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
+import {
+	type ActiveBuild as RegistryActiveBuild,
+	getRegistryForProject,
+	type Surface as RegistrySurface,
+} from "@/src/lib/project-registry";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -13,123 +18,51 @@ const EMA_ROOT = resolve(WEB_ROOT, "../..");
 const EMA_CLI = join(EMA_ROOT, "apps/cli/dist/bin.js");
 const INTENTION_STORE_ROOT = join(EMA_ROOT, ".ema-dev", "intention-backfeed");
 const EMA_PIDS_ROOT = join(EMA_ROOT, ".ema-dev", "pids");
-const PROSLYNC_APP = "/Users/trajanm4air/Desktop/Active builds/proslync-app-ios-final";
+const DEFAULT_PROJECT_SLUG = "proslync-app-ios-final";
 
-const CLIENT = {
-	id: "client:ms-wilson",
-	name: "Ms. Wilson",
-	color: "#d49a6a",
-} as const;
+type RouteBuild = {
+	readonly id: string;
+	readonly label: string;
+	readonly role: string;
+	readonly path: string;
+	readonly repo_url: string | null;
+	readonly dev_command: string | null;
+};
 
-const PROSLYNC_PROJECT_ID = "project:01KR0FKC3Q028AX7DK658J8D99";
+type RouteSurface = {
+	readonly id: string;
+	readonly label: string;
+	readonly role: string;
+	readonly owner: string;
+	readonly build_id: string;
+	readonly path: string;
+	readonly local_url: string | null;
+	readonly status: string;
+};
 
-const PROSLYNC_BUILDS = [
-	{
-		id: "proslync-app-ios-final",
-		label: "Proslync iOS app",
-		role: "mobile mirror, athlete/brand/persona flows",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-app-ios-final",
-		repo_url: "https://github.com/TrajanWJ/proslync-app-ios-final",
-		dev_command: "npx expo start",
-	},
-	{
-		id: "proslync-backend",
-		label: "Proslync backend",
-		role: "Bun/Hono/Drizzle API and product-core persistence",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-backend",
-		repo_url: "https://github.com/TrajanWJ/proslync-backend-final",
-		dev_command: "bun --hot src/server.ts",
-	},
-	{
-		id: "proslync-desktop",
-		label: "Proslync desktop",
-		role: "AD cockpit and Brand HQ desktop surface",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-desktop",
-		repo_url: "https://github.com/TrajanWJ/proslync-desktop-site-final",
-		dev_command: "pnpm dev",
-	},
-	{
-		id: "proslync-presentation-assets-final",
-		label: "Presentation assets",
-		role: "master plan, research capture, client-facing narrative",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-presentation-assets-final",
-		repo_url: "https://github.com/TrajanWJ/proslync-presentation-assets-final",
-		dev_command: null,
-	},
-] as const;
+function buildToRouteShape(build: RegistryActiveBuild): RouteBuild {
+	return {
+		id: build.id,
+		label: build.label,
+		role: build.role,
+		path: build.path,
+		repo_url: build.repoUrl,
+		dev_command: build.devCommand,
+	};
+}
 
-const PROSLYNC_SURFACES = [
-	{
-		id: "ad-cockpit",
-		label: "AD cockpit",
-		role: "buyer control room: revenue share, cap context, compliance health",
-		owner: "Proslync desktop",
-		build_id: "proslync-desktop",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-desktop/app/ad/page.tsx",
-		local_url: "http://localhost:3021/ad",
-		status: "planned",
-	},
-	{
-		id: "brand-hq",
-		label: "Brand HQ",
-		role: "open deal workflow, ranked applicants, rationale and trust metadata",
-		owner: "Proslync desktop",
-		build_id: "proslync-desktop",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-desktop/app/brand/page.tsx",
-		local_url: "http://localhost:3021/brand",
-		status: "candidate",
-	},
-	{
-		id: "nil-deal-detail",
-		label: "NIL Deal Detail",
-		role: "cross-role spine: packet, deliverables, review tracks, audit timeline",
-		owner: "Proslync iOS app",
-		build_id: "proslync-app-ios-final",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-app-ios-final/app/deal/[id].tsx",
-		local_url: null,
-		status: "planned",
-	},
-	{
-		id: "nil-manager",
-		label: "NIL Manager",
-		role: "consent-aware review queue and approval gates",
-		owner: "Proslync iOS app",
-		build_id: "proslync-app-ios-final",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-app-ios-final/components/nil-manager/nil-manager-view.tsx",
-		local_url: null,
-		status: "candidate",
-	},
-	{
-		id: "backend-api",
-		label: "Backend API",
-		role: "product-core objects, routes, seed data, trust metadata",
-		owner: "Proslync backend",
-		build_id: "proslync-backend",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-backend/src",
-		local_url: "http://localhost:3020/api/health",
-		status: "candidate",
-	},
-	{
-		id: "master-plan",
-		label: "Master plan and assets",
-		role: "client story, role happiness, research and presentation proof",
-		owner: "Presentation assets",
-		build_id: "proslync-presentation-assets-final",
-		path: "/Users/trajanm4air/Desktop/Active builds/proslync-presentation-assets-final/docs/plans/proslync-role-happiness-master-plan-2026-05-09/README.md",
-		local_url: null,
-		status: "live",
-	},
-	{
-		id: "hero-website",
-		label: "Hero website",
-		role: "remote narrative surface for AD wedge, demo proof, and launch story",
-		owner: "Proslync website",
-		build_id: "proslync-website",
-		path: "https://github.com/TrajanWJ/proslync-website",
-		local_url: "https://proslync-hero.vercel.app",
-		status: "queued",
-	},
-] as const;
+function surfaceToRouteShape(surface: RegistrySurface): RouteSurface {
+	return {
+		id: surface.id,
+		label: surface.label,
+		role: surface.role,
+		owner: surface.owner,
+		build_id: surface.buildId,
+		path: surface.path,
+		local_url: surface.localUrl,
+		status: surface.status,
+	};
+}
 
 type WorkspaceScope = {
 	org_id?: string | null;
@@ -199,11 +132,12 @@ async function run(
 async function runEmaJson<T>(
 	args: readonly string[],
 	errors: string[],
+	cwd: string,
 ): Promise<T | null> {
 	try {
 		const stdout = existsSync(EMA_CLI)
-			? await run(process.execPath, [EMA_CLI, ...args], PROSLYNC_APP)
-			: await run("ema", args, PROSLYNC_APP);
+			? await run(process.execPath, [EMA_CLI, ...args], cwd)
+			: await run("ema", args, cwd);
 		return JSON.parse(stdout) as T;
 	} catch (error) {
 		errors.push(`ema ${args.join(" ")} failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -211,7 +145,7 @@ async function runEmaJson<T>(
 	}
 }
 
-async function gitFact(build: (typeof PROSLYNC_BUILDS)[number]) {
+async function gitFact(build: RouteBuild) {
 	if (!existsSync(build.path)) {
 		return {
 			...build,
@@ -255,20 +189,27 @@ async function gitFact(build: (typeof PROSLYNC_BUILDS)[number]) {
 	}
 }
 
-function projectFrom(scope: WorkspaceScope | null | undefined, status: EmaStatus | null) {
-	const projectId = scope?.project_id ?? PROSLYNC_PROJECT_ID;
+function projectFrom(
+	scope: WorkspaceScope | null | undefined,
+	status: EmaStatus | null,
+	registry: ReturnType<typeof getRegistryForProject>,
+	defaultProjectSlug: string,
+	defaultActiveBuildPath: string,
+) {
+	const projectId = scope?.project_id ?? registry?.projectId ?? "project:unresolved";
 	const spaceId = scope?.space_id ?? status?.space?.id ?? "space:01J00000000000000000000013";
+	const primaryRepoUrl = registry?.activeBuilds[0]?.repoUrl ?? null;
 	return {
 		id: projectId,
-		name: scope?.project_name ?? "proslync-app-ios-final",
+		name: scope?.project_name ?? registry?.projectSlug ?? defaultProjectSlug,
 		kind: "client",
-		client_id: CLIENT.id,
-		client_label: CLIENT.name,
-		client_color: CLIENT.color,
+		client_id: registry?.clientId ?? null,
+		client_label: registry?.clientName ?? null,
+		client_color: registry?.clientColor ?? null,
 		space_id: spaceId,
-		project_record: scope?.project_record ?? "/Users/trajanm4air/Desktop/Projects/proslync-app-ios-final",
-		active_build: scope?.active_build ?? PROSLYNC_APP,
-		repo_url: "https://github.com/TrajanWJ/proslync-app-ios-final",
+		project_record: scope?.project_record ?? registry?.projectRecordPath ?? null,
+		active_build: scope?.active_build ?? defaultActiveBuildPath,
+		repo_url: primaryRepoUrl,
 		resolution_source: scope?.resolution_source ?? null,
 	};
 }
@@ -308,19 +249,29 @@ function normalizeQueue(raw: Record<string, unknown>, projectId: string) {
 export async function GET(request: Request) {
 	const generatedAt = new Date().toISOString();
 	const projectName =
-		new URL(request.url).searchParams.get("project")?.trim() || "proslync-app-ios-final";
+		new URL(request.url).searchParams.get("project")?.trim() || DEFAULT_PROJECT_SLUG;
+	const registry = getRegistryForProject(projectName) ?? getRegistryForProject(DEFAULT_PROJECT_SLUG);
+	const routeBuilds: readonly RouteBuild[] = registry
+		? registry.activeBuilds.map(buildToRouteShape)
+		: [];
+	const routeSurfaces: readonly RouteSurface[] = registry
+		? registry.surfaces.map(surfaceToRouteShape)
+		: [];
+	// CLI calls run from the primary active build of the project so that
+	// `ema` resolves the same workspace scope the cockpit is rendering for.
+	const cliCwd = routeBuilds[0]?.path ?? EMA_ROOT;
 	const errors: string[] = [];
 	const [status, next, laneList, queueList, activeBuilds] = await Promise.all([
-		runEmaJson<EmaStatus>(["status", "--json"], errors),
-		runEmaJson<EmaNext>(["next", "--json"], errors),
-		runEmaJson<EmaLaneList>(["lane", "list", "--project", projectName, "--json"], errors),
-		runEmaJson<EmaQueueList>(["queue", "list", "--project", projectName, "--json"], errors),
-		Promise.all(PROSLYNC_BUILDS.map((build) => gitFact(build))),
+		runEmaJson<EmaStatus>(["status", "--json"], errors, cliCwd),
+		runEmaJson<EmaNext>(["next", "--json"], errors, cliCwd),
+		runEmaJson<EmaLaneList>(["lane", "list", "--project", projectName, "--json"], errors, cliCwd),
+		runEmaJson<EmaQueueList>(["queue", "list", "--project", projectName, "--json"], errors, cliCwd),
+		Promise.all(routeBuilds.map((build) => gitFact(build))),
 	]);
 
 	const workspaceScope =
 		laneList?.workspace_scope ?? queueList?.workspace_scope ?? status?.workspace_scope ?? null;
-	const project = projectFrom(workspaceScope, status);
+	const project = projectFrom(workspaceScope, status, registry, projectName, cliCwd);
 	const lanes = (laneList?.lanes ?? []).map((lane) => normalizeLane(lane, project.id));
 	const queue = (queueList?.queue ?? []).map((item) => normalizeQueue(item, project.id));
 	const runtime = readRuntimeFacts();
@@ -328,7 +279,7 @@ export async function GET(request: Request) {
 		activeBuilds,
 		daemonUp: Boolean(status?.ok || laneList?.ok || queueList?.ok),
 		intentionsUp: intentionProjectionAvailable(projectName),
-		surfaces: PROSLYNC_SURFACES,
+		surfaces: routeSurfaces,
 		runtime,
 	});
 
@@ -337,7 +288,13 @@ export async function GET(request: Request) {
 			ok: true,
 			source: "ema-cli-cockpit-bridge",
 			generated_at: generatedAt,
-			client: CLIENT,
+			client: registry
+				? {
+						id: registry.clientId,
+						name: registry.clientName,
+						color: registry.clientColor,
+					}
+				: null,
 			spaces: [
 				{
 					id: project.space_id,
@@ -358,7 +315,7 @@ export async function GET(request: Request) {
 				project_record: project.project_record,
 				active_build: project.active_build,
 				resolution_source: project.resolution_source,
-				cwd: workspaceScope?.cwd ?? PROSLYNC_APP,
+				cwd: workspaceScope?.cwd ?? cliCwd,
 				home_current_project: status?.project?.name ?? null,
 				scope_warning: status?.scope_warning ?? null,
 				vcalendar_phase: next?.vcalendar_phase ?? null,
@@ -368,7 +325,7 @@ export async function GET(request: Request) {
 			lanes,
 			queue,
 			active_builds: activeBuilds,
-			surfaces: PROSLYNC_SURFACES,
+			surfaces: routeSurfaces,
 			health,
 		},
 		{
@@ -435,7 +392,7 @@ function healthFrom(input: {
 	readonly activeBuilds: readonly Awaited<ReturnType<typeof gitFact>>[];
 	readonly daemonUp: boolean;
 	readonly intentionsUp: boolean;
-	readonly surfaces: typeof PROSLYNC_SURFACES;
+	readonly surfaces: readonly RouteSurface[];
 	readonly runtime: RuntimeFacts;
 }) {
 	const gitBuilds = new Map<string, (typeof input.activeBuilds)[number]>(

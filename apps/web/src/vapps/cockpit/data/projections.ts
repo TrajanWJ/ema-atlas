@@ -4,8 +4,14 @@
  * EMA's cockpit is the native client-work surface. It reads live workspace
  * state through the local cockpit projection bridge, then falls back to staged
  * donor data when the daemon or CLI is unavailable.
+ *
+ * Proslync project metadata (client identity, color, project id) lives in the
+ * project registry at `src/lib/project-registry/`, mirrored from the CLI
+ * source of truth at `apps/cli/src/project-registry/`. Do not redefine the
+ * Proslync client/project here.
  */
 
+import { Proslync } from "../../../lib/project-registry";
 import type {
 	ClientBench,
 	ClientWorkItem,
@@ -35,9 +41,13 @@ const SPACES: readonly CockpitSpace[] = [
 	{ id: "space:01J00000000000000000000005", name: "EMA Studio", kind: "studio" },
 ];
 
-const CLIENTS: readonly CockpitClient[] = [
-	{ id: "client:ms-wilson", name: "Ms. Wilson / Proslync", color: "#5b8def" },
-];
+const PROSLYNC_CLIENT: CockpitClient = {
+	id: Proslync.clientId ?? "client:ms-wilson",
+	name: Proslync.clientName ?? "Ms. Wilson",
+	color: Proslync.clientColor,
+};
+
+const CLIENTS: readonly CockpitClient[] = [PROSLYNC_CLIENT];
 
 const PROJECTS: readonly CockpitProject[] = [
 	{
@@ -59,12 +69,12 @@ const PROJECTS: readonly CockpitProject[] = [
 		space_id: SPACES[0]!.id,
 	},
 	{
-		id: "project:proslync-app-ios-final",
-		name: "proslync-app-ios-final",
+		id: Proslync.projectId,
+		name: Proslync.projectSlug,
 		kind: "client",
-		client_id: CLIENTS[0]!.id,
-		client_label: CLIENTS[0]!.name,
-		client_color: CLIENTS[0]!.color,
+		client_id: PROSLYNC_CLIENT.id,
+		client_label: PROSLYNC_CLIENT.name,
+		client_color: PROSLYNC_CLIENT.color,
 		space_id: SPACES[0]!.id,
 	},
 	{

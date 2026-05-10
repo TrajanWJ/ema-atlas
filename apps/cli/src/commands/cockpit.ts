@@ -1,17 +1,17 @@
 import { execFile } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { promisify } from "node:util";
 import type { ParsedArgs } from "../args.js";
 import { flagBool } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
+import { getRegistryForProject, type ActiveBuild, type ProjectRegistryEntry, type Surface } from "../project-registry/index.js";
 import { DESKTOP_ROOT } from "../workspace-state.js";
 import { resolveWorkspaceScope, type WorkspaceScope } from "../workspace-scope.js";
 import { loadIntentionProjection } from "./intention.js";
 import { readProjectionBatch, renderEmaCommand } from "./workspace-daemon.js";
 
 const execFileAsync = promisify(execFile);
-const ACTIVE_BUILDS_ROOT = join(DESKTOP_ROOT, "Active builds");
 const INTENTION_STORE_ROOT = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
 const EMA_PIDS_ROOT = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "pids");
 
@@ -236,9 +236,10 @@ async function loadCockpitProjection(
   const projectId = scope.project_id;
   const lanes = filterProject(laneProjection ?? [], projectId);
   const queue = filterProject(queueProjection ?? [], projectId);
-  const client = inferClient(scope);
-  const activeBuilds = await discoverBuilds(scope);
-  const surfaces = inferSurfaces(scope);
+  const registry = registryForScope(scope);
+  const client = clientFromRegistry(registry);
+  const activeBuilds = await discoverBuilds(scope, registry);
+  const surfaces = surfacesFromRegistry(registry);
   const runtime = readRuntimeFacts();
   const health = healthFor({
     activeBuilds,
@@ -442,25 +443,46 @@ function filterProject<T extends { readonly project_id?: string | null }>(
   return records.filter((record) => record.project_id == null || record.project_id === projectId);
 }
 
-function inferClient(scope: WorkspaceScope): CockpitClient | null {
-  if (scope.project_name?.startsWith("proslync")) {
-    return { id: "client:ms-wilson", name: "Ms. Wilson", color: "#d49a6a" };
-  }
-  return null;
+function registryForScope(scope: WorkspaceScope): ProjectRegistryEntry | null {
+  return getRegistryForProject(scope.project_name) ?? getRegistryForProject(scope.project_id);
 }
 
-async function discoverBuilds(scope: WorkspaceScope): Promise<CockpitBuild[]> {
-  const paths = new Set<string>();
-  if (scope.active_build) paths.add(scope.active_build);
-  const family = projectFamily(scope.project_name);
-  if (family && existsSync(ACTIVE_BUILDS_ROOT)) {
-    for (const name of readdirSync(ACTIVE_BUILDS_ROOT)) {
-      if (name === family || name.startsWith(`${family}-`)) {
-        paths.add(join(ACTIVE_BUILDS_ROOT, name));
-      }
-    }
+function clientFromRegistry(registry: ProjectRegistryEntry | null): CockpitClient | null {
+  if (!registry || !registry.clientId || !registry.clientName) return null;
+  return { id: registry.clientId, name: registry.clientName, color: registry.clientColor };
+}
+
+function surfacesFromRegistry(registry: ProjectRegistryEntry | null): CockpitSurface[] {
+  if (!registry) return [];
+  return registry.surfaces.map((surface) => surfaceToCockpit(surface));
+}
+
+function surfaceToCockpit(surface: Surface): CockpitSurface {
+  return {
+    id: surface.id,
+    label: surface.label,
+    role: surface.role,
+    owner: surface.owner,
+    build_id: surface.buildId,
+    path: surface.path,
+    local_url: surface.localUrl,
+    status: surface.status,
+  };
+}
+
+async function discoverBuilds(scope: WorkspaceScope, registry: ProjectRegistryEntry | null): Promise<CockpitBuild[]> {
+  // Index registry builds by absolute path so scope.active_build (when present
+  // on disk) is treated as the same build entry as the registry, not a
+  // duplicate keyed by basename.
+  const registryByPath = new Map<string, ActiveBuild>();
+  if (registry) {
+    for (const build of registry.activeBuilds) registryByPath.set(build.path, build);
   }
-  return await Promise.all([...paths].sort().map((path) => gitFact(path)));
+  const paths = new Set<string>();
+  for (const path of registryByPath.keys()) paths.add(path);
+  if (scope.active_build) paths.add(scope.active_build);
+  const sorted = [...paths].sort();
+  return await Promise.all(sorted.map((path) => gitFact(path, registryByPath.get(path) ?? null)));
 }
 
 function intentionProjectionAvailable(scope: WorkspaceScope): boolean {
@@ -468,15 +490,15 @@ function intentionProjectionAvailable(scope: WorkspaceScope): boolean {
   return existsSync(join(INTENTION_STORE_ROOT, `${safeName(project)}.json`));
 }
 
-async function gitFact(path: string): Promise<CockpitBuild> {
-  const id = basename(path);
+async function gitFact(path: string, registryBuild: ActiveBuild | null): Promise<CockpitBuild> {
+  const id = registryBuild?.id ?? basename(path);
   const base = {
     id,
-    label: labelForBuild(id),
-    role: roleForBuild(id),
+    label: registryBuild?.label ?? id,
+    role: registryBuild?.role ?? "active build",
     path,
-    repo_url: repoForBuild(id),
-    dev_command: devCommandForBuild(id),
+    repo_url: registryBuild?.repoUrl ?? null,
+    dev_command: registryBuild?.devCommand ?? null,
   };
   if (!existsSync(path)) {
     return { ...base, branch: null, head: null, dirty_count: null, git_status: "missing" };
@@ -507,82 +529,6 @@ async function run(command: string, args: readonly string[], cwd: string): Promi
     maxBuffer: 4 * 1024 * 1024,
   });
   return stdout.trim();
-}
-
-function inferSurfaces(scope: WorkspaceScope): CockpitSurface[] {
-  if (!scope.project_name?.startsWith("proslync")) return [];
-  return [
-    {
-      id: "ad-cockpit",
-      label: "AD cockpit",
-      role: "Buyer control room: revenue share, cap context, compliance health.",
-      owner: "Proslync desktop",
-      build_id: "proslync-desktop",
-      path: join(ACTIVE_BUILDS_ROOT, "proslync-desktop/app/ad/page.tsx"),
-      local_url: "http://localhost:3021/ad",
-      status: "planned",
-    },
-    {
-      id: "brand-hq",
-      label: "Brand HQ",
-      role: "Open-deal workflow, ranked applicants, rationale, and trust metadata.",
-      owner: "Proslync desktop",
-      build_id: "proslync-desktop",
-      path: join(ACTIVE_BUILDS_ROOT, "proslync-desktop/app/brand/page.tsx"),
-      local_url: "http://localhost:3021/brand",
-      status: "candidate",
-    },
-    {
-      id: "nil-deal-detail",
-      label: "NIL Deal Detail",
-      role: "Cross-role spine: packet, deliverables, review tracks, audit timeline.",
-      owner: "Proslync iOS app",
-      build_id: "proslync-app-ios-final",
-      path: join(ACTIVE_BUILDS_ROOT, "proslync-app-ios-final/app/deal/[id].tsx"),
-      local_url: null,
-      status: "planned",
-    },
-    {
-      id: "nil-manager",
-      label: "NIL Manager",
-      role: "Consent-aware review queue and approval gates.",
-      owner: "Proslync iOS app",
-      build_id: "proslync-app-ios-final",
-      path: join(ACTIVE_BUILDS_ROOT, "proslync-app-ios-final/components/nil-manager/nil-manager-view.tsx"),
-      local_url: null,
-      status: "candidate",
-    },
-    {
-      id: "backend-api",
-      label: "Backend API",
-      role: "Product-core objects, routes, seed data, and trust metadata.",
-      owner: "Proslync backend",
-      build_id: "proslync-backend",
-      path: join(ACTIVE_BUILDS_ROOT, "proslync-backend/src"),
-      local_url: "http://localhost:3020/api/health",
-      status: "candidate",
-    },
-    {
-      id: "master-plan",
-      label: "Master plan and assets",
-      role: "Client story, role happiness, research, and presentation proof.",
-      owner: "Presentation assets",
-      build_id: "proslync-presentation-assets-final",
-      path: join(ACTIVE_BUILDS_ROOT, "proslync-presentation-assets-final/docs/plans/proslync-role-happiness-master-plan-2026-05-09/README.md"),
-      local_url: null,
-      status: "live",
-    },
-    {
-      id: "hero-website",
-      label: "Hero website",
-      role: "Remote narrative surface for AD wedge, demo proof, and launch story.",
-      owner: "Proslync website",
-      build_id: "proslync-website",
-      path: "https://github.com/TrajanWJ/proslync-website",
-      local_url: "https://proslync-hero.vercel.app",
-      status: "queued",
-    },
-  ];
 }
 
 type RuntimeFacts = {
@@ -666,45 +612,8 @@ function cockpitUrlFor(scope: WorkspaceScope, client: CockpitClient | null): str
   return `http://localhost:5173/cockpit#/personal/${scope.project_id}`;
 }
 
-function projectFamily(name: string | null): string | null {
-  if (!name) return null;
-  if (name.startsWith("proslync")) return "proslync";
-  return name;
-}
-
 function safeName(value: string): string {
   return value.replace(/[^a-zA-Z0-9._-]+/g, "_");
-}
-
-function labelForBuild(id: string): string {
-  if (id === "proslync-app-ios-final") return "Proslync iOS app";
-  if (id === "proslync-backend") return "Proslync backend";
-  if (id === "proslync-desktop") return "Proslync desktop";
-  if (id === "proslync-presentation-assets-final") return "Presentation assets";
-  return id;
-}
-
-function roleForBuild(id: string): string {
-  if (id === "proslync-app-ios-final") return "mobile mirror, athlete/brand/persona flows";
-  if (id === "proslync-backend") return "Bun/Hono/Drizzle API and product-core persistence";
-  if (id === "proslync-desktop") return "AD cockpit and Brand HQ desktop surface";
-  if (id === "proslync-presentation-assets-final") return "master plan, research capture, client narrative";
-  return "active build";
-}
-
-function repoForBuild(id: string): string | null {
-  if (id === "proslync-app-ios-final") return "https://github.com/TrajanWJ/proslync-app-ios-final";
-  if (id === "proslync-backend") return "https://github.com/TrajanWJ/proslync-backend-final";
-  if (id === "proslync-desktop") return "https://github.com/TrajanWJ/proslync-desktop-site-final";
-  if (id === "proslync-presentation-assets-final") return "https://github.com/TrajanWJ/proslync-presentation-assets-final";
-  return null;
-}
-
-function devCommandForBuild(id: string): string | null {
-  if (id === "proslync-app-ios-final") return "npx expo start";
-  if (id === "proslync-backend") return "bun --hot src/server.ts";
-  if (id === "proslync-desktop") return "pnpm dev";
-  return null;
 }
 
 function agentWorkpackFor(projection: CockpitProjection) {

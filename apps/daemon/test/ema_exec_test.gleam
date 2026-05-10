@@ -97,6 +97,71 @@ pub fn execution_end_appends_event_test() {
   let _ = delete_file(path)
 }
 
+pub fn execution_complete_appends_event_test() {
+  let path = tmp_path("ema-exec-complete.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(event_id) =
+    ema_exec.complete_execution(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "dispatch:test",
+      "execution:test",
+      "codex",
+      0,
+      42,
+      12,
+      3,
+      ".ema-dev/harness-glue/codex/execution_test.jsonl",
+      "prompt-hash",
+      None,
+    )
+
+  should.equal(string.starts_with(event_id, "event:"), True)
+  should.equal(
+    bus.event_exists(bus_subject, "execution.completed", "org:test"),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn execution_timeout_appends_event_test() {
+  let path = tmp_path("ema-exec-timeout.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(event_id) =
+    ema_exec.timeout_execution(
+      bus_subject,
+      "org:test",
+      "actor:test",
+      "dispatch:test",
+      "execution:test",
+      "codex",
+      60_000,
+      60_001,
+      12,
+      3,
+      ".ema-dev/harness-glue/codex/execution_test.jsonl",
+      "prompt-hash",
+    )
+
+  should.equal(string.starts_with(event_id, "event:"), True)
+  should.equal(
+    bus.event_exists(bus_subject, "execution.timeout", "org:test"),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
 pub fn execution_fail_appends_event_test() {
   let path = tmp_path("ema-exec-fail.db")
   let _ = delete_file(path)
@@ -118,6 +183,39 @@ pub fn execution_fail_appends_event_test() {
   should.equal(string.starts_with(event_id, "event:"), True)
   should.equal(
     bus.event_exists(bus_subject, "execution.failed", "org:test"),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn execution_restart_interrupt_appends_event_test() {
+  let path = tmp_path("ema-exec-restart-interrupt.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let assert Ok(event_id) =
+    ema_exec.interrupt_by_restart(
+      bus_subject,
+      "org:test",
+      "actor:boot_recovery_scanner",
+      "dispatch:test",
+      "execution:test",
+      "running",
+      "execution.started",
+      "2026-05-10T00:00:00.000Z",
+      "{}",
+    )
+
+  should.equal(string.starts_with(event_id, "event:"), True)
+  should.equal(
+    bus.event_exists(
+      bus_subject,
+      "execution.interrupted_by_restart",
+      "org:test",
+    ),
     True,
   )
 

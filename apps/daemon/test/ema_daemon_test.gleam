@@ -151,6 +151,27 @@ pub fn topbar_uses_home_current_node_state_test() {
   let _ = delete_file(path)
 }
 
+pub fn git_ema_slug_projects_active_builds_label_test() {
+  let path = tmp_path("ema-active-builds-vapp.db")
+  let _ = delete_file(path)
+
+  let assert Ok(started) = bus.start(path)
+  let bus_subject = started.data
+
+  let projection = bus.space_vapps_projection_json(bus_subject)
+
+  should.equal(
+    string.contains(projection, "\"slug\":\"git-ema\""),
+    True,
+  )
+  should.equal(
+    string.contains(projection, "\"label\":\"Active builds\""),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
 pub fn peer_trust_events_are_in_runtime_catalog_test() {
   let path = tmp_path("ema-peer-catalog.db")
   let _ = delete_file(path)

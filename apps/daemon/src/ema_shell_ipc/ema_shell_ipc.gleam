@@ -17,8 +17,10 @@ import gleam/string
 import mist.{type Connection, type ResponseData}
 
 import ema_access_sessions/ema_access_sessions
+import ema_artifact/ema_artifact
 import ema_blueprint/ema_blueprint
 import ema_blueprint/planner_nodes
+import ema_canon/ema_canon
 import ema_collab/ema_collab
 import ema_companion/ema_companion
 import ema_daemon/bus
@@ -1100,6 +1102,112 @@ fn handle_text(
                 }
               }
             }
+            Some("actor.register") ->
+              handle_pipeline_event(
+                conn,
+                state,
+                incoming,
+                "actor.created",
+                incoming.actor_id,
+                [
+                  #("actor_id", required_json(incoming.actor_id)),
+                  #("id", required_json(incoming.actor_id)),
+                  #("kind", agent_workspace.opt(incoming.target_kind)),
+                  #("display_name", agent_workspace.opt(incoming.display_name)),
+                  #("role", agent_workspace.opt(incoming.role)),
+                  #("dispatch", agent_workspace.opt(incoming.provider)),
+                  #("perspective", agent_workspace.opt(incoming.relation)),
+                ],
+              )
+            Some("intent.create") -> {
+              let now = iso_now()
+              handle_pipeline_event(
+                conn,
+                state,
+                incoming,
+                "intent.created",
+                incoming.intent,
+                [
+                  #("intent_id", required_json(incoming.intent)),
+                  #("slug", agent_workspace.opt(incoming.label)),
+                  #("title", title_json(incoming)),
+                  #("body", agent_workspace.opt(incoming.body)),
+                  #("kind", agent_workspace.opt(incoming.target_kind)),
+                  #("status", agent_workspace.opt(incoming.status)),
+                  #("project_id", agent_workspace.opt(incoming.project_id)),
+                  #("space_id", agent_workspace.opt(incoming.space_id)),
+                  #("actor_id", json.string(actor_or_default(incoming))),
+                  #("exit_condition", agent_workspace.opt(incoming.done_when)),
+                  #("created_at", json.string(now)),
+                ],
+              )
+            }
+            Some("intent.update") -> {
+              let now = iso_now()
+              handle_pipeline_event(
+                conn,
+                state,
+                incoming,
+                "intent.updated",
+                incoming.intent,
+                [
+                  #("intent_id", required_json(incoming.intent)),
+                  #("changed_fields", csv_json_array(incoming.changed)),
+                  #("actor_id", json.string(actor_or_default(incoming))),
+                  #("updated_at", json.string(now)),
+                  #("reason", agent_workspace.opt(incoming.reason)),
+                  #("title", agent_workspace.opt(incoming.title)),
+                  #("body", agent_workspace.opt(incoming.body)),
+                  #("status", agent_workspace.opt(incoming.status)),
+                  #("exit_condition", agent_workspace.opt(incoming.done_when)),
+                ],
+              )
+            }
+            Some("proposal.create") -> {
+              let now = iso_now()
+              let requires_approval = bool_from_option(incoming.verified, True)
+              handle_pipeline_event(
+                conn,
+                state,
+                incoming,
+                "proposal.created",
+                incoming.target,
+                [
+                  #("proposal_id", required_json(incoming.target)),
+                  #("intent_id", required_json(incoming.intent)),
+                  #("title", title_json(incoming)),
+                  #("body", agent_workspace.opt(incoming.body)),
+                  #("plan", agent_workspace.opt(incoming.context)),
+                  #("approver_required", json.bool(requires_approval)),
+                  #("proposed_by_actor_id", json.string(actor_or_default(incoming))),
+                  #("status", json.string(case requires_approval {
+                    True -> "created"
+                    False -> "approved"
+                  })),
+                  #("created_at", json.string(now)),
+                ],
+              )
+            }
+            Some("proposal.approve") ->
+              handle_proposal_decision(
+                conn,
+                state,
+                incoming,
+                "proposal.approved",
+                "approved_by_actor_id",
+                "approved_at",
+                True,
+              )
+            Some("proposal.reject") ->
+              handle_proposal_decision(
+                conn,
+                state,
+                incoming,
+                "proposal.rejected",
+                "rejected_by_actor_id",
+                "rejected_at",
+                False,
+              )
             Some("membership.role_grant") -> {
               case incoming.org_id, incoming.user_id, incoming.role {
                 Some(org_id), Some(user_id), Some(role) ->
@@ -4024,26 +4132,39 @@ fn handle_text(
                 }
               }
             }
-            Some("execution.fail") -> {
+            Some("execution.complete") -> {
               case
                 incoming.org_id,
                 incoming.dispatch_id,
                 incoming.execution_id,
-                incoming.error_class,
-                incoming.error_message
+                incoming.provider,
+                incoming.exit_code,
+                incoming.duration_ms,
+                incoming.stdout_bytes,
+                incoming.stderr_bytes,
+                incoming.session_file_path,
+                incoming.prompt_hash
               {
                 Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  error_class,
-                ), Some(error_message) ->
+                  provider,
+                ), Some(exit_code), Some(duration_ms), Some(stdout_bytes), Some(
+                  stderr_bytes,
+                ), Some(session_file_path), Some(prompt_hash) -> {
                   case
-                    ema_exec.fail_execution(
+                    ema_exec.complete_execution(
                       bus_subj,
                       org_id,
                       actor_or_default(incoming),
                       dispatch_id,
                       execution_id,
-                      error_class,
-                      error_message,
+                      provider,
+                      exit_code,
+                      duration_ms,
+                      stdout_bytes,
+                      stderr_bytes,
+                      session_file_path,
+                      prompt_hash,
+                      incoming.canon_id,
                     )
                   {
                     Ok(event_id) -> {
@@ -4067,6 +4188,97 @@ fn handle_text(
                       mist.continue(state)
                     }
                   }
+                }
+                _, _, _, _, _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.dispatch_id, args.execution_id, args.provider, args.exit_code, args.duration_ms, args.stdout_bytes, args.stderr_bytes, args.session_file_path, or args.prompt_hash",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("execution.fail") -> {
+              case
+                incoming.org_id,
+                incoming.dispatch_id,
+                incoming.execution_id,
+                incoming.error_class,
+                incoming.error_message
+              {
+                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
+                  error_class,
+                ), Some(error_message) -> {
+                  let failed =
+                    case
+                      incoming.provider,
+                      incoming.exit_code,
+                      incoming.duration_ms,
+                      incoming.stdout_bytes,
+                      incoming.stderr_bytes,
+                      incoming.session_file_path,
+                      incoming.prompt_hash
+                    {
+                      Some(provider), Some(exit_code), Some(duration_ms), Some(
+                        stdout_bytes,
+                      ), Some(stderr_bytes), Some(session_file_path), Some(
+                        prompt_hash,
+                      ) ->
+                        ema_exec.fail_execution_with_report(
+                          bus_subj,
+                          org_id,
+                          actor_or_default(incoming),
+                          dispatch_id,
+                          execution_id,
+                          error_class,
+                          error_message,
+                          provider,
+                          exit_code,
+                          duration_ms,
+                          stdout_bytes,
+                          stderr_bytes,
+                          session_file_path,
+                          prompt_hash,
+                        )
+                      _, _, _, _, _, _, _ ->
+                        ema_exec.fail_execution(
+                          bus_subj,
+                          org_id,
+                          actor_or_default(incoming),
+                          dispatch_id,
+                          execution_id,
+                          error_class,
+                          error_message,
+                        )
+                    }
+                  case failed {
+                    Ok(event_id) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, exec_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
                 _, _, _, _, _ -> {
                   let _ =
                     mist.send_text_frame(
@@ -4075,6 +4287,466 @@ fn handle_text(
                         incoming.id,
                         "invalid_args",
                         "missing args.org_id, args.dispatch_id, args.execution_id, args.error_class, or args.message",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("execution.timeout") -> {
+              case
+                incoming.org_id,
+                incoming.dispatch_id,
+                incoming.execution_id,
+                incoming.provider,
+                incoming.timeout_ms,
+                incoming.duration_ms,
+                incoming.stdout_bytes,
+                incoming.stderr_bytes,
+                incoming.session_file_path,
+                incoming.prompt_hash
+              {
+                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
+                  provider,
+                ), Some(timeout_ms), Some(duration_ms), Some(stdout_bytes), Some(
+                  stderr_bytes,
+                ), Some(session_file_path), Some(prompt_hash) -> {
+                  case
+                    ema_exec.timeout_execution(
+                      bus_subj,
+                      org_id,
+                      actor_or_default(incoming),
+                      dispatch_id,
+                      execution_id,
+                      provider,
+                      timeout_ms,
+                      duration_ms,
+                      stdout_bytes,
+                      stderr_bytes,
+                      session_file_path,
+                      prompt_hash,
+                    )
+                  {
+                    Ok(event_id) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, exec_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _, _, _, _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.dispatch_id, args.execution_id, args.provider, args.timeout_ms, args.duration_ms, args.stdout_bytes, args.stderr_bytes, args.session_file_path, or args.prompt_hash",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("artifact.create") -> {
+              case
+                incoming.org_id,
+                incoming.project_id,
+                incoming.source_type,
+                incoming.title,
+                incoming.source,
+                incoming.body
+              {
+                Some(org_id), Some(project_id), Some(kind), Some(title), Some(
+                  source_path,
+                ), Some(body) -> {
+                  case
+                    ema_artifact.create_artifact(
+                      bus_subj,
+                      org_id,
+                      actor_or_default(incoming),
+                      project_id,
+                      kind,
+                      title,
+                      source_path,
+                      body,
+                    )
+                  {
+                    Ok(ema_artifact.WrittenArtifact(
+                      artifact_id: artifact_id,
+                      event_id: event_id,
+                      ..,
+                    )) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, artifact_id, [
+                            event_id,
+                          ]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.project_id, args.source_type, args.title, args.source, or args.body",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("artifact.update") -> {
+              case
+                incoming.org_id,
+                incoming.project_id,
+                incoming.document_id,
+                incoming.source_type,
+                incoming.title,
+                incoming.source,
+                incoming.body
+              {
+                Some(org_id), Some(project_id), Some(artifact_id), Some(kind), Some(
+                  title,
+                ), Some(source_path), Some(body) -> {
+                  case
+                    ema_artifact.update_artifact(
+                      bus_subj,
+                      org_id,
+                      actor_or_default(incoming),
+                      artifact_id,
+                      project_id,
+                      kind,
+                      title,
+                      source_path,
+                      body,
+                    )
+                  {
+                    Ok(ema_artifact.WrittenArtifact(event_id: event_id, ..)) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.project_id, args.document_id, args.source_type, args.title, args.source, or args.body",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("artifact.link") -> {
+              case
+                incoming.org_id,
+                incoming.project_id,
+                incoming.document_id,
+                incoming.source_type,
+                incoming.title,
+                incoming.result,
+                incoming.source,
+                incoming.duration_ms,
+                incoming.target_kind,
+                incoming.target_value
+              {
+                Some(org_id), Some(project_id), Some(artifact_id), Some(kind), Some(
+                  title,
+                ), Some(content_hash), Some(storage_path), Some(bytes), Some(
+                  target_kind,
+                ), Some(target_id) -> {
+                  case
+                    ema_artifact.link_artifact(
+                      bus_subj,
+                      org_id,
+                      actor_or_default(incoming),
+                      artifact_id,
+                      project_id,
+                      kind,
+                      title,
+                      content_hash,
+                      storage_path,
+                      bytes,
+                      target_kind,
+                      target_id,
+                    )
+                  {
+                    Ok(event_id) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _, _, _, _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.project_id, args.document_id, args.source_type, args.title, args.result, args.source, args.duration_ms, args.target_kind, or args.target_value",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("artifact.archive") -> {
+              case
+                incoming.org_id,
+                incoming.project_id,
+                incoming.document_id,
+                incoming.source_type,
+                incoming.title,
+                incoming.result,
+                incoming.source,
+                incoming.duration_ms
+              {
+                Some(org_id), Some(project_id), Some(artifact_id), Some(kind), Some(
+                  title,
+                ), Some(content_hash), Some(storage_path), Some(bytes) -> {
+                  let reason = case incoming.reason {
+                    Some(value) -> value
+                    None -> "archived"
+                  }
+                  case
+                    ema_artifact.archive_artifact(
+                      bus_subj,
+                      org_id,
+                      actor_or_default(incoming),
+                      artifact_id,
+                      project_id,
+                      kind,
+                      title,
+                      content_hash,
+                      storage_path,
+                      bytes,
+                      reason,
+                    )
+                  {
+                    Ok(event_id) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _, _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.project_id, args.document_id, args.source_type, args.title, args.result, args.source, or args.duration_ms",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("canon.write") -> {
+              case
+                incoming.org_id,
+                incoming.canon_kind,
+                incoming.body,
+                incoming.content_hash,
+                incoming.source_kind,
+                incoming.source_id
+              {
+                Some(org_id), Some(canon_kind), Some(body), Some(content_hash), Some(
+                  source_kind,
+                ), Some(source_id) -> {
+                  case
+                    ema_canon.write_canon(
+                      bus_subj,
+                      org_id,
+                      actor_or_default(incoming),
+                      incoming.canon_id,
+                      canon_kind,
+                      body,
+                      content_hash,
+                      source_kind,
+                      source_id,
+                      incoming.approved_by_actor_id,
+                      incoming.links,
+                    )
+                  {
+                    Ok(ema_canon.WrittenCanon(
+                      canon_id: canon_id,
+                      event_id: event_id,
+                      ..,
+                    )) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok_resource(incoming.id, canon_id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, canon_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.canon_kind, args.body, args.content_hash, args.source_kind, or args.source_id",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("canon.supersede") -> {
+              case
+                incoming.org_id,
+                incoming.canon_id,
+                incoming.superseded_by_canon_id,
+                incoming.reason
+              {
+                Some(org_id), Some(canon_id), Some(superseded_by), Some(
+                  rationale,
+                ) -> {
+                  case
+                    ema_canon.supersede_canon(
+                      bus_subj,
+                      org_id,
+                      actor_or_default(incoming),
+                      canon_id,
+                      superseded_by,
+                      rationale,
+                    )
+                  {
+                    Ok(event_id) -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          command_ok(incoming.id, [event_id]),
+                        )
+                      let _ =
+                        send_projection_snapshot(
+                          conn,
+                          bus_subj,
+                          collab_subj,
+                          Some("event_trail"),
+                        )
+                      mist.continue(state)
+                    }
+                    Error(e) -> {
+                      let _ =
+                        mist.send_text_frame(conn, canon_error(incoming.id, e))
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.canon_id, args.superseded_by_canon_id, or args.reason",
                       ),
                     )
                   mist.continue(state)
@@ -4421,6 +5093,20 @@ type Incoming {
     error_class: Option(String),
     error_message: Option(String),
     duration_ms: Option(Int),
+    exit_code: Option(Int),
+    timeout_ms: Option(Int),
+    stdout_bytes: Option(Int),
+    stderr_bytes: Option(Int),
+    session_file_path: Option(String),
+    prompt_hash: Option(String),
+    canon_id: Option(String),
+    canon_kind: Option(String),
+    content_hash: Option(String),
+    source_kind: Option(String),
+    source_id: Option(String),
+    approved_by_actor_id: Option(String),
+    superseded_by_canon_id: Option(String),
+    links: List(String),
     read_scopes: List(String),
     write_scopes: List(String),
     call_scopes: List(String),
@@ -4557,6 +5243,20 @@ type IncomingArgs {
     error_class: Option(String),
     error_message: Option(String),
     duration_ms: Option(Int),
+    exit_code: Option(Int),
+    timeout_ms: Option(Int),
+    stdout_bytes: Option(Int),
+    stderr_bytes: Option(Int),
+    session_file_path: Option(String),
+    prompt_hash: Option(String),
+    canon_id: Option(String),
+    canon_kind: Option(String),
+    content_hash: Option(String),
+    source_kind: Option(String),
+    source_id: Option(String),
+    approved_by_actor_id: Option(String),
+    superseded_by_canon_id: Option(String),
+    links: List(String),
     read_scopes: List(String),
     write_scopes: List(String),
     call_scopes: List(String),
@@ -5198,6 +5898,76 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.int),
     )
+    use exit_code <- decode.optional_field(
+      "exit_code",
+      None,
+      decode.optional(decode.int),
+    )
+    use timeout_ms <- decode.optional_field(
+      "timeout_ms",
+      None,
+      decode.optional(decode.int),
+    )
+    use stdout_bytes <- decode.optional_field(
+      "stdout_bytes",
+      None,
+      decode.optional(decode.int),
+    )
+    use stderr_bytes <- decode.optional_field(
+      "stderr_bytes",
+      None,
+      decode.optional(decode.int),
+    )
+    use session_file_path <- decode.optional_field(
+      "session_file_path",
+      None,
+      decode.optional(decode.string),
+    )
+    use prompt_hash <- decode.optional_field(
+      "prompt_hash",
+      None,
+      decode.optional(decode.string),
+    )
+    use canon_id <- decode.optional_field(
+      "canon_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use canon_kind <- decode.optional_field(
+      "canon_kind",
+      None,
+      decode.optional(decode.string),
+    )
+    use content_hash <- decode.optional_field(
+      "content_hash",
+      None,
+      decode.optional(decode.string),
+    )
+    use source_kind <- decode.optional_field(
+      "source_kind",
+      None,
+      decode.optional(decode.string),
+    )
+    use source_id <- decode.optional_field(
+      "source_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use approved_by_actor_id <- decode.optional_field(
+      "approved_by_actor_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use superseded_by_canon_id <- decode.optional_field(
+      "superseded_by_canon_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use links <- decode.optional_field(
+      "links",
+      [],
+      decode.list(decode.string),
+    )
     use read_scopes <- decode.optional_field(
       "read_scopes",
       [],
@@ -5345,6 +6115,20 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       error_class: error_class,
       error_message: error_message,
       duration_ms: duration_ms,
+      exit_code: exit_code,
+      timeout_ms: timeout_ms,
+      stdout_bytes: stdout_bytes,
+      stderr_bytes: stderr_bytes,
+      session_file_path: session_file_path,
+      prompt_hash: prompt_hash,
+      canon_id: canon_id,
+      canon_kind: canon_kind,
+      content_hash: content_hash,
+      source_kind: source_kind,
+      source_id: source_id,
+      approved_by_actor_id: approved_by_actor_id,
+      superseded_by_canon_id: superseded_by_canon_id,
+      links: links,
       read_scopes: read_scopes,
       write_scopes: write_scopes,
       call_scopes: call_scopes,
@@ -5489,6 +6273,20 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         error_class: None,
         error_message: None,
         duration_ms: None,
+        exit_code: None,
+        timeout_ms: None,
+        stdout_bytes: None,
+        stderr_bytes: None,
+        session_file_path: None,
+        prompt_hash: None,
+        canon_id: None,
+        canon_kind: None,
+        content_hash: None,
+        source_kind: None,
+        source_id: None,
+        approved_by_actor_id: None,
+        superseded_by_canon_id: None,
+        links: [],
         read_scopes: [],
         write_scopes: [],
         call_scopes: [],
@@ -5627,6 +6425,20 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       error_class: args.error_class,
       error_message: args.error_message,
       duration_ms: args.duration_ms,
+      exit_code: args.exit_code,
+      timeout_ms: args.timeout_ms,
+      stdout_bytes: args.stdout_bytes,
+      stderr_bytes: args.stderr_bytes,
+      session_file_path: args.session_file_path,
+      prompt_hash: args.prompt_hash,
+      canon_id: args.canon_id,
+      canon_kind: args.canon_kind,
+      content_hash: args.content_hash,
+      source_kind: args.source_kind,
+      source_id: args.source_id,
+      approved_by_actor_id: args.approved_by_actor_id,
+      superseded_by_canon_id: args.superseded_by_canon_id,
+      links: args.links,
       read_scopes: args.read_scopes,
       write_scopes: args.write_scopes,
       call_scopes: args.call_scopes,
@@ -5835,6 +6647,206 @@ fn command_data(
   <> "}}"
 }
 
+fn handle_pipeline_event(
+  conn: mist.WebsocketConnection,
+  state: ConnState,
+  incoming: Incoming,
+  kind: String,
+  resource_id: Option(String),
+  fields: List(#(String, json.Json)),
+) -> mist.Next(ConnState, WsCustom) {
+  case incoming.org_id, resource_id {
+    Some(org_id), Some(id) -> {
+      case
+        agent_workspace.append_event(
+          state.bus_subject,
+          org_id,
+          actor_or_default(incoming),
+          kind,
+          id,
+          incoming.project_id,
+          fields,
+        )
+      {
+        Ok(agent_workspace.WorkspaceEvent(resource_id, event_id)) -> {
+          let _ =
+            mist.send_text_frame(
+              conn,
+              command_ok_resource(incoming.id, resource_id, [event_id]),
+            )
+          let _ =
+            send_projection_snapshot(
+              conn,
+              state.bus_subject,
+              state.collab_subject,
+              Some("event_trail"),
+            )
+          mist.continue(state)
+        }
+        Error(e) -> {
+          let _ = mist.send_text_frame(conn, workspace_error(incoming.id, e))
+          mist.continue(state)
+        }
+      }
+    }
+    _, _ -> {
+      let _ =
+        mist.send_text_frame(
+          conn,
+          err(incoming.id, "invalid_args", "missing args.org_id or resource id"),
+        )
+      mist.continue(state)
+    }
+  }
+}
+
+fn handle_proposal_decision(
+  conn: mist.WebsocketConnection,
+  state: ConnState,
+  incoming: Incoming,
+  kind: String,
+  actor_key: String,
+  timestamp_key: String,
+  update_intent: Bool,
+) -> mist.Next(ConnState, WsCustom) {
+  case incoming.org_id, incoming.target, incoming.actor_id, incoming.reason {
+    Some(org_id), Some(proposal_id), Some(actor_id), Some(rationale) -> {
+      case update_intent, incoming.intent {
+        True, None -> {
+          let _ =
+            mist.send_text_frame(
+              conn,
+              err(incoming.id, "invalid_args", "missing args.intent"),
+            )
+          mist.continue(state)
+        }
+        _, intent_id -> {
+          let now = iso_now()
+          case
+            agent_workspace.append_event(
+              state.bus_subject,
+              org_id,
+              actor_id,
+              kind,
+              proposal_id,
+              incoming.project_id,
+              [
+                #("proposal_id", json.string(proposal_id)),
+                #(actor_key, json.string(actor_id)),
+                #("rationale", json.string(rationale)),
+                #(timestamp_key, json.string(now)),
+              ],
+            )
+          {
+            Ok(agent_workspace.WorkspaceEvent(_, event_id)) -> {
+              case update_intent, intent_id {
+                True, Some(parent_intent_id) ->
+                  append_intent_acceptance(
+                    conn,
+                    state,
+                    incoming,
+                    org_id,
+                    actor_id,
+                    parent_intent_id,
+                    rationale,
+                    now,
+                    event_id,
+                  )
+                _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      command_ok_resource(incoming.id, proposal_id, [event_id]),
+                    )
+                  let _ =
+                    send_projection_snapshot(
+                      conn,
+                      state.bus_subject,
+                      state.collab_subject,
+                      Some("event_trail"),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Error(e) -> {
+              let _ =
+                mist.send_text_frame(conn, workspace_error(incoming.id, e))
+              mist.continue(state)
+            }
+          }
+        }
+      }
+    }
+    _, _, _, _ -> {
+      let _ =
+        mist.send_text_frame(
+          conn,
+          err(
+            incoming.id,
+            "invalid_args",
+            "missing args.org_id, args.target, args.actor_id, or args.reason",
+          ),
+        )
+      mist.continue(state)
+    }
+  }
+}
+
+fn append_intent_acceptance(
+  conn: mist.WebsocketConnection,
+  state: ConnState,
+  incoming: Incoming,
+  org_id: String,
+  actor_id: String,
+  intent_id: String,
+  rationale: String,
+  now: String,
+  proposal_event_id: String,
+) -> mist.Next(ConnState, WsCustom) {
+  case
+    agent_workspace.append_event(
+      state.bus_subject,
+      org_id,
+      actor_id,
+      "intent.updated",
+      intent_id,
+      incoming.project_id,
+      [
+        #("intent_id", json.string(intent_id)),
+        #("changed_fields", json.preprocessed_array([json.string("status")])),
+        #("actor_id", json.string(actor_id)),
+        #("updated_at", json.string(now)),
+        #("reason", json.string("proposal approved: " <> rationale)),
+        #("status", json.string("accepted")),
+      ],
+    )
+  {
+    Ok(agent_workspace.WorkspaceEvent(_, intent_event_id)) -> {
+      let _ =
+        mist.send_text_frame(
+          conn,
+          command_ok_resource(incoming.id, intent_id, [
+            proposal_event_id,
+            intent_event_id,
+          ]),
+        )
+      let _ =
+        send_projection_snapshot(
+          conn,
+          state.bus_subject,
+          state.collab_subject,
+          Some("event_trail"),
+        )
+      mist.continue(state)
+    }
+    Error(e) -> {
+      let _ = mist.send_text_frame(conn, workspace_error(incoming.id, e))
+      mist.continue(state)
+    }
+  }
+}
+
 fn handle_workspace_event(
   conn: mist.WebsocketConnection,
   state: ConnState,
@@ -5971,6 +6983,35 @@ fn actor_or_default(incoming: Incoming) -> String {
   case incoming.actor_id {
     Some(actor_id) -> actor_id
     None -> "actor:dev-console"
+  }
+}
+
+fn bool_from_option(value: Option(String), fallback: Bool) -> Bool {
+  case value {
+    Some(raw) ->
+      case string.trim(raw) {
+        "false" | "0" | "no" -> False
+        _ -> True
+      }
+    None -> fallback
+  }
+}
+
+fn csv_json_array(value: Option(String)) -> json.Json {
+  case value {
+    Some(raw) -> {
+      let items =
+        raw
+        |> string.split(",")
+        |> list.filter_map(fn(part) {
+          case string.trim(part) {
+            "" -> Error(Nil)
+            clean -> Ok(json.string(clean))
+          }
+        })
+      json.preprocessed_array(items)
+    }
+    None -> json.preprocessed_array([])
   }
 }
 
@@ -6281,6 +7322,8 @@ fn exec_error(in_reply_to: String, error: ema_exec.ExecError) -> String {
       err(in_reply_to, "invalid_args", "message is required")
     ema_exec.EmptyOutcome ->
       err(in_reply_to, "invalid_args", "outcome is required")
+    ema_exec.EmptyPriorStatus ->
+      err(in_reply_to, "invalid_args", "prior_status is required")
     ema_exec.InvalidKind(value) ->
       err(in_reply_to, "invalid_args", "invalid exec_kind " <> value)
     ema_exec.InvalidOutcome(value) ->
@@ -6288,6 +7331,26 @@ fn exec_error(in_reply_to: String, error: ema_exec.ExecError) -> String {
     ema_exec.InvalidErrorClass(value) ->
       err(in_reply_to, "invalid_args", "invalid error_class " <> value)
     ema_exec.AppendFailed(reason) -> err(in_reply_to, "internal", reason)
+  }
+}
+
+fn artifact_error(
+  in_reply_to: String,
+  error: ema_artifact.ArtifactError,
+) -> String {
+  let reason = ema_artifact.describe_error(error)
+  case error {
+    ema_artifact.AppendFailed(_) -> err(in_reply_to, "internal", reason)
+    ema_artifact.StorageFailed(_) -> err(in_reply_to, "internal", reason)
+    _ -> err(in_reply_to, "invalid_args", reason)
+  }
+}
+
+fn canon_error(in_reply_to: String, error: ema_canon.CanonError) -> String {
+  let reason = ema_canon.describe_error(error)
+  case error {
+    ema_canon.AppendFailed(_) -> err(in_reply_to, "internal", reason)
+    _ -> err(in_reply_to, "invalid_args", reason)
   }
 }
 

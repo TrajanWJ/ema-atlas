@@ -148,9 +148,16 @@ or surface code must appear in this list.
 
 - `agent.reported`
 
+## intent
+
+- `intent.created`
+- `intent.updated`
+
 ## proposal
 
 - `proposal.drafted`
+- `proposal.created`
+- `proposal.approved`
 - `proposal.submitted`
 - `proposal.accepted`
 - `proposal.rejected`
@@ -162,6 +169,18 @@ or surface code must appear in this list.
 - `incident.noted`
 - `incident.resolved`
 
+## artifact
+
+- `artifact.created`
+- `artifact.updated`
+- `artifact.linked`
+- `artifact.archived`
+
+## canon
+
+- `canon.written`
+- `canon.superseded`
+
 ## dispatch
 
 - `dispatch.started`             (Hermes seam)
@@ -171,8 +190,11 @@ or surface code must appear in this list.
 ## execution
 
 - `execution.started`            (Hermes seam)
+- `execution.completed`
 - `execution.ended`
 - `execution.failed`
+- `execution.timeout`
+- `execution.interrupted_by_restart`
 
 ## tool
 

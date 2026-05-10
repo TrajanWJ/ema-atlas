@@ -17,6 +17,7 @@ import ema_collab/ema_collab
 import ema_daemon/bus
 import ema_daemon/ema_env
 import ema_daemon/registry
+import ema_exec/restart_recovery
 import ema_shell_ipc/ema_shell_ipc
 import ema_swarm_coordination/first_boot
 import gleam/erlang/process.{type Subject}
@@ -53,36 +54,47 @@ pub fn start() -> Result(StartedTree, SupervisorError) {
         Error(first_boot.AppendFailed(reason)) ->
           Error(ChildFailedToStart("first_boot", reason))
         Ok(_) ->
-          case ema_collab.start(db_path) {
+          case restart_recovery.scan(db_path, bus_subject) {
             Error(e) ->
-              Error(ChildFailedToStart("collab", describe_start_error(e)))
-            Ok(collab_started) -> {
-              let collab_subject = collab_started.data
-              case registry.start() {
+              Error(ChildFailedToStart(
+                "restart_recovery",
+                restart_recovery.describe_error(e),
+              ))
+            Ok(_) ->
+              case ema_collab.start(db_path) {
                 Error(e) ->
-                  Error(ChildFailedToStart("registry", describe_start_error(e)))
-                Ok(registry_started) -> {
-                  let registry_subject = registry_started.data
-                  case
-                    ema_shell_ipc.start(
-                      bus_subject,
-                      collab_subject,
-                      bind_addr,
-                      port,
-                    )
-                  {
-                    Error(reason) ->
-                      Error(ChildFailedToStart("shell_ipc", reason))
-                    Ok(_ipc) ->
-                      Ok(StartedTree(
-                        bus: bus_subject,
-                        collab: collab_subject,
-                        registry: registry_subject,
+                  Error(ChildFailedToStart("collab", describe_start_error(e)))
+                Ok(collab_started) -> {
+                  let collab_subject = collab_started.data
+                  case registry.start() {
+                    Error(e) ->
+                      Error(ChildFailedToStart(
+                        "registry",
+                        describe_start_error(e),
                       ))
+                    Ok(registry_started) -> {
+                      let registry_subject = registry_started.data
+                      case
+                        ema_shell_ipc.start(
+                          bus_subject,
+                          collab_subject,
+                          bind_addr,
+                          port,
+                        )
+                      {
+                        Error(reason) ->
+                          Error(ChildFailedToStart("shell_ipc", reason))
+                        Ok(_ipc) ->
+                          Ok(StartedTree(
+                            bus: bus_subject,
+                            collab: collab_subject,
+                            registry: registry_subject,
+                          ))
+                      }
+                    }
                   }
                 }
               }
-            }
           }
       }
     }

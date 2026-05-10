@@ -39,6 +39,14 @@
     persist_access_session_challenge_created/3,
     persist_access_session_approved/3,
     persist_access_session_status/4,
+    persist_intent_created/4,
+    persist_intent_updated/4,
+    persist_proposal_drafted/4,
+    persist_proposal_created/4,
+    persist_proposal_approved/4,
+    persist_proposal_rejected/4,
+    persist_canon_written/4,
+    persist_canon_superseded/4,
     topbar_projection_json/1,
     event_trail_projection_json/1,
     access_session_projection_json/1,
@@ -63,6 +71,7 @@
     vcalendar_projection_json/1,
     intent_graph_projection_json/1,
     auto_checkup_due_lanes/1,
+    running_executions/1,
     peer_is_trusted/3,
     collab_open_document/5,
     collab_replace_document/5,
@@ -376,6 +385,163 @@ persist_access_session_status(Db, PayloadJson, Status, UpdatedAt) ->
     SessionId = extract_json_string(PayloadJson, <<"session_id">>),
     Sql = <<"UPDATE access_sessions SET status = ?2, updated_at = ?3 WHERE id = ?1">>,
     exec_bound(Db, Sql, [SessionId, Status, UpdatedAt]).
+
+persist_intent_created(Db, PayloadJson, CreatedAt, Actor) ->
+    IntentId = extract_json_string(PayloadJson, <<"intent_id">>),
+    Slug = non_empty(extract_json_string(PayloadJson, <<"slug">>), IntentId),
+    Title = extract_json_string(PayloadJson, <<"title">>),
+    Body = extract_json_string(PayloadJson, <<"body">>),
+    Kind = extract_json_string(PayloadJson, <<"kind">>),
+    Status = non_empty(extract_json_string(PayloadJson, <<"status">>), <<"open">>),
+    ProjectId = extract_json_string(PayloadJson, <<"project_id">>),
+    SpaceId = extract_json_string(PayloadJson, <<"space_id">>),
+    ActorId = non_empty(extract_json_string(PayloadJson, <<"actor_id">>), Actor),
+    ExitCondition = extract_json_string(PayloadJson, <<"exit_condition">>),
+    Created = non_empty(extract_json_string(PayloadJson, <<"created_at">>), CreatedAt),
+    Sql = <<"INSERT INTO intents
+             (intent_id, slug, title, body, kind, status, project_id, space_id,
+              actor_id, exit_condition, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?11)">>,
+    exec_bound(Db, Sql, [
+        IntentId, Slug, Title, Body, Kind, Status, ProjectId, SpaceId,
+        ActorId, ExitCondition, Created
+    ]).
+
+persist_intent_updated(Db, PayloadJson, UpdatedAt, Actor) ->
+    IntentId = extract_json_string(PayloadJson, <<"intent_id">>),
+    Title = extract_json_string(PayloadJson, <<"title">>),
+    Body = extract_json_string(PayloadJson, <<"body">>),
+    Status = extract_json_string(PayloadJson, <<"status">>),
+    ExitCondition = extract_json_string(PayloadJson, <<"exit_condition">>),
+    ActorId = non_empty(extract_json_string(PayloadJson, <<"actor_id">>), Actor),
+    Updated = non_empty(extract_json_string(PayloadJson, <<"updated_at">>), UpdatedAt),
+    Sql = <<"UPDATE intents
+             SET title = CASE WHEN ?2 = '' THEN title ELSE ?2 END,
+                 body = CASE WHEN ?3 = '' THEN body ELSE ?3 END,
+                 status = CASE WHEN ?4 = '' THEN status ELSE ?4 END,
+                 exit_condition = CASE WHEN ?5 = '' THEN exit_condition ELSE ?5 END,
+                 actor_id = CASE WHEN ?6 = '' THEN actor_id ELSE ?6 END,
+                 updated_at = ?7
+             WHERE intent_id = ?1">>,
+    exec_bound(Db, Sql, [
+        IntentId, Title, Body, Status, ExitCondition, ActorId, Updated
+    ]).
+
+persist_proposal_drafted(Db, PayloadJson, CreatedAt, Actor) ->
+    ProposalId = extract_json_string(PayloadJson, <<"proposal_id">>),
+    IntentId = extract_json_string(PayloadJson, <<"intent_id">>),
+    Title = non_empty(extract_json_string(PayloadJson, <<"title">>), ProposalId),
+    Body = extract_json_string(PayloadJson, <<"body">>),
+    Plan = extract_json_string(PayloadJson, <<"plan">>),
+    ProposedBy = non_empty(
+        non_empty(extract_json_string(PayloadJson, <<"proposed_by_actor_id">>),
+                  extract_json_string(PayloadJson, <<"draft_by">>)),
+        Actor
+    ),
+    Created = non_empty(extract_json_string(PayloadJson, <<"created_at">>), CreatedAt),
+    Sql = <<"INSERT OR IGNORE INTO proposals
+             (proposal_id, intent_id, title, body, plan, status,
+              approver_required, proposed_by_actor_id, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, 'drafted', 0, ?6, ?7)">>,
+    exec_bound(Db, Sql, [ProposalId, IntentId, Title, Body, Plan, ProposedBy, Created]).
+
+persist_proposal_created(Db, PayloadJson, CreatedAt, Actor) ->
+    ProposalId = extract_json_string(PayloadJson, <<"proposal_id">>),
+    IntentId = extract_json_string(PayloadJson, <<"intent_id">>),
+    Title = extract_json_string(PayloadJson, <<"title">>),
+    Body = extract_json_string(PayloadJson, <<"body">>),
+    Plan = extract_json_string(PayloadJson, <<"plan">>),
+    Status = non_empty(extract_json_string(PayloadJson, <<"status">>), <<"created">>),
+    ApproverRequired = json_bool_as_integer(PayloadJson, <<"approver_required">>, <<"1">>),
+    ProposedBy = non_empty(extract_json_string(PayloadJson, <<"proposed_by_actor_id">>), Actor),
+    Created = non_empty(extract_json_string(PayloadJson, <<"created_at">>), CreatedAt),
+    Sql = <<"INSERT INTO proposals
+             (proposal_id, intent_id, title, body, plan, status,
+              approver_required, proposed_by_actor_id, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)">>,
+    exec_bound(Db, Sql, [
+        ProposalId, IntentId, Title, Body, Plan, Status, ApproverRequired,
+        ProposedBy, Created
+    ]).
+
+persist_proposal_approved(Db, PayloadJson, UpdatedAt, Actor) ->
+    ProposalId = extract_json_string(PayloadJson, <<"proposal_id">>),
+    ApprovedBy = non_empty(extract_json_string(PayloadJson, <<"approved_by_actor_id">>), Actor),
+    Rationale = extract_json_string(PayloadJson, <<"rationale">>),
+    ApprovedAt = non_empty(extract_json_string(PayloadJson, <<"approved_at">>), UpdatedAt),
+    Sql = <<"UPDATE proposals
+             SET status = 'approved',
+                 approved_by_actor_id = ?2,
+                 rejected_by_actor_id = NULL,
+                 rationale = ?3,
+                 decided_at = ?4
+             WHERE proposal_id = ?1">>,
+    exec_bound(Db, Sql, [ProposalId, ApprovedBy, Rationale, ApprovedAt]).
+
+persist_proposal_rejected(Db, PayloadJson, UpdatedAt, Actor) ->
+    ProposalId = extract_json_string(PayloadJson, <<"proposal_id">>),
+    RejectedBy = non_empty(extract_json_string(PayloadJson, <<"rejected_by_actor_id">>), Actor),
+    Rationale = extract_json_string(PayloadJson, <<"rationale">>),
+    RejectedAt = non_empty(extract_json_string(PayloadJson, <<"rejected_at">>), UpdatedAt),
+    Sql = <<"UPDATE proposals
+             SET status = 'rejected',
+                 rejected_by_actor_id = ?2,
+                 approved_by_actor_id = NULL,
+                 rationale = ?3,
+                 decided_at = ?4
+             WHERE proposal_id = ?1">>,
+    exec_bound(Db, Sql, [ProposalId, RejectedBy, Rationale, RejectedAt]).
+
+persist_canon_written(Db, PayloadJson, WrittenAt, Actor) ->
+    CanonId = extract_json_string(PayloadJson, <<"canon_id">>),
+    Kind = extract_json_string(PayloadJson, <<"kind">>),
+    ContentHash = extract_json_string(PayloadJson, <<"content_hash">>),
+    Body = extract_json_string(PayloadJson, <<"body">>),
+    SourceKind = extract_json_string(PayloadJson, <<"source_kind">>),
+    SourceId = extract_json_string(PayloadJson, <<"source_id">>),
+    WrittenBy = non_empty(extract_json_string(PayloadJson, <<"written_by_actor_id">>), Actor),
+    ApprovedBy = extract_json_string(PayloadJson, <<"approved_by_actor_id">>),
+    Written = non_empty(extract_json_string(PayloadJson, <<"written_at">>), WrittenAt),
+    Sql = <<"INSERT INTO canon_nodes
+             (canon_id, kind, content_hash, body, source_kind, source_id,
+              written_by_actor_id, approved_by_actor_id, written_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)">>,
+    case exec_bound(Db, Sql, [
+        CanonId,
+        Kind,
+        ContentHash,
+        Body,
+        SourceKind,
+        SourceId,
+        WrittenBy,
+        ApprovedBy,
+        Written
+    ]) of
+        {ok, nil} -> persist_canon_links(Db, CanonId, PayloadJson);
+        Other -> Other
+    end.
+
+persist_canon_superseded(Db, PayloadJson, SupersededAt, Actor) ->
+    CanonId = extract_json_string(PayloadJson, <<"canon_id">>),
+    SupersededBy = extract_json_string(PayloadJson, <<"superseded_by_canon_id">>),
+    _SupersededByActor =
+        non_empty(extract_json_string(PayloadJson, <<"superseded_by_actor_id">>), Actor),
+    Superseded = non_empty(extract_json_string(PayloadJson, <<"superseded_at">>), SupersededAt),
+    Sql = <<"UPDATE canon_nodes
+             SET superseded_by = ?2,
+                 superseded_at = ?3
+             WHERE canon_id = ?1">>,
+    exec_bound(Db, Sql, [CanonId, SupersededBy, Superseded]).
+
+persist_canon_links(Db, CanonId, PayloadJson) ->
+    Sql = <<"INSERT OR IGNORE INTO canon_links (canon_id, kind, target_id)
+             SELECT ?1,
+                    json_extract(value, '$.kind'),
+                    json_extract(value, '$.target_id')
+               FROM json_each(?2, '$.links')
+              WHERE json_extract(value, '$.kind') IS NOT NULL
+                AND json_extract(value, '$.target_id') IS NOT NULL">>,
+    exec_bound(Db, Sql, [CanonId, PayloadJson]).
 
 collab_open_document(Db, DocumentId, Title, UpdatedAt, UpdatedBy) ->
     Sql = <<"INSERT OR IGNORE INTO collab_documents
@@ -1564,6 +1730,61 @@ auto_checkup_due_lanes(Db) ->
         maps:values(LaneMap)
     ),
     lists:reverse(DueLanes).
+
+running_executions(Db) ->
+    Sql = <<"WITH execution_events AS (
+                 SELECT txid, kind, ts, org_id, dispatch_id, execution_id, payload_json
+                   FROM events
+                  WHERE execution_id IS NOT NULL
+                    AND execution_id <> ''
+                    AND kind IN (
+                      'execution.started',
+                      'execution.completed',
+                      'execution.ended',
+                      'execution.failed',
+                      'execution.timeout',
+                      'execution.interrupted_by_restart'
+                    )
+             ),
+             latest AS (
+                 SELECT e.*
+                   FROM execution_events e
+                  WHERE e.txid = (
+                    SELECT MAX(e2.txid)
+                      FROM execution_events e2
+                     WHERE e2.execution_id = e.execution_id
+                  )
+             )
+             SELECT org_id, dispatch_id, execution_id, kind, ts, payload_json
+               FROM latest
+              WHERE kind = 'execution.started'
+              ORDER BY txid ASC">>,
+    case esqlite3:prepare(Db, Sql) of
+        {ok, Stmt} -> {ok, collect_running_execution_rows(Stmt, [])};
+        {error, Reason} -> {error, {sqlite_error, inspect_reason(Reason)}}
+    end.
+
+collect_running_execution_rows(Stmt, Acc) ->
+    case esqlite3:step(Stmt) of
+        [OrgId, DispatchId, ExecutionId, Kind, LastTxid, PayloadJson] ->
+            collect_running_execution_rows(
+                Stmt,
+                [{to_binary(OrgId), to_binary(DispatchId), to_binary(ExecutionId), to_binary(Kind), to_binary(LastTxid), to_binary(PayloadJson)} | Acc]
+            );
+        {row, {OrgId, DispatchId, ExecutionId, Kind, LastTxid, PayloadJson}} ->
+            collect_running_execution_rows(
+                Stmt,
+                [{to_binary(OrgId), to_binary(DispatchId), to_binary(ExecutionId), to_binary(Kind), to_binary(LastTxid), to_binary(PayloadJson)} | Acc]
+            );
+        {row, [OrgId, DispatchId, ExecutionId, Kind, LastTxid, PayloadJson]} ->
+            collect_running_execution_rows(
+                Stmt,
+                [{to_binary(OrgId), to_binary(DispatchId), to_binary(ExecutionId), to_binary(Kind), to_binary(LastTxid), to_binary(PayloadJson)} | Acc]
+            );
+        '$done' -> lists:reverse(Acc);
+        {error, Reason} -> erlang:error({sqlite_error, Reason});
+        _ -> lists:reverse(Acc)
+    end.
 
 %% Wrapper around apply_lane_event/2 that also captures the
 %% envelope-level scope (org_id / space_id) on lane.opened so the
@@ -2937,6 +3158,29 @@ non_empty(<<>>, Fallback) ->
     Fallback;
 non_empty(Value, _Fallback) ->
     Value.
+
+json_bool_as_integer(PayloadJson, Key, Default) ->
+    Payload = to_binary(PayloadJson),
+    TruePattern = iolist_to_binary([<<"\"">>, Key, <<"\":true">>]),
+    FalsePattern = iolist_to_binary([<<"\"">>, Key, <<"\":false">>]),
+    TrueStringPattern = iolist_to_binary([<<"\"">>, Key, <<"\":\"true\"">>]),
+    FalseStringPattern = iolist_to_binary([<<"\"">>, Key, <<"\":\"false\"">>]),
+    case binary:match(Payload, FalsePattern) of
+        nomatch ->
+            case binary:match(Payload, FalseStringPattern) of
+                nomatch ->
+                    case binary:match(Payload, TruePattern) of
+                        nomatch ->
+                            case binary:match(Payload, TrueStringPattern) of
+                                nomatch -> Default;
+                                _ -> <<"1">>
+                            end;
+                        _ -> <<"1">>
+                    end;
+                _ -> <<"0">>
+            end;
+        _ -> <<"0">>
+    end.
 
 join_json([]) ->
     <<>>;

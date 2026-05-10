@@ -171,7 +171,11 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "swarm.stopped" -> True
     "swarm.report_generated" -> True
     "agent.reported" -> True
+    "intent.created" -> True
+    "intent.updated" -> True
     "proposal.drafted" -> True
+    "proposal.created" -> True
+    "proposal.approved" -> True
     "proposal.submitted" -> True
     "proposal.accepted" -> True
     "proposal.rejected" -> True
@@ -179,12 +183,21 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "incident.opened" -> True
     "incident.noted" -> True
     "incident.resolved" -> True
+    "artifact.created" -> True
+    "artifact.updated" -> True
+    "artifact.linked" -> True
+    "artifact.archived" -> True
+    "canon.written" -> True
+    "canon.superseded" -> True
     "dispatch.started" -> True
     "dispatch.scope_granted" -> True
     "dispatch.ended" -> True
     "execution.started" -> True
+    "execution.completed" -> True
     "execution.ended" -> True
     "execution.failed" -> True
+    "execution.timeout" -> True
+    "execution.interrupted_by_restart" -> True
     "tool.invoked" -> True
     "tool.returned" -> True
     "tool.errored" -> True

@@ -450,6 +450,102 @@ pub fn persist_access_session_status(
   }
 }
 
+pub fn persist_intent_created(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_intent_created_raw(db, payload_json, created_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_intent_updated(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_intent_updated_raw(db, payload_json, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_proposal_drafted(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_proposal_drafted_raw(db, payload_json, created_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_proposal_created(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_proposal_created_raw(db, payload_json, created_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_proposal_approved(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_proposal_approved_raw(db, payload_json, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_proposal_rejected(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_proposal_rejected_raw(db, payload_json, updated_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_canon_written(
+  db: Db,
+  payload_json: String,
+  written_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_canon_written_raw(db, payload_json, written_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
+pub fn persist_canon_superseded(
+  db: Db,
+  payload_json: String,
+  superseded_at: String,
+  actor: String,
+) -> Result(Nil, Error) {
+  case persist_canon_superseded_raw(db, payload_json, superseded_at, actor) {
+    Ok(_) -> Ok(Nil)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
+}
+
 pub fn topbar_projection_json(db: Db) -> String {
   topbar_projection_json_raw(db)
 }
@@ -557,6 +653,15 @@ pub fn auto_checkup_due_lanes(
   db: Db,
 ) -> List(#(String, String, String, String, String)) {
   auto_checkup_due_lanes_raw(db)
+}
+
+pub fn running_executions(
+  db: Db,
+) -> Result(List(#(String, String, String, String, String, String)), Error) {
+  case running_executions_raw(db) {
+    Ok(rows) -> Ok(rows)
+    Error(reason) -> Error(SqliteError(inspect_reason(reason)))
+  }
 }
 
 pub fn peer_is_trusted(db: Db, org_id: String, peer_device: String) -> Bool {
@@ -801,6 +906,70 @@ fn persist_access_session_status_raw(
   updated_at: String,
 ) -> Result(Dynamic, Dynamic)
 
+@external(erlang, "ema_sqlite_helpers", "persist_intent_created")
+fn persist_intent_created_raw(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_intent_updated")
+fn persist_intent_updated_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_proposal_drafted")
+fn persist_proposal_drafted_raw(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_proposal_created")
+fn persist_proposal_created_raw(
+  db: Db,
+  payload_json: String,
+  created_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_proposal_approved")
+fn persist_proposal_approved_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_proposal_rejected")
+fn persist_proposal_rejected_raw(
+  db: Db,
+  payload_json: String,
+  updated_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_canon_written")
+fn persist_canon_written_raw(
+  db: Db,
+  payload_json: String,
+  written_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
+@external(erlang, "ema_sqlite_helpers", "persist_canon_superseded")
+fn persist_canon_superseded_raw(
+  db: Db,
+  payload_json: String,
+  superseded_at: String,
+  actor: String,
+) -> Result(Dynamic, Dynamic)
+
 @external(erlang, "ema_sqlite_helpers", "topbar_projection_json")
 fn topbar_projection_json_raw(db: Db) -> String
 
@@ -880,6 +1049,11 @@ fn intent_graph_projection_json_raw(db: Db) -> String
 fn auto_checkup_due_lanes_raw(
   db: Db,
 ) -> List(#(String, String, String, String, String))
+
+@external(erlang, "ema_sqlite_helpers", "running_executions")
+fn running_executions_raw(
+  db: Db,
+) -> Result(List(#(String, String, String, String, String, String)), Dynamic)
 
 @external(erlang, "ema_sqlite_helpers", "peer_is_trusted")
 fn peer_is_trusted_raw(db: Db, org_id: String, peer_device: String) -> Bool

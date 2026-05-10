@@ -15,6 +15,8 @@ payload {
   kind: "human" | "agent" | "personal_ai" | "service"
   display_name: string
   role: string
+  dispatch?: string
+  perspective?: string
   user_id?: user:<ulid>
 }
 ```

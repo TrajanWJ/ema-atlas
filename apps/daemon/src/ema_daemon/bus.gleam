@@ -336,6 +336,59 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
           status TEXT NOT NULL,
           expires_at TEXT NOT NULL,
           updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS intents (
+          intent_id TEXT PRIMARY KEY,
+          slug TEXT UNIQUE NOT NULL,
+          title TEXT NOT NULL,
+          body TEXT,
+          kind TEXT NOT NULL,
+          status TEXT NOT NULL,
+          project_id TEXT,
+          space_id TEXT,
+          actor_id TEXT NOT NULL,
+          exit_condition TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS intents_project_idx ON intents (project_id);
+        CREATE INDEX IF NOT EXISTS intents_status_idx ON intents (status);
+        CREATE INDEX IF NOT EXISTS intents_actor_idx ON intents (actor_id);
+        CREATE TABLE IF NOT EXISTS proposals (
+          proposal_id TEXT PRIMARY KEY,
+          intent_id TEXT NOT NULL,
+          title TEXT NOT NULL,
+          body TEXT,
+          plan TEXT,
+          status TEXT NOT NULL,
+          approver_required INTEGER NOT NULL DEFAULT 1,
+          proposed_by_actor_id TEXT NOT NULL,
+          approved_by_actor_id TEXT,
+          rejected_by_actor_id TEXT,
+          rationale TEXT,
+          created_at TEXT NOT NULL,
+          decided_at TEXT,
+          FOREIGN KEY (intent_id) REFERENCES intents (intent_id)
+        );
+        CREATE TABLE IF NOT EXISTS canon_nodes (
+          canon_id TEXT PRIMARY KEY,
+          kind TEXT NOT NULL,
+          content_hash TEXT NOT NULL,
+          body TEXT NOT NULL,
+          source_kind TEXT NOT NULL,
+          source_id TEXT,
+          written_by_actor_id TEXT NOT NULL,
+          approved_by_actor_id TEXT,
+          written_at TEXT NOT NULL,
+          superseded_by TEXT,
+          superseded_at TEXT
+        );
+        CREATE TABLE IF NOT EXISTS canon_links (
+          canon_id TEXT NOT NULL,
+          kind TEXT NOT NULL,
+          target_id TEXT NOT NULL,
+          PRIMARY KEY (canon_id, kind, target_id),
+          FOREIGN KEY (canon_id) REFERENCES canon_nodes (canon_id)
         );"
       case sqlite_ffi.exec(db, ddl) {
         Ok(Nil) -> {
@@ -365,6 +418,15 @@ fn init_db(path: String) -> Result(sqlite_ffi.Db, sqlite_ffi.Error) {
               "ALTER TABLE devices ADD COLUMN capabilities_json TEXT",
             )
           let _ = sqlite_ffi.migrate_projects_unique_name(db)
+          let _ =
+            sqlite_ffi.exec(
+              db,
+              "CREATE INDEX IF NOT EXISTS proposals_intent_idx ON proposals (intent_id);
+               CREATE INDEX IF NOT EXISTS proposals_status_idx ON proposals (status);
+               CREATE INDEX IF NOT EXISTS canon_kind_idx ON canon_nodes (kind);
+               CREATE INDEX IF NOT EXISTS canon_source_idx ON canon_nodes (source_kind, source_id);
+               CREATE INDEX IF NOT EXISTS canon_links_target_idx ON canon_links (target_id);",
+            )
           Ok(db)
         }
         Error(e) -> Error(e)
@@ -1051,6 +1113,102 @@ fn persist_compact_object(
           env.payload_json,
           "expired",
           env.ts,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "intent.created" ->
+      case
+        sqlite_ffi.persist_intent_created(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "intent.updated" ->
+      case
+        sqlite_ffi.persist_intent_updated(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "proposal.drafted" ->
+      case
+        sqlite_ffi.persist_proposal_drafted(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "proposal.created" ->
+      case
+        sqlite_ffi.persist_proposal_created(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "proposal.approved" ->
+      case
+        sqlite_ffi.persist_proposal_approved(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "proposal.rejected" ->
+      case
+        sqlite_ffi.persist_proposal_rejected(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "canon.written" ->
+      case
+        sqlite_ffi.persist_canon_written(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
+        )
+      {
+        Ok(Nil) -> Ok(Nil)
+        Error(sqlite_ffi.SqliteError(m)) -> Error(PersistenceFailed(m))
+      }
+    "canon.superseded" ->
+      case
+        sqlite_ffi.persist_canon_superseded(
+          db,
+          env.payload_json,
+          env.ts,
+          env.actor,
         )
       {
         Ok(Nil) -> Ok(Nil)

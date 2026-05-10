@@ -109,8 +109,11 @@ event {
 | handoff       | `handoff.md`        | ema_swarm_coordination |
 | problem       | `problem.md`        | ema_swarm_coordination |
 | swarm         | `swarm.md`          | ema_swarm_coordination |
-| proposal      | `proposal.md`       | (future) ema_swarm_coordination    |
+| intent        | `intent.md`         | ema_swarm_coordination |
+| proposal      | `proposal.md`       | ema_swarm_coordination |
 | incident      | `incident.md`       | (future) ema_swarm_coordination    |
+| artifact      | `artifact.md`       | ema_artifact          |
+| canon         | `canon.md`          | ema_canon             |
 | dispatch      | `dispatch.md`       | ema_control seam      |
 | execution     | `execution.md`      | ema_exec seam         |
 | tool          | `tool.md`           | ema_exec seam         |

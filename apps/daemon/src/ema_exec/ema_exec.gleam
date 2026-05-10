@@ -28,6 +28,7 @@ pub type ExecError {
   EmptyErrorClass
   EmptyMessage
   EmptyOutcome
+  EmptyPriorStatus
   InvalidKind(value: String)
   InvalidOutcome(value: String)
   InvalidErrorClass(value: String)
@@ -164,6 +165,85 @@ pub fn end_execution(
   }
 }
 
+/// Append an `execution.completed` envelope for executable provider runs.
+pub fn complete_execution(
+  bus_subject: Subject(bus.Msg),
+  org_id: String,
+  actor: String,
+  dispatch_id: String,
+  execution_id: String,
+  provider: String,
+  exit_code: Int,
+  duration_ms: Int,
+  stdout_bytes: Int,
+  stderr_bytes: Int,
+  session_file_path: String,
+  prompt_hash: String,
+  canon_id: Option(String),
+) -> Result(String, ExecError) {
+  let clean_org = string.trim(org_id)
+  let clean_actor = string.trim(actor)
+  let clean_dispatch = string.trim(dispatch_id)
+  let clean_execution = string.trim(execution_id)
+  let clean_provider = string.trim(provider)
+  let clean_session_file_path = string.trim(session_file_path)
+  let clean_prompt_hash = string.trim(prompt_hash)
+
+  case
+    clean_org,
+    clean_actor,
+    clean_dispatch,
+    clean_execution,
+    clean_provider,
+    clean_session_file_path,
+    clean_prompt_hash
+  {
+    "", _, _, _, _, _, _ -> Error(EmptyOrg)
+    _, "", _, _, _, _, _ -> Error(EmptyActor)
+    _, _, "", _, _, _, _ -> Error(EmptyDispatchId)
+    _, _, _, "", _, _, _ -> Error(EmptyExecutionId)
+    _, _, _, _, "", _, _ -> Error(EmptyName)
+    _, _, _, _, _, "", _ -> Error(EmptyResultSummary)
+    _, _, _, _, _, _, "" -> Error(EmptyResultSummary)
+    _, _, _, _, _, _, _ -> {
+      let event_id = "event:" <> ulid()
+      let now = iso_now()
+      let payload =
+        json.to_string(
+          json.object([
+            #("execution_id", json.string(clean_execution)),
+            #("provider", json.string(clean_provider)),
+            #("exit_code", json.int(exit_code)),
+            #("duration_ms", json.int(duration_ms)),
+            #("stdout_bytes", json.int(stdout_bytes)),
+            #("stderr_bytes", json.int(stderr_bytes)),
+            #("session_file_path", json.string(clean_session_file_path)),
+            #("prompt_hash", json.string(clean_prompt_hash)),
+            #("canon_id", optional_string(canon_id)),
+          ]),
+        )
+      let envelope =
+        Envelope(
+          event_id: event_id,
+          kind: "execution.completed",
+          ts: now,
+          actor: clean_actor,
+          org_id: clean_org,
+          space_id: event_envelope.none(),
+          project_id: event_envelope.none(),
+          dispatch_id: event_envelope.some(clean_dispatch),
+          execution_id: event_envelope.some(clean_execution),
+          payload_json: payload,
+        )
+
+      case bus.append(bus_subject, envelope) {
+        Ok(_) -> Ok(event_id)
+        Error(e) -> Error(AppendFailed(describe_append_error(e)))
+      }
+    }
+  }
+}
+
 /// Append an `execution.failed` envelope.
 pub fn fail_execution(
   bus_subject: Subject(bus.Msg),
@@ -221,6 +301,235 @@ pub fn fail_execution(
           }
         }
       }
+  }
+}
+
+/// Append an `execution.failed` envelope with executable provider run details.
+pub fn fail_execution_with_report(
+  bus_subject: Subject(bus.Msg),
+  org_id: String,
+  actor: String,
+  dispatch_id: String,
+  execution_id: String,
+  error_class: String,
+  message: String,
+  provider: String,
+  exit_code: Int,
+  duration_ms: Int,
+  stdout_bytes: Int,
+  stderr_bytes: Int,
+  session_file_path: String,
+  prompt_hash: String,
+) -> Result(String, ExecError) {
+  let clean_org = string.trim(org_id)
+  let clean_actor = string.trim(actor)
+  let clean_dispatch = string.trim(dispatch_id)
+  let clean_execution = string.trim(execution_id)
+  let clean_class = string.trim(error_class)
+  let clean_msg = string.trim(message)
+  let clean_provider = string.trim(provider)
+  let clean_session_file_path = string.trim(session_file_path)
+  let clean_prompt_hash = string.trim(prompt_hash)
+
+  case
+    clean_org,
+    clean_actor,
+    clean_dispatch,
+    clean_execution,
+    clean_class,
+    clean_msg,
+    clean_provider,
+    clean_session_file_path,
+    clean_prompt_hash
+  {
+    "", _, _, _, _, _, _, _, _ -> Error(EmptyOrg)
+    _, "", _, _, _, _, _, _, _ -> Error(EmptyActor)
+    _, _, "", _, _, _, _, _, _ -> Error(EmptyDispatchId)
+    _, _, _, "", _, _, _, _, _ -> Error(EmptyExecutionId)
+    _, _, _, _, "", _, _, _, _ -> Error(EmptyErrorClass)
+    _, _, _, _, _, "", _, _, _ -> Error(EmptyMessage)
+    _, _, _, _, _, _, "", _, _ -> Error(EmptyName)
+    _, _, _, _, _, _, _, "", _ -> Error(EmptyResultSummary)
+    _, _, _, _, _, _, _, _, "" -> Error(EmptyResultSummary)
+    _, _, _, _, _, _, _, _, _ -> {
+      let event_id = "event:" <> ulid()
+      let now = iso_now()
+      let payload =
+        json.to_string(
+          json.object([
+            #("execution_id", json.string(clean_execution)),
+            #("error_class", json.string(clean_class)),
+            #("message", json.string(clean_msg)),
+            #("provider", json.string(clean_provider)),
+            #("exit_code", json.int(exit_code)),
+            #("duration_ms", json.int(duration_ms)),
+            #("stdout_bytes", json.int(stdout_bytes)),
+            #("stderr_bytes", json.int(stderr_bytes)),
+            #("session_file_path", json.string(clean_session_file_path)),
+            #("prompt_hash", json.string(clean_prompt_hash)),
+          ]),
+        )
+      let envelope =
+        Envelope(
+          event_id: event_id,
+          kind: "execution.failed",
+          ts: now,
+          actor: clean_actor,
+          org_id: clean_org,
+          space_id: event_envelope.none(),
+          project_id: event_envelope.none(),
+          dispatch_id: event_envelope.some(clean_dispatch),
+          execution_id: event_envelope.some(clean_execution),
+          payload_json: payload,
+        )
+
+      case bus.append(bus_subject, envelope) {
+        Ok(_) -> Ok(event_id)
+        Error(e) -> Error(AppendFailed(describe_append_error(e)))
+      }
+    }
+  }
+}
+
+/// Append an `execution.timeout` envelope for bounded provider runs.
+pub fn timeout_execution(
+  bus_subject: Subject(bus.Msg),
+  org_id: String,
+  actor: String,
+  dispatch_id: String,
+  execution_id: String,
+  provider: String,
+  timeout_ms: Int,
+  duration_ms: Int,
+  stdout_bytes: Int,
+  stderr_bytes: Int,
+  session_file_path: String,
+  prompt_hash: String,
+) -> Result(String, ExecError) {
+  let clean_org = string.trim(org_id)
+  let clean_actor = string.trim(actor)
+  let clean_dispatch = string.trim(dispatch_id)
+  let clean_execution = string.trim(execution_id)
+  let clean_provider = string.trim(provider)
+  let clean_session_file_path = string.trim(session_file_path)
+  let clean_prompt_hash = string.trim(prompt_hash)
+
+  case
+    clean_org,
+    clean_actor,
+    clean_dispatch,
+    clean_execution,
+    clean_provider,
+    clean_session_file_path,
+    clean_prompt_hash
+  {
+    "", _, _, _, _, _, _ -> Error(EmptyOrg)
+    _, "", _, _, _, _, _ -> Error(EmptyActor)
+    _, _, "", _, _, _, _ -> Error(EmptyDispatchId)
+    _, _, _, "", _, _, _ -> Error(EmptyExecutionId)
+    _, _, _, _, "", _, _ -> Error(EmptyName)
+    _, _, _, _, _, "", _ -> Error(EmptyResultSummary)
+    _, _, _, _, _, _, "" -> Error(EmptyResultSummary)
+    _, _, _, _, _, _, _ -> {
+      let event_id = "event:" <> ulid()
+      let now = iso_now()
+      let payload =
+        json.to_string(
+          json.object([
+            #("execution_id", json.string(clean_execution)),
+            #("provider", json.string(clean_provider)),
+            #("exit_code", json.int(-1)),
+            #("timeout_ms", json.int(timeout_ms)),
+            #("duration_ms", json.int(duration_ms)),
+            #("stdout_bytes", json.int(stdout_bytes)),
+            #("stderr_bytes", json.int(stderr_bytes)),
+            #("session_file_path", json.string(clean_session_file_path)),
+            #("prompt_hash", json.string(clean_prompt_hash)),
+          ]),
+        )
+      let envelope =
+        Envelope(
+          event_id: event_id,
+          kind: "execution.timeout",
+          ts: now,
+          actor: clean_actor,
+          org_id: clean_org,
+          space_id: event_envelope.none(),
+          project_id: event_envelope.none(),
+          dispatch_id: event_envelope.some(clean_dispatch),
+          execution_id: event_envelope.some(clean_execution),
+          payload_json: payload,
+        )
+
+      case bus.append(bus_subject, envelope) {
+        Ok(_) -> Ok(event_id)
+        Error(e) -> Error(AppendFailed(describe_append_error(e)))
+      }
+    }
+  }
+}
+
+/// Append an `execution.interrupted_by_restart` envelope.
+pub fn interrupt_by_restart(
+  bus_subject: Subject(bus.Msg),
+  org_id: String,
+  actor: String,
+  dispatch_id: String,
+  execution_id: String,
+  prior_status: String,
+  last_event_kind: String,
+  last_event_ts: String,
+  prior_dispatch_state: String,
+) -> Result(String, ExecError) {
+  let clean_org = string.trim(org_id)
+  let clean_actor = string.trim(actor)
+  let clean_dispatch = string.trim(dispatch_id)
+  let clean_execution = string.trim(execution_id)
+  let clean_prior = string.trim(prior_status)
+  let clean_last_event_kind = string.trim(last_event_kind)
+  let clean_last_event_ts = string.trim(last_event_ts)
+
+  case clean_org, clean_actor, clean_dispatch, clean_execution, clean_prior {
+    "", _, _, _, _ -> Error(EmptyOrg)
+    _, "", _, _, _ -> Error(EmptyActor)
+    _, _, "", _, _ -> Error(EmptyDispatchId)
+    _, _, _, "", _ -> Error(EmptyExecutionId)
+    _, _, _, _, "" -> Error(EmptyPriorStatus)
+    _, _, _, _, _ -> {
+      let event_id = "event:" <> ulid()
+      let now = iso_now()
+      let payload =
+        json.to_string(
+          json.object([
+            #("execution_id", json.string(clean_execution)),
+            #("prior_status", json.string(clean_prior)),
+            #("last_event_kind", json.string(clean_last_event_kind)),
+            #("last_event_ts", json.string(clean_last_event_ts)),
+            #("prior_dispatch_state", json.string(prior_dispatch_state)),
+            #("interrupted_at", json.string(now)),
+            #("restarted_at", json.string(now)),
+            #("recovered_by", json.string("boot_recovery_scanner")),
+          ]),
+        )
+      let envelope =
+        Envelope(
+          event_id: event_id,
+          kind: "execution.interrupted_by_restart",
+          ts: now,
+          actor: clean_actor,
+          org_id: clean_org,
+          space_id: event_envelope.none(),
+          project_id: event_envelope.none(),
+          dispatch_id: event_envelope.some(clean_dispatch),
+          execution_id: event_envelope.some(clean_execution),
+          payload_json: payload,
+        )
+
+      case bus.append(bus_subject, envelope) {
+        Ok(_) -> Ok(event_id)
+        Error(e) -> Error(AppendFailed(describe_append_error(e)))
+      }
+    }
   }
 }
 
@@ -458,6 +767,7 @@ pub fn describe_error(e: ExecError) -> String {
     EmptyErrorClass -> "error_class is required"
     EmptyMessage -> "message is required"
     EmptyOutcome -> "outcome is required"
+    EmptyPriorStatus -> "prior_status is required"
     InvalidKind(v) ->
       "invalid execution kind: " <> v <> " (expected tool | task | session)"
     InvalidOutcome(v) ->

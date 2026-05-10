@@ -6,9 +6,9 @@ the app. This doc defines the canonical sequence for device 1 of the
 founding operator.
 
 The founding user is **Trajan**. On first-boot, the daemon seeds **two**
-organizations: a personal org for Trajan and the project-building org
-`Founding-Fathers-EMA`. Trajan owns both. Later devices (paired in) skip
-this sequence — they replay the existing log.
+organizations: a personal org for Trajan and the EMA development org. Trajan
+owns both. Later devices (paired in) skip this sequence — they replay the
+existing log.
 
 All events below are appended by the daemon to the canonical SQLite log
 in the order shown. They are replayable: starting a fresh daemon on an
@@ -35,21 +35,21 @@ projections.
 | 7  | `org.created`              | `system:ema_orgs`        | `kind: "personal"`; name = `"Trajan's Organization"`                |
 | 8  | `membership.role_granted`  | `system:ema_memberships` | role `"owner"` for user `trajan` on the personal org                |
 | 9  | `space.created`            | `system:ema_spaces`      | `"Personal Workspace"`; default space of the personal org           |
-| 10 | `org.created`              | `system:ema_orgs`        | `kind: "team"`; name = `"Founding-Fathers-EMA"`                     |
-| 11 | `membership.role_granted`  | `system:ema_memberships` | role `"owner"` for user `trajan` on Founding-Fathers-EMA            |
-| 12 | `space.created`            | `system:ema_spaces`      | name = `"Founding-Fathers-EMA"`; default space of that org          |
-| 13 | `project.created`          | `system:ema_projects`    | name = `"EMA 0.0.5"` under the Founding-Fathers-EMA default space   |
-| 14 | `blueprint.document.created` | `system:ema_blueprint` | creates the default EMA 0.0.5 Blueprint document                    |
+| 10 | `org.created`              | `system:ema_orgs`        | `kind: "team"`; name = `"Trajan's Organization"`                   |
+| 11 | `membership.role_granted`  | `system:ema_memberships` | role `"owner"` for user `trajan` on the EMA development org         |
+| 12 | `space.created`            | `system:ema_spaces`      | name = `"EMA Development"`; default space of that org               |
+| 13 | `project.created`          | `system:ema_projects`    | name = `"EMA 0.0.6"` under the EMA development default space        |
+| 14 | `blueprint.document.created` | `system:ema_blueprint` | creates the default EMA 0.0.6 Blueprint document                    |
 | 15 | `blueprint.section.added`  | `system:ema_blueprint`   | root section                                                        |
 | 16 | `blueprint.section.added`  | `system:ema_blueprint`   | runtime/source evidence section                                     |
-| 17 | `attachment.created`       | `system:ema_attachments` | local EMA 0.0.5 runtime codebase attachment                         |
+| 17 | `attachment.created`       | `system:ema_attachments` | local EMA 0.0.6 runtime codebase attachment                         |
 | 18 | `attachment.linked`        | `system:ema_attachments` | links runtime attachment to the Blueprint evidence section          |
 | 19 | `blueprint.attachment.linked` | `system:ema_blueprint` | Blueprint-level attachment link                                     |
 
-The shell boots with the current selection pointed at events 5/7/8
-(Founding-Fathers-EMA → Founding-Fathers-EMA → EMA 0.0.5). The personal
-org exists from day one but is not the default context; Trajan switches
-into it via the topbar org selector.
+A fresh deterministic seed starts with the EMA development workspace available.
+Existing daemon logs may have `home_current` moved by user work; use
+`ema status --json` to inspect the live topbar selection. Agents should use the
+durable Desktop project record with `--project EMA` for current EMA work.
 
 ## User label
 
@@ -72,9 +72,9 @@ Per `01-topology.md`:
   org, targeting the sole user.
 - Additional members on a personal org are only `guest`.
 
-Founding-Fathers-EMA is a regular `kind: "team"` org — none of the
-personal-org invariants apply. Trajan is its `owner` and can invite
-other operators as `admin` / `member` later.
+The EMA development org is a regular `kind: "team"` org — none of the
+personal-org invariants apply. Trajan is its `owner` and can invite other
+operators as `admin` / `member` later.
 
 ## Where this lives in code
 
@@ -104,11 +104,11 @@ the replicated log once replication is enabled.
 
 ## Open questions (deferred)
 
-- Exact content of the initial seed attachments for `EMA 0.0.5`
+- Exact content of the initial seed attachments for `EMA 0.0.6`
   (doctrine folder, runtime repo, atlas snapshot). Covered in
   `08-vanilla-workspace.md` — requires a bootstrap script beyond this
   event sequence.
-- Whether the default Blueprint document for `EMA 0.0.5` is emitted as
-  part of this sequence (event #9: `blueprint.document.created`) or
-  deferred to first visit. Current default: emit at #9, with a fixed
-  title `"EMA 0.0.5 — Master Blueprint"`, same writer call as #8.
+- Whether the default Blueprint document for `EMA 0.0.6` is emitted as
+  part of this sequence (event #14: `blueprint.document.created`) or
+  deferred to first visit. Current default: emit at #14, with a fixed
+  title `"EMA 0.0.6 Blueprint"`.

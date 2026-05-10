@@ -32,6 +32,31 @@ project/client/work registry surfacing — formerly cwt's role. The
 binary. See `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md` and the
 `Agent Workspace CLI Loop` section in `~/Desktop/AGENTS.md`.
 
+## Environment preflight
+
+Run this from any directory before coding:
+
+```bash
+ema help
+ema ping --json
+ema status --json
+ema tl about --summary --json
+ema vcalendar tick --json
+ema doctor --json
+```
+
+When the work names a project, scope follow-up commands explicitly:
+
+```bash
+ema next --project <project-name-or-id> --json
+ema agent orient --project <project-name-or-id> --json
+ema agent meta-progress --project <project-name-or-id> --json
+```
+
+`ema doctor --json` is the runtime-health check. Use
+`ema doctor --strict --json` only when incomplete roadmap gaps should fail the
+gate.
+
 ## First build assumptions
 
 - backend language direction: Gleam / BEAM

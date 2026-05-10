@@ -20,6 +20,32 @@ The CLI is invoked globally as `ema <command>` (wrapper at `~/.local/bin/ema`,
 default `EMA_HOME=Active builds/EMA-0.0.6`); `pnpm cli <command>` from this
 build root is equivalent and is the fallback when the wrapper is unavailable.
 
+Before editing, verify the general environment first:
+
+```bash
+ema help
+ema ping --json
+ema status --json
+ema tl about --summary --json
+ema vcalendar tick --json
+ema doctor --json
+```
+
+When the task names a project, scope the working commands explicitly:
+
+```bash
+ema next --project <project-name-or-id> --json
+ema agent orient --project <project-name-or-id> --json
+ema agent meta-progress --project <project-name-or-id> --json
+ema cockpit workpack --project <project-name-or-id> --json
+```
+
+As of 2026-05-10, `ema doctor --json` exits 0 unless daemon health fails and
+reports `health_ok`, `readiness_ok`, and `readiness_blockers` separately.
+`ema doctor --strict --json` exits nonzero when daemon health fails or
+`readiness_ok` is false. Roadmap gaps do not fail strict mode; they remain
+informational `subsystems` entries with `partial` or `missing` status.
+
 Do not use the mistaken `lockedinIOSapp` space/project as canonical context.
 It is a cleanup target once archive/move writers exist.
 

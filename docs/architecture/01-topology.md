@@ -49,7 +49,11 @@ space.created
 in that order. The `space.created.name` should initially equal the
 `org.created.name`.
 
-The first seeded org is `Founding-Fathers-EMA`, with a same-name default space.
+The current EMA 0.0.6 deterministic seed creates Trajan's personal organization
+with `Personal Workspace`, plus an EMA development workspace. The durable
+Desktop project record agents address through the CLI is `EMA`; use
+`--project EMA` for current workspace commands. Historical Founding-Fathers
+seed names only belong in archive/provenance material.
 
 ## Identifiers
 

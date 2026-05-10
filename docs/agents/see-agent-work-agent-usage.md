@@ -1,8 +1,8 @@
 # See Agent Work Agent Usage
 
 This document is the operating guide for external Codex, Claude CLI, and other
-agent sessions working inside the EMA 0.0.5 workspace before EMA can run those
-agents directly.
+agent sessions working inside the EMA project while the active runtime build is
+0.0.6, before EMA can run those agents directly.
 
 See Agent Work is the human-visible control room. This file is the
 agent-facing runbook for behaving as if that control room already exists.
@@ -19,25 +19,30 @@ agent-facing runbook for behaving as if that control room already exists.
 Unless a lane states otherwise, agents should assume:
 
 ```text
-Organization: Founding-Fathers-EMA
-Space: Founding-Fathers-EMA
-Project: EMA 0.0.5
+Organization: Trajan's Organization
+Space: Personal Workspace
+Project: EMA
+Build: 0.0.6
 ```
 
-The first organization has a same-name default space. That space is renamable
-later, but early agent instructions should keep the names explicit to avoid
-scope drift.
+The daemon also seeds Trajan's personal organization and `Personal Workspace`.
+Project work must still pass `--project <name-or-id>` when a task names a
+project, because daemon `home_current` is a convenience selection, not a
+workspace contract.
 
 ## Read Before Working
 
 Before editing, an external agent should read:
 
 1. `../../../Projects/EMA/PROJECT-MAP.md`
-2. `../../../Projects/EMA/atlas/canon/current/ema-0-0-5-current-canon.md`
-3. `../architecture/08-vanilla-workspace.md`
-4. `../architecture/09-see-agent-work.md`
-5. `../vapps/see-agent-work.md`
-6. `../cli/see-agent-work.md`
+2. `../WORKSPACE-ENTRYPOINT.md`
+3. `../orchestration/STATUS.md`
+4. `../architecture/01-topology.md`
+5. `../architecture/10-first-boot.md`
+6. `../architecture/09-see-agent-work.md`
+7. `../vapps/see-agent-work.md`
+8. `../cli/agent-workspace.md`
+9. `../cli/see-agent-work.md`
 
 If the lane touches git-ema, also read:
 
@@ -73,9 +78,10 @@ shape:
 
 ```text
 EMA Scope:
-- Organization: Founding-Fathers-EMA
-- Space: Founding-Fathers-EMA
-- Project: EMA 0.0.5
+- Organization: Trajan's Organization
+- Space: Personal Workspace
+- Project: EMA
+- Build: 0.0.6
 
 Mission:
 <mission id/title/purpose>
@@ -220,12 +226,13 @@ Do not:
 ## Example External-Agent Prompt
 
 ```text
-You are working inside EMA 0.0.5.
+You are working inside the EMA project, active runtime build 0.0.6.
 
 Scope:
-- Organization: Founding-Fathers-EMA
-- Space: Founding-Fathers-EMA
-- Project: EMA 0.0.5
+- Organization: Trajan's Organization
+- Space: Personal Workspace
+- Project: EMA
+- Build: 0.0.6
 
 Mission:
 Build the vanilla workspace control surfaces.
@@ -239,11 +246,11 @@ sessions should claim lanes, preserve canon/intent boundaries, report progress,
 request handoffs, and use git-ema source refs.
 
 Allowed Write Scope:
-- runtime/EMA-0.0.5--4-24/docs/agents/
-- runtime/EMA-0.0.5--4-24/docs/vapps/see-agent-work.md
-- runtime/EMA-0.0.5--4-24/docs/cli/see-agent-work.md
-- runtime/EMA-0.0.5--4-24/docs/architecture/09-see-agent-work.md
-- doctrine/planning/EMA-0.0.5-BUILDOUT-MASTER-PLAN.md
+- Active builds/EMA-0.0.6/docs/agents/
+- Active builds/EMA-0.0.6/docs/vapps/see-agent-work.md
+- Active builds/EMA-0.0.6/docs/cli/see-agent-work.md
+- Active builds/EMA-0.0.6/docs/architecture/09-see-agent-work.md
+- Active builds/EMA-0.0.6/docs/WORKSPACE-ENTRYPOINT.md
 
 Rules:
 - Do not implement real execution.

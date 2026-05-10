@@ -53,9 +53,9 @@ reporting format, see:
 Every command should resolve into the active EMA scope:
 
 ```text
---org "Founding-Fathers-EMA"
---space "Founding-Fathers-EMA"
---project "EMA 0.0.5"
+--org "Trajan's Organization"
+--space "Personal Workspace"
+--project "EMA"
 ```
 
 Short examples may omit these flags when the active scope is obvious.
@@ -63,7 +63,7 @@ Short examples may omit these flags when the active scope is obvious.
 ## Swarm Commands
 
 ```text
-ema swarm list --project "EMA 0.0.5"
+ema swarm list --project EMA
 ema swarm show --swarm "buildout"
 ema swarm start --swarm "buildout"
 ema swarm pause --swarm "buildout"
@@ -81,8 +81,8 @@ Early behavior:
 ## Campaign Commands
 
 ```text
-ema campaign create --title "EMA 0.0.5 Buildout" --project "EMA 0.0.5"
-ema campaign list --project "EMA 0.0.5"
+ema campaign create --title "EMA 0.0.6 Buildout" --project EMA
+ema campaign list --project EMA
 ema campaign show --campaign campaign:<id>
 ema campaign archive --campaign campaign:<id>
 ```
@@ -93,7 +93,7 @@ Campaigns are long-running initiatives made of missions.
 
 ```text
 ema mission create --campaign campaign:<id> --title "Build vanilla workspace"
-ema mission list --project "EMA 0.0.5"
+ema mission list --project EMA
 ema mission show --mission mission:<id>
 ema mission start --mission mission:<id>
 ema mission pause --mission mission:<id>
@@ -126,7 +126,7 @@ ema handoff request --from lane:<id> --to actor:<id> --needed "Review event cata
 ema handoff accept --handoff handoff:<id>
 ema handoff reject --handoff handoff:<id> --reason "Wrong lane"
 ema handoff complete --handoff handoff:<id>
-ema handoff list --project "EMA 0.0.5"
+ema handoff list --project EMA
 ```
 
 Handoffs are explicit transfer contracts, not chat paragraphs.
@@ -141,7 +141,7 @@ Handoffs are explicit transfer contracts, not chat paragraphs.
 
 ```text
 ema vcalendar show --actor actor:<id>
-ema vcalendar week --project "EMA 0.0.5"
+ema vcalendar week --project EMA
 ema vcalendar block add --actor actor:<id> --kind focus --label "Blueprint section work"
 ema vcalendar block move --block calendar_block:<id> --start "2026-04-24T15:00:00-04:00"
 ema vcalendar phase set --actor actor:<id> --label "Implementation Week"
@@ -149,12 +149,11 @@ ema checkup schedule --lane lane:<id> --cadence daily
 ema checkup complete --checkup checkup:<id> --result "Ready for review"
 ```
 
-Defaults when flags are omitted: `--org` falls back to
-`org:01J00000000000000000000001` (the first-boot Founding-Fathers-EMA seed);
-`--actor` falls back to `actor:dev-console`. Pass `--json` for a structured
-response. Creates (`block add`, `checkup schedule`) return the generated
-resource id on the `resource` field so the next `move` / `complete` call can
-use it directly.
+Defaults when flags are omitted: `--actor` falls back to `actor:dev-console`;
+workspace scope comes from explicit `--project`, `EMA_PROJECT`, cwd inference,
+or the daemon current selection. Pass `--json` for a structured response.
+Creates (`block add`, `checkup schedule`) return the generated resource id on
+the `resource` field so the next `move` / `complete` call can use it directly.
 
 The vCalendar supports real time and self-paced agent time. Agent weeks and
 weekly phases are product concepts even before scheduling automation is real.
@@ -170,8 +169,8 @@ ema events tail --family vcalendar
 ## Agent Work Commands
 
 ```text
-ema actor list --project "EMA 0.0.5"
-ema agent list --project "EMA 0.0.5"
+ema actor list --project EMA
+ema agent list --project EMA
 ema agent show --actor actor:<id>
 ema agent assign --actor actor:<id> --lane lane:<id>
 ema agent prompt --actor actor:<id> --mission mission:<id> --lane lane:<id>
@@ -195,8 +194,8 @@ ema source attach --object lane:<id> --attachment attachment:<id>
 ema source attach --object mission:<id> --attachment attachment:<id>
 ema source attach --object blueprint_sec:<id> --attachment attachment:<id>
 ema source list --object lane:<id>
-ema codebase link --project "EMA 0.0.5" --repo "/path/to/repo"
-ema artifact create --project "EMA 0.0.5" --name "Build plan"
+ema codebase link --project EMA --repo "/path/to/repo"
+ema artifact create --project EMA --name "Build plan"
 ```
 
 The canonical source identity belongs to git-ema records. See Agent Work only
@@ -209,7 +208,7 @@ ema proposal draft --from blueprint_sec:<id> --title "Build See Agent Work"
 ema proposal submit --proposal proposal:<id>
 ema proposal accept --proposal proposal:<id>
 ema proposal reject --proposal proposal:<id> --reason "Not yet"
-ema proposal queue --project "EMA 0.0.5"
+ema proposal queue --project EMA
 ```
 
 Plan/spec commands should wait until the proposal path is real enough to need

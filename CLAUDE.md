@@ -1,4 +1,4 @@
-# EMA 0.0.5 — agent context
+# EMA 0.0.6 — Claude agent context
 
 You are working in the active EMA build. Read `README.md` and `AGENTS.md` first if you have not. The orchestrator overview is in `../../AGENTS.md`.
 
@@ -17,20 +17,47 @@ Spaces contain multiple projects. `locked-in-ios-app` is a project in
 - orientation command: `ema agent orient --project locked-in-ios-app --json`
 
 The CLI is invoked globally as `ema <command>` (wrapper at `~/.local/bin/ema`,
-default `EMA_HOME=Active builds/EMA-0.0.5`); `pnpm cli <command>` from this
+default `EMA_HOME=Active builds/EMA-0.0.6`); `pnpm cli <command>` from this
 build root is equivalent and is the fallback when the wrapper is unavailable.
+
+Before editing, verify the general environment first:
+
+```bash
+ema help
+ema ping --json
+ema status --json
+ema tl about --summary --json
+ema vcalendar tick --json
+ema doctor --json
+```
+
+When the task names a project, scope the working commands explicitly:
+
+```bash
+ema next --project <project-name-or-id> --json
+ema agent orient --project <project-name-or-id> --json
+ema agent meta-progress --project <project-name-or-id> --json
+ema cockpit workpack --project <project-name-or-id> --json
+```
+
+`ema doctor --json` reports runtime health. `ema doctor --strict --json`
+also fails while known roadmap gaps remain.
 
 Do not use the mistaken `lockedinIOSapp` space/project as canonical context.
 It is a cleanup target once archive/move writers exist.
 
-## Central tracker boundary (2026-05-07)
+## Cockpit boundary (2026-05-07, post-CWT absorption)
 
 `current-work-tracker-trajan` (project id
-`project:01KR0AAG8D004J8015N9P8A0VY`) is **EMA's central tracker for
-projects, clients, and work**. Its active build is at
-`/Users/trajanm4air/Desktop/Active builds/current-work-tracker-trajan/`.
+`project:01KR0AAG8D004J8015N9P8A0VY`) is now a **legacy / donor** project.
+Its UI patterns and contracts have been absorbed into EMA web as the
+`cockpit` vApp. Keep the donor build at
+`/Users/trajanm4air/Desktop/Active builds/current-work-tracker-trajan/`, but
+do not develop it as an independent active surface unless the user explicitly
+asks for legacy comparison or salvage.
 
-cwt owns these record families as writer-of-truth:
+EMA's daemon/cockpit path owns the active project/client/work registry below
+org/space:
 
 - `client` (first-class; one client → many projects)
 - `project` (with `client_id`, `kind`, `client_label`, `client_color`)
@@ -43,24 +70,17 @@ EMA owns these:
 - `org`, `space`, agent identity, daemon-process, shell-state
 - the daemon transport itself
 
-When `ema` needs project or client metadata (e.g. for `ema agent orient
---project <name>` or `ema status`), it reads from cwt's local SQLite
-store today, and from the daemon's projection once `@ema/contracts` ships
-project + client extensions and cwt becomes a daemon-mirroring writer.
+When `ema` needs project or client metadata, route through `ema cockpit …` and
+the daemon-backed registry/projection path. The old `cwt` command is only a
+muscle-memory alias for `ema cockpit "$@"`.
 
-Do **not** add new project- or client-related record families to EMA
-core. Add them to cwt (`Active builds/current-work-tracker-trajan/packages/contracts/`)
-and let the daemon absorb them when contracts ship the extension.
+See `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md`.
 
-See `docs/decisions/2026-05-07-cwt-central-tracker.md` and the cwt
-blueprint `Projects/current-work-tracker-trajan/blueprint/09-ema-central-tracker-promotion.md`.
+## Unified CLI doctrine
 
-## Multi-first-command CLI doctrine
-
-EMA's CLI is split across multiple first commands on `PATH`. `ema` is
-one; `cwt` is another. They cooperate via the contracts layer, never via
-subcommand inheritance. New CLI verbs for projects/clients/work go on
-`cwt`, not `ema`.
+EMA's CLI is `ema`. For projects, clients, captures, responsibilities, and
+cross-client work, use `ema cockpit …`; do not add or depend on a separate
+writer CLI.
 
 ## Auto-loaded skills
 

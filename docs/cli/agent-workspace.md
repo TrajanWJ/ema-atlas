@@ -15,8 +15,8 @@ CLI is `ema`. cwt is absorbed; `~/.local/bin/cwt` is now a thin alias for
 for client X?", route through `ema cockpit …` (the cockpit vApp's CLI
 surface). See
 `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md` (supersedes the same-day
-central-tracker ADR). The earlier `ema cwt status` / `ema cwt ingest`
-commands and the multi-first-command framing are deprecated.
+pre-absorption ADR). The earlier `ema cwt status` / `ema cwt ingest`
+commands and split-CLI framing are deprecated.
 Command-group `--help` output is the normalized source for current flags and
 implementation status.
 
@@ -77,34 +77,49 @@ The coordination files under `Projects/EMA/atlas/workspace/` are templates or
 emergency snapshots unless a command explicitly exports them from the daemon.
 Do not treat an empty `CLAIMS.md`, `HANDOFFS_PENDING.md`, `LANES_CATALOG.md`,
 `PROTECTED_ZONES.md`, or `BLOCKERS.md` as proof that nobody owns work. Use
-`ema agent orient --json`, `ema lane list --json`, `ema queue list --json`, and
-`ema handoff list --json` instead.
+`ema agent orient --project <project> --json`,
+`ema lane list --project <project> --json`,
+`ema queue list --project <project> --json`, and
+`ema handoff list --project <project> --json` instead.
 
 ## Start Every Session
 
-Run orientation before editing:
+Run general EMA health and orientation before editing. Do not assume the daemon
+current project is the task project; it is just the home/current selection.
+When a task names a project, add `--project <name-or-id>` to the workspace
+commands that follow.
 
 ```bash
 ema help
-ema cockpit summary --json
-ema next --json
-ema tl about --summary --json
-ema lane --help
-ema queue --help
-ema problem --help
+ema ping --json
 ema status --json
-ema agent orient --json
-ema agent meta-progress --json
+ema tl about --summary --json
 ema vcalendar tick --json
+ema doctor --json
 ```
 
-Agents must run `ema next --json`, `ema tl about --summary --json`, and
-`ema vcalendar tick --json` at the start of every session. These are mandatory
-session-start commands, not optional reading shortcuts. `next` gives the
+Agents must run the health commands above plus task-layer commands at the start
+of every session. Use unscoped task-layer commands only when the task does not
+name a project and cwd inference is the intended scope. `next` gives the
 smallest actionable command, compact `tl about` establishes the task-layer map,
 and `vcalendar tick` establishes the current planning / execution / review
 phase. Use full `ema tl about --json` only when the complete lane and queue
 arrays are needed.
+
+If the task names a project or the cwd is not inside the intended project,
+scope the task-layer commands explicitly:
+
+```bash
+ema next --project <project-name-or-id> --json
+ema agent orient --project <project-name-or-id> --json
+ema agent meta-progress --project <project-name-or-id> --json
+ema cockpit workpack --project <project-name-or-id> --json
+```
+
+Generated follow-up commands from `next`, `agent orient`, `agent
+meta-progress`, and cockpit workpacks must preserve the resolved project scope
+so they can be copied from Desktop, project records, or active builds without
+depending on daemon `home_current`.
 
 `ema /tl about --summary --json` is an alias for agents or humans with
 slash-command muscle memory. It reports the current daemon registry projection
@@ -152,24 +167,24 @@ campaign -> mission -> lane -> queue_item -> execution -> result
 ## Orientation Commands
 
 ```bash
-ema next --json
-ema cockpit summary --json
-ema cockpit projection --json
-ema intention projection --json
-ema cockpit intentions --json
+ema ping --json
+ema status --json
 ema tl about --summary --json
-ema /tl about --summary --json
-ema agent orient --json
-ema agent meta-progress --json
 ema vcalendar tick --json
+ema doctor --json
+ema next --project EMA --json
+ema agent orient --project EMA --json
+ema agent meta-progress --project EMA --json
+ema cockpit summary --project EMA --json
+ema cockpit projection --project EMA --json
+ema intention projection --project EMA --json
+ema cockpit intentions --project EMA --json
 ema campaign list --project EMA
 ema mission list --project EMA
 ema lane list --project EMA --status active
 ema queue list --project EMA --status ready
 ema handoff list --project EMA
 ema vcalendar week --project EMA
-ema cockpit summary --project EMA --json
-ema cockpit projection --project EMA --json
 ```
 
 The commands above are the standard cold-start map for any agent. `cockpit`,
@@ -221,7 +236,7 @@ If no lane exists yet:
 ema mission create \
   --campaign campaign:<id> \
   --title "Build agent workspace CLI parity" \
-  --project "EMA 0.0.5" \
+  --project EMA \
   --done-when "agents can orient, claim, queue follow-ups, and request handoffs"
 
 ema lane open \
@@ -239,7 +254,7 @@ moving on:
 ```bash
 ema queue add \
   --title "Promote lane claim writes from stub to daemon writer" \
-  --project "EMA 0.0.5" \
+  --project EMA \
   --mission mission:<id> \
   --lane lane:<id> \
   --why "CLI grammar exists but canonical lane events do not yet write" \
@@ -266,7 +281,7 @@ edges.
 ```bash
 ema problem log \
   --title "Surface projection shape drift" \
-  --project "EMA 0.0.5" \
+  --project EMA \
   --lane lane:<id> \
   --cause "Two SeeAgentWorkProjection TypeScript shapes exist" \
   --depends-on "surface-core adapter reconciliation" \

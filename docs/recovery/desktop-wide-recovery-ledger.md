@@ -1,8 +1,14 @@
 # Desktop-Wide Recovery Ledger
 
+<!-- doctrine-alignment -->
+- target: EMA-0.0.6
+- last_aligned: 2026-05-10
+- canonical_stack_doc: docs/architecture/STACK.md
+<!-- /doctrine-alignment -->
+
 This ledger tracks donor material found outside the modern EMA implementation.
 Donor projects are read-only. Recovery work ports or adapts ideas into
-`/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5` only.
+`/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6` only. [realigned 0.0.5 -> 0.0.6 in Sprint 1.5]
 
 ## Policy
 
@@ -18,8 +24,8 @@ Donor projects are read-only. Recovery work ports or adapts ideas into
 
 | Donor | Classification | Modern EMA Target | Status |
 | --- | --- | --- | --- |
-| `Active builds/EMA-0.0.5-swarm-claude/docs/orchestration/swarm/` | swarm runbook | `docs/orchestration/swarm/` | accepted |
-| `Active builds/EMA-0.0.5-swarm-codex/docs/orchestration/swarm/` | swarm operating model | `docs/orchestration/swarm/` | accepted |
+| `Active builds/EMA-0.0.5-swarm-claude/docs/orchestration/swarm/` | historical swarm runbook donor | `docs/orchestration/swarm/` | accepted as historical evidence |
+| `Active builds/EMA-0.0.5-swarm-codex/docs/orchestration/swarm/` | historical swarm operating model donor | `docs/orchestration/swarm/` | accepted as historical evidence |
 | `Projects/EMA/atlas/content/swarm/object-model.md` | canonical object model | contracts + docs + Agent Work projection | accepted |
 | `Projects/EMA/atlas/content/swarm/ema-swarm-workspace.md` | workspace doctrine | contracts + Agent Work/HQ behavior | accepted |
 | `Projects/EMA/atlas/content/swarm/orchestration-kernel.md` | operating discipline | `docs/orchestration/swarm/` | accepted |

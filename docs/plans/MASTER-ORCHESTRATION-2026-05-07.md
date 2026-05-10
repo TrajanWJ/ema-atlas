@@ -1,3 +1,5 @@
+> **SUPERSEDED BY:** [`../superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`](../superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md). The 14-lane wave plan below is preserved for provenance and for the reconciliation map at [`0.0.6-LANE-PLAN-2026-05-07.md`](0.0.6-LANE-PLAN-2026-05-07.md). Do not start work from this plan; start from the 2026-05-10 master plan and consult [`README.md`](README.md) for hierarchy.
+
 # Master Orchestration Plan — 2026-05-07
 
 **Origin:** Operator (Trajan) on 2026-05-07: *"ema cli and source of truth is not connected up to the EMA frontend setup, vDesktop / launchpad / tauri app"* → escalating into a head-orchestrator session covering 14 lanes across 4 waves, with explicit conceptual development of Blueprint, atlas, and the agent harness glue.

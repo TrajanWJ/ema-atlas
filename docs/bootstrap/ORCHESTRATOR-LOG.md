@@ -270,3 +270,24 @@ Run status: halted before Phase 0. No sub-agent dispatches were issued, because 
 requires the orchestrator's own intent to exist in canon first. This is the terminating substrate
 finding for this session.
 
+## Continuation 2026-05-10 — Halt resolved by Sprint 2.5 pipeline floor
+
+The substrate gap that terminated this run is now closed.
+
+- `ema intent create | list | show | update` — landed (see `apps/cli/src/commands/intent.ts`; canonical events are in `packages/contracts/events/intent.md`).
+- `ema proposal create | approve | reject | list | show` — landed (see `apps/cli/src/commands/proposal.ts`).
+- `ema canon write | show | list | supersede` — landed (see `apps/cli/src/commands/canon.ts`).
+- `ema actor register | list | show` — landed (see `apps/cli/src/commands/actor.ts`).
+- The CLI now records the orchestrator's own work as canonical intents/proposals/canon nodes; live evidence:
+  - `ema intent list --json` includes `BOOTSTRAP-INT-001` (status `accepted`) and `PROSLYNC-INT-001` (status `accepted`).
+  - `ema canon list --json` includes the 2026-05-10 commit-hygiene canon nodes.
+- The bootstrap orchestrator's halt is therefore retired. Continuation work belongs under the head-orchestrator master plan, not as a separate bootstrap rerun.
+
+Controlling plan from this point forward:
+
+- `docs/superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`
+
+The patch file `ORCHESTRATOR-PROMPT-PATCH-POST-SPRINT-2.5.md` in this directory is preserved as historical context for what the bootstrap orchestrator's recursive frame would have required; it is not the path forward. If a future agent wants to re-file `BOOTSTRAP-INT-001`-style work, it should be filed as a child intent under the head-orchestrator master plan's tracks rather than as a recursive bootstrap rerun.
+
+`docs/plans/README.md` and `docs/superpowers/plans/README.md` carry the full plan hierarchy.
+

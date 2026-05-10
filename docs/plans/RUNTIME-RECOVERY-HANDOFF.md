@@ -1,3 +1,5 @@
+> **Status: historical (0.0.5 lineage).** This handoff was written for the EMA-0.0.5 active build and references EMA-0.0.5 paths as live. 0.0.6 has superseded that lineage; current runtime ownership is recorded under `Active builds/EMA-0.0.6/` and the controlling implementation plan in [`../superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`](../superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md). Preserved here for provenance; do not start new work from this document.
+
 # Runtime Recovery Handoff
 
 Date: 2026-04-24

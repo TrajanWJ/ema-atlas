@@ -1117,3 +1117,23 @@ Verified:
 - `pnpm --dir apps/web exec tsc --noEmit`: clean.
 - `pnpm cockpit:perf`: passes both workpack and projection at the new tighter budget.
 - `node apps/cli/dist/bin.js cockpit workpack --project proslync-app-ios-final --json`: returns `health.web=down`, two `stale_records`, `proslync_ready=false`.
+
+## Session update 2026-05-10 - CLI subcommand --help across stub-contract groups
+
+- Closed the harness queue item (`queue_item:01KR1XB6CT0076XEX8XZBMJD81`): `ema harness <sub> --help` now shows that subcommand's flags and required fields instead of repeating the top-level command list.
+- Same fix landed for lane, queue, intent, canon, proposal, actor: `ema lane open --help`, `ema queue add --help`, etc., used to run the action and fail with a missing-required-flag error; they now print verb-specific help (text and JSON modes).
+- Mechanism: `apps/cli/src/commands/stub-contract.ts` gains `maybeRunVerbHelp(args, opts)`. Each command group hoists its `StubOptions` verb table to module scope and calls the helper before dispatch. Harness's hand-rolled help renderer was replaced with a `runStubContract` delegate, and its commands gained the same flag/required metadata.
+- Codex `--ask-for-approval` adapter drift was already fixed in code; only `tooling/cli-readiness-smoke.mjs` still references the flag as a regression guard.
+
+## Session update 2026-05-10 - EMA contents network repair
+
+Repaired the doctrine and plan-hierarchy network so the live spine resolves cleanly for the next agent.
+
+- **Master design doc**: created a redirect stub at `Projects/EMA/MASTER-EMA-DESIGN-DOC.md` explaining the 2026-05-07 retirement and pointing to the live spine. Updated `Projects/EMA/PROJECT-MAP.md` and `Projects/EMA/README.md` so the broken-link claim ("the master EMA doctrine, ontology, workflow…") is replaced with redirect-stub language. The two `atlas-live.ts` files now resolve `MASTER-EMA-DESIGN-DOC.md` to the redirect stub instead of a missing file. The 1533-line archived snapshot at `Projects/EMA/atlas/archive/master-doc/MASTER-EMA-DESIGN-DOC-2026-04-29.md` remains untouched as historical product-vision reading.
+- **Plan-hierarchy clarity**: created `docs/plans/README.md` and `docs/superpowers/plans/README.md` listing controlling vs superseded plans. Added `> SUPERSEDED BY:` banners at the top of `docs/plans/MASTER-ORCHESTRATION-2026-05-07.md` and `docs/superpowers/plans/2026-05-10-ema-proslync-first-active-development-sprints.md`. `docs/WORKSPACE-ENTRYPOINT.md` "Before coding" list now points at the controlling master plan and the plan-hierarchy README.
+- **Bootstrap halt resolved**: appended a 2026-05-10 continuation note to `docs/bootstrap/ORCHESTRATOR-LOG.md` explaining that Sprint 2.5 closed the pipeline-floor gap (intent/proposal/canon/actor are live) so the bootstrap halt is retired; continuation work belongs under the head-orchestrator master plan, not as a separate bootstrap rerun.
+- **Stale CLI inventory**: `docs/bootstrap/CLI-VERB-INVENTORY.md` now carries a STATUS banner marking it historical; runtime is `ema help` and `ema <command> --help`.
+- **0.0.5-era recovery handoff**: `docs/plans/RUNTIME-RECOVERY-HANDOFF.md` carries a `Status: historical (0.0.5 lineage)` banner.
+- **Atlas spine**: `Projects/EMA/atlas/PROJECT-ATLAS.md` now lists the live doctrine spine (canon current, redirect stub, build README, workspace entry, master plan, STATUS, durable transcripts). `Projects/EMA/atlas/canon/current/ema-0-0-6-current-canon.md` adds Controlling Plan and Master Design Doc Note sections.
+
+Verified by inspection of all modified files; no source code changes in this pass, only docs and project records. EMA repo working tree is clean except for the modified docs and the two new plan READMEs.

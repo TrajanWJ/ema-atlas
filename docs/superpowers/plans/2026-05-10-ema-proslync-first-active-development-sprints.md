@@ -1,3 +1,5 @@
+> **SUPERSEDED BY:** [`2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`](2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md). This narrower plan is reclassified into the master plan's tracks; reach for it only for evidence of the original sprint thinking. Start from the master plan and see [`README.md`](README.md) for hierarchy.
+
 # EMA Proslync-First Active Development Sprints Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

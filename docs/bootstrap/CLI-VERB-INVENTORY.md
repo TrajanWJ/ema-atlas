@@ -1,5 +1,7 @@
 # CLI Verb Inventory - Pipeline Floor Pre-Sprint
 
+> **STATUS (2026-05-10):** Snapshot is **historical**. The pipeline-floor gap this inventory documented (no `ema intent | proposal | canon | actor`) closed in Sprint 2.5. All four verb groups are now live with full subcommand `--help`. For the current verb landscape, run `ema help` and `ema <command> --help`; for the bootstrap halt resolution, see `ORCHESTRATOR-LOG.md` §"Continuation 2026-05-10".
+
 Date: 2026-05-10
 Repo: `/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6`
 Branch observed: `bootstrap/m2-m3-shell-port`

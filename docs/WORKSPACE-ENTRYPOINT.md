@@ -6,20 +6,23 @@ Use this repo as the implementation root for EMA `0.0.6`.
 
 Read:
 
-1. `orchestration/STATUS.md`
+1. `orchestration/STATUS.md` - live ledger; trust this over plan claims when they disagree.
 2. `../../Projects/EMA/project.md`
 3. `../../Projects/EMA/PROJECT-MAP.md`
 4. `../../Projects/EMA/builds/BUILD-MANIFEST.md`
 5. `../../Projects/EMA/atlas/README.md`
-6. `../../Projects/EMA/builds/0.0.6/BUILD.md`
-7. `architecture/08-vanilla-workspace.md`
-8. `architecture/09-see-agent-work.md`
-9. `agents/see-agent-work-agent-usage.md`
-10. `architecture/10-first-boot.md`
-11. `architecture/11-transport-and-auth-survey.md`
-12. `architecture/12-hermes-integration.md`
-13. `operations/peer-computer-access.md`
-14. `plans/IMPLEMENTATION-ROADMAP.md`
+6. `../../Projects/EMA/atlas/canon/current/ema-0-0-6-current-canon.md` - distilled current truth.
+7. `../../Projects/EMA/builds/0.0.6/BUILD.md`
+8. `architecture/08-vanilla-workspace.md`
+9. `architecture/09-see-agent-work.md`
+10. `agents/see-agent-work-agent-usage.md`
+11. `architecture/10-first-boot.md`
+12. `architecture/11-transport-and-auth-survey.md`
+13. `architecture/12-hermes-integration.md`
+14. `operations/peer-computer-access.md`
+15. `plans/README.md` - plan-hierarchy index (controlling vs superseded).
+16. `superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md` - **current controlling implementation plan**.
+17. `plans/IMPLEMENTATION-ROADMAP.md` - broader roadmap; verify against the master plan above before treating any step as current.
 
 ## CLI doctrine
 

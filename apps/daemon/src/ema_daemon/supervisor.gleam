@@ -17,6 +17,7 @@ import ema_collab/ema_collab
 import ema_daemon/bus
 import ema_daemon/ema_env
 import ema_daemon/registry
+import ema_replication/sidecar
 import ema_shell_ipc/ema_shell_ipc
 import ema_swarm_coordination/first_boot
 import gleam/erlang/process.{type Subject}
@@ -29,6 +30,7 @@ pub type StartedTree {
     bus: Subject(bus.Msg),
     collab: Subject(ema_collab.Msg),
     registry: Subject(registry.Msg),
+    sidecar: Subject(sidecar.Msg),
   )
 }
 
@@ -73,12 +75,24 @@ pub fn start() -> Result(StartedTree, SupervisorError) {
                   {
                     Error(reason) ->
                       Error(ChildFailedToStart("shell_ipc", reason))
-                    Ok(_ipc) ->
-                      Ok(StartedTree(
-                        bus: bus_subject,
-                        collab: collab_subject,
-                        registry: registry_subject,
-                      ))
+                    Ok(_ipc) -> {
+                      let config =
+                        sidecar_config(bus_subject, collab_subject)
+                      case sidecar.start_link(config) {
+                        Error(e) ->
+                          Error(ChildFailedToStart(
+                            "sidecar",
+                            describe_start_error(e),
+                          ))
+                        Ok(sidecar_started) ->
+                          Ok(StartedTree(
+                            bus: bus_subject,
+                            collab: collab_subject,
+                            registry: registry_subject,
+                            sidecar: sidecar_started.data,
+                          ))
+                      }
+                    }
                   }
                 }
               }
@@ -86,6 +100,40 @@ pub fn start() -> Result(StartedTree, SupervisorError) {
           }
       }
     }
+  }
+}
+
+fn sidecar_config(
+  bus_subject: Subject(bus.Msg),
+  collab_subject: Subject(ema_collab.Msg),
+) -> sidecar.Config {
+  let heartbeat_interval_ms =
+    ema_env.getenv_or("EMA_IROH_HEARTBEAT_MS", "5000")
+    |> int.parse
+    |> result.unwrap(5000)
+
+  sidecar.Config(
+    daemon_id: ema_env.getenv_or("EMA_DAEMON_ID", "daemon:dev-local"),
+    runtime_dir: ema_env.getenv_or("XDG_RUNTIME_DIR", "/tmp"),
+    mode: sidecar_mode(),
+    bus_subject: bus_subject,
+    collab_subject: collab_subject,
+    heartbeat_interval_ms: heartbeat_interval_ms,
+  )
+}
+
+fn sidecar_mode() -> sidecar.Mode {
+  case ema_env.getenv_or("EMA_IROH_MODE", "external") {
+    "dev-loopback" | "loopback" ->
+      sidecar.DevLoopback(node_id: ema_env.getenv_or(
+        "EMA_IROH_NODE_ID",
+        "iroh-node:dev-local",
+      ))
+    _ ->
+      sidecar.External(
+        command: ema_env.getenv_or("EMA_IROH_COMMAND", "iroh"),
+        args: ["start"],
+      )
   }
 }
 
@@ -98,5 +146,5 @@ fn describe_start_error(e: actor.StartError) -> String {
 }
 
 pub fn children() -> List(String) {
-  ["bus", "collab", "registry", "shell_ipc"]
+  ["bus", "collab", "registry", "shell_ipc", "sidecar"]
 }

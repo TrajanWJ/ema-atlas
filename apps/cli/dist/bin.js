@@ -3481,8 +3481,9 @@ async function showProblem(args) {
   }
   const graph = await loadGraph(args);
   if (!graph) return 1;
-  const problem = graph.problems.find((item) => item.id === id || item.problem_id === id) ?? null;
-  if (json) emitJson({ ok: true, source: "problem.graph", problem, solutions: graph.solutions, links: graph.links });
+  const payload = problemShowJsonPayload(id, graph);
+  const problem = payload.problem;
+  if (json) emitJson(payload);
   else if (problem) emitPretty(JSON.stringify({ problem, solutions: graph.solutions, links: graph.links }, null, 2));
   else emitPretty(`problem not found: ${id}`);
   return problem ? 0 : 1;
@@ -3493,6 +3494,20 @@ function problemShowId(args) {
 function positionalShowId2(args, verb) {
   const offset = args.positional[0] === verb ? 1 : args.positional[1] === verb ? 2 : -1;
   return offset >= 0 ? args.positional[offset] : void 0;
+}
+function problemShowJsonPayload(id, graph) {
+  const problem = graph.problems.find((item) => item.id === id || item.problem_id === id) ?? null;
+  return {
+    ok: problem !== null,
+    source: "problem.graph",
+    problem,
+    solutions: graph.solutions,
+    links: graph.links,
+    error: problem ? null : {
+      class: "not_found",
+      message: `problem not found in resolved workspace scope: ${id}`
+    }
+  };
 }
 async function loadGraph(args) {
   const context = await workspaceScopeContext(args);

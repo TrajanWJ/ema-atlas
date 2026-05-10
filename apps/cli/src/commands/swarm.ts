@@ -17,10 +17,24 @@ type Swarm = {
   result?: string | null;
 };
 
+type ScopeClaim = {
+  id: string;
+  claim_id?: string;
+  actor_id?: string | null;
+  owner_id?: string | null;
+  owner_kind?: string | null;
+  project_id?: string | null;
+  path?: string | null;
+  status?: string | null;
+  updated_at?: string | null;
+};
+
 export async function runSwarm(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0];
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return runSwarmHelp(args);
   if (verb === "create") return createSwarm(args);
+  if (verb === "scope-claim") return scopeClaim(args);
+  if (verb === "scope-registry" || verb === "scope") return listScopeClaims(args);
   if (verb === "start") return changeSwarm(args, "swarm.start", "started");
   if (verb === "pause") return changeSwarm(args, "swarm.pause", "paused");
   if (verb === "stop") return changeSwarm(args, "swarm.stop", "stopped");
@@ -44,6 +58,8 @@ function runSwarmHelp(args: ParsedArgs): number {
       { verb: "pause", flags: ["swarm", "reason"], required: ["swarm"], summary: "Pause a swarm with an optional reason." },
       { verb: "stop", flags: ["swarm", "reason"], required: ["swarm"], summary: "Stop a swarm with an optional reason." },
       { verb: "report", flags: ["swarm", "summary"], required: ["swarm"], summary: "Append a swarm report event with an optional summary." },
+      { verb: "scope-claim", flags: ["path", "scope", "swarm", "project"], required: ["path"], summary: "Claim an edit path through daemon-enforced scope.registry overlap checks." },
+      { verb: "scope-registry", flags: ["project", "all-projects", "json"], summary: "List active edit path claims from scope.registry." },
     ],
   });
 }
@@ -91,6 +107,43 @@ async function reportSwarm(args: ParsedArgs): Promise<number> {
     swarm_id: swarm,
     body: flagString(args, "summary") ?? flagString(args, "body") ?? null,
   }, { human: `recorded swarm report for ${swarm}`, resourceLabel: "swarm_report" });
+}
+
+async function scopeClaim(args: ParsedArgs): Promise<number> {
+  const path = flagString(args, "path") ?? flagString(args, "scope");
+  if (!path) {
+    emitError("ema swarm scope-claim: --path is required");
+    return 64;
+  }
+  return sendWorkspaceCommand(args, "swarm.scope_claim", {
+    org_id: flagString(args, "org") ?? DEFAULT_ORG,
+    actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
+    swarm_id: flagString(args, "swarm") ?? null,
+    project_id: flagString(args, "project") ?? null,
+    scope: path,
+  }, { human: `claimed edit scope ${path}`, resourceLabel: "scope_claim" });
+}
+
+async function listScopeClaims(args: ParsedArgs): Promise<number> {
+  const json = flagBool(args, "json");
+  const context = await workspaceScopeContext(args);
+  const claims = await readProjection(args, {
+    name: "scope.registry",
+    pick: (data) => (data.claims as ScopeClaim[] | undefined) ?? [],
+  });
+  if (!claims) return 1;
+  const scoped = filterProjectScopedRecords(claims, context);
+  if (json) emitJson({ ok: true, source: "scope.registry", claims: scoped });
+  else {
+    emitPretty("# scope claims");
+    if (scoped.length === 0) emitPretty("  (none)");
+    for (const claim of scoped) {
+      emitPretty(`  ${claim.id} [${claim.status ?? "unknown"}] ${claim.path ?? ""}`);
+      if (claim.actor_id) emitPretty(`    actor: ${claim.actor_id}`);
+      if (claim.owner_id) emitPretty(`    owner: ${claim.owner_kind ?? "owner"} ${claim.owner_id}`);
+    }
+  }
+  return 0;
 }
 
 async function listSwarms(args: ParsedArgs): Promise<number> {

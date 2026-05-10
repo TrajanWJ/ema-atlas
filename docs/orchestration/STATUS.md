@@ -8,6 +8,66 @@ Claude CLI, or human — reads this file on cold start.
 Coordinator: Claude (replacement orchestrator, consolidated role).
 Last coordinator sweep: 2026-05-09T03:45-04:00.
 
+## Session update 2026-05-10 - Host doctrine, org scope, and swarm claims
+
+Codex landed the source-backed doctrine and guardrail slice for the 0.0.6
+multi-host work. No commit was created in this pass.
+
+### Commit Map
+
+- Track 1 / source doctrine:
+  `docs/decisions/2026-05-10-host-node-doctrine.md`,
+  `docs/decisions/2026-05-10-multi-host-conflict-policy.md`,
+  `docs/decisions/2026-05-10-recovery-bip39.md`, the named architecture /
+  operations docs, and the doc registry now carry canonical wiki IDs and point
+  at the source-intake loop.
+- Track 2 / org-scoped model:
+  `apps/cli/src/commands/org.ts`, `apps/cli/src/commands/cockpit.ts`, and
+  `apps/cli/src/workspace-scope.ts` now expose `ema org status`, typed
+  `project.org_id`, and typed file-backed org/space IDs when daemon labels
+  drift.
+- Track 3 / swarm scope guardrails:
+  `apps/daemon/src/ema_shell_ipc/ema_shell_ipc.gleam`,
+  `apps/daemon/src/ema_daemon/{bus,event_envelope,sqlite_ffi}.gleam`,
+  `apps/daemon/src/ema_sqlite_helpers.erl`,
+  `apps/daemon/src/ema_swarm/scope_registry.gleam`, and
+  `apps/cli/src/commands/swarm.ts` add daemon-enforced `scope.claimed`
+  commands and the `scope.registry` projection.
+- Track 4 / workspace schema:
+  `packages/contracts/workspace/v0/schema.md` records
+  `org -> host_set -> entity_class -> conflict_strategy` plus the required
+  `workspace.sources` and `workspace.donor_patterns` projections.
+
+### Verified
+
+- `pnpm --dir apps/cli test`
+- `pnpm --dir apps/cli typecheck`
+- `pnpm build:cli`
+- `cd apps/daemon && gleam check`
+- `ema ping --json`
+- `ema org status --json`
+- `ema cockpit projection --project proslync-app-ios-final --json`
+- `ema swarm scope-claim --project proslync-app-ios-final --path <smoke>/a --json`
+- overlapping `ema swarm scope-claim --path <smoke>/a/child.ts --json` rejects
+  with daemon conflict
+- non-overlapping `ema swarm scope-claim --path <smoke>/b --json` accepts
+- `ema swarm scope-registry --project proslync-app-ios-final --json`
+- `ema wiki check --json`
+- `ema doctor --strict --json`
+
+### Deferred
+
+- Track 5 Proslync follow-on swarm was not launched in this pass; the
+  source-license posture and agent report requirements remain the gate.
+- `apps/daemon/src/ema_workspace/**` source/donor projections are represented
+  in the shared workspace schema and still need the daemon implementation
+  slice.
+- `gleam test` still has the known baseline failure
+  `ema_daemon_test.git_ema_slug_projects_active_builds_label_test`; the new
+  scope-registry tests are included in the passing set.
+- Smoke scope claims remain active under `.ema-dev/scope-smoke/` because the
+  CLI currently exposes claim/list, not release.
+
 ## Session update 2026-05-09 - Active progress and lost-work sweep
 
 Codex refreshed the active-progress summary for the in-flight 0.0.6 build and

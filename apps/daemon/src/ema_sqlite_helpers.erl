@@ -66,6 +66,8 @@
     problem_graph_projection_json/1,
     agent_reports_projection_json/1,
     swarm_registry_projection_json/1,
+    scope_registry_projection_json/1,
+    scope_claim_conflict/4,
     blueprint_projection_json/1,
     blueprint_planner_projection_json/1,
     vcalendar_projection_json/1,
@@ -811,6 +813,20 @@ swarm_registry_projection_json(Db) ->
     Items = sort_by_updated(maps:values(Map)),
     Array = join_json([workspace_record_json(swarm_id, Item) || Item <- Items]),
     iolist_to_binary([<<"{\"source\":\"daemon_events\",\"swarms\":[">>, Array, <<"]}">>]).
+
+scope_registry_projection_json(Db) ->
+    Claims = active_scope_claims(Db),
+    Array = join_json([scope_claim_json(Claim) || Claim <- Claims]),
+    iolist_to_binary([<<"{\"source\":\"daemon_events\",\"claims\":[">>, Array, <<"]}">>]).
+
+scope_claim_conflict(Db, OrgId, ProjectId, Path) ->
+    Candidate = normalize_scope_path(Path),
+    Claims = active_scope_claims(Db),
+    case [maps:get(id, Claim) || Claim <- Claims,
+          scope_claim_matches(Claim, OrgId, ProjectId, Candidate)] of
+        [ClaimId | _] -> ClaimId;
+        [] -> <<>>
+    end.
 
 blueprint_projection_json(Db) ->
     Events = select_events_like(Db, <<"blueprint.%">>, 2000),
@@ -2981,6 +2997,116 @@ apply_swarm_event({_Txid, Kind, Ts, Payload}, Acc) ->
             end,
             Acc#{Id => Next}
     end.
+
+active_scope_claims(Db) ->
+    Events = select_events_like_with_scope(Db, <<"scope.%">>, 1000),
+    Map = lists:foldl(fun apply_scope_event/2, #{}, Events),
+    Claims = maps:values(Map),
+    Active = lists:filter(
+        fun(Claim) -> maps:get(status, Claim, <<>>) =:= <<"active">> end,
+        Claims
+    ),
+    sort_by_updated(Active).
+
+apply_scope_event({_Txid, Kind, Ts, OrgId, _SpaceId, ProjectId, Payload}, Acc) ->
+    ClaimId = extract_json_string(Payload, <<"claim_id">>),
+    case ClaimId of
+        <<>> -> Acc;
+        _ ->
+            Current = maps:get(ClaimId, Acc, scope_claim_default(ClaimId)),
+            Next0 = Current#{
+                id => ClaimId,
+                claim_id => ClaimId,
+                org_id => non_empty(OrgId, maps:get(org_id, Current, <<>>)),
+                project_id => non_empty(ProjectId, maps:get(project_id, Current, <<>>)),
+                actor_id => non_empty(extract_json_string(Payload, <<"actor_id">>), maps:get(actor_id, Current, <<>>)),
+                owner_kind => non_empty(extract_json_string(Payload, <<"owner_kind">>), maps:get(owner_kind, Current, <<>>)),
+                owner_id => non_empty(extract_json_string(Payload, <<"owner_id">>), maps:get(owner_id, Current, <<>>)),
+                path => normalize_scope_path(non_empty(
+                    extract_json_string(Payload, <<"path">>),
+                    extract_json_string(Payload, <<"scope">>)
+                )),
+                updated_at => Ts
+            },
+            Next = case Kind of
+                <<"scope.claimed">> -> Next0#{status => <<"active">>, claimed_at => Ts};
+                <<"scope.released">> -> Next0#{status => <<"released">>, released_at => Ts};
+                _ -> Next0
+            end,
+            Acc#{ClaimId => Next}
+    end.
+
+scope_claim_default(ClaimId) ->
+    #{
+        id => ClaimId,
+        claim_id => ClaimId,
+        org_id => <<>>,
+        project_id => <<>>,
+        actor_id => <<>>,
+        owner_kind => <<>>,
+        owner_id => <<>>,
+        path => <<>>,
+        status => <<"active">>,
+        claimed_at => <<>>,
+        released_at => <<>>,
+        updated_at => <<>>
+    }.
+
+scope_claim_matches(Claim, OrgId, ProjectId, CandidatePath) ->
+    ClaimOrg = maps:get(org_id, Claim, <<>>),
+    ClaimProject = maps:get(project_id, Claim, <<>>),
+    ClaimPath = maps:get(path, Claim, <<>>),
+    Org = to_binary(OrgId),
+    Project = to_binary(ProjectId),
+    CandidatePath =/= <<>>
+    andalso ClaimOrg =:= Org
+    andalso (Project =:= <<>> orelse ClaimProject =:= <<>> orelse ClaimProject =:= Project)
+    andalso scope_paths_overlap(ClaimPath, CandidatePath).
+
+scope_paths_overlap(Existing, Candidate) ->
+    A = normalize_scope_path(Existing),
+    B = normalize_scope_path(Candidate),
+    case {A, B} of
+        {<<>>, _} -> false;
+        {_, <<>>} -> false;
+        _ ->
+            A =:= B
+            orelse binary_starts_with(A, <<B/binary, "/">>)
+            orelse binary_starts_with(B, <<A/binary, "/">>)
+    end.
+
+normalize_scope_path(Path) ->
+    Clean0 = binary:replace(to_binary(Path), <<"\\">>, <<"/">>, [global]),
+    Parts0 = binary:split(Clean0, <<"/">>, [global]),
+    Parts = [P || P <- Parts0, P =/= <<>>, P =/= <<".">>],
+    join_path(Parts).
+
+join_path([]) -> <<>>;
+join_path([One]) -> One;
+join_path([One | Rest]) -> iolist_to_binary([One, <<"/">>, join_path(Rest)]).
+
+binary_starts_with(Bin, Prefix) ->
+    Size = byte_size(Prefix),
+    case Bin of
+        <<Prefix:Size/binary, _/binary>> -> true;
+        _ -> false
+    end.
+
+scope_claim_json(Claim) ->
+    [
+        <<"{\"id\":">>, nullable_string_json(maps:get(id, Claim, <<>>)),
+        <<",\"claim_id\":">>, nullable_string_json(maps:get(claim_id, Claim, <<>>)),
+        <<",\"org_id\":">>, nullable_string_json(maps:get(org_id, Claim, <<>>)),
+        <<",\"project_id\":">>, nullable_string_json(maps:get(project_id, Claim, <<>>)),
+        <<",\"actor_id\":">>, nullable_string_json(maps:get(actor_id, Claim, <<>>)),
+        <<",\"owner_kind\":">>, nullable_string_json(maps:get(owner_kind, Claim, <<>>)),
+        <<",\"owner_id\":">>, nullable_string_json(maps:get(owner_id, Claim, <<>>)),
+        <<",\"path\":">>, nullable_string_json(maps:get(path, Claim, <<>>)),
+        <<",\"status\":">>, nullable_string_json(maps:get(status, Claim, <<>>)),
+        <<",\"claimed_at\":">>, nullable_string_json(maps:get(claimed_at, Claim, <<>>)),
+        <<",\"updated_at\":">>, nullable_string_json(maps:get(updated_at, Claim, <<>>)),
+        <<"}">>
+    ].
 
 apply_problem_event({_Txid, Kind, Ts, Payload}, {Problems, Solutions, Links}) ->
     case Kind of

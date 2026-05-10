@@ -51,7 +51,7 @@ export const COMMANDS: CommandInfo[] = [
   { name: "recovery scan", summary: "Read-only desktop-wide donor, worktree, stale-lane, and lost-work scan." },
   { name: "cwt status/ingest", summary: "Inspect current-work-tracker shared-files projection and dry-run EMA promotion." },
   { name: "events tail", summary: "Stream daemon events line-by-line (Ctrl-C to quit)." },
-  { name: "swarm create/list/show/start/pause/stop/report", summary: "Coordinate daemon-backed swarms over missions, lanes, and queue items." },
+  { name: "swarm create/list/show/start/pause/stop/report/scope-claim", summary: "Coordinate daemon-backed swarms and daemon-enforced edit scope claims." },
   { name: "vcalendar show", summary: "Show an actor's calendar (filtered from the recent event_trail)." },
   { name: "vcalendar week", summary: "Show this week's vcalendar events (filtered from the recent event_trail)." },
   { name: "vcalendar tick", summary: "Compute the current self-controlled planning/execution/review phase." },

@@ -429,18 +429,26 @@ function mergeProjects(daemon: DaemonProject[], fileProjects: DaemonProject[]): 
   }
   for (const project of daemon) {
     const existing = merged.get(projectKey(project));
+    const orgId = preferTypedId(project.org_id, existing?.org_id, "org:");
+    const spaceId = preferTypedId(project.space_id, existing?.space_id, "space:");
     merged.set(projectKey(project), {
       ...existing,
       ...project,
       id: project.id || existing?.id || "",
-      org_id: project.org_id || existing?.org_id || "",
-      space_id: project.space_id || existing?.space_id || "",
+      org_id: orgId,
+      space_id: spaceId,
       local_path: project.local_path || existing?.local_path || "",
       active_build: project.active_build || existing?.active_build,
       materialization_status: project.materialization_status || existing?.materialization_status || "",
     });
   }
   return [...merged.values()];
+}
+
+function preferTypedId(primary: string, fallback: string | undefined, prefix: string): string {
+  if (primary.startsWith(prefix)) return primary;
+  if (fallback?.startsWith(prefix)) return fallback;
+  return primary || fallback || "";
 }
 
 function resolveMetadataPath(projectRecord: string, raw: string): string {

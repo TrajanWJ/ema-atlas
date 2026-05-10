@@ -8,6 +8,13 @@ import { resolveWorkspaceScope, type WorkspaceScope } from "../workspace-scope.j
 import { connect, type CommandResult } from "../ws-client.js";
 import { CANONICAL_DB, readText, sha256, sqliteJson, stableId } from "./substrate-utils.js";
 import { DEFAULT_ORG } from "./workspace-daemon.js";
+import {
+  runWorkspaceStatus,
+  runWorkspaceWorktree,
+  runWorkspaceBranch,
+  runWorkspaceRemote,
+  runWorkspacePair,
+} from "./workspace-manage-commands.js";
 
 const CONTRACT_KINDS = new Set(["report", "note", "output", "session_log", "proof", "other"]);
 const LEGACY_KIND_ALIASES = new Set(["plan", "handoff", "context_bundle", "session_export"]);
@@ -60,8 +67,13 @@ export async function runWorkspace(args: ParsedArgs): Promise<number> {
   const noun = args.positional[0];
   const verb = args.positional[1] ?? "list";
   if (flagBool(args, "help") || args.flags.h === true || noun === "help") return help(args);
+  if (noun === "status") return runWorkspaceStatus(args);
+  if (noun === "worktree") return runWorkspaceWorktree(args);
+  if (noun === "branch") return runWorkspaceBranch(args);
+  if (noun === "remote") return runWorkspaceRemote(args);
+  if (noun === "pair") return runWorkspacePair(args);
   if (noun !== "artifact" && noun !== "artifacts") {
-    emitError(`ema workspace: unknown subcommand "${noun ?? ""}" (expected: artifact)`);
+    emitError(`ema workspace: unknown subcommand "${noun ?? ""}" (expected: artifact | status | worktree | branch | remote | pair)`);
     return 64;
   }
   if (verb === "add") return addArtifact(args);
@@ -82,6 +94,11 @@ function help(args: ParsedArgs): number {
     { verb: "artifact show", summary: "Show one artifact by --artifact." },
     { verb: "artifact link", summary: "Link an artifact to a lane, queue item, execution, dispatch, project, or intention." },
     { verb: "artifact archive", summary: "Archive an artifact through the daemon writer." },
+    { verb: "status", summary: "Status snapshot of every clone under Active builds + Projects." },
+    { verb: "worktree list/prune/add/move", summary: "Manage git worktrees across the EMA root filesystem." },
+    { verb: "branch list/clean/sync", summary: "List branches, clean stale ones (--with-branches), ff-only sync." },
+    { verb: "remote sync/ensure/status", summary: "Fetch/prune origin, ensure origin URL, report ahead/behind." },
+    { verb: "pair", summary: "Active builds <-> Projects pair-symmetry findings (read-only)." },
   ];
   if (flagBool(args, "json")) emitJson({ noun: "workspace", status: "available", commands });
   else {

@@ -466,6 +466,18 @@ fn handle_bus_delivery(
             "swarm.registry",
             bus.swarm_registry_projection_json(state.bus_subject),
           )
+        "scope.claimed" ->
+          send_projection(
+            conn,
+            "scope.registry",
+            bus.scope_registry_projection_json(state.bus_subject),
+          )
+        "scope.released" ->
+          send_projection(
+            conn,
+            "scope.registry",
+            bus.scope_registry_projection_json(state.bus_subject),
+          )
         "blueprint.document.created" -> {
           send_projection(
             conn,
@@ -2853,6 +2865,65 @@ fn handle_text(
                   #("summary", agent_workspace.opt(incoming.body)),
                 ],
               )
+            }
+            Some("swarm.scope_claim") -> {
+              let claim_id = agent_workspace.new_id("scope_claim")
+              case incoming.org_id, incoming.scope {
+                Some(org_id), Some(scope) -> {
+                  let project_id = case incoming.project_id {
+                    Some(value) -> value
+                    None -> ""
+                  }
+                  let conflict =
+                    bus.scope_claim_conflict(bus_subj, org_id, project_id, scope)
+                  case conflict {
+                    "" ->
+                      handle_workspace_event(
+                        conn,
+                        state,
+                        incoming,
+                        "scope.claimed",
+                        "claim_id",
+                        Some(claim_id),
+                        Some("scope.registry"),
+                        [
+                          #("claim_id", json.string(claim_id)),
+                          #("actor_id", json.string(actor_or_default(incoming))),
+                          #("owner_kind", json.string("swarm")),
+                          #("owner_id", agent_workspace.opt(incoming.swarm_id)),
+                          #("project_id", agent_workspace.opt(incoming.project_id)),
+                          #("path", json.string(scope)),
+                          #("scope", json.string(scope)),
+                          #("status", json.string("active")),
+                        ],
+                      )
+                    _ -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(
+                            incoming.id,
+                            "conflict",
+                            "scope overlaps active claim " <> conflict,
+                          ),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                }
+                _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "org_id and scope/path are required",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
             }
             Some("blueprint.document.create") -> {
               case
@@ -8310,6 +8381,12 @@ fn send_projection_snapshot_scoped(
         conn,
         "swarm.registry",
         bus.swarm_registry_projection_json(bus_subj),
+      )
+    Some("scope.registry") ->
+      send_projection(
+        conn,
+        "scope.registry",
+        bus.scope_registry_projection_json(bus_subj),
       )
     Some("blueprint.sections") ->
       send_projection(

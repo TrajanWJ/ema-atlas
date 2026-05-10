@@ -170,6 +170,8 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "swarm.paused" -> True
     "swarm.stopped" -> True
     "swarm.report_generated" -> True
+    "scope.claimed" -> True
+    "scope.released" -> True
     "agent.reported" -> True
     "intent.created" -> True
     "intent.updated" -> True

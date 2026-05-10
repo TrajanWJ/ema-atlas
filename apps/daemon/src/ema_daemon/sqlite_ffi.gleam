@@ -628,6 +628,19 @@ pub fn swarm_registry_projection_json(db: Db) -> String {
   swarm_registry_projection_json_raw(db)
 }
 
+pub fn scope_registry_projection_json(db: Db) -> String {
+  scope_registry_projection_json_raw(db)
+}
+
+pub fn scope_claim_conflict(
+  db: Db,
+  org_id: String,
+  project_id: String,
+  path: String,
+) -> String {
+  scope_claim_conflict_raw(db, org_id, project_id, path)
+}
+
 pub fn blueprint_projection_json(db: Db) -> String {
   blueprint_projection_json_raw(db)
 }
@@ -1048,6 +1061,17 @@ fn agent_reports_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "swarm_registry_projection_json")
 fn swarm_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "scope_registry_projection_json")
+fn scope_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "scope_claim_conflict")
+fn scope_claim_conflict_raw(
+  db: Db,
+  org_id: String,
+  project_id: String,
+  path: String,
+) -> String
 
 @external(erlang, "ema_sqlite_helpers", "blueprint_projection_json")
 fn blueprint_projection_json_raw(db: Db) -> String

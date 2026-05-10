@@ -93,6 +93,7 @@ type CockpitProjection = {
   readonly client: CockpitClient | null;
   readonly project: {
     readonly id: string | null;
+    readonly org_id: string | null;
     readonly name: string | null;
     readonly kind: "client" | "personal" | "internal" | "unresolved";
     readonly project_record: string | null;
@@ -263,6 +264,7 @@ async function loadCockpitProjection(
     client,
     project: {
       id: scope.project_id,
+      org_id: scope.org_id,
       name: scope.project_name,
       kind: scope.project_id ? (client ? "client" : "personal") : "unresolved",
       project_record: scope.project_record,

@@ -78,6 +78,15 @@ pub type Msg {
 
   SwarmRegistryProjection(reply: Subject(String))
 
+  ScopeRegistryProjection(reply: Subject(String))
+
+  ScopeClaimConflict(
+    org_id: String,
+    project_id: String,
+    path: String,
+    reply: Subject(String),
+  )
+
   BlueprintProjection(reply: Subject(String))
 
   BlueprintPlannerProjection(reply: Subject(String))
@@ -590,6 +599,19 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
 
     SwarmRegistryProjection(reply) -> {
       process.send(reply, sqlite_ffi.swarm_registry_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    ScopeRegistryProjection(reply) -> {
+      process.send(reply, sqlite_ffi.scope_registry_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    ScopeClaimConflict(org_id, project_id, path, reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.scope_claim_conflict(state.db, org_id, project_id, path),
+      )
       actor.continue(state)
     }
 
@@ -1426,6 +1448,21 @@ pub fn agent_reports_projection_json(bus: Subject(Msg)) -> String {
 
 pub fn swarm_registry_projection_json(bus: Subject(Msg)) -> String {
   process.call(bus, 5000, fn(reply) { SwarmRegistryProjection(reply) })
+}
+
+pub fn scope_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { ScopeRegistryProjection(reply) })
+}
+
+pub fn scope_claim_conflict(
+  bus: Subject(Msg),
+  org_id: String,
+  project_id: String,
+  path: String,
+) -> String {
+  process.call(bus, 5000, fn(reply) {
+    ScopeClaimConflict(org_id, project_id, path, reply)
+  })
 }
 
 pub fn blueprint_projection_json(bus: Subject(Msg)) -> String {

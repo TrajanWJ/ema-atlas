@@ -63,7 +63,14 @@ export function CaptureForm({ projects }: CaptureFormProps) {
 				priority: safePriority,
 				tags,
 			});
-			setResult({ ok: true, message: `staged ${response.queue_id} (Slice 4 stub)` });
+			setResult(
+				response.ok
+					? { ok: true, message: `queued ${response.queue_id}` }
+					: {
+							ok: false,
+							message: response.error ?? response.status ?? "queue capture failed",
+						},
+			);
 		});
 	}
 
@@ -180,8 +187,10 @@ export function CaptureForm({ projects }: CaptureFormProps) {
 
 			<div className="cockpit-capture__actions">
 				<p className="cockpit-capture__hint">
-					Saved as <span className="cockpit-mono">queue:&lt;ulid&gt;</span> with{" "}
-					<span className="cockpit-mono">promotion_state=proposal</span>.
+					Writes through{" "}
+					<span className="cockpit-mono">
+						ema queue add --project proslync-app-ios-final --json
+					</span>.
 				</p>
 				<button
 					type="submit"

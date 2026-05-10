@@ -20,6 +20,13 @@ commands and the multi-first-command framing are deprecated.
 Command-group `--help` output is the normalized source for current flags and
 implementation status.
 
+Current cockpit implementation status: `ema cockpit summary`, `projection`,
+`builds`, `surfaces`, `lanes`, `queue`, and `open` are live CLI reads. They
+combine the resolved workspace scope, daemon lane/queue projections,
+active-build git facts, known project surfaces, and the cockpit URL. For
+Proslync, this is the cold-start surface an agent should use before touching
+app/backend/desktop/assets work.
+
 This document defines how agents use EMA while working. The CLI is not just an
 admin tool. It is the project-management, organization, executive-function, and
 handoff grammar agents should use to frame work as it happens.
@@ -79,6 +86,7 @@ Run orientation before editing:
 
 ```bash
 ema help
+ema cockpit summary --json
 ema next --json
 ema tl about --summary --json
 ema lane --help
@@ -145,6 +153,10 @@ campaign -> mission -> lane -> queue_item -> execution -> result
 
 ```bash
 ema next --json
+ema cockpit summary --json
+ema cockpit projection --json
+ema intention projection --json
+ema cockpit intentions --json
 ema tl about --summary --json
 ema /tl about --summary --json
 ema agent orient --json
@@ -156,19 +168,38 @@ ema lane list --project EMA --status active
 ema queue list --project EMA --status ready
 ema handoff list --project EMA
 ema vcalendar week --project EMA
-ema cwt status --json
-ema cwt ingest --dry-run --json
+ema cockpit summary --project EMA --json
+ema cockpit projection --project EMA --json
 ```
 
-The commands above are the standard cold-start map for any agent. `tl`,
+The commands above are the standard cold-start map for any agent. `cockpit`,
+`tl`,
 `agent orient`, `agent meta-progress`, `next`, and `vcalendar tick` return
 daemon lane/queue registry state when the daemon is available and file-shaped
-fallback context otherwise. `next` is the compact "what should I do now?"
+fallback context otherwise. `cockpit` is the project/client/build/surface map;
+`next` is the compact "what should I do now?"
 answer. `agent meta-progress` is the compact self-progress snapshot: it counts
 lane and queue statuses, lists pressure signals, includes recent agent reports,
 and names the next action to preserve momentum. Writers that are still pending
 return command-shaped stubs rather than fake state. That is intentional: agents
 should learn and obey the grammar without mistaking drafts for daemon truth.
+
+For Proslync development, start with:
+
+```bash
+ema cockpit projection --project proslync-app-ios-final --json
+ema cockpit builds --project proslync-app-ios-final
+ema cockpit surfaces --project proslync-app-ios-final
+ema cockpit lanes --project proslync-app-ios-final
+ema cockpit queue --project proslync-app-ios-final
+ema intention projection --project proslync-app-ios-final --json
+ema cockpit intentions --project proslync-app-ios-final --json
+```
+
+This should show the Ms. Wilson client context, the app/backend/desktop/assets
+active builds, and the AD cockpit / Brand HQ / NIL Deal Detail / Backend API
+surface registry. Use that projection as the shared workspace map before
+claiming lanes or splitting agent scopes.
 
 ## Claim Work
 

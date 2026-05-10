@@ -29,7 +29,7 @@ export async function runProject(args: ParsedArgs): Promise<number> {
 
   if (!orgId || !spaceId || !name.trim()) {
     emitError(`ema project create: missing --org, --space, or --name`);
-    emitError(`Usage: ema project create --org org:<id> --space space:<id> --name "EMA 0.0.5"`);
+    emitError(`Usage: ema project create --org org:<id> --space space:<id> --name "EMA 0.0.6"`);
     return 64;
   }
 

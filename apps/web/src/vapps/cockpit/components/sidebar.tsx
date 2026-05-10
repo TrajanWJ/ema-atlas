@@ -64,7 +64,7 @@ export function Sidebar({ activeRoute }: SidebarProps) {
 			);
 		}
 		load().catch(() => {
-			/* TODO(slice-5): surface daemon read errors */
+			/* Sidebar keeps its last rendered projection if the daemon read fails. */
 		});
 		return () => {
 			cancelled = true;
@@ -130,6 +130,29 @@ export function Sidebar({ activeRoute }: SidebarProps) {
 			/>
 
 			<ClientWorkSection clients={selectedClientWork} activeRoute={activeRoute} />
+
+			<SidebarSection
+				title="CLIENT WORK"
+				defaultOpen
+				activeRoute={activeRoute}
+				items={[
+					{
+						route: "/clients/client:ms-wilson/proslync-app-ios-final",
+						label: "Ms. Wilson / Proslync",
+						dot: "#d49a6a",
+					},
+					{
+						route: "/clients/client:ms-wilson/proslync-app-ios-final/intentions",
+						label: "Intentions Backfeed",
+						dot: "var(--place-accent-warning)",
+					},
+					{
+						route: "/clients/client:ms-wilson/proslync-app-ios-final/workspace",
+						label: "Runtime Health",
+						dot: "var(--place-secondary-400)",
+					},
+				]}
+			/>
 
 			<SidebarSection
 				title="PERSONAL"

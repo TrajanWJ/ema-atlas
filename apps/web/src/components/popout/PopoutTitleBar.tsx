@@ -97,11 +97,31 @@ export function PopoutTitleBar({ appName, appId, isCompanion, onClose }: PopoutT
 		window.close();
 	};
 
-	const handleMinimize = () => {
+	const currentTauriWindow = async () => {
+		if (!isCompanion) return null;
+		try {
+			const mod = await import("@tauri-apps/api/window");
+			return mod.getCurrentWindow();
+		} catch {
+			return null;
+		}
+	};
+
+	const handleMinimize = async () => {
+		const win = await currentTauriWindow();
+		if (win) {
+			await win.minimize().catch(() => {});
+			return;
+		}
 		window.blur();
 	};
 
-	const handleMaximize = () => {
+	const handleMaximize = async () => {
+		const win = await currentTauriWindow();
+		if (win) {
+			await win.toggleMaximize().catch(() => {});
+			return;
+		}
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
 		} else {
@@ -109,21 +129,12 @@ export function PopoutTitleBar({ appName, appId, isCompanion, onClose }: PopoutT
 		}
 	};
 
-	const handleDragStart = (e: React.MouseEvent) => {
+	const handleDragStart = async (e: React.MouseEvent) => {
 		if (!isCompanion) return;
 		// Don't drag when clicking on buttons (they have WebkitAppRegion: no-drag)
 		if ((e.target as HTMLElement).closest('button')) return;
-		// Call Tauri's native window drag directly
-		try {
-			const internals = (window as unknown as Record<string, unknown>).__TAURI_INTERNALS__ as
-				| { invoke: (cmd: string) => void }
-				| undefined;
-			if (internals) {
-				internals.invoke('plugin:window|start_dragging');
-			}
-		} catch {
-			// Not in Tauri webview — ignore
-		}
+		const win = await currentTauriWindow();
+		await win?.startDragging().catch(() => {});
 	};
 
 	return (

@@ -7,14 +7,14 @@ export type ProjectBenchKind = "client" | "personal" | "workshop";
 export function ProjectBenchPage({
 	projectId,
 	kind,
+	defaultTab,
 }: {
 	readonly projectId: string;
 	readonly kind: ProjectBenchKind;
+	readonly defaultTab?: string;
 }) {
-	// `kind` is currently informational — donor used the URL kind only for
-	// breadcrumb routing and the underlying view always reads the project
-	// row to decide what to render. We keep it on the prop so Slice 5 can
-	// pre-select scope without an extra projection round-trip.
+	// `kind` is currently informational. The underlying view reads the project
+	// row from the live cockpit projection and decides what to render there.
 	void kind;
-	return <ProjectBenchView projectId={projectId} />;
+	return <ProjectBenchView projectId={projectId} defaultTab={defaultTab} />;
 }

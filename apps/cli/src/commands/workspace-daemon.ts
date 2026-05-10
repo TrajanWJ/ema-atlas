@@ -143,6 +143,53 @@ export async function readProjection<T>(
   }
 }
 
+export async function readProjectionBatch(
+  args: ParsedArgs,
+  specs: readonly ProjectionWait<unknown>[],
+  timeoutMs = 1200,
+): Promise<unknown[]> {
+  const json = flagBool(args, "json");
+  if (specs.length === 0) return [];
+  try {
+    const scopeContext = await workspaceScopeContext(args);
+    const projectId =
+      !scopeContext.allProjects && scopeContext.scope.project_id
+        ? scopeContext.scope.project_id
+        : null;
+    const c = await connect({ surface: "desktop" });
+    const values = new Map<string, unknown>();
+    const wanted = new Set(specs.map((spec) => spec.name));
+    const result = await new Promise<unknown[]>((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        resolve(specs.map((spec) => values.has(spec.name) ? values.get(spec.name) : spec.pick({})));
+      };
+      const timer = setTimeout(finish, timeoutMs);
+      c.onMessage((msg) => {
+        const name = (msg as { name?: string }).name;
+        if (msg.type !== "projection" || !name || !wanted.has(name) || values.has(name)) return;
+        const spec = specs.find((candidate) => candidate.name === name);
+        if (!spec) return;
+        values.set(name, spec.pick((msg as { data?: Record<string, unknown> }).data ?? {}));
+        if (values.size === wanted.size) {
+          clearTimeout(timer);
+          finish();
+        }
+      });
+      for (const spec of specs) {
+        c.subscribe(spec.name, projectId ? { project_id: projectId } : undefined);
+      }
+    });
+    c.close();
+    return result;
+  } catch (err) {
+    await reportError(err, json);
+    return specs.map((spec) => spec.pick({}));
+  }
+}
+
 export function requireFlag(value: string | undefined, message: string): string {
   if (!value) throw new Error(message);
   return value;

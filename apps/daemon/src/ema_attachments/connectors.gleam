@@ -101,7 +101,7 @@ pub fn demo_picker_items(provider: Provider) -> List(PickerItem) {
       PickerItem(
         id: "drive:sheet-roadmap",
         provider: GoogleDrive,
-        display_name: "0.0.5 Roadmap (Sheet)",
+        display_name: "0.0.6 Roadmap (Sheet)",
         kind_hint: "drive_file",
       ),
       PickerItem(

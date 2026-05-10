@@ -9,7 +9,7 @@ import gleam/io
 import gleam/string
 
 pub fn main() {
-  io.println("ema_daemon: starting 0.0.5")
+  io.println("ema_daemon: starting 0.0.6")
 
   case supervisor.start() {
     Ok(_sup) -> {

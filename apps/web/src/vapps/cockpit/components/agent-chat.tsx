@@ -8,12 +8,13 @@ interface ChatTurn {
 	readonly role: "user" | "agent";
 	readonly body: string;
 	readonly actions?: readonly string[];
+	readonly error?: boolean;
 }
 
 const STARTER_TURNS: readonly ChatTurn[] = [
 	{
 		role: "agent",
-		body: "Cockpit agent is stubbed in Slice 4. Try `first day` or `queue: Title | why: ... | done: ...`. Real daemon publish wires in Slice 5.",
+		body: "Cockpit reads live EMA workspace state for Proslync. Try `proslync swarm` or `queue: Title | why: ... | done: ...`.",
 	},
 ];
 
@@ -31,7 +32,7 @@ export function AgentChat() {
 			const result = await publishAgentMessage(message);
 			setTurns((current) => [
 				...current,
-				{ role: "agent", body: result.reply, actions: result.actions },
+				{ role: "agent", body: result.reply, actions: result.actions, error: !result.ok },
 			]);
 		});
 	}
@@ -42,7 +43,7 @@ export function AgentChat() {
 				<div>
 					<h2 className="cockpit-agent__title">Agent Chat</h2>
 					<p className="cockpit-agent__sub">
-						local command agent - stubbed in Slice 4
+						local command grammar - writes queue-backed
 					</p>
 				</div>
 			</header>
@@ -54,7 +55,9 @@ export function AgentChat() {
 						className={
 							turn.role === "user"
 								? "cockpit-agent__turn cockpit-agent__turn--user"
-								: "cockpit-agent__turn cockpit-agent__turn--agent"
+								: turn.error
+									? "cockpit-agent__turn cockpit-agent__turn--agent cockpit-agent__turn--error"
+									: "cockpit-agent__turn cockpit-agent__turn--agent"
 						}
 					>
 						<p className="cockpit-agent__role">{turn.role}</p>
@@ -77,7 +80,7 @@ export function AgentChat() {
 							submit();
 						}
 					}}
-					placeholder="first day"
+					placeholder="proslync swarm"
 					className="cockpit-input"
 				/>
 				<button

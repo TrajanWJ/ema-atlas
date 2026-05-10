@@ -442,7 +442,7 @@ export function FocusApp() {
 		const focusWindows = state.getWindowsByApp("focus");
 		const win = focusWindows[0];
 		if (win) {
-			getPopoutLauncher().detach(win.id, "focus", win.position);
+			await getPopoutLauncher().detach(win.id, "focus", win.position);
 		}
 	}
 

@@ -1,10 +1,10 @@
 /**
  * cockpit vApp — EMA's port of the cwt (current-work-tracker-trajan) web UI.
  *
- * Slice 4 of the EMA-absorbs-cwt migration: the donor surface is rendered
- * in-process inside EMA's shell. Donor data is stubbed; daemon WebSocket
- * reads/writes wire in Slice 5 (search the cockpit/ subtree for
- * `TODO(slice-5)`).
+ * EMA's native client-work cockpit. The surface keeps the donor's compact
+ * work-tracker layout, but reads local EMA workspace state through the
+ * cockpit projection bridge and renders client projects, lanes, queue items,
+ * active builds, and product surfaces as first-class operating context.
  *
  * Donor URL layout -> cockpit hash routes (read in `router.ts`):
  *   /                    -> #/now              (NOW dashboard)
@@ -74,7 +74,7 @@ function CockpitView({ route }: { readonly route: ReturnType<typeof useCockpitRo
 		case "client":
 			return <ClientsBenchPage clientId={route.clientId} />;
 		case "client-project":
-			return <ProjectBenchPage projectId={route.projectId} kind="client" />;
+			return <ProjectBenchPage projectId={route.projectId} kind="client" defaultTab={route.tab} />;
 		case "personal-project":
 			return <ProjectBenchPage projectId={route.projectId} kind="personal" />;
 		case "workshop-project":

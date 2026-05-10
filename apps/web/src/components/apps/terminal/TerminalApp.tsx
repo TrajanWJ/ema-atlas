@@ -6,7 +6,7 @@ import { useFocusStore } from "@/src/stores/focus-store";
 import { useWindowStore } from "@/src/stores/window-store";
 import { COMMANDS } from "./commands";
 
-const PROMPT = "place.org > ";
+const PROMPT = "ema > ";
 const MAX_HISTORY = 200;
 
 interface OutputLine {
@@ -21,7 +21,7 @@ function lineId(): string {
 
 export function TerminalApp() {
 	const [output, setOutput] = useState<readonly OutputLine[]>([
-		{ id: lineId(), text: "place.org terminal v0.2 — type 'help' for commands", type: "output" },
+		{ id: lineId(), text: "EMA terminal v0.6 — type 'help' for commands", type: "output" },
 	]);
 	const [input, setInput] = useState("");
 	const [historyIndex, setHistoryIndex] = useState(-1);

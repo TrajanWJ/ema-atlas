@@ -18,6 +18,7 @@ export async function runCheckup(args: ParsedArgs): Promise<number> {
       commands: [
         { verb: "schedule", flags: ["lane", "cadence", "actor"], required: ["lane", "cadence"], summary: "Schedule a cadence-based lane checkup." },
         { verb: "complete", flags: ["checkup", "result", "actor"], required: ["checkup", "result"], summary: "Mark a scheduled checkup complete." },
+        { verb: "runtime", flags: ["json"], summary: "Run the daemon-backed checkup tick and report emitted checkups." },
       ],
     });
   }
@@ -26,10 +27,12 @@ export async function runCheckup(args: ParsedArgs): Promise<number> {
       return runSchedule(args);
     case "complete":
       return runComplete(args);
+    case "runtime":
+      return runRuntime(args);
     default:
       emitError(
         `ema checkup: unknown subcommand "${sub ?? ""}" ` +
-          `(expected: schedule | complete)`
+          `(expected: schedule | complete | runtime)`
       );
       emitError(`See docs/cli/see-agent-work.md §vCalendar for grammar.`);
       return 64;
@@ -86,6 +89,68 @@ async function runComplete(args: ParsedArgs): Promise<number> {
   }, { json, human: `completed ${checkupId}: ${result}` });
 }
 
+async function runRuntime(args: ParsedArgs): Promise<number> {
+  const json = flagBool(args, "json");
+  try {
+    const c = await connect({ surface: "desktop" });
+    const result = await c.command("vcalendar.checkup.tick", {});
+    c.close();
+
+    if (result.ok !== true) {
+      if (json) {
+        emitJson({
+          ok: false,
+          command: "checkup runtime",
+          op: "vcalendar.checkup.tick",
+          source: "daemon_command",
+          daemon_authority: "canonical_events",
+          error: result.error,
+        });
+      } else {
+        emitError(`ema checkup runtime: ${result.error.class}: ${result.error.message}`);
+      }
+      return 1;
+    }
+
+    const data = (result as {
+      data?: { emitted?: number; lane_ids?: string[]; skipped_unscoped?: number };
+    }).data ?? {};
+    const emitted = data.emitted ?? 0;
+    const laneIds = data.lane_ids ?? [];
+    const skippedUnscoped = data.skipped_unscoped ?? 0;
+    const reason =
+      emitted === 0
+        ? skippedUnscoped > 0
+          ? "skipped_unscoped"
+          : "no_due_lanes"
+        : null;
+
+    if (json) {
+      emitJson({
+        ok: true,
+        command: "checkup runtime",
+        op: "vcalendar.checkup.tick",
+        source: "daemon_command",
+        daemon_authority: "canonical_events",
+        emitted,
+        lane_ids: laneIds,
+        skipped_unscoped: skippedUnscoped,
+        reason,
+      });
+    } else {
+      emitPretty("checkup runtime");
+      emitPretty("source: daemon_command; daemon authority: canonical_events");
+      emitPretty(`emitted: ${emitted}`);
+      if (skippedUnscoped > 0) emitPretty(`skipped_unscoped: ${skippedUnscoped}`);
+      if (reason) emitPretty(`reason: ${reason}`);
+      for (const laneId of laneIds) emitPretty(`  + ${laneId}`);
+    }
+    return 0;
+  } catch (err) {
+    return reportError(err, json);
+  }
+}
+
 async function send(
   op: string,
   argsObj: Record<string, unknown>,
@@ -104,7 +169,18 @@ async function send(
 
     const events = res.events ?? [];
     const resource = typeof res.resource === "string" ? res.resource : null;
-    if (out.json) emitJson({ ok: true, op, args: argsObj, events, resource });
+    if (out.json) {
+      emitJson({
+        ok: true,
+        command: op,
+        op,
+        source: "daemon_command",
+        daemon_authority: "canonical_events",
+        args: argsObj,
+        events,
+        resource,
+      });
+    }
     else {
       emitPretty(out.human);
       if (resource) emitPretty(`${out.resourceLabel ?? "created"}: ${resource}`);

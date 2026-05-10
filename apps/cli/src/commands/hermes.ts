@@ -22,8 +22,8 @@ const DOCS = [
 	"Projects/EMA/atlas/README.md",
 	"Projects/EMA/subprojects/agent-workspace-vapp/blueprint/02-agent-cli-operating-contract.md",
 	"Active builds/README.md",
-	"Active builds/EMA-0.0.5/README.md",
-	"Active builds/EMA-0.0.5/docs/cli/agent-workspace.md",
+	"Active builds/EMA-0.0.6/README.md",
+	"Active builds/EMA-0.0.6/docs/cli/agent-workspace.md",
 ];
 
 export async function runHermes(args: ParsedArgs): Promise<number> {
@@ -154,9 +154,9 @@ async function runHermesPlan(args: ParsedArgs): Promise<number> {
 		goal: "Coordinate EMA work through Hermes while every action remains auditable through workspace and dispatch events.",
 		lane,
 		dispatches: [
-			{ provider: "simulated", lane, cwd: "Active builds/EMA-0.0.5", purpose: "prove Harness Glue event normalization" },
-			{ provider: "codex", lane, cwd: "Active builds/EMA-0.0.5", purpose: "future PTY adapter implementation", status: "planned" },
-			{ provider: "claude-code", lane, cwd: "Active builds/EMA-0.0.5", purpose: "future PTY adapter implementation", status: "planned" },
+			{ provider: "simulated", lane, cwd: "Active builds/EMA-0.0.6", purpose: "prove Harness Glue event normalization" },
+			{ provider: "codex", lane, cwd: "Active builds/EMA-0.0.6", purpose: "future PTY adapter implementation", status: "planned" },
+			{ provider: "claude-code", lane, cwd: "Active builds/EMA-0.0.6", purpose: "future PTY adapter implementation", status: "planned" },
 		],
 		verification: ["ema hermes orient --json", "ema harness providers --json", "ema harness dispatch --provider simulated --json", "ema peer doctor --json"],
 		risks: daemonRecent.queue.filter((item) => item.status === "blocked").map((item) => item.title),
@@ -210,7 +210,7 @@ function runHermesPending(args: ParsedArgs, verb: string): number {
 	const payload = {
 		ok: true,
 		command: `hermes ${verb}`,
-		status: "pending_daemon_writer",
+		status: "reserved_writer",
 		projection: "hermes.orchestrator",
 		note: "Hermes handoff/audit grammar is reserved; canonical writes should flow through handoff/agent/harness events.",
 	};
@@ -224,7 +224,7 @@ function nextActions(lane: string | null, blockedCount: number): string[] {
 		return [
 			`ema lane show --lane ${lane} --json`,
 			"ema harness providers --json",
-			"ema harness dispatch --provider simulated --lane <lane> --cwd \"Active builds/EMA-0.0.5\" --prompt \"prove Harness Glue\" --json",
+			"ema harness dispatch --provider simulated --lane <lane> --cwd \"Active builds/EMA-0.0.6\" --prompt \"prove Harness Glue\" --json",
 		];
 	}
 	if (blockedCount > 0) return ["ema hermes sweep --json", "ema queue list --status blocked --json", "ema problem --help"];

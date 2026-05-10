@@ -13,6 +13,10 @@ export const COMMANDS: CommandInfo[] = [
   { name: "org create", summary: "Create an organization and its same-name default space." },
   { name: "space create", summary: "Create a space inside an organization." },
   { name: "project create", summary: "Create a project inside an organization space." },
+  { name: "cockpit summary/projection", summary: "Inspect project/client cockpit state, active builds, vApp surfaces, lanes, and queue." },
+  { name: "cockpit builds/surfaces/lanes/queue/open", summary: "List active builds, surfaces, lanes, queue, or print the cockpit URL." },
+  { name: "intention harvest/projection/list/show", summary: "Mine sessions/docs for reviewable lost intentions." },
+  { name: "intention backfeed", summary: "Convert an approved harvested intention into queue/lane work." },
   { name: "tl about", summary: "Show daemon-backed lane/queue records, fallback workspace records, and current vCalendar phase." },
   { name: "/tl about", summary: "Alias for `ema tl about`; matches slash-command muscle memory." },
   { name: "agent orient", summary: "Print the enforced agent orientation checklist and workspace summary." },
@@ -73,7 +77,9 @@ export async function runHelp(args: ParsedArgs): Promise<number> {
     emitPretty(`  ${f.flag.padEnd(width)}  ${f.summary}`);
   }
   emitPretty("");
-  emitPretty("Orientation: ema tl about --json; ema status --json; ema agent orient --json; ema vcalendar tick --json");
+  emitPretty(
+    "Orientation: ema cockpit summary --json; ema intention projection --json; ema tl about --json; ema status --json; ema agent orient --json; ema vcalendar tick --json",
+  );
   emitPretty("Full command grammar: docs/cli/agent-workspace.md and docs/cli/see-agent-work.md");
   return 0;
 }

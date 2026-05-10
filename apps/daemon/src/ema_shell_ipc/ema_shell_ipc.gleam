@@ -5650,7 +5650,7 @@ fn hello_ack() -> String {
       #("v", json.int(0)),
       #("type", json.string("hello")),
       #("id", json.string("msg-hello-daemon")),
-      #("daemon_version", json.string("0.0.5-dev")),
+      #("daemon_version", json.string("0.0.6-dev")),
       #("accepted_device_id", json.string("device:dev-local")),
       #("note", json.null()),
     ]),

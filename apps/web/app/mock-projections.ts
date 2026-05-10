@@ -6,7 +6,7 @@ export const EMA_SCOPE = {
   spaceId: "space:01J00000000000000000000005",
   spaceName: "EMA Studio",
   projectId: "project:01J00000000000000000000006",
-  projectName: "EMA 0.0.5",
+  projectName: "EMA 0.0.6",
   blueprintDocId: "blueprint_doc:01J00000000000000000000007",
   blueprintRootSectionId: "blueprint_sec:01J00000000000000000000008",
   blueprintSourceSectionId: "blueprint_sec:01J00000000000000000000009",
@@ -34,7 +34,7 @@ export const mockTopbar = {
 
 export const hqProjection = {
   pulse: [
-    { label: "workspace", value: "EMA", detail: "active build 0.0.5 mounted from Desktop" },
+    { label: "workspace", value: "EMA", detail: "active build 0.0.6 mounted from Desktop" },
     { label: "surfaces", value: "8", detail: "HQ, Blueprint, git-ema, agent work, wiki, threads, launchpad, settings" },
     { label: "donor base", value: "place", detail: "tokens, glass, dock, window grammar, and companion bridge recovered" },
     { label: "daemon", value: "local", detail: "BEAM control plane remains source of truth" },
@@ -63,7 +63,7 @@ export const hqProjection = {
   ],
   hubLinks: [
     "control-room/readme",
-    "org/Trajan-Workspace/space/EMA-Studio/project/EMA-0.0.5",
+    "org/Trajan-Workspace/space/EMA-Studio/project/EMA-0.0.6",
     "blueprint/operational-surfaces",
     "git-ema/connectors",
     "agent-work/web-lane",
@@ -105,7 +105,7 @@ export const eventTrail = [
   {
     time: "13:20",
     actor: "daemon seed",
-    action: "Founding-Fathers-EMA -> Founding-Fathers-EMA -> EMA 0.0.5 initialized",
+    action: "Trajan's Organization -> EMA Development -> EMA 0.0.6 initialized",
     surface: "Localhost",
   },
 ];
@@ -135,7 +135,7 @@ export const seeAgentWorkProjection = {
   swarms: [
     {
       id: "swarm:01J00000000000000000000001",
-      name: "EMA 0.0.5 buildout swarm",
+      name: "EMA 0.0.6 Proslync-first readiness swarm",
       status: "staged",
       purpose: "Coordinate Codex, Claude, and human founder work around the vanilla workspace.",
     },
@@ -143,7 +143,7 @@ export const seeAgentWorkProjection = {
   campaigns: [
     {
       id: "campaign:01J000000000000000000001",
-      title: "0.0.5 Vanilla Workspace",
+      title: "0.0.6 Proslync-Ready Workspace",
       status: "active staged",
       signal: "Make the whole operating environment visible before real autonomy.",
     },
@@ -157,7 +157,7 @@ export const seeAgentWorkProjection = {
   missions: [
     {
       id: "mission:01J000000000000000000001",
-      title: "Seed Founding-Fathers-EMA",
+      title: "Seed EMA 0.0.6 workspace",
       campaign_id: "campaign:01J000000000000000000001",
       status: "active",
     },
@@ -348,7 +348,7 @@ export const seeAgentWorkProjection = {
     `ema agent prompt --actor actor:01J00000000000000000000003 --mission mission:01J000000000000000000002`,
   ],
   agent_instruction:
-    "Work inside Founding-Fathers-EMA / Founding-Fathers-EMA / EMA 0.0.5. Keep the lane scoped, report changed files, preserve intent vs canon, and do not imply staged controls executed real work.",
+    "Work inside Trajan's Organization / EMA Development / EMA 0.0.6. Keep the lane scoped, report changed files, preserve intent vs canon, and do not imply staged controls executed real work.",
   // Chronicle strip feed. Bounded by CHRONICLE_MAX. Wave 1: seeded from
   // eventTrail + synthesized lane/handoff entries. Wave 2+: daemon-sourced.
   recent_events: [
@@ -360,7 +360,7 @@ export const seeAgentWorkProjection = {
     { ts: "13:39", actor: "agent-work", kind: "event", summary: "Lane lane:01J00000000000000000000002 entered review" },
     { ts: "13:31", actor: "blueprint", kind: "event", summary: "Section attachment targets prepared" },
     { ts: "13:28", actor: "coordinator ledger", kind: "event", summary: "Handoff accepted: contracts → UI lane" },
-    { ts: "13:20", actor: "daemon seed", kind: "event", summary: "Founding-Fathers-EMA -> Founding-Fathers-EMA -> EMA 0.0.5 initialized" },
+    { ts: "13:20", actor: "daemon seed", kind: "event", summary: "Trajan's Organization -> EMA Development -> EMA 0.0.6 initialized" },
     { ts: "13:18", actor: "daemon supervisor", kind: "event", summary: "ema_daemon_supervisor boot complete" },
   ],
 };
@@ -400,7 +400,7 @@ export const doctrineCards = [
 
 export const threadCards = [
   {
-    title: "Demo Room",
+    title: "EMA coordination",
     meta: "staged thread",
     body: "A future chat stream for walkthrough questions, decisions, and surface handoffs.",
   },
@@ -420,7 +420,7 @@ export const blueprintProjection = {
   documents: [
     {
       id: EMA_SCOPE.blueprintDocId,
-      title: "EMA 0.0.5 Blueprint",
+      title: "EMA 0.0.6 Blueprint",
       sections: [
         {
           id: EMA_SCOPE.blueprintRootSectionId,
@@ -474,7 +474,7 @@ export const gitEmaAttachmentsProjection = {
       id: EMA_SCOPE.runtimeAttachmentId,
       kind: "folder",
       source: "staged projection",
-      display_name: "runtime/EMA-0.0.5--4-24",
+      display_name: "runtime/EMA-0.0.6",
     },
     {
       id: "seed-web-src",
@@ -486,7 +486,7 @@ export const gitEmaAttachmentsProjection = {
       id: "seed-blueprint-doc",
       kind: "drive_file",
       source: "staged projection",
-      display_name: "EMA 0.0.5 Control Room Blueprint",
+      display_name: "EMA 0.0.6 Control Room Blueprint",
     },
   ],
 };

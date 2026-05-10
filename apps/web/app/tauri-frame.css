@@ -28,6 +28,28 @@
 [data-runtime="tauri"] .ema-topbar,
 [data-runtime="tauri"] .ambient-bar {
 	padding-left: 84px !important;
+	-webkit-app-region: drag;
+	app-region: drag;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+[data-runtime="tauri"] .ema-topbar *,
+[data-runtime="tauri"] .ambient-bar * {
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+[data-runtime="tauri"] .ambient-bar button,
+[data-runtime="tauri"] .ambient-bar input,
+[data-runtime="tauri"] .ambient-bar a,
+[data-runtime="tauri"] .ambient-bar select,
+[data-runtime="tauri"] .ambient-bar textarea,
+[data-runtime="tauri"] .ambient-bar [role="button"],
+[data-runtime="tauri"] .ambient-bar [onclick],
+[data-runtime="tauri"] .ambient-bar .ema-traffic-lights {
+	-webkit-app-region: no-drag;
+	app-region: no-drag;
 }
 
 /* ---------------------------------------------------------------------------

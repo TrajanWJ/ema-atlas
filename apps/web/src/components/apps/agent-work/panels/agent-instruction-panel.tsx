@@ -7,7 +7,7 @@ import type { AgentWorkspacePanelProps } from "./component-types";
 
 function buildPrompt(agentInstruction: string, missionTitle: string, laneTitle: string) {
   return [
-    `You are working inside EMA 0.0.5 scope:`,
+    `You are working inside EMA 0.0.6 scope:`,
     `  Organization: ${EMA_SCOPE.orgName}`,
     `  Space:        ${EMA_SCOPE.spaceName}`,
     `  Project:      ${EMA_SCOPE.projectName}`,

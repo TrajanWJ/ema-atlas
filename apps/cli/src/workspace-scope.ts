@@ -332,7 +332,7 @@ function matchActiveBuildPath(projectName: string): string | null {
 
 function parseBuildName(buildName: string): { projectName: string; version: string | null } {
   // Convention: "<project>-<version>" where version starts with a digit.
-  // Examples: "EMA-0.0.5" -> ("EMA", "0.0.5"); "life-manager" -> ("life-manager", null).
+  // Examples: "EMA-0.0.6" -> ("EMA", "0.0.6"); "life-manager" -> ("life-manager", null).
   const match = buildName.match(/^(.*)-(\d[\w.\-+]*)$/);
   if (match) return { projectName: match[1] ?? buildName, version: match[2] ?? null };
   return { projectName: buildName, version: null };

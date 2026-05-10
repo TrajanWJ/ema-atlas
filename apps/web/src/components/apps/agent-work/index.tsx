@@ -21,7 +21,7 @@ import "./agent-work.css";
 export function SeeAgentWorkVApp() {
   const { projection, eventTrail, sourceLabel, isLive } = useAgentWorkspaceProjection();
   const tick = useVcalendarTick();
-  const swarmName = projection.swarms[0]?.name ?? "EMA 0.0.5 swarm";
+  const swarmName = projection.swarms[0]?.name ?? "EMA 0.0.6 readiness swarm";
 
   return (
     <section className="ema-vapp ema-vapp--agent-work ema-saw-root">

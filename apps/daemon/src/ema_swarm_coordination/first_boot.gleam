@@ -1,4 +1,4 @@
-//// First-boot workspace seed for EMA 0.0.5.
+//// First-boot workspace seed for EMA 0.0.6.
 ////
 //// This is daemon-side data. Surfaces may mirror it through mocked
 //// projections while IPC is stubbed, but this module is the canonical
@@ -45,7 +45,7 @@ pub const runtime_attachment_id: String = "attachment:01J00000000000000000000010
 
 pub const runtime_codebase_id: String = "codebase:01J00000000000000000000011"
 
-pub const runtime_local_path: String = "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5"
+pub const runtime_local_path: String = "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6"
 
 pub type ActorKind {
   Human
@@ -172,17 +172,17 @@ pub fn workspace() -> FirstBootWorkspace {
       name: "Personal Workspace",
       is_default: True,
     ),
-    org: Organization(id: org_id, name: "Founding-Fathers-EMA", personal: False),
+    org: Organization(id: org_id, name: "Trajan's Organization", personal: False),
     default_space: Space(
       id: default_space_id,
       org_id: org_id,
-      name: "Founding-Fathers-EMA",
+      name: "EMA Development",
       is_default: True,
     ),
     project: Project(
       id: project_id,
       space_id: default_space_id,
-      name: "EMA 0.0.5",
+      name: "EMA 0.0.6",
     ),
     actors: [
       Actor(
@@ -207,7 +207,7 @@ pub fn workspace() -> FirstBootWorkspace {
     blueprint_document: BlueprintDocument(
       id: blueprint_doc_id,
       project_id: project_id,
-      title: "EMA 0.0.5 Blueprint",
+      title: "EMA 0.0.6 Blueprint",
     ),
     blueprint_sections: [
       BlueprintSection(
@@ -226,7 +226,7 @@ pub fn workspace() -> FirstBootWorkspace {
     codebase: CodebaseRecord(
       id: runtime_codebase_id,
       project_id: project_id,
-      display_name: "EMA 0.0.5 runtime",
+      display_name: "EMA 0.0.6 runtime",
       local_path: runtime_local_path,
       attachment_id: runtime_attachment_id,
     ),
@@ -238,18 +238,18 @@ pub fn topbar_projection() -> TopbarProjection {
     user_id: genesis_user_id,
     user_label: "Trajan",
     org_id: org_id,
-    org_name: "Founding-Fathers-EMA",
+    org_name: "Trajan's Organization",
     space_id: default_space_id,
-    space_name: "Founding-Fathers-EMA",
+    space_name: "EMA Development",
     project_id: project_id,
-    project_name: "EMA 0.0.5",
+    project_name: "EMA 0.0.6",
     node_state: "home_current",
   )
 }
 
 pub fn see_agent_work_seed() -> SeeAgentWorkSeed {
   SeeAgentWorkSeed(
-    swarm_name: "EMA 0.0.5 buildout swarm",
+    swarm_name: "EMA 0.0.6 Proslync-first readiness swarm",
     weekly_phase: "Vanilla workspace ignition",
     active_missions: [
       "Build daemon-owned org/space/project seed",
@@ -345,7 +345,7 @@ pub fn first_boot_events() -> List(Envelope) {
       kind: "org.created",
       space_id: event_envelope.none(),
       project_id: event_envelope.none(),
-      payload_json: "{\"org_id\":\"org:01J00000000000000000000001\",\"name\":\"Founding-Fathers-EMA\",\"personal\":false,\"owner_user_id\":\"user:01J00000000000000000000001\"}",
+      payload_json: "{\"org_id\":\"org:01J00000000000000000000001\",\"name\":\"Trajan's Organization\",\"personal\":false,\"owner_user_id\":\"user:01J00000000000000000000001\"}",
     ),
     envelope(
       event_id: "event:01J00000000000000000000108",
@@ -359,21 +359,21 @@ pub fn first_boot_events() -> List(Envelope) {
       kind: "space.created",
       space_id: event_envelope.some(default_space_id),
       project_id: event_envelope.none(),
-      payload_json: "{\"space_id\":\"space:01J00000000000000000000005\",\"org_id\":\"org:01J00000000000000000000001\",\"name\":\"Founding-Fathers-EMA\",\"created_by\":\"user:01J00000000000000000000001\",\"default\":true}",
+      payload_json: "{\"space_id\":\"space:01J00000000000000000000005\",\"org_id\":\"org:01J00000000000000000000001\",\"name\":\"EMA Development\",\"created_by\":\"user:01J00000000000000000000001\",\"default\":true}",
     ),
     envelope(
       event_id: "event:01J00000000000000000000110",
       kind: "project.created",
       space_id: event_envelope.some(default_space_id),
       project_id: event_envelope.some(project_id),
-      payload_json: "{\"project_id\":\"project:01J00000000000000000000006\",\"space_id\":\"space:01J00000000000000000000005\",\"name\":\"EMA 0.0.5\",\"created_by\":\"user:01J00000000000000000000001\"}",
+      payload_json: "{\"project_id\":\"project:01J00000000000000000000006\",\"space_id\":\"space:01J00000000000000000000005\",\"name\":\"EMA 0.0.6\",\"created_by\":\"user:01J00000000000000000000001\"}",
     ),
     envelope(
       event_id: "event:01J00000000000000000000111",
       kind: "blueprint.document.created",
       space_id: event_envelope.some(default_space_id),
       project_id: event_envelope.some(project_id),
-      payload_json: "{\"document_id\":\"blueprint_doc:01J00000000000000000000007\",\"project_id\":\"project:01J00000000000000000000006\",\"title\":\"EMA 0.0.5 Blueprint\"}",
+      payload_json: "{\"document_id\":\"blueprint_doc:01J00000000000000000000007\",\"project_id\":\"project:01J00000000000000000000006\",\"title\":\"EMA 0.0.6 Blueprint\"}",
     ),
     envelope(
       event_id: "event:01J00000000000000000000112",
@@ -394,7 +394,7 @@ pub fn first_boot_events() -> List(Envelope) {
       kind: "attachment.created",
       space_id: event_envelope.some(default_space_id),
       project_id: event_envelope.some(project_id),
-      payload_json: "{\"attachment_id\":\"attachment:01J00000000000000000000010\",\"kind\":\"git_repo\",\"source\":\"local\",\"display_name\":\"EMA 0.0.5 runtime\",\"source_ref\":{\"kind\":\"local_path\",\"path\":\"/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5\"},\"codebase_id\":\"codebase:01J00000000000000000000011\"}",
+      payload_json: "{\"attachment_id\":\"attachment:01J00000000000000000000010\",\"kind\":\"git_repo\",\"source\":\"local\",\"display_name\":\"EMA 0.0.6 runtime\",\"source_ref\":{\"kind\":\"local_path\",\"path\":\"/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6\"},\"codebase_id\":\"codebase:01J00000000000000000000011\"}",
     ),
     envelope(
       event_id: "event:01J00000000000000000000115",
@@ -445,7 +445,7 @@ fn identity_user_upserted_event() -> Envelope {
     kind: "identity.user_upserted",
     space_id: event_envelope.none(),
     project_id: event_envelope.none(),
-    payload_json: "{\"user_id\":\"user:01J00000000000000000000001\",\"display_name\":\"Trajan\",\"email\":\"trajan@place.org\",\"email_verified\":false,\"primary_device_id\":\"device:01J00000000000000000000000\"}",
+    payload_json: "{\"user_id\":\"user:01J00000000000000000000001\",\"display_name\":\"Trajan\",\"email\":\"trajan@ema.local\",\"email_verified\":false,\"primary_device_id\":\"device:01J00000000000000000000000\"}",
     org_id: "org:identity",
   )
 }

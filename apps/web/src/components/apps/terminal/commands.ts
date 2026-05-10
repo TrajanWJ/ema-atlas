@@ -86,7 +86,7 @@ export const COMMANDS: Record<string, CommandHandler> = {
 	},
 
 	whoami() {
-		return "trajan@place.org";
+		return "trajan@ema.local";
 	},
 
 	uptime() {

@@ -29,7 +29,8 @@ defmodule EmaDaemon.ElixirApplication do
   def start(_type, _args) do
     children = [
       EmaClients.Server,
-      EmaResponsibilities.Server
+      EmaResponsibilities.Server,
+      EmaIntentionFarmer.Server
     ]
 
     opts = [strategy: :one_for_one, name: EmaDaemon.ElixirSupervisor]

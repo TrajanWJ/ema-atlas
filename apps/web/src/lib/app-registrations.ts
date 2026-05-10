@@ -5,7 +5,7 @@ import type { FileEntry, FileContent, AppStatus, AppGroup, PlaceApp } from "./ap
 
 // Re-export so vApp surfaces (Launchpad, Place Tools folder) can import the
 // grouping helpers from the same module they import the registrations from.
-export { getAppsByGroup, getCanonicalAppIds };
+export { getApp, getAppsByGroup, getCanonicalAppIds };
 export type { AppGroup, PlaceApp };
 export type AppDef = PlaceApp;
 import { DEFAULT_WINDOW_SIZES } from "./constants";
@@ -939,7 +939,7 @@ export function registerAllApps(): void {
 
 	registerApp({
 		id: "cockpit",
-		name: "Cockpit",
+		name: "Client Cockpit",
 		icon: icon(CheckIcon),
 		defaultSize: sizeOf("cockpit"),
 		titlebarDotColor: "#5b8def",

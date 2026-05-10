@@ -4,7 +4,7 @@ import type { WorkspaceScope } from "./workspace-scope.js";
 
 export const DESKTOP_ROOT = "/Users/trajanm4air/Desktop";
 // Retained for peer.ts and hermes orientation defaults; not used as a project_record fallback.
-export const EMA_ACTIVE_BUILD = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.5");
+export const EMA_ACTIVE_BUILD = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.6");
 export const AGENT_WORKSPACE_PROJECT = join(DESKTOP_ROOT, "Projects", "agent-workspace-vapp");
 export const AGENTS_MD = join(DESKTOP_ROOT, "AGENTS.md");
 export const CLAUDE_MD = join(DESKTOP_ROOT, "CLAUDE.md");

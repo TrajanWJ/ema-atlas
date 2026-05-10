@@ -209,7 +209,7 @@ const APP_DESCRIPTIONS: Record<AppId, string> = {
 	// EMA additions
 	hq: 'EMA · operations control room',
 	cwt: 'Current work, clients, projects, lanes, and queue',
-	cockpit: 'Holodeck cockpit for current EMA work',
+	cockpit: 'Client cockpit for Proslync builds, lanes, queue, intentions, and surfaces',
 	clients: 'Client record boundary and CWT launch targets',
 	"git-ema": 'Connectors, repos, attachments — daemon-owned',
 	"agent-work": 'Lanes, missions, queues, vcalendar',
@@ -237,7 +237,7 @@ const DESKTOP_APP_ORDER: readonly AppId[] = [
 	// Column 7 — system+info
 	'system-monitor', 'finder', 'pipes', 'about-place',
 	// Column 8 — overflow
-	'about-trajan', 'rss',
+	'about-trajan', 'rss', 'cockpit',
 ];
 
 const COLUMN_HEIGHT = 4; // icons per column before wrapping

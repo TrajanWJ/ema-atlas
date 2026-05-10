@@ -34,6 +34,8 @@ import { runDoctor } from "./commands/doctor.js";
 import { runDesktop } from "./commands/desktop.js";
 import { runRecovery } from "./commands/recovery.js";
 import { runCwt } from "./commands/cwt.js";
+import { runCockpit } from "./commands/cockpit.js";
+import { runIntention } from "./commands/intention.js";
 
 async function main(): Promise<number> {
   const [, , cmd, ...rest] = process.argv;
@@ -102,6 +104,10 @@ async function main(): Promise<number> {
       return runRecovery(args);
     case "cwt":
       return runCwt(args);
+    case "cockpit":
+      return runCockpit(args);
+    case "intention":
+      return runIntention(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

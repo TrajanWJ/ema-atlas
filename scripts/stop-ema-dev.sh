@@ -116,4 +116,8 @@ if [ "$stopped_any" -eq 0 ]; then
   echo "nothing to stop."
 fi
 
+echo "stop summary:"
+lsof -nP -iTCP:"$DAEMON_PORT" -sTCP:LISTEN || true
+lsof -nP -iTCP:"$WEB_PORT" -sTCP:LISTEN || true
+
 exit 0

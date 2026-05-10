@@ -22,6 +22,27 @@ remains a projection seed until the See Agent Work projection is promoted.
 External Codex and Claude sessions should use this language when operating
 against EMA work.
 
+## Cockpit Commands
+
+The cockpit vApp is the client/project/build/surface front door. These commands
+are live reads:
+
+```text
+ema cockpit summary --project <project-name-or-id>
+ema cockpit projection --project <project-name-or-id> --json
+ema cockpit builds --project <project-name-or-id>
+ema cockpit surfaces --project <project-name-or-id>
+ema cockpit lanes --project <project-name-or-id>
+ema cockpit queue --project <project-name-or-id>
+ema cockpit open --project <project-name-or-id>
+```
+
+`projection` is the agent handoff form. It includes workspace scope, the
+current cockpit URL, daemon lane/queue counts, active-build git facts, and
+registered vApp/product surfaces. For Proslync, it should resolve the Ms.
+Wilson client context plus the app/backend/desktop/assets builds and the AD
+cockpit / Brand HQ / NIL Deal Detail / Backend API surfaces.
+
 For agent behavior, lane discipline, handoffs, mocked-control rules, and
 reporting format, see:
 

@@ -51,7 +51,7 @@ const FALLBACK_PROJECTION: BlueprintProjection = {
   documents: [
     {
       id: EMA_SCOPE.blueprintDocId,
-      title: "EMA 0.0.5 Blueprint",
+      title: "EMA 0.0.6 Blueprint",
       project_id: EMA_SCOPE.projectId,
       status: "staged",
       sections: FALLBACK_SECTIONS,

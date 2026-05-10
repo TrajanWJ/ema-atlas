@@ -56,6 +56,10 @@ var COMMANDS = [
   { name: "org create", summary: "Create an organization and its same-name default space." },
   { name: "space create", summary: "Create a space inside an organization." },
   { name: "project create", summary: "Create a project inside an organization space." },
+  { name: "cockpit summary/projection", summary: "Inspect project/client cockpit state, active builds, vApp surfaces, lanes, and queue." },
+  { name: "cockpit builds/surfaces/lanes/queue/open", summary: "List active builds, surfaces, lanes, queue, or print the cockpit URL." },
+  { name: "intention harvest/projection/list/show", summary: "Mine sessions/docs for reviewable lost intentions." },
+  { name: "intention backfeed", summary: "Convert an approved harvested intention into queue/lane work." },
   { name: "tl about", summary: "Show daemon-backed lane/queue records, fallback workspace records, and current vCalendar phase." },
   { name: "/tl about", summary: "Alias for `ema tl about`; matches slash-command muscle memory." },
   { name: "agent orient", summary: "Print the enforced agent orientation checklist and workspace summary." },
@@ -114,7 +118,9 @@ async function runHelp(args) {
     emitPretty(`  ${f.flag.padEnd(width)}  ${f.summary}`);
   }
   emitPretty("");
-  emitPretty("Orientation: ema tl about --json; ema status --json; ema agent orient --json; ema vcalendar tick --json");
+  emitPretty(
+    "Orientation: ema cockpit summary --json; ema intention projection --json; ema tl about --json; ema status --json; ema agent orient --json; ema vcalendar tick --json"
+  );
   emitPretty("Full command grammar: docs/cli/agent-workspace.md and docs/cli/see-agent-work.md");
   return 0;
 }
@@ -470,7 +476,7 @@ import { join as join2, relative as relative2, resolve as resolvePath, sep } fro
 import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join, relative } from "path";
 var DESKTOP_ROOT = "/Users/trajanm4air/Desktop";
-var EMA_ACTIVE_BUILD = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.5");
+var EMA_ACTIVE_BUILD = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.6");
 var AGENT_WORKSPACE_PROJECT = join(DESKTOP_ROOT, "Projects", "agent-workspace-vapp");
 var AGENTS_MD = join(DESKTOP_ROOT, "AGENTS.md");
 var CLAUDE_MD = join(DESKTOP_ROOT, "CLAUDE.md");
@@ -799,8 +805,8 @@ function inferFromCwd(cwd, projects) {
     const rel = cwd === ACTIVE_BUILDS_DIR ? "" : relative2(ACTIVE_BUILDS_DIR, cwd);
     const buildName = rel.split(sep)[0] ?? "";
     if (buildName) {
-      const { projectName, version } = parseBuildName(buildName);
-      const project = pickProject(projects, projectName);
+      const { projectName: projectName2, version } = parseBuildName(buildName);
+      const project = pickProject(projects, projectName2);
       if (project) {
         const projectRecord = project.local_path && project.local_path.length > 0 ? project.local_path : join2(PROJECTS_DIR, project.name);
         const activeBuild = join2(ACTIVE_BUILDS_DIR, buildName);
@@ -826,7 +832,7 @@ function inferFromCwd(cwd, projects) {
 function nullIfEmpty(value) {
   return value && value.length > 0 ? value : null;
 }
-function inferBuildPaths(projectName, projectRecord, cwd, configuredActiveBuild) {
+function inferBuildPaths(projectName2, projectRecord, cwd, configuredActiveBuild) {
   const configured = configuredActiveBuild ? canonicalMaybe(configuredActiveBuild) : null;
   if (configured && (cwd === configured || cwd.startsWith(ensureTrailingSep(configured)))) {
     return {
@@ -840,7 +846,7 @@ function inferBuildPaths(projectName, projectRecord, cwd, configuredActiveBuild)
     const buildName = relative2(ACTIVE_BUILDS_DIR, cwd).split(sep)[0] ?? "";
     if (buildName) {
       const parsed = parseBuildName(buildName);
-      if (sameProjectName(parsed.projectName, projectName)) {
+      if (sameProjectName(parsed.projectName, projectName2)) {
         const activeBuild = join2(ACTIVE_BUILDS_DIR, buildName);
         return {
           activeBuild,
@@ -852,7 +858,7 @@ function inferBuildPaths(projectName, projectRecord, cwd, configuredActiveBuild)
   }
   const buildVersion = inferBuildVersionUnderProject(projectRecord, cwd);
   return {
-    activeBuild: configured ?? matchActiveBuildPath(projectName),
+    activeBuild: configured ?? matchActiveBuildPath(projectName2),
     buildVersion,
     buildRecord: buildVersion ? join2(projectRecord, "builds", buildVersion) : null
   };
@@ -871,13 +877,13 @@ function inferBuildVersionUnderProject(projectRecord, cwd) {
   const rest = relative2(join2(projectRecord, "builds"), cwd);
   return rest.split(sep)[0] ?? null;
 }
-function matchActiveBuildPath(projectName) {
+function matchActiveBuildPath(projectName2) {
   if (!existsSync2(ACTIVE_BUILDS_DIR)) return null;
-  const exact = join2(ACTIVE_BUILDS_DIR, projectName);
+  const exact = join2(ACTIVE_BUILDS_DIR, projectName2);
   if (existsSync2(exact) && isDirectory(exact)) return exact;
   try {
     const entries = readdirSync2(ACTIVE_BUILDS_DIR);
-    const prefixed = entries.find((name) => name.startsWith(`${projectName}-`));
+    const prefixed = entries.find((name) => name.startsWith(`${projectName2}-`));
     return prefixed ? join2(ACTIVE_BUILDS_DIR, prefixed) : null;
   } catch {
     return null;
@@ -1311,6 +1317,45 @@ async function readProjection(args, spec) {
     return null;
   }
 }
+async function readProjectionBatch(args, specs, timeoutMs = 1200) {
+  const json = flagBool(args, "json");
+  if (specs.length === 0) return [];
+  try {
+    const scopeContext = await workspaceScopeContext(args);
+    const projectId = !scopeContext.allProjects && scopeContext.scope.project_id ? scopeContext.scope.project_id : null;
+    const c = await connect({ surface: "desktop" });
+    const values = /* @__PURE__ */ new Map();
+    const wanted = new Set(specs.map((spec) => spec.name));
+    const result = await new Promise((resolve2) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        resolve2(specs.map((spec) => values.has(spec.name) ? values.get(spec.name) : spec.pick({})));
+      };
+      const timer = setTimeout(finish, timeoutMs);
+      c.onMessage((msg) => {
+        const name = msg.name;
+        if (msg.type !== "projection" || !name || !wanted.has(name) || values.has(name)) return;
+        const spec = specs.find((candidate) => candidate.name === name);
+        if (!spec) return;
+        values.set(name, spec.pick(msg.data ?? {}));
+        if (values.size === wanted.size) {
+          clearTimeout(timer);
+          finish();
+        }
+      });
+      for (const spec of specs) {
+        c.subscribe(spec.name, projectId ? { project_id: projectId } : void 0);
+      }
+    });
+    c.close();
+    return result;
+  } catch (err) {
+    await reportError(err, json);
+    return specs.map((spec) => spec.pick({}));
+  }
+}
 
 // src/commands/swarm.ts
 var DOC_REF = "docs/cli/see-agent-work.md";
@@ -1443,7 +1488,7 @@ async function runOrg(args) {
   const name = flagString(args, "name") ?? args.positional.slice(1).join(" ");
   if (!name.trim()) {
     emitError(`ema org create: missing organization name`);
-    emitError(`Usage: ema org create --name Founding-Fathers-EMA`);
+    emitError(`Usage: ema org create --name "Trajan's Organization"`);
     return 64;
   }
   try {
@@ -1541,7 +1586,7 @@ async function runProject(args) {
   const name = flagString(args, "name") ?? args.positional.slice(1).join(" ");
   if (!orgId || !spaceId || !name.trim()) {
     emitError(`ema project create: missing --org, --space, or --name`);
-    emitError(`Usage: ema project create --org org:<id> --space space:<id> --name "EMA 0.0.5"`);
+    emitError(`Usage: ema project create --org org:<id> --space space:<id> --name "EMA 0.0.6"`);
     return 64;
   }
   try {
@@ -2000,7 +2045,8 @@ async function runCheckup(args) {
       docRef: "docs/cli/see-agent-work.md",
       commands: [
         { verb: "schedule", flags: ["lane", "cadence", "actor"], required: ["lane", "cadence"], summary: "Schedule a cadence-based lane checkup." },
-        { verb: "complete", flags: ["checkup", "result", "actor"], required: ["checkup", "result"], summary: "Mark a scheduled checkup complete." }
+        { verb: "complete", flags: ["checkup", "result", "actor"], required: ["checkup", "result"], summary: "Mark a scheduled checkup complete." },
+        { verb: "runtime", flags: ["json"], summary: "Run the daemon-backed checkup tick and report emitted checkups." }
       ]
     });
   }
@@ -2009,9 +2055,11 @@ async function runCheckup(args) {
       return runSchedule(args);
     case "complete":
       return runComplete(args);
+    case "runtime":
+      return runRuntime(args);
     default:
       emitError(
-        `ema checkup: unknown subcommand "${sub ?? ""}" (expected: schedule | complete)`
+        `ema checkup: unknown subcommand "${sub ?? ""}" (expected: schedule | complete | runtime)`
       );
       emitError(`See docs/cli/see-agent-work.md \xA7vCalendar for grammar.`);
       return 64;
@@ -2061,6 +2109,57 @@ async function runComplete(args) {
     result
   }, { json, human: `completed ${checkupId}: ${result}` });
 }
+async function runRuntime(args) {
+  const json = flagBool(args, "json");
+  try {
+    const c = await connect({ surface: "desktop" });
+    const result = await c.command("vcalendar.checkup.tick", {});
+    c.close();
+    if (result.ok !== true) {
+      if (json) {
+        emitJson({
+          ok: false,
+          command: "checkup runtime",
+          op: "vcalendar.checkup.tick",
+          source: "daemon_command",
+          daemon_authority: "canonical_events",
+          error: result.error
+        });
+      } else {
+        emitError(`ema checkup runtime: ${result.error.class}: ${result.error.message}`);
+      }
+      return 1;
+    }
+    const data = result.data ?? {};
+    const emitted = data.emitted ?? 0;
+    const laneIds = data.lane_ids ?? [];
+    const skippedUnscoped = data.skipped_unscoped ?? 0;
+    const reason = emitted === 0 ? skippedUnscoped > 0 ? "skipped_unscoped" : "no_due_lanes" : null;
+    if (json) {
+      emitJson({
+        ok: true,
+        command: "checkup runtime",
+        op: "vcalendar.checkup.tick",
+        source: "daemon_command",
+        daemon_authority: "canonical_events",
+        emitted,
+        lane_ids: laneIds,
+        skipped_unscoped: skippedUnscoped,
+        reason
+      });
+    } else {
+      emitPretty("checkup runtime");
+      emitPretty("source: daemon_command; daemon authority: canonical_events");
+      emitPretty(`emitted: ${emitted}`);
+      if (skippedUnscoped > 0) emitPretty(`skipped_unscoped: ${skippedUnscoped}`);
+      if (reason) emitPretty(`reason: ${reason}`);
+      for (const laneId of laneIds) emitPretty(`  + ${laneId}`);
+    }
+    return 0;
+  } catch (err) {
+    return reportError(err, json);
+  }
+}
 async function send2(op, argsObj, out) {
   try {
     const c = await connect({ surface: "desktop" });
@@ -2073,8 +2172,18 @@ async function send2(op, argsObj, out) {
     }
     const events = res.events ?? [];
     const resource = typeof res.resource === "string" ? res.resource : null;
-    if (out.json) emitJson({ ok: true, op, args: argsObj, events, resource });
-    else {
+    if (out.json) {
+      emitJson({
+        ok: true,
+        command: op,
+        op,
+        source: "daemon_command",
+        daemon_authority: "canonical_events",
+        args: argsObj,
+        events,
+        resource
+      });
+    } else {
       emitPretty(out.human);
       if (resource) emitPretty(`${out.resourceLabel ?? "created"}: ${resource}`);
       emitPretty(`events: ${events.join(", ") || "(none returned)"}`);
@@ -4504,20 +4613,20 @@ function findBlueprintVapp(data) {
     return record.slug === "blueprint" || record.id === "vapp-install-blueprint" || record.installation_id === "vapp-install-blueprint";
   }) ?? null;
 }
-function summarizeCollabDocument(projection) {
-  if (!projection.received || !projection.data) {
+function summarizeCollabDocument(projection2) {
+  if (!projection2.received || !projection2.data) {
     return { received: false, status: "not_visible" };
   }
   return {
     received: true,
-    document_id: projection.data.document_id ?? null,
-    title: projection.data.title ?? null,
-    target: projection.data.target ?? null,
-    revision: projection.data.revision ?? projection.data.version ?? null,
-    status: projection.data.status ?? null,
-    authority: projection.data.authority ?? null,
-    storage_authority: projection.data.storage_authority ?? null,
-    updated_at: projection.data.updated_at ?? null
+    document_id: projection2.data.document_id ?? null,
+    title: projection2.data.title ?? null,
+    target: projection2.data.target ?? null,
+    revision: projection2.data.revision ?? projection2.data.version ?? null,
+    status: projection2.data.status ?? null,
+    authority: projection2.data.authority ?? null,
+    storage_authority: projection2.data.storage_authority ?? null,
+    updated_at: projection2.data.updated_at ?? null
   };
 }
 function readArray(data, key) {
@@ -4715,8 +4824,8 @@ var DOCS = [
   "Projects/EMA/atlas/README.md",
   "Projects/EMA/subprojects/agent-workspace-vapp/blueprint/02-agent-cli-operating-contract.md",
   "Active builds/README.md",
-  "Active builds/EMA-0.0.5/README.md",
-  "Active builds/EMA-0.0.5/docs/cli/agent-workspace.md"
+  "Active builds/EMA-0.0.6/README.md",
+  "Active builds/EMA-0.0.6/docs/cli/agent-workspace.md"
 ];
 async function runHermes(args) {
   const verb = args.positional[0] ?? "orient";
@@ -4841,9 +4950,9 @@ async function runHermesPlan(args) {
     goal: "Coordinate EMA work through Hermes while every action remains auditable through workspace and dispatch events.",
     lane,
     dispatches: [
-      { provider: "simulated", lane, cwd: "Active builds/EMA-0.0.5", purpose: "prove Harness Glue event normalization" },
-      { provider: "codex", lane, cwd: "Active builds/EMA-0.0.5", purpose: "future PTY adapter implementation", status: "planned" },
-      { provider: "claude-code", lane, cwd: "Active builds/EMA-0.0.5", purpose: "future PTY adapter implementation", status: "planned" }
+      { provider: "simulated", lane, cwd: "Active builds/EMA-0.0.6", purpose: "prove Harness Glue event normalization" },
+      { provider: "codex", lane, cwd: "Active builds/EMA-0.0.6", purpose: "future PTY adapter implementation", status: "planned" },
+      { provider: "claude-code", lane, cwd: "Active builds/EMA-0.0.6", purpose: "future PTY adapter implementation", status: "planned" }
     ],
     verification: ["ema hermes orient --json", "ema harness providers --json", "ema harness dispatch --provider simulated --json", "ema peer doctor --json"],
     risks: daemonRecent.queue.filter((item) => item.status === "blocked").map((item) => item.title)
@@ -4894,7 +5003,7 @@ function runHermesPending(args, verb) {
   const payload = {
     ok: true,
     command: `hermes ${verb}`,
-    status: "pending_daemon_writer",
+    status: "reserved_writer",
     projection: "hermes.orchestrator",
     note: "Hermes handoff/audit grammar is reserved; canonical writes should flow through handoff/agent/harness events."
   };
@@ -4907,7 +5016,7 @@ function nextActions(lane, blockedCount) {
     return [
       `ema lane show --lane ${lane} --json`,
       "ema harness providers --json",
-      'ema harness dispatch --provider simulated --lane <lane> --cwd "Active builds/EMA-0.0.5" --prompt "prove Harness Glue" --json'
+      'ema harness dispatch --provider simulated --lane <lane> --cwd "Active builds/EMA-0.0.6" --prompt "prove Harness Glue" --json'
     ];
   }
   if (blockedCount > 0) return ["ema hermes sweep --json", "ema queue list --status blocked --json", "ema problem --help"];
@@ -5274,18 +5383,19 @@ async function runDispatch(args) {
   const prompt = flagString(args, "prompt") ?? "";
   if (provider !== "simulated") {
     const pending = {
-      ok: true,
+      ok: false,
       command: "harness dispatch",
-      status: "pending_provider_adapter",
+      status: "unsupported_provider_adapter",
       provider,
       lane,
       cwd,
       prompt,
-      required_capability: `${provider} PTY/SDK adapter`
+      required_capability: `${provider} PTY/SDK adapter`,
+      remediation: "Use --provider simulated until the guarded PTY/SDK adapter is implemented."
     };
     if (flagBool(args, "json")) emitJson(pending);
-    else emitPretty(`${provider} adapter pending; simulated provider is ready`);
-    return 0;
+    else emitPretty(`${provider} adapter unsupported in this build; simulated provider is ready`);
+    return 1;
   }
   const org = flagString(args, "org") ?? DEFAULT_ORG5;
   const actor = flagString(args, "actor") ?? DEFAULT_ACTOR5;
@@ -5668,12 +5778,12 @@ function shellQuote2(input) {
   return `'${input.replace(/'/g, `'"'"'`)}'`;
 }
 function stableId(input) {
-  let hash = 2166136261;
+  let hash2 = 2166136261;
   for (let i = 0; i < input.length; i += 1) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
+    hash2 ^= input.charCodeAt(i);
+    hash2 = Math.imul(hash2, 16777619);
   }
-  return (hash >>> 0).toString(36).padStart(7, "0");
+  return (hash2 >>> 0).toString(36).padStart(7, "0");
 }
 
 // src/commands/peer.ts
@@ -6287,11 +6397,11 @@ async function runPresence(args) {
 }
 async function showPresence(args) {
   const json = flagBool(args, "json");
-  const projection = await readProjection(args, {
+  const projection2 = await readProjection(args, {
     name: "desktop.presence",
     pick: (data) => data
   });
-  const payload = projection ?? {};
+  const payload = projection2 ?? {};
   if (json) {
     emitJson({ ok: true, command: "desktop presence show", projection: "desktop.presence", data: payload });
   } else {
@@ -6903,6 +7013,1101 @@ async function exists(path2) {
   }
 }
 
+// src/commands/cockpit.ts
+import { execFile as execFile2 } from "child_process";
+import { existsSync as existsSync7, readdirSync as readdirSync5 } from "fs";
+import { basename as basename2, join as join8 } from "path";
+import { promisify as promisify2 } from "util";
+
+// src/commands/intention.ts
+import { existsSync as existsSync6, mkdirSync as mkdirSync2, readFileSync as readFileSync5, readdirSync as readdirSync4, statSync as statSync3, writeFileSync as writeFileSync3 } from "fs";
+import { homedir as homedir2 } from "os";
+import { basename, dirname as dirname2, join as join7 } from "path";
+var STORE_ROOT = join7(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
+var REVIEWS_PATH = join7(STORE_ROOT, "reviews.json");
+var DEFAULT_PROJECT = "proslync-app-ios-final";
+async function runIntention(args) {
+  const verb = args.positional[0] ?? "projection";
+  if (verb === "help" || flagBool(args, "help") || args.flags.h === true) {
+    printHelp();
+    return 0;
+  }
+  if (verb === "harvest") return harvest(args);
+  if (verb === "projection") return projection(args);
+  if (verb === "list") return list(args);
+  if (verb === "show") return show(args);
+  if (verb === "backfeed") return backfeed(args);
+  if (verb === "accept") return reviewIntent(args, "accepted");
+  if (verb === "reject") return reviewIntent(args, "rejected");
+  if (verb === "defer") return reviewIntent(args, "deferred");
+  emitError(`ema intention: unknown subcommand "${verb}"`);
+  emitError("Usage: ema intention [harvest|projection|list|show|accept|reject|defer|backfeed] [--project <name>] [--json]");
+  return 64;
+}
+async function loadIntentionProjection(args) {
+  const project = await projectName(args);
+  const stored = readStoredProjection(project);
+  return applyReviews(stored ?? emptyProjection(project));
+}
+async function harvest(args) {
+  const project = await projectName(args);
+  const maxSources = parsePositiveInt(flagString(args, "max-sources"), 100);
+  const maxRecordsPerSource = parsePositiveInt(flagString(args, "max-records-per-source"), 500);
+  const sources = discoverSources(project).slice(0, maxSources);
+  const { intents, recordsParsed, duplicatesSkipped } = parseSources(sources, maxRecordsPerSource);
+  const projection2 = buildProjection(project, sources.length, recordsParsed, duplicatesSkipped, intents);
+  writeStoredProjection(project, projection2);
+  const reviewedProjection = applyReviews(projection2);
+  emit(args, reviewedProjection, () => {
+    emitPretty(`harvested ${reviewedProjection.stats.candidate_intents} candidate intentions`);
+    emitPretty(`sources: ${reviewedProjection.stats.sources_seen}`);
+    emitPretty(`proslync: ${reviewedProjection.stats.proslync_relevant}`);
+    emitPretty(`lost followups: ${reviewedProjection.stats.lost_followups}`);
+  });
+  return 0;
+}
+async function projection(args) {
+  const value = await loadIntentionProjection(args);
+  emit(args, value, () => printProjection(value));
+  return 0;
+}
+async function list(args) {
+  const value = await loadIntentionProjection(args);
+  const tag = flagString(args, "tag");
+  const state = flagString(args, "state");
+  const items = value.intents.filter((intent) => {
+    if (tag && !intent.tags.includes(tag)) return false;
+    if (state && intent.review_state !== state) return false;
+    return true;
+  });
+  const payload = { ...value, command: "intention.list", intents: items };
+  emit(args, payload, () => {
+    if (items.length === 0) {
+      emitPretty("No harvested intentions match.");
+      return;
+    }
+    for (const intent of items) {
+      emitPretty(`${intent.id} [${intent.review_state}] ${intent.title}`);
+      emitPretty(`  tags: ${intent.tags.join(", ") || "(none)"}`);
+      emitPretty(`  destination: ${intent.recommended_destination}`);
+      emitPretty(`  evidence: ${intent.evidence_ref}`);
+    }
+  });
+  return 0;
+}
+async function show(args) {
+  const id = flagString(args, "intent");
+  if (!id) {
+    emitError("ema intention show: --intent is required");
+    return 64;
+  }
+  const value = await loadIntentionProjection(args);
+  const found = findIntent(value, id) ?? findIntentAcrossStore(id);
+  const intent = found?.intent ?? null;
+  emit(args, { ok: intent != null, command: "intention.show", intent }, () => {
+    if (!intent) emitPretty(`intent not found: ${id}`);
+    else emitPretty(JSON.stringify(intent, null, 2));
+  });
+  return intent ? 0 : 1;
+}
+async function backfeed(args) {
+  const id = flagString(args, "intent");
+  if (!id) {
+    emitError("ema intention backfeed: --intent is required");
+    return 64;
+  }
+  const destination = flagString(args, "destination") ?? "queue";
+  if (destination !== "queue") {
+    emitError("ema intention backfeed: only --destination queue is supported in this slice");
+    return 64;
+  }
+  const scopedProjection = await loadIntentionProjection(args);
+  const found = findIntent(scopedProjection, id) ?? findIntentAcrossStore(id);
+  if (!found) {
+    emitError(`ema intention backfeed: intent not found: ${id}`);
+    return 1;
+  }
+  const { projection: value, intent } = found;
+  const targetProject = targetProjectForIntent(value.project ?? DEFAULT_PROJECT, intent);
+  const queueCommand = queueAddCommand(targetProject, intent);
+  if (flagBool(args, "dry-run")) {
+    emit(args, { ok: true, command: "intention.backfeed", mode: "dry_run", target_project: targetProject, queue_command: queueCommand, intent }, () => {
+      emitPretty(queueCommand.join(" "));
+    });
+    return 0;
+  }
+  if (flagString(args, "approve") !== "reviewed") {
+    emitError("ema intention backfeed: non-dry-run requires --approve reviewed");
+    return 64;
+  }
+  if (intent.review_state !== "accepted") {
+    emitError("ema intention backfeed: non-dry-run requires an accepted review state");
+    return 64;
+  }
+  return runQueue({
+    positional: ["add"],
+    flags: {
+      ...args.flags,
+      project: targetProject,
+      title: intent.title,
+      why: `${intent.raw_text.slice(0, 400)} Evidence: ${intent.evidence_ref}`,
+      "done-when": `Reviewed intention is either shipped, rejected, or merged into the current project plan. Source: ${intent.id}`,
+      source: intent.evidence_ref
+    }
+  });
+}
+async function reviewIntent(args, state) {
+  const id = flagString(args, "intent");
+  if (!id) {
+    emitError(`ema intention ${state}: --intent is required`);
+    return 64;
+  }
+  const reason = flagString(args, "reason") ?? "reviewed in cockpit";
+  const reviewer = flagString(args, "reviewer") ?? "actor:trajan";
+  const scopedProjection = await loadIntentionProjection(args);
+  const found = findIntent(scopedProjection, id) ?? findIntentAcrossStore(id);
+  if (!found) {
+    emitError(`ema intention ${state}: intent not found: ${id}`);
+    return 1;
+  }
+  const review = {
+    intent_id: id,
+    state,
+    reviewer,
+    reason,
+    reviewed_at: (/* @__PURE__ */ new Date()).toISOString()
+  };
+  const reviews = readReviews().filter((item) => item.intent_id !== id);
+  writeReviews([...reviews, review]);
+  const reviewedProjection = applyReviews(found.projection);
+  const reviewedIntent = findIntent(reviewedProjection, id)?.intent ?? { ...found.intent, review_state: state };
+  emit(args, { ok: true, command: `intention.${state}`, review, intent: reviewedIntent }, () => {
+    emitPretty(`${id} -> ${state}`);
+  });
+  return 0;
+}
+function targetProjectForIntent(fallbackProject, intent) {
+  if (intent.recommended_destination === "ema_queue") return intent.project_hint ?? "EMA";
+  if (intent.recommended_destination === "proslync_queue") return intent.project_hint ?? fallbackProject;
+  return intent.project_hint ?? fallbackProject;
+}
+function printHelp() {
+  emitPretty("ema intention - session/history intention backfeed");
+  emitPretty("");
+  emitPretty("Usage:");
+  emitPretty("  ema intention harvest --project proslync-app-ios-final --max-sources 100 [--json]");
+  emitPretty("  ema intention projection --project proslync-app-ios-final [--json]");
+  emitPretty("  ema intention list --project proslync-app-ios-final [--tag lost_followup] [--json]");
+  emitPretty("  ema intention list --project proslync-app-ios-final --state accepted [--json]");
+  emitPretty("  ema intention show --intent <id> [--json]");
+  emitPretty("  ema intention accept --intent <id> --reason <text> --reviewer actor:trajan [--json]");
+  emitPretty("  ema intention reject --intent <id> --reason <text> --reviewer actor:trajan [--json]");
+  emitPretty("  ema intention defer --intent <id> --reason <text> --reviewer actor:trajan [--json]");
+  emitPretty("  ema intention backfeed --intent <id> --destination queue --dry-run [--json]");
+  emitPretty("  ema intention backfeed --intent <id> --destination queue --approve reviewed [--json]");
+}
+function printProjection(value) {
+  emitPretty(`${value.project ?? "(unresolved project)"} intention projection`);
+  emitPretty(`sources: ${value.stats.sources_seen}`);
+  emitPretty(`candidates: ${value.stats.candidate_intents}`);
+  emitPretty(`proslync: ${value.stats.proslync_relevant}`);
+  emitPretty(`ema: ${value.stats.ema_relevant}`);
+  emitPretty(`lost followups: ${value.stats.lost_followups}`);
+  emitPretty(`recommended queue: ${value.recommended_queue.length}`);
+}
+function emit(args, payload, pretty) {
+  if (flagBool(args, "json")) emitJson(payload);
+  else pretty();
+}
+async function projectName(args) {
+  const explicit = flagString(args, "project");
+  if (explicit) return explicit;
+  const scope = await resolveWorkspaceScope({ args });
+  return scope.project_name ?? DEFAULT_PROJECT;
+}
+function discoverSources(project) {
+  const home = homedir2();
+  const paths = [
+    join7(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", "docs", "architecture", "18-harness-glue.md"),
+    join7(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", "docs", "architecture", "24-harness-vapp-launch.md"),
+    join7(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", "docs", "vapps", "duct-tape-onion-harness.md"),
+    join7(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", "docs", "superpowers", "specs", "2026-05-09-intention-backlog-farmer.md"),
+    join7(DESKTOP_ROOT, "Projects", "EMA", "atlas", "workspace", "cmux-native-orchestrator-proposal.md"),
+    ...projectDocs(join7(DESKTOP_ROOT, "Projects", "ema-agent-multiplexer-interface")),
+    ...proslyncDocs(),
+    join7(home, ".codex/memories/MEMORY.md"),
+    ...expandGlob(join7(home, ".codex/memories/rollout_summaries")),
+    ...projectDocs(join7(DESKTOP_ROOT, "Active builds", "chronicle")),
+    ...projectDocs(join7(DESKTOP_ROOT, "Projects", "chronicle")),
+    ...projectDocs(join7(DESKTOP_ROOT, "Active builds", "duct-tape-onion-harness")),
+    ...projectDocs(join7(DESKTOP_ROOT, "Projects", "duct-tape-onion-harness")),
+    join7(home, ".codex/history.jsonl"),
+    join7(home, ".codex/session_index.jsonl"),
+    ...expandGlob(join7(home, ".claude/projects")),
+    ...expandGlob(join7(home, ".codex/sessions")),
+    ...expandGlob(join7(home, ".codex/archived_sessions"))
+  ];
+  const seen = /* @__PURE__ */ new Set();
+  return paths.filter((path2) => existsSync6(path2) && safeStat(path2)?.isFile()).filter((path2) => {
+    if (seen.has(path2)) return false;
+    seen.add(path2);
+    return true;
+  }).map((path2) => sourceForPath(path2, project));
+}
+function expandGlob(root) {
+  if (!existsSync6(root)) return [];
+  const out = [];
+  const stack = [root];
+  while (stack.length > 0 && out.length < 500) {
+    const current = stack.pop();
+    const stat = safeStat(current);
+    if (!stat) continue;
+    if (stat.isFile() && interestingFile(current)) {
+      out.push(current);
+      continue;
+    }
+    if (!stat.isDirectory() || skipDir(current)) continue;
+    for (const name of readdirSync4(current)) stack.push(join7(current, name));
+  }
+  return out.sort();
+}
+function projectDocs(root) {
+  return [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    "project.md",
+    "queue/README.md",
+    "blueprint/01-executive-summary.md",
+    "blueprint/02-system-boundaries.md",
+    "blueprint/03-dual-fork-spike.md",
+    "blueprint/04-t3code-relationship.md",
+    "blueprint/05-stack-decision.md"
+  ].map((path2) => join7(root, path2));
+}
+function proslyncDocs() {
+  const roots = [
+    join7(DESKTOP_ROOT, "Active builds", "proslync-app-ios-final"),
+    join7(DESKTOP_ROOT, "Active builds", "proslync-backend"),
+    join7(DESKTOP_ROOT, "Active builds", "proslync-desktop"),
+    join7(DESKTOP_ROOT, "Active builds", "proslync-presentation-assets-final")
+  ];
+  return roots.flatMap(projectDocs).concat([
+    join7(DESKTOP_ROOT, "Active builds", "proslync-app-ios-final", "PLAN.md"),
+    join7(DESKTOP_ROOT, "Active builds", "proslync-app-ios-final", "research-plane", "cross-pollinators", "identity-absorption-product-plan-2026-05-09.md"),
+    join7(DESKTOP_ROOT, "Active builds", "proslync-app-ios-final", "research-plane", "cross-pollinators", "master-plan-integration-2026-05-09.md"),
+    join7(DESKTOP_ROOT, "Active builds", "proslync-presentation-assets-final", "docs", "plans", "proslync-role-happiness-master-plan-2026-05-09", "README.md")
+  ]);
+}
+function parseSources(sources, maxRecordsPerSource) {
+  const seen = /* @__PURE__ */ new Set();
+  const intents = [];
+  let recordsParsed = 0;
+  let duplicatesSkipped = 0;
+  for (const source of sources) {
+    const records = parseSource(source, maxRecordsPerSource);
+    recordsParsed += records.length;
+    for (const intent of records) {
+      const key = normalize(intent.raw_text).toLowerCase();
+      if (seen.has(key)) {
+        duplicatesSkipped += 1;
+        continue;
+      }
+      seen.add(key);
+      if (intent.tags.length > 0 && intent.raw_text.length >= 12) intents.push(intent);
+    }
+  }
+  return { intents, recordsParsed, duplicatesSkipped };
+}
+function parseSource(source, maxRecords) {
+  try {
+    const body = readFileSync5(source.path, "utf8");
+    if (source.path.endsWith(".jsonl")) {
+      return body.split("\n").slice(0, maxRecords).flatMap((line, index) => parseJsonLine(source, line, index + 1));
+    }
+    return parseMarkdown(source, body);
+  } catch {
+    return [];
+  }
+}
+function parseJsonLine(source, line, lineNumber) {
+  if (line.trim() === "") return [];
+  let parsed;
+  try {
+    parsed = JSON.parse(line);
+  } catch {
+    return [];
+  }
+  const text = normalize(extractTexts(parsed).join("\n"));
+  if (!text) return [];
+  const role = stringField(parsed, ["role", "type"]);
+  const occurredAt = stringField(parsed, ["timestamp", "created_at", "time"]);
+  return [card(source, text, `jsonl:${source.path}#${lineNumber}`, role, occurredAt)];
+}
+function parseMarkdown(source, body) {
+  const chunks = body.split(/\n(?=#{1,4}\s+)/).map((chunk) => normalize(chunk)).filter(Boolean).slice(0, 80);
+  return chunks.map((chunk, index) => card(source, chunk, `md:${source.path}#${index + 1}`, null, null));
+}
+function card(source, text, evidenceRef, role, occurredAt) {
+  const tags = tagsFor(text, source);
+  const confidence = Math.min(0.55 + Math.min(tags.length * 0.1, 0.35) + (text.length > 240 ? 0.1 : 0), 0.99);
+  const id = `intent:${hash(`${evidenceRef}:${text}`).slice(0, 24)}`;
+  return {
+    id,
+    title: titleFor(text, tags),
+    raw_text: text.slice(0, 1500),
+    tags,
+    confidence,
+    review_state: "new",
+    recommended_destination: destinationFor(tags),
+    evidence_ref: evidenceRef,
+    source_path: source.path,
+    source_type: source.source_type,
+    source_family: source.source_family,
+    project_hint: source.project_hint,
+    occurred_at: occurredAt,
+    role
+  };
+}
+function extractTexts(value) {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap(extractTexts);
+  if (value && typeof value === "object") {
+    const object = value;
+    return ["prompt", "text", "content", "message", "summary", "command", "cmd", "body", "output", "input"].flatMap((key) => extractTexts(object[key])).filter((text) => text.trim().length > 0);
+  }
+  return [];
+}
+function tagsFor(text, source) {
+  const lower = text.toLowerCase();
+  const proslyncSource = source.source_family === "proslync" || lower.includes("proslync");
+  const emaSource = source.source_family === "ema" || lower.includes(" ema ") || lower.startsWith("ema ");
+  return [
+    testTag(lower, /proslync|mrs\.? wilson|\bnil\b|athletic director|\bad\b|brand hq|revenue-share|revenue share|athlete|compliance/, "proslync_product_intent"),
+    proslyncSource ? testTag(lower, /tsc|typecheck|build|simulator|backend|desktop|active build|branch|dirty|worktree/, "proslync_build_process_intent") : null,
+    emaSource ? testTag(lower, /\bema\b|cockpit|lane|queue|vapp|daemon|projection|active builds/, "ema_build_process_intent") : null,
+    testTag(lower, /i want|we need|should|keep|don't|please|follow up|lost|stale|blocker|next/, "lost_followup"),
+    testTag(lower, /chronicle|activity|replay|event stream|session history/, "chronicle_pattern"),
+    testTag(lower, /duct tape|harness glue|dispatch|execution|tool\.timeline/, "harness_glue_pattern"),
+    testTag(lower, /cmux|multiplexer|session manager|\btui\b|codex\/claude sessions|claude tui|codex tui/, "session_manager_pattern")
+  ].filter((tag) => tag != null);
+}
+function testTag(text, regex, tag) {
+  return regex.test(text) ? tag : null;
+}
+function destinationFor(tags) {
+  if (tags.includes("proslync_product_intent") || tags.includes("proslync_build_process_intent")) return "proslync_queue";
+  if (tags.some((tag) => ["ema_build_process_intent", "harness_glue_pattern", "chronicle_pattern", "session_manager_pattern", "lost_followup"].includes(tag))) return "ema_queue";
+  return "doc_only";
+}
+function titleFor(text, tags) {
+  const prefix = tags.includes("proslync_product_intent") ? "Proslync" : tags.includes("ema_build_process_intent") ? "EMA" : tags.includes("harness_glue_pattern") ? "Harness" : tags.includes("chronicle_pattern") ? "Chronicle" : tags.includes("session_manager_pattern") ? "Session" : "Intent";
+  return `${prefix}: ${text.split(/\s+/).slice(0, 18).join(" ")}`.slice(0, 160);
+}
+function buildProjection(project, sourceCount, recordsParsed, duplicatesSkipped, intents) {
+  const topTags = Object.entries(
+    intents.flatMap((intent) => intent.tags).reduce((acc, tag) => {
+      acc[tag] = (acc[tag] ?? 0) + 1;
+      return acc;
+    }, {})
+  ).map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+  return {
+    ok: true,
+    command: "intention.projection",
+    source: "ema_intention_cli",
+    authority: "file_backed_review_projection",
+    generated_at: (/* @__PURE__ */ new Date()).toISOString(),
+    project,
+    stats: {
+      sources_seen: sourceCount,
+      records_parsed: recordsParsed,
+      candidate_intents: intents.length,
+      proslync_relevant: intents.filter((intent) => intent.tags.includes("proslync_product_intent")).length,
+      ema_relevant: intents.filter((intent) => intent.tags.includes("ema_build_process_intent")).length,
+      lost_followups: intents.filter((intent) => intent.tags.includes("lost_followup")).length,
+      duplicates_skipped: duplicatesSkipped
+    },
+    top_tags: topTags,
+    intents,
+    recommended_queue: intents.filter((intent) => (intent.recommended_destination === "proslync_queue" || intent.recommended_destination === "ema_queue") && intent.review_state !== "rejected" && intent.review_state !== "deferred").sort((a, b) => queuePriority(b) - queuePriority(a) || b.confidence - a.confidence || a.title.localeCompare(b.title)).slice(0, 25)
+  };
+}
+function queuePriority(intent) {
+  let score = 0;
+  if (intent.recommended_destination === "proslync_queue") score += 10;
+  if (intent.tags.includes("proslync_product_intent")) score += 6;
+  if (intent.source_family === "proslync") score += 4;
+  if (intent.tags.includes("lost_followup")) score += 2;
+  return score;
+}
+function sourceForPath(path2, project) {
+  const lower = path2.toLowerCase();
+  const source_family = lower.includes("proslync") ? "proslync" : lower.includes("ema-0.0.6") || lower.includes("/projects/ema/") ? "ema" : lower.includes("chronicle") ? "chronicle" : lower.includes("duct-tape") ? "duct_tape" : lower.includes("multiplexer") || lower.includes("cmux") || lower.includes("t3code") ? "session_manager" : "general";
+  const source_type = lower.endsWith(".jsonl") && lower.includes("/.claude/") ? "claude_project" : lower.endsWith(".jsonl") && (lower.includes("/.codex/sessions/") || lower.includes("/.codex/archived_sessions/")) ? "codex_session" : lower.endsWith(".jsonl") && lower.includes("/.codex/") ? "codex_history" : lower.includes("/.codex/memories/") ? "codex_memory" : source_family === "proslync" ? "proslync_repo" : source_family === "ema" ? "ema_doc" : "donor_project";
+  return {
+    path: path2,
+    source_type,
+    source_family,
+    project_hint: source_family === "proslync" ? project ?? DEFAULT_PROJECT : source_family === "ema" ? "EMA" : basename(dirname2(path2)) || null
+  };
+}
+function readStoredProjection(project) {
+  const path2 = storePath(project);
+  if (!existsSync6(path2)) return null;
+  try {
+    return JSON.parse(readFileSync5(path2, "utf8"));
+  } catch {
+    return null;
+  }
+}
+function readReviews() {
+  if (!existsSync6(REVIEWS_PATH)) return [];
+  try {
+    const parsed = JSON.parse(readFileSync5(REVIEWS_PATH, "utf8"));
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isReview);
+  } catch {
+    return [];
+  }
+}
+function writeReviews(reviews) {
+  mkdirSync2(STORE_ROOT, { recursive: true });
+  writeFileSync3(REVIEWS_PATH, JSON.stringify(reviews, null, 2) + "\n");
+}
+function isReview(value) {
+  if (!value || typeof value !== "object") return false;
+  const record = value;
+  return typeof record.intent_id === "string" && (record.state === "accepted" || record.state === "rejected" || record.state === "deferred" || record.state === "new") && typeof record.reviewer === "string" && typeof record.reason === "string" && typeof record.reviewed_at === "string";
+}
+function applyReviews(projection2) {
+  const reviews = new Map(readReviews().map((review) => [review.intent_id, review]));
+  const intents = projection2.intents.map((intent) => ({
+    ...intent,
+    review_state: reviews.get(intent.id)?.state ?? intent.review_state ?? "new"
+  }));
+  return {
+    ...projection2,
+    intents,
+    recommended_queue: intents.filter((intent) => (intent.recommended_destination === "proslync_queue" || intent.recommended_destination === "ema_queue") && intent.review_state !== "rejected" && intent.review_state !== "deferred").sort((a, b) => queuePriority(b) - queuePriority(a) || b.confidence - a.confidence || a.title.localeCompare(b.title)).slice(0, 25)
+  };
+}
+function findIntent(projection2, id) {
+  const intent = projection2.intents.find((candidate) => candidate.id === id) ?? null;
+  return intent ? { projection: projection2, intent } : null;
+}
+function findIntentAcrossStore(id) {
+  if (!existsSync6(STORE_ROOT)) return null;
+  for (const name of readdirSync4(STORE_ROOT)) {
+    if (name === "reviews.json") continue;
+    if (!name.endsWith(".json")) continue;
+    try {
+      const projection2 = applyReviews(JSON.parse(readFileSync5(join7(STORE_ROOT, name), "utf8")));
+      const found = findIntent(projection2, id);
+      if (found) return found;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+function writeStoredProjection(project, projection2) {
+  mkdirSync2(STORE_ROOT, { recursive: true });
+  writeFileSync3(storePath(project), JSON.stringify(projection2, null, 2) + "\n");
+}
+function storePath(project) {
+  return join7(STORE_ROOT, `${safeName(project ?? "unresolved")}.json`);
+}
+function emptyProjection(project) {
+  return buildProjection(project, 0, 0, 0, []);
+}
+function queueAddCommand(project, intent) {
+  return [
+    "ema",
+    "queue",
+    "add",
+    "--project",
+    shellQuote3(project),
+    "--title",
+    shellQuote3(intent.title),
+    "--why",
+    shellQuote3(`${intent.raw_text.slice(0, 400)} Evidence: ${intent.evidence_ref}`),
+    "--done-when",
+    shellQuote3(`Reviewed intention is either shipped, rejected, or merged into the current project plan. Source: ${intent.id}`),
+    "--source",
+    shellQuote3(intent.evidence_ref)
+  ];
+}
+function safeName(value) {
+  return value.replace(/[^a-zA-Z0-9._-]+/g, "_");
+}
+function shellQuote3(value) {
+  return JSON.stringify(value);
+}
+function interestingFile(path2) {
+  const lower = path2.toLowerCase();
+  return lower.endsWith(".jsonl") || lower.endsWith(".md");
+}
+function skipDir(path2) {
+  const lower = path2.toLowerCase();
+  return ["/node_modules", "/.next", "/dist", "/build", "/pods", "/deriveddata"].some((part) => lower.includes(part));
+}
+function safeStat(path2) {
+  try {
+    return statSync3(path2);
+  } catch {
+    return null;
+  }
+}
+function normalize(value) {
+  return value.replace(/\s+/g, " ").trim();
+}
+function stringField(value, keys) {
+  if (!value || typeof value !== "object") return null;
+  const object = value;
+  for (const key of keys) {
+    const raw = object[key];
+    if (typeof raw === "string" && raw.trim()) return raw.trim();
+  }
+  return null;
+}
+function hash(value) {
+  let h1 = 3735928559;
+  let h2 = 1103547991;
+  for (let i = 0; i < value.length; i++) {
+    const ch = value.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507) ^ Math.imul(h2 ^ h2 >>> 13, 3266489909);
+  h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507) ^ Math.imul(h1 ^ h1 >>> 13, 3266489909);
+  return `${(h2 >>> 0).toString(16).padStart(8, "0")}${(h1 >>> 0).toString(16).padStart(8, "0")}`;
+}
+function parsePositiveInt(value, fallback) {
+  if (!value) return fallback;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+// src/commands/cockpit.ts
+var execFileAsync2 = promisify2(execFile2);
+var ACTIVE_BUILDS_ROOT = join8(DESKTOP_ROOT, "Active builds");
+var INTENTION_STORE_ROOT = join8(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
+async function runCockpit(args) {
+  const sub = args.positional[0] ?? "summary";
+  if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
+    printHelp2();
+    return 0;
+  }
+  if (!["summary", "projection", "workpack", "builds", "surfaces", "lanes", "queue", "intentions", "open"].includes(sub)) {
+    emitError(`ema cockpit: unknown subcommand "${sub}"`);
+    emitError("Usage: ema cockpit [summary|projection|workpack|builds|surfaces|lanes|queue|intentions|open] [--project <name>] [--json]");
+    return 64;
+  }
+  const json = flagBool(args, "json");
+  if (sub === "intentions") {
+    const intentions = await loadIntentionProjection(args);
+    const payload = {
+      ok: true,
+      command: "cockpit.intentions",
+      project: intentions.project,
+      stats: intentions.stats,
+      top_tags: intentions.top_tags,
+      recommended_queue: intentions.recommended_queue
+    };
+    if (json) emitJson(payload);
+    else printIntentions(payload);
+    return 0;
+  }
+  if (sub === "workpack") {
+    const workpackProjection = await loadCockpitProjection(args, { includeTopbar: false });
+    const payload = {
+      ok: true,
+      command: "cockpit.workpack",
+      generated_at: (/* @__PURE__ */ new Date()).toISOString(),
+      project: workpackProjection.project,
+      client: workpackProjection.client,
+      health: workpackProjection.health,
+      agent_work: agentWorkpackFor(workpackProjection)
+    };
+    if (json) emitJson(payload);
+    else printWorkpack(payload);
+    return 0;
+  }
+  const projection2 = await loadCockpitProjection(args);
+  if (sub === "projection") {
+    emitJson(projection2);
+    return 0;
+  }
+  if (sub === "builds") {
+    if (json) emitJson({ ok: true, command: "cockpit.builds", builds: projection2.active_builds });
+    else printBuilds(projection2.active_builds);
+    return 0;
+  }
+  if (sub === "surfaces") {
+    if (json) emitJson({ ok: true, command: "cockpit.surfaces", surfaces: projection2.surfaces });
+    else printSurfaces(projection2.surfaces);
+    return 0;
+  }
+  if (sub === "lanes") {
+    if (json) emitJson({ ok: true, command: "cockpit.lanes", lanes: projection2.lanes });
+    else printLanes(projection2.lanes);
+    return 0;
+  }
+  if (sub === "queue") {
+    if (json) emitJson({ ok: true, command: "cockpit.queue", queue: projection2.queue });
+    else printQueue(projection2.queue);
+    return 0;
+  }
+  if (sub === "open") {
+    if (json) emitJson({ ok: true, command: "cockpit.open", url: projection2.workspace.cockpit_url });
+    else emitPretty(projection2.workspace.cockpit_url ?? "No cockpit URL: workspace project is unresolved.");
+    return 0;
+  }
+  if (json) emitJson(projection2);
+  else printSummary(projection2);
+  return 0;
+}
+async function loadCockpitProjection(args, options = {}) {
+  const scope = await resolveWorkspaceScope({ args });
+  const includeTopbar = options.includeTopbar ?? true;
+  const projectionSpecs = [
+    {
+      name: "lane.registry",
+      pick: (data) => toRecords(data.lanes)
+    },
+    {
+      name: "queue.registry",
+      pick: (data) => toRecords(data.queue_items)
+    },
+    ...includeTopbar ? [{
+      name: "topbar",
+      pick: (data) => data
+    }] : []
+  ];
+  const [laneProjection, queueProjection, topbar = null] = await readProjectionBatch(args, projectionSpecs);
+  const projectId = scope.project_id;
+  const lanes = filterProject(laneProjection ?? [], projectId);
+  const queue = filterProject(queueProjection ?? [], projectId);
+  const client = inferClient(scope);
+  const activeBuilds = await discoverBuilds(scope);
+  const surfaces = inferSurfaces(scope);
+  const health = healthFor({
+    activeBuilds,
+    daemonUp: laneProjection != null || queueProjection != null,
+    intentionsUp: intentionProjectionAvailable(scope),
+    surfaces
+  });
+  const cockpitUrl = cockpitUrlFor(scope, client);
+  const homeCurrentProject = topbar?.current_project?.name ?? null;
+  const scopeWarning = homeCurrentProject && scope.project_name && homeCurrentProject !== scope.project_name ? `home_current project ${homeCurrentProject} differs from workspace_scope project ${scope.project_name}; workspace commands use workspace_scope unless --project overrides it.` : null;
+  return {
+    ok: true,
+    command: "cockpit.projection",
+    source: "ema-cockpit-cli",
+    generated_at: (/* @__PURE__ */ new Date()).toISOString(),
+    client,
+    project: {
+      id: scope.project_id,
+      name: scope.project_name,
+      kind: scope.project_id ? client ? "client" : "personal" : "unresolved",
+      project_record: scope.project_record,
+      active_build: scope.active_build,
+      resolution_source: scope.resolution_source
+    },
+    workspace: {
+      workspace_scope: scope,
+      home_current_project: homeCurrentProject,
+      scope_warning: scopeWarning,
+      cockpit_url: cockpitUrl
+    },
+    counts: {
+      lanes: lanes.length,
+      active_lanes: lanes.filter((lane) => lane.status === "active").length,
+      ready_lanes: lanes.filter((lane) => lane.status === "ready").length,
+      queue: queue.length,
+      ready_queue: queue.filter((item) => item.status === "ready").length,
+      blocked_queue: queue.filter((item) => item.status === "blocked").length,
+      builds: activeBuilds.length,
+      surfaces: surfaces.length
+    },
+    lanes,
+    queue,
+    active_builds: activeBuilds,
+    surfaces,
+    health
+  };
+}
+function printHelp2() {
+  emitPretty("ema cockpit \u2014 client/project cockpit over daemon workspace state");
+  emitPretty("");
+  emitPretty("Usage:");
+  emitPretty("  ema cockpit summary [--project <name>] [--json]");
+  emitPretty("  ema cockpit projection [--project <name>] --json");
+  emitPretty("  ema cockpit workpack [--project <name>] [--json]");
+  emitPretty("  ema cockpit builds [--project <name>] [--json]");
+  emitPretty("  ema cockpit surfaces [--project <name>] [--json]");
+  emitPretty("  ema cockpit lanes [--project <name>] [--json]");
+  emitPretty("  ema cockpit queue [--project <name>] [--json]");
+  emitPretty("  ema cockpit intentions [--project <name>] [--json]");
+  emitPretty("  ema cockpit open [--project <name>] [--json]");
+}
+function printWorkpack(payload) {
+  emitPretty(`${payload.project.name ?? "(unresolved project)"} workpack`);
+  emitPretty(`health: daemon ${payload.health.daemon}, web ${payload.health.web}, ready ${payload.health.proslync_ready}`);
+  emitPretty("");
+  emitPretty("kickoff:");
+  for (const command of payload.agent_work.kickoff_commands) emitPretty(`  ${command}`);
+  emitPretty("");
+  emitPretty("verification:");
+  for (const command of payload.agent_work.verification_commands) emitPretty(`  ${command}`);
+  if (payload.agent_work.hazards.length > 0) {
+    emitPretty("");
+    emitPretty("hazards:");
+    for (const hazard of payload.agent_work.hazards) emitPretty(`  ${hazard}`);
+  }
+}
+function printSummary(projection2) {
+  const clientPrefix = projection2.client ? `${projection2.client.name} / ` : "";
+  emitPretty(`${clientPrefix}${projection2.project.name ?? "(unresolved project)"}`);
+  emitPretty(`project: ${projection2.project.id ?? "(none)"}`);
+  emitPretty(`record:  ${projection2.project.project_record ?? "(none)"}`);
+  emitPretty(`build:   ${projection2.project.active_build ?? "(none)"}`);
+  emitPretty(`scope:   ${projection2.project.resolution_source}`);
+  if (projection2.workspace.scope_warning) emitPretty(`[warn] ${projection2.workspace.scope_warning}`);
+  emitPretty("");
+  emitPretty(
+    `lanes: ${projection2.counts.lanes} (${projection2.counts.active_lanes} active, ${projection2.counts.ready_lanes} ready)`
+  );
+  emitPretty(
+    `queue: ${projection2.counts.queue} (${projection2.counts.ready_queue} ready, ${projection2.counts.blocked_queue} blocked)`
+  );
+  emitPretty(`builds: ${projection2.counts.builds}`);
+  emitPretty(`surfaces: ${projection2.counts.surfaces}`);
+  emitPretty(
+    `health: daemon ${projection2.health.daemon}, web ${projection2.health.web}, Proslync ${projection2.health.proslync_ready ? "ready" : "needs review"}`
+  );
+  if (projection2.workspace.cockpit_url) emitPretty(`url: ${projection2.workspace.cockpit_url}`);
+}
+function printBuilds(builds) {
+  if (builds.length === 0) {
+    emitPretty("No active builds discovered for this project.");
+    return;
+  }
+  for (const build of builds) {
+    const git = [
+      build.git_status,
+      build.branch ? `branch ${build.branch}` : null,
+      build.head ? `HEAD ${build.head}` : null,
+      typeof build.dirty_count === "number" ? `dirty ${build.dirty_count}` : null
+    ].filter(Boolean).join(" \xB7 ");
+    emitPretty(`${build.label}`);
+    emitPretty(`  ${build.path}`);
+    emitPretty(`  ${git}`);
+    if (build.dev_command) emitPretty(`  dev: ${build.dev_command}`);
+  }
+}
+function printSurfaces(surfaces) {
+  if (surfaces.length === 0) {
+    emitPretty("No cockpit surfaces registered for this project.");
+    return;
+  }
+  for (const surface of surfaces) {
+    emitPretty(`${surface.label} [${surface.status}]`);
+    emitPretty(`  ${surface.role}`);
+    emitPretty(`  owner: ${surface.owner}`);
+    emitPretty(`  path: ${surface.path}`);
+    if (surface.local_url) emitPretty(`  url: ${surface.local_url}`);
+  }
+}
+function printLanes(lanes) {
+  if (lanes.length === 0) {
+    emitPretty("No lanes found for this project.");
+    return;
+  }
+  for (const lane of lanes) {
+    emitPretty(`${lane.id} [${lane.status ?? "unknown"}] ${lane.title ?? lane.name ?? "(untitled lane)"}`);
+    if (lane.actor_id) emitPretty(`  actor: ${lane.actor_id}`);
+    if (lane.scope) emitPretty(`  scope: ${lane.scope}`);
+    if (lane.next) emitPretty(`  next: ${lane.next}`);
+  }
+}
+function printQueue(queue) {
+  if (queue.length === 0) {
+    emitPretty("No queue items found for this project.");
+    return;
+  }
+  for (const item of queue) {
+    emitPretty(`${item.id} [${item.status ?? "unknown"}] ${item.title ?? item.name ?? "(untitled queue item)"}`);
+    if (item.lane_id) emitPretty(`  lane: ${item.lane_id}`);
+    if (item.why) emitPretty(`  why: ${item.why}`);
+    if (item.done_when) emitPretty(`  done: ${item.done_when}`);
+  }
+}
+function printIntentions(payload) {
+  emitPretty(`${payload.project ?? "(unresolved project)"} intentions`);
+  emitPretty(`candidates: ${payload.stats.candidate_intents}`);
+  emitPretty(`proslync: ${payload.stats.proslync_relevant}`);
+  emitPretty(`lost followups: ${payload.stats.lost_followups}`);
+  if (payload.recommended_queue.length === 0) {
+    emitPretty("recommended queue: (none)");
+    return;
+  }
+  emitPretty("recommended queue:");
+  for (const item of payload.recommended_queue.slice(0, 10)) {
+    emitPretty(`  ${item.id} ${item.title}`);
+    emitPretty(`    tags: ${item.tags.join(", ")}`);
+    emitPretty(`    evidence: ${item.evidence_ref}`);
+  }
+}
+function toRecords(value) {
+  return Array.isArray(value) ? value : [];
+}
+function filterProject(records, projectId) {
+  if (!projectId) return [...records];
+  return records.filter((record) => record.project_id == null || record.project_id === projectId);
+}
+function inferClient(scope) {
+  if (scope.project_name?.startsWith("proslync")) {
+    return { id: "client:ms-wilson", name: "Ms. Wilson", color: "#d49a6a" };
+  }
+  return null;
+}
+async function discoverBuilds(scope) {
+  const paths = /* @__PURE__ */ new Set();
+  if (scope.active_build) paths.add(scope.active_build);
+  const family = projectFamily(scope.project_name);
+  if (family && existsSync7(ACTIVE_BUILDS_ROOT)) {
+    for (const name of readdirSync5(ACTIVE_BUILDS_ROOT)) {
+      if (name === family || name.startsWith(`${family}-`)) {
+        paths.add(join8(ACTIVE_BUILDS_ROOT, name));
+      }
+    }
+  }
+  return await Promise.all([...paths].sort().map((path2) => gitFact(path2)));
+}
+function intentionProjectionAvailable(scope) {
+  const project = scope.project_name ?? "unresolved";
+  return existsSync7(join8(INTENTION_STORE_ROOT, `${safeName2(project)}.json`));
+}
+async function gitFact(path2) {
+  const id = basename2(path2);
+  const base = {
+    id,
+    label: labelForBuild(id),
+    role: roleForBuild(id),
+    path: path2,
+    repo_url: repoForBuild(id),
+    dev_command: devCommandForBuild(id)
+  };
+  if (!existsSync7(path2)) {
+    return { ...base, branch: null, head: null, dirty_count: null, git_status: "missing" };
+  }
+  if (!existsSync7(join8(path2, ".git"))) {
+    return { ...base, branch: null, head: null, dirty_count: null, git_status: "no_git" };
+  }
+  const [branch, head, status] = await Promise.all([
+    run("git", ["branch", "--show-current"], path2).catch(() => ""),
+    run("git", ["rev-parse", "--short", "HEAD"], path2).catch(() => ""),
+    run("git", ["status", "--short"], path2).catch(() => "")
+  ]);
+  const dirtyCount = status.split("\n").filter(Boolean).length;
+  return {
+    ...base,
+    branch: branch || null,
+    head: head || null,
+    dirty_count: dirtyCount,
+    git_status: head ? dirtyCount > 0 ? "dirty" : "clean" : "unborn"
+  };
+}
+async function run(command, args, cwd) {
+  const { stdout } = await execFileAsync2(command, [...args], {
+    cwd,
+    encoding: "utf8",
+    timeout: 8e3,
+    maxBuffer: 4 * 1024 * 1024
+  });
+  return stdout.trim();
+}
+function inferSurfaces(scope) {
+  if (!scope.project_name?.startsWith("proslync")) return [];
+  return [
+    {
+      id: "ad-cockpit",
+      label: "AD cockpit",
+      role: "Buyer control room: revenue share, cap context, compliance health.",
+      owner: "Proslync desktop",
+      build_id: "proslync-desktop",
+      path: join8(ACTIVE_BUILDS_ROOT, "proslync-desktop/app/ad/page.tsx"),
+      local_url: "http://localhost:3021/ad",
+      status: "planned"
+    },
+    {
+      id: "brand-hq",
+      label: "Brand HQ",
+      role: "Open-deal workflow, ranked applicants, rationale, and trust metadata.",
+      owner: "Proslync desktop",
+      build_id: "proslync-desktop",
+      path: join8(ACTIVE_BUILDS_ROOT, "proslync-desktop/app/brand/page.tsx"),
+      local_url: "http://localhost:3021/brand",
+      status: "candidate"
+    },
+    {
+      id: "nil-deal-detail",
+      label: "NIL Deal Detail",
+      role: "Cross-role spine: packet, deliverables, review tracks, audit timeline.",
+      owner: "Proslync iOS app",
+      build_id: "proslync-app-ios-final",
+      path: join8(ACTIVE_BUILDS_ROOT, "proslync-app-ios-final/app/deal/[id].tsx"),
+      local_url: null,
+      status: "planned"
+    },
+    {
+      id: "nil-manager",
+      label: "NIL Manager",
+      role: "Consent-aware review queue and approval gates.",
+      owner: "Proslync iOS app",
+      build_id: "proslync-app-ios-final",
+      path: join8(ACTIVE_BUILDS_ROOT, "proslync-app-ios-final/components/nil-manager/nil-manager-view.tsx"),
+      local_url: null,
+      status: "candidate"
+    },
+    {
+      id: "backend-api",
+      label: "Backend API",
+      role: "Product-core objects, routes, seed data, and trust metadata.",
+      owner: "Proslync backend",
+      build_id: "proslync-backend",
+      path: join8(ACTIVE_BUILDS_ROOT, "proslync-backend/src"),
+      local_url: "http://localhost:3020/api/health",
+      status: "candidate"
+    },
+    {
+      id: "master-plan",
+      label: "Master plan and assets",
+      role: "Client story, role happiness, research, and presentation proof.",
+      owner: "Presentation assets",
+      build_id: "proslync-presentation-assets-final",
+      path: join8(ACTIVE_BUILDS_ROOT, "proslync-presentation-assets-final/docs/plans/proslync-role-happiness-master-plan-2026-05-09/README.md"),
+      local_url: null,
+      status: "live"
+    }
+  ];
+}
+function healthFor(input) {
+  const gitBuilds = new Map(input.activeBuilds.map((build) => [build.id, build]));
+  const gitFactsLoaded = ["proslync-app-ios-final", "proslync-backend", "proslync-presentation-assets-final"].every((id) => {
+    const status = gitBuilds.get(id)?.git_status;
+    return status != null && status !== "missing" && status !== "unknown" && status !== "no_git";
+  });
+  const desktopStatus = gitBuilds.get("proslync-desktop")?.git_status;
+  const desktopExplicit = desktopStatus != null && desktopStatus !== "missing" && desktopStatus !== "unknown";
+  return {
+    daemon: input.daemonUp ? "up" : "down",
+    web: "up",
+    dirty_builds: input.activeBuilds.filter((build) => build.git_status === "dirty").length,
+    no_git_builds: input.activeBuilds.filter((build) => build.git_status === "no_git").length,
+    stale_records: [],
+    proslync_ready: input.daemonUp && input.intentionsUp && gitFactsLoaded && desktopExplicit && input.surfaces.length >= 6
+  };
+}
+function cockpitUrlFor(scope, client) {
+  if (!scope.project_id) return null;
+  if (client) {
+    return `http://localhost:5173/cockpit#/clients/${client.id}/${scope.project_id}`;
+  }
+  return `http://localhost:5173/cockpit#/personal/${scope.project_id}`;
+}
+function projectFamily(name) {
+  if (!name) return null;
+  if (name.startsWith("proslync")) return "proslync";
+  return name;
+}
+function safeName2(value) {
+  return value.replace(/[^a-zA-Z0-9._-]+/g, "_");
+}
+function labelForBuild(id) {
+  if (id === "proslync-app-ios-final") return "Proslync iOS app";
+  if (id === "proslync-backend") return "Proslync backend";
+  if (id === "proslync-desktop") return "Proslync desktop";
+  if (id === "proslync-presentation-assets-final") return "Presentation assets";
+  return id;
+}
+function roleForBuild(id) {
+  if (id === "proslync-app-ios-final") return "mobile mirror, athlete/brand/persona flows";
+  if (id === "proslync-backend") return "Bun/Hono/Drizzle API and product-core persistence";
+  if (id === "proslync-desktop") return "AD cockpit and Brand HQ desktop surface";
+  if (id === "proslync-presentation-assets-final") return "master plan, research capture, client narrative";
+  return "active build";
+}
+function repoForBuild(id) {
+  if (id === "proslync-app-ios-final") return "https://github.com/TrajanWJ/proslync-app-ios-final";
+  if (id === "proslync-backend") return "https://github.com/TrajanWJ/proslync-backend-final";
+  if (id === "proslync-desktop") return "https://github.com/TrajanWJ/proslync-desktop-site-final";
+  if (id === "proslync-presentation-assets-final") return "https://github.com/TrajanWJ/proslync-presentation-assets-final";
+  return null;
+}
+function devCommandForBuild(id) {
+  if (id === "proslync-app-ios-final") return "npx expo start";
+  if (id === "proslync-backend") return "bun --hot src/server.ts";
+  if (id === "proslync-desktop") return "pnpm dev";
+  return null;
+}
+function agentWorkpackFor(projection2) {
+  const dirtyBuilds = projection2.active_builds.filter((build) => build.git_status === "dirty");
+  const unstableBuilds = projection2.active_builds.filter((build) => build.git_status === "no_git" || build.git_status === "unborn" || build.git_status === "unknown" || build.git_status === "missing");
+  const activeOrReadyLane = projection2.lanes.find((lane) => lane.status === "active") ?? projection2.lanes.find((lane) => lane.status === "ready") ?? projection2.lanes[0] ?? null;
+  const readyQueue = projection2.queue.filter((item) => item.status === "ready").slice(0, 8);
+  const projectName2 = projection2.project.name ?? "proslync-app-ios-final";
+  const claimCommand = activeOrReadyLane ? `ema lane claim --lane ${activeOrReadyLane.id} --actor actor:codex --scope "<paths>" --goal "<goal>" --next "<next step>"` : `ema lane open --project ${projectName2} --title "<slice title>" --scope "<paths>" --done-when "<done criteria>"`;
+  return {
+    mode: "multi-repo-agent-work",
+    project_name: projectName2,
+    client_name: projection2.client?.name ?? null,
+    cockpit_url: projection2.workspace.cockpit_url,
+    active_lane: activeOrReadyLane,
+    ready_queue: readyQueue,
+    builds: projection2.active_builds.map((build) => ({
+      id: build.id,
+      path: build.path,
+      role: build.role,
+      git_status: build.git_status,
+      branch: build.branch,
+      head: build.head,
+      dirty_count: build.dirty_count,
+      dev_command: build.dev_command
+    })),
+    surfaces: projection2.surfaces.map((surface) => ({
+      id: surface.id,
+      owner: surface.owner,
+      build_id: surface.build_id,
+      path: surface.path,
+      status: surface.status,
+      local_url: surface.local_url
+    })),
+    kickoff_commands: [
+      `ema cockpit projection --project ${projectName2} --json`,
+      `ema cockpit intentions --project ${projectName2} --json`,
+      claimCommand
+    ],
+    verification_commands: [
+      "pnpm --filter @ema/cli typecheck",
+      "pnpm build:cli",
+      "pnpm --dir apps/web exec tsc --noEmit",
+      `ema cockpit workpack --project ${projectName2} --json`
+    ],
+    hazards: [
+      ...dirtyBuilds.map((build) => `${build.id} has ${build.dirty_count ?? 0} dirty file(s); inspect before assigning broad writes.`),
+      ...unstableBuilds.map((build) => `${build.id} git status is ${build.git_status}; treat branch/head as unavailable.`),
+      ...projection2.health.proslync_ready ? [] : ["Project health is not ready; inspect daemon/web/intentions/build facts before swarm kickoff."]
+    ],
+    handoff_contract: {
+      before_editing: "Read the active build docs and claim a daemon lane with exact path scope.",
+      during_work: "Keep writes scoped by build and surface; do not reset or clean dirty worktrees.",
+      after_work: "Run verification commands, update lane/queue, and record evidence in the cockpit or release report."
+    }
+  };
+}
+
 // src/bin.ts
 async function main() {
   const [, , cmd, ...rest] = process.argv;
@@ -6970,6 +8175,10 @@ async function main() {
       return runRecovery(args);
     case "cwt":
       return runCwt(args);
+    case "cockpit":
+      return runCockpit(args);
+    case "intention":
+      return runIntention(args);
     default:
       emitError(`ema: unknown command "${cmd}"`);
       emitError(`Run "ema help" to list commands.`);

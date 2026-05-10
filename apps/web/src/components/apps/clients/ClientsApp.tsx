@@ -3,6 +3,13 @@
 import { useAtlasLiveState, formatAtlasTime } from "@/src/components/apps/atlas/live-state";
 import { useWindowStore } from "@/src/stores/window-store";
 
+function openClientCockpit(): void {
+	if (typeof window !== "undefined") {
+		window.location.hash = "/clients/client:ms-wilson/proslync-app-ios-final";
+	}
+	useWindowStore.getState().openWindow("cockpit");
+}
+
 export function ClientsApp() {
 	const { data, loading, error } = useAtlasLiveState();
 
@@ -18,6 +25,9 @@ export function ClientsApp() {
 					</p>
 				</div>
 				<div className="clients-actions">
+					<button type="button" onClick={openClientCockpit}>
+						Client Cockpit
+					</button>
 					<button type="button" onClick={() => useWindowStore.getState().openWindow("cwt")}>
 						Open CWT
 					</button>
@@ -43,7 +53,10 @@ export function ClientsApp() {
 						<div>
 							<span>Last Atlas pull</span>
 							<strong>{formatAtlasTime(data.generatedAt)}</strong>
-							<p>CWT bridge route: {data.cwt.bridgeUrl}</p>
+							<p>
+								<span className="clients-status clients-status--live">bridge route</span>{" "}
+								{data.cwt.bridgeUrl}
+							</p>
 						</div>
 					</section>
 
@@ -65,6 +78,10 @@ export function ClientsApp() {
 							<h2>Boundary-preserving routes</h2>
 						</header>
 						<div className="clients-link-grid">
+							<button type="button" onClick={openClientCockpit}>
+								<strong>Proslync Cockpit</strong>
+								<small>#/clients/client:ms-wilson/proslync-app-ios-final</small>
+							</button>
 							<a href={data.cwt.standaloneUrl} target="_blank" rel="noreferrer">
 								<strong>Standalone CWT</strong>
 								<small>{data.cwt.standaloneUrl}</small>
@@ -100,9 +117,7 @@ function ClientsStyles() {
 				overflow: auto;
 				padding: 26px;
 				color: var(--place-text-primary);
-				background:
-					linear-gradient(180deg, rgba(157,224,181,0.07), transparent 240px),
-					var(--place-bg-primary);
+				background: var(--place-bg-primary);
 			}
 			.clients-head {
 				display: flex;
@@ -141,9 +156,10 @@ function ClientsStyles() {
 			}
 			.clients-actions button,
 			.clients-chip-grid span,
-			.clients-link-grid a {
+			.clients-link-grid a,
+			.clients-link-grid button {
 				border: 1px solid var(--place-border-subtle);
-				border-radius: 7px;
+				border-radius: 6px;
 				background: var(--place-surface-2);
 				color: var(--place-text-secondary);
 				padding: 7px 9px;
@@ -151,8 +167,15 @@ function ClientsStyles() {
 				font: inherit;
 				font-size: 0.78rem;
 			}
-			.clients-actions button {
+			.clients-actions button,
+			.clients-link-grid button {
 				cursor: pointer;
+			}
+			.clients-actions button:hover,
+			.clients-link-grid a:hover,
+			.clients-link-grid button:hover {
+				border-color: var(--place-border-default);
+				color: var(--place-text-primary);
 			}
 			.clients-bridge {
 				display: grid;
@@ -163,7 +186,7 @@ function ClientsStyles() {
 			.clients-bridge > div,
 			.clients-panel {
 				border: 1px solid var(--place-border-default);
-				border-radius: 8px;
+				border-radius: 6px;
 				background: color-mix(in srgb, var(--place-surface-1) 92%, transparent);
 				padding: 14px;
 				min-width: 0;
@@ -198,6 +221,30 @@ function ClientsStyles() {
 				gap: 4px;
 				padding: 10px;
 			}
+			.clients-link-grid button {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				padding: 10px;
+				text-align: left;
+			}
+			.clients-status {
+				display: inline-flex;
+				align-items: center;
+				min-height: 18px;
+				padding: 0 6px;
+				border: 1px solid var(--place-border-subtle);
+				border-radius: 3px;
+				font-family: var(--place-font-mono);
+				font-size: 0.62rem;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+			}
+			.clients-status--live {
+				color: var(--place-accent-personal);
+				border-color: color-mix(in srgb, var(--place-accent-personal) 38%, transparent);
+				background: color-mix(in srgb, var(--place-accent-personal) 14%, transparent);
+			}
 			.clients-empty {
 				min-height: 50%;
 				display: grid;
@@ -205,6 +252,9 @@ function ClientsStyles() {
 				gap: 6px;
 				text-align: center;
 				color: var(--place-text-secondary);
+				border: 1px solid var(--place-border-default);
+				border-radius: 6px;
+				background: var(--place-surface-1);
 			}
 			@media (max-width: 820px) {
 				.clients-head {

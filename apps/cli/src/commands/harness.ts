@@ -379,18 +379,19 @@ async function runDispatch(args: ParsedArgs): Promise<number> {
 	const prompt = flagString(args, "prompt") ?? "";
 	if (provider !== "simulated") {
 		const pending = {
-			ok: true,
+			ok: false,
 			command: "harness dispatch",
-			status: "pending_provider_adapter",
+			status: "unsupported_provider_adapter",
 			provider,
 			lane,
 			cwd,
 			prompt,
 			required_capability: `${provider} PTY/SDK adapter`,
+			remediation: "Use --provider simulated until the guarded PTY/SDK adapter is implemented.",
 		};
 		if (flagBool(args, "json")) emitJson(pending);
-		else emitPretty(`${provider} adapter pending; simulated provider is ready`);
-		return 0;
+		else emitPretty(`${provider} adapter unsupported in this build; simulated provider is ready`);
+		return 1;
 	}
 
 	// L2 (humble-sketch lane:01KR0RQ6JK): when --provider simulated and the

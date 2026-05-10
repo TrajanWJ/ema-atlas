@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { motion } from "motion/react";
 
 import { type AppDef, getAppsByGroup } from "@/src/lib/app-registrations";
@@ -16,6 +16,15 @@ const HERO_RECENT_LIMIT = 4;
 
 function openApp(id: string): void {
 	useWindowStore.getState().openWindow(id as AppId);
+}
+
+function openClientCockpit(tab?: "workspace" | "intentions" | "surfaces"): void {
+	if (typeof window !== "undefined") {
+		window.location.hash = tab
+			? `/clients/client:ms-wilson/proslync-app-ios-final/${tab}`
+			: "/clients/client:ms-wilson/proslync-app-ios-final";
+	}
+	openApp("cockpit");
 }
 
 function recentAppIds(
@@ -37,6 +46,7 @@ export function LaunchpadApp() {
 	const windows = useWindowStore((state) => state.windows);
 	const emaApps = useMemo(() => getAppsByGroup("ema"), []);
 	const placeApps = useMemo(() => getAppsByGroup("place-tools"), []);
+	const cockpitApp = useMemo(() => emaApps.find((app) => app.id === "cockpit") ?? null, [emaApps]);
 	const recents = useMemo(() => recentAppIds(windows), [windows]);
 	const recentApps = useMemo(() => {
 		const all: readonly AppDef[] = [...emaApps, ...placeApps];
@@ -94,10 +104,60 @@ export function LaunchpadApp() {
 				/>
 			</section>
 
+			<section className="lp-group" aria-label="Client Work">
+				<header className="lp-group__head">
+					<p className="lp-section__eyebrow">client work</p>
+					<h2 className="lp-group__title">Proslync</h2>
+				</header>
+				<div className="lp-grid">
+					<motion.button
+						type="button"
+						className="lp-tile"
+						onClick={() => openClientCockpit()}
+						whileHover={{ y: -2 }}
+						transition={{ duration: 0.15, ease: FADE_EASE }}
+					>
+						<span className="lp-tile__icon" aria-hidden>
+							{cockpitApp?.icon}
+						</span>
+						<strong className="lp-tile__name">Client Cockpit</strong>
+						<span className="lp-tile__meta">
+							Proslync builds, lanes, queue, intentions, and surfaces.
+						</span>
+					</motion.button>
+					<motion.button
+						type="button"
+						className="lp-tile"
+						onClick={() => openClientCockpit("intentions")}
+						whileHover={{ y: -2 }}
+						transition={{ duration: 0.15, ease: FADE_EASE }}
+					>
+						<span className="lp-tile__icon" aria-hidden>
+							#
+						</span>
+						<strong className="lp-tile__name">Intention Backfeed</strong>
+						<span className="lp-tile__meta">Harvested Proslync signals and review controls.</span>
+					</motion.button>
+					<motion.button
+						type="button"
+						className="lp-tile"
+						onClick={() => openClientCockpit("workspace")}
+						whileHover={{ y: -2 }}
+						transition={{ duration: 0.15, ease: FADE_EASE }}
+					>
+						<span className="lp-tile__icon" aria-hidden>
+							$
+						</span>
+						<strong className="lp-tile__name">Runtime Health</strong>
+						<span className="lp-tile__meta">Daemon, web, active builds, and next command.</span>
+					</motion.button>
+				</div>
+			</section>
+
 			<section className="lp-group" aria-label="EMA Workspace">
 				<header className="lp-group__head">
-					<p className="lp-section__eyebrow">section 1</p>
-					<h2 className="lp-group__title">EMA Workspace</h2>
+					<p className="lp-section__eyebrow">agent workspace</p>
+					<h2 className="lp-group__title">EMA Surfaces</h2>
 				</header>
 				<div className="lp-grid">
 					{emaApps.map((app) => (
@@ -108,8 +168,8 @@ export function LaunchpadApp() {
 
 			<section className="lp-group" aria-label="Place Tools">
 				<header className="lp-group__head">
-					<p className="lp-section__eyebrow">section 2</p>
-					<h2 className="lp-group__title">Place Tools</h2>
+					<p className="lp-section__eyebrow">holodeck tools</p>
+					<h2 className="lp-group__title">Desktop Tools</h2>
 				</header>
 				<div className="lp-grid">
 					{placeApps.map((app) => (
@@ -375,7 +435,7 @@ function HeroButton({
 }: {
 	readonly variant: "primary" | "secondary";
 	readonly onClick: () => void;
-	readonly children: React.ReactNode;
+	readonly children: ReactNode;
 }) {
 	const primary = variant === "primary";
 	return (

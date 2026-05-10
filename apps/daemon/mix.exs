@@ -20,7 +20,7 @@ defmodule EmaDaemon.MixProject do
   def project do
     [
       app: :ema_daemon_elixir,
-      version: "0.0.5",
+      version: "0.0.6",
       elixir: "~> 1.17",
       elixirc_paths: ["lib"],
       test_paths: ["test"],

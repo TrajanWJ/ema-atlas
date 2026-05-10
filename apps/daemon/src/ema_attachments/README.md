@@ -5,7 +5,7 @@ The daemon-side backend for `git-ema`. Owns canonical truth for:
 - **attachments** — pointer + metadata records that any EMA object can
   link to.
 - **connectors** — external-source connection state (Google Drive,
-  GitHub). Demo-stubbed in 0.0.5 wave 1.
+  GitHub). Demo-stubbed in 0.0.6 wave 1.
 
 See:
 

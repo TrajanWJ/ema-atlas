@@ -174,9 +174,9 @@ export function Window({ win, children }: WindowProps) {
 		[displayName, scope.org?.id, scope.space?.id, win.id, win.appId],
 	);
 
-	const handleDetach = () => {
+	const handleDetach = async () => {
 		const launcher = getPopoutLauncher();
-		const popup = launcher.detach(win.id, win.appId, win.position);
+		const popup = await launcher.detach(win.id, win.appId, win.position);
 		if (popup) closeWindow(win.id);
 	};
 
@@ -202,12 +202,11 @@ export function Window({ win, children }: WindowProps) {
 
 		// If released outside the viewport, pop out
 		if (wasOutside || isCursorOutsideViewport(d.x, d.y)) {
-			const popup = getPopoutLauncher().detach(
-				win.id,
-				win.appId,
-				win.position,
-			);
-			if (popup) closeWindow(win.id);
+			void getPopoutLauncher()
+				.detach(win.id, win.appId, win.position)
+				.then((popup) => {
+					if (popup) closeWindow(win.id);
+				});
 			return;
 		}
 

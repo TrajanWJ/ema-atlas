@@ -8,7 +8,7 @@ import { runStubContract } from "./stub-contract.js";
 
 // ---------------------------------------------------------------------------
 // Defaults — match the first-boot seed so `ema vcalendar ...` works against
-// the canonical Founding-Fathers-EMA org without flags in development.
+// the canonical EMA development org without flags in development.
 // ---------------------------------------------------------------------------
 
 const DEFAULT_ORG = "org:01J00000000000000000000001";

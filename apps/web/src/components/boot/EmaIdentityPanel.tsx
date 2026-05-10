@@ -20,7 +20,7 @@ interface EmaIdentityPanelProps {
  * Until Wave II wires real daemon-bound identity:
  *   - hostname: from os hostname (Tauri) or "this machine" fallback
  *   - scope: from useTopbar() projection (mock fallback returns the EMA
- *     Workspace / EMA Studio / EMA 0.0.5 trio)
+ *     Workspace / EMA Studio / EMA 0.0.6 trio)
  *   - daemon status: live from useIpcConnection()
  */
 export function EmaIdentityPanel({ onContinue }: EmaIdentityPanelProps) {
@@ -56,7 +56,7 @@ export function EmaIdentityPanel({ onContinue }: EmaIdentityPanelProps) {
 
 	const orgName = scope.org?.name ?? "EMA Workspace";
 	const spaceName = scope.space?.name ?? "EMA Studio";
-	const projectName = scope.project?.name ?? "EMA 0.0.5";
+	const projectName = scope.project?.name ?? "EMA 0.0.6";
 
 	function handleEntry(target: EntryTarget) {
 		// In Tauri the user's already on their machine; quickLogin keeps the

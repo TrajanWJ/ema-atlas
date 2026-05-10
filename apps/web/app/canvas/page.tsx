@@ -1,12 +1,11 @@
-"use client";
+import { Suspense } from "react";
 
-import { CanvasCore } from "@/src/components/apps/canvas/CanvasCore";
-import { holodeckInsetStyle } from "@/src/lib/holodeck-layout";
+import { PanelAppFrame } from "@/src/components/apps/PanelAppFrame";
 
 export default function CanvasPage() {
 	return (
-		<div style={holodeckInsetStyle()}>
-			<CanvasCore fullPage />
-		</div>
+		<Suspense fallback={null}>
+			<PanelAppFrame appId="canvas" />
+		</Suspense>
 	);
 }

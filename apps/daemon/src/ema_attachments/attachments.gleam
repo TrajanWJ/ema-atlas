@@ -2,7 +2,7 @@
 ////
 //// Handles commands that mutate attachment records and emits
 //// `attachment.*` events to the bus. Pointer metadata only — raw
-//// file bytes are out of scope for 0.0.5 wave 1.
+//// file bytes are out of scope for 0.0.6 wave 1.
 
 import gleam/erlang/process.{type Subject}
 

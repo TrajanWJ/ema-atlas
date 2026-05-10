@@ -246,6 +246,496 @@ textarea::-webkit-scrollbar-thumb:hover {
 	background: rgba(45, 212, 168, 0.15) !important;
 }
 
+/* =============================================================================
+ * EMA 0.0.6 priority vApp polish
+ * Shared visual grammar for the agent/client-work spine:
+ * Launchpad, Client Cockpit, Agent Work, HQ, Atlas, Blueprint, Chronicle,
+ * git-ema, Clients, Threads, Wiki, and the Place Tools folder.
+ * ============================================================================= */
+
+[data-panel-app] {
+	min-height: 0;
+}
+
+[data-app="launchpad"],
+[data-app="wiki"],
+[data-app="threads"],
+[data-app="place-tools"],
+[data-app="git-ema"],
+[data-app="clients"],
+[data-app="atlas"],
+[data-app="hq"],
+[data-app="chronicle"],
+[data-app="agent-work"],
+[data-app="blueprint"] {
+	position: relative;
+	isolation: isolate;
+	min-height: 100%;
+	color: var(--place-text-primary);
+	background:
+		radial-gradient(circle at 18% 0%, rgba(45, 212, 168, 0.08), transparent 34%),
+		radial-gradient(circle at 78% 8%, rgba(91, 141, 239, 0.10), transparent 36%),
+		linear-gradient(180deg, rgba(255,255,255,0.025), transparent 280px),
+		var(--place-base);
+}
+
+[data-app="launchpad"]::before,
+[data-app="wiki"]::before,
+[data-app="threads"]::before,
+[data-app="place-tools"]::before,
+[data-app="git-ema"]::before,
+[data-app="clients"]::before,
+[data-app="atlas"]::before,
+[data-app="hq"]::before,
+[data-app="chronicle"]::before,
+[data-app="agent-work"]::before,
+[data-app="blueprint"]::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: -1;
+	background-image:
+		linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+	background-size: 44px 44px;
+	mask-image: linear-gradient(to bottom, rgba(0,0,0,0.45), transparent 62%);
+}
+
+.lp-root,
+.wiki-root,
+.threads-root {
+	height: 100%;
+	overflow: auto;
+	padding: 24px;
+}
+
+.lp-header,
+.wiki-header,
+.threads-header {
+	display: grid;
+	gap: 8px;
+	margin-bottom: 16px;
+	padding: 22px;
+	border: 1px solid var(--place-border-default);
+	border-radius: 14px;
+	background:
+		linear-gradient(135deg, rgba(255,255,255,0.045), transparent),
+		color-mix(in srgb, var(--place-surface-1) 86%, transparent);
+	box-shadow: 0 18px 54px rgba(0,0,0,0.24);
+	backdrop-filter: blur(22px) saturate(150%);
+	-webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.lp-header__title,
+.wiki-header__title,
+.threads-header__title {
+	margin: 0;
+	font-size: clamp(1.4rem, 2vw, 2.25rem);
+	font-weight: 720;
+	letter-spacing: 0;
+	line-height: 1;
+}
+
+.lp-header__intent,
+.wiki-header__intent,
+.threads-header__intent {
+	max-width: 76ch;
+	margin: 0;
+	color: var(--place-text-secondary);
+	font-size: 0.92rem;
+	line-height: 1.55;
+}
+
+.lp-section__eyebrow,
+.wiki-header__eyebrow,
+.threads-header__eyebrow,
+.wiki-article__eyebrow {
+	margin: 0;
+	color: var(--place-text-tertiary);
+	font-family: var(--place-font-mono);
+	font-size: 0.62rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+.lp-hero,
+.lp-group,
+.wiki-body,
+.threads-list,
+.threads-detail {
+	border: 1px solid var(--place-border-default);
+	border-radius: 14px;
+	background:
+		linear-gradient(135deg, rgba(255,255,255,0.032), transparent 60%),
+		color-mix(in srgb, var(--place-surface-1) 90%, transparent);
+	box-shadow: 0 16px 48px rgba(0,0,0,0.22);
+	backdrop-filter: blur(20px) saturate(145%);
+	-webkit-backdrop-filter: blur(20px) saturate(145%);
+}
+
+.lp-hero {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+	gap: 16px;
+	margin-bottom: 16px;
+	padding: 16px;
+}
+
+.lp-hero__recent-row,
+.lp-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+	gap: 10px;
+}
+
+.lp-hero__empty {
+	margin: 0;
+	color: var(--place-text-secondary);
+	font-size: 0.85rem;
+}
+
+.lp-group {
+	margin-bottom: 16px;
+	padding: 16px;
+}
+
+.lp-group__head {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.lp-group__title {
+	margin: 0;
+	font-size: 1.05rem;
+	font-weight: 680;
+	letter-spacing: 0;
+}
+
+.lp-tile {
+	min-height: 122px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 14px;
+	border: 1px solid var(--place-border-subtle);
+	border-radius: 10px;
+	background:
+		linear-gradient(145deg, rgba(45,212,168,0.06), transparent 58%),
+		color-mix(in srgb, var(--place-surface-2) 88%, transparent);
+	color: var(--place-text-primary);
+	text-align: left;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
+	transition:
+		border-color 180ms var(--place-ease-smooth),
+		background 180ms var(--place-ease-smooth),
+		transform 180ms var(--place-ease-smooth);
+}
+
+.lp-tile:hover {
+	border-color: var(--place-primary-border);
+	background:
+		linear-gradient(145deg, rgba(45,212,168,0.11), transparent 60%),
+		color-mix(in srgb, var(--place-surface-2) 94%, transparent);
+}
+
+.lp-tile__icon {
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 9px;
+	background: rgba(255,255,255,0.055);
+	color: var(--place-primary-400);
+}
+
+.lp-tile__name {
+	font-size: 0.92rem;
+	letter-spacing: 0;
+}
+
+.lp-tile__meta {
+	color: var(--place-text-secondary);
+	font-size: 0.74rem;
+	line-height: 1.35;
+}
+
+.wiki-header__meta,
+.threads-header__meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.wiki-pill,
+.threads-pill {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px;
+	padding: 0 9px;
+	border: 1px solid var(--place-primary-border);
+	border-radius: 999px;
+	background: var(--place-primary-subtle);
+	color: var(--place-primary-400);
+	font-family: var(--place-font-mono);
+	font-size: 0.6rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.wiki-body {
+	display: grid;
+	grid-template-columns: minmax(190px, 0.32fr) minmax(0, 1fr);
+	min-height: 420px;
+	overflow: hidden;
+}
+
+.wiki-spine {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 14px;
+	border-right: 1px solid var(--place-border-subtle);
+	background: rgba(0,0,0,0.14);
+}
+
+.wiki-spine__search {
+	display: grid;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+
+.wiki-spine__search-label {
+	color: var(--place-text-tertiary);
+	font-size: 0.62rem;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+}
+
+.wiki-spine__search input {
+	min-width: 0;
+	height: 34px;
+	padding: 0 10px;
+	border: 1px solid var(--place-border-subtle);
+	border-radius: 8px;
+	background: rgba(255,255,255,0.04);
+	color: var(--place-text-primary);
+	outline: none;
+}
+
+.wiki-spine__tab {
+	min-height: 36px;
+	padding: 8px 10px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--place-text-secondary);
+	font: inherit;
+	font-size: 0.78rem;
+	text-align: left;
+}
+
+.wiki-spine__tab:hover,
+.wiki-spine__tab[aria-current="true"] {
+	border-color: var(--place-primary-border);
+	background: var(--place-primary-subtle);
+	color: var(--place-text-primary);
+}
+
+.wiki-article {
+	padding: 24px;
+	outline: none;
+}
+
+.wiki-article__head {
+	margin-bottom: 12px;
+}
+
+.wiki-article__title,
+.threads-detail__title {
+	margin: 0;
+	font-size: 1.35rem;
+	font-weight: 700;
+	letter-spacing: 0;
+	line-height: 1.1;
+}
+
+.wiki-article__body,
+.threads-detail__excerpt,
+.threads-detail__placeholder {
+	margin: 0;
+	max-width: 78ch;
+	color: var(--place-text-secondary);
+	font-size: 0.95rem;
+	line-height: 1.65;
+}
+
+.wiki-article__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 18px;
+}
+
+.wiki-article__note {
+	margin-top: 18px;
+	padding: 12px;
+	border: 1px solid var(--place-border-subtle);
+	border-radius: 10px;
+	background: rgba(255,255,255,0.035);
+	color: var(--place-text-secondary);
+	font-size: 0.82rem;
+}
+
+.wiki-footer {
+	margin-top: 12px;
+	color: var(--place-text-tertiary);
+	font-family: var(--place-font-mono);
+	font-size: 0.68rem;
+}
+
+.threads-list {
+	display: grid;
+	gap: 10px;
+	padding: 14px;
+}
+
+.threads-preview {
+	display: grid;
+	gap: 10px;
+	width: 100%;
+	padding: 14px;
+	border: 1px solid var(--place-border-subtle);
+	border-radius: 10px;
+	background:
+		linear-gradient(145deg, rgba(91,141,239,0.07), transparent 58%),
+		rgba(255,255,255,0.035);
+	color: var(--place-text-primary);
+	text-align: left;
+}
+
+.threads-preview:hover {
+	border-color: var(--place-secondary-400);
+}
+
+.threads-preview__head,
+.threads-preview__foot,
+.threads-detail__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.threads-preview__title {
+	min-width: 0;
+	font-size: 0.92rem;
+}
+
+.threads-preview__time {
+	flex: none;
+	color: var(--place-text-tertiary);
+	font-family: var(--place-font-mono);
+	font-size: 0.68rem;
+}
+
+.threads-preview__excerpt {
+	margin: 0;
+	color: var(--place-text-secondary);
+	font-size: 0.82rem;
+	line-height: 1.45;
+}
+
+.threads-avatars {
+	display: flex;
+}
+
+.threads-avatar {
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	margin-right: -6px;
+	border: 1px solid var(--place-base);
+	border-radius: 999px;
+	background: var(--place-primary-subtle);
+	color: var(--place-primary-400);
+	font-size: 0.66rem;
+	font-weight: 700;
+}
+
+.threads-detail {
+	display: grid;
+	gap: 16px;
+	padding: 18px;
+}
+
+.threads-detail__back,
+[data-app="git-ema"] button,
+.clients-actions button,
+.atlas-head__actions button,
+.atlas-chip-row button {
+	min-height: 32px;
+	border: 1px solid var(--place-border-subtle);
+	border-radius: 8px;
+	background: rgba(255,255,255,0.045);
+	color: var(--place-text-secondary);
+	font: inherit;
+	font-size: 0.78rem;
+}
+
+[data-app="git-ema"] > header,
+[data-app="hq"] > header,
+[data-app="chronicle"] > main > header {
+	border-radius: 14px;
+	background:
+		linear-gradient(135deg, rgba(255,255,255,0.045), transparent),
+		color-mix(in srgb, var(--place-surface-1) 86%, transparent);
+}
+
+[data-app="git-ema"] > section,
+[data-app="git-ema"] > div,
+[data-app="hq"] article,
+[data-app="hq"] section,
+[data-app="chronicle"] aside,
+[data-app="chronicle"] main {
+	border-color: var(--place-border-default) !important;
+}
+
+[data-app="blueprint"] {
+	background:
+		radial-gradient(circle at 12% 0%, rgba(45,212,168,0.07), transparent 34%),
+		var(--place-base) !important;
+}
+
+[data-app="blueprint"] .bp-header,
+[data-app="blueprint"] .bp-spine,
+[data-app="blueprint"] .bp-section {
+	background: color-mix(in srgb, var(--place-surface-1) 84%, transparent);
+}
+
+@media (max-width: 860px) {
+	.lp-root,
+	.wiki-root,
+	.threads-root {
+		padding: 14px;
+	}
+	.lp-hero,
+	.wiki-body {
+		grid-template-columns: 1fr;
+	}
+	.wiki-spine {
+		border-right: 0;
+		border-bottom: 1px solid var(--place-border-subtle);
+	}
+}
+
 /* Dock icon hover glow */
 .dock-icon-btn:hover {
 	color: var(--place-secondary-400) !important;

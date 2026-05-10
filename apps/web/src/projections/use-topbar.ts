@@ -37,7 +37,7 @@ export type TopbarView = {
 };
 
 // Mock fallback — the daemon-offline scope still surfaces a coherent
-// EMA / EMA Studio / EMA 0.0.5 trio so the scope strip + chrome render
+// EMA / EMA Studio / EMA 0.0.6 trio so the scope strip + chrome render
 // real values until Wave II wires real identity.
 const MOCK_SCOPE: TopbarScope = {
   org: mockTopbar.current_org as TopbarOrg,

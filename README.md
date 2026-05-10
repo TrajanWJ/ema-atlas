@@ -29,7 +29,7 @@ The 0.0.6 architecture audit and rearchitecture plan live at:
 ## Intended repo shape
 
 ```text
-EMA-0.0.5/
+EMA-0.0.6/
 ├── apps/
 │   ├── daemon/
 │   ├── desktop/
@@ -59,7 +59,7 @@ EMA-0.0.5/
 
 - `scripts/install-macos-tauri-app.sh` installs the built Tauri bundle
   (`apps/desktop/src-tauri/target/release/bundle/macos/EMA.app`) as the
-  human-facing `~/Desktop/EMA 0.0.5.app`. Existing target apps are moved to a
+  human-facing `~/Desktop/EMA 0.0.6.app`. Existing target apps are moved to a
   timestamped backup path; EMA user data under `~/Library` is not deleted.
 
 ## What should be built first

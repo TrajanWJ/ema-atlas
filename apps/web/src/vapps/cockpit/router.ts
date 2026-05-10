@@ -8,6 +8,7 @@
  *   ?vapp=cockpit#/capture
  *   ?vapp=cockpit#/clients/<id>
  *   ?vapp=cockpit#/clients/<clientId>/<projectId>
+ *   ?vapp=cockpit#/clients/<clientId>/<projectId>/<tab>
  *   ?vapp=cockpit#/personal/<id>
  *   ?vapp=cockpit#/workshop/<id>
  *   ?vapp=cockpit#/tl
@@ -16,8 +17,8 @@
  * `hashchange`. `cockpitNavigate(route)` writes the next hash and lets the
  * subscription pick it up.
  *
- * Slice 5 will replace this with a real shell router primitive once vApps
- * become full URL citizens.
+ * Hash parsing stays tiny and deterministic until the shell exposes
+ * structured vApp route state.
  */
 
 import { useEffect, useState } from "react";
@@ -31,6 +32,7 @@ export type CockpitRoute =
 			readonly kind: "client-project";
 			readonly clientId: string;
 			readonly projectId: string;
+			readonly tab?: string;
 	  }
 	| { readonly kind: "personal-project"; readonly projectId: string }
 	| { readonly kind: "workshop-project"; readonly projectId: string };
@@ -43,12 +45,13 @@ export function parseCockpitRoute(raw: string): CockpitRoute {
 	if (path === "/capture") return { kind: "capture" };
 	if (path === "/tl") return { kind: "tl" };
 
-	const clientProject = path.match(/^\/clients\/([^/]+)\/([^/]+)$/);
+	const clientProject = path.match(/^\/clients\/([^/]+)\/([^/]+)(?:\/([^/]+))?$/);
 	if (clientProject) {
 		return {
 			kind: "client-project",
 			clientId: decodeURIComponent(clientProject[1]!),
 			projectId: decodeURIComponent(clientProject[2]!),
+			tab: clientProject[3] ? decodeURIComponent(clientProject[3]) : undefined,
 		};
 	}
 

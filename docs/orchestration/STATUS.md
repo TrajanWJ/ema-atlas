@@ -1076,3 +1076,28 @@ Reality check against what is actually on disk (not what old plan docs claimed):
 1. Scope `L-m1-roundtrip` lane prompt under `docs/orchestration/lanes/L-m1-roundtrip.md` (when a worker is assigned).
 2. Audit the other two web shells (topbar, agent-work-page) for any other UI-as-truth patterns.
 3. Confirm `tooling/m1-round-trip.mjs` shape matches the current daemon WS protocol.
+
+## Session update 2026-05-10 - Functional 0.0.6 Proslync cockpit rails
+
+- `ema cockpit workpack --project proslync-app-ios-final --json` now emits a shared agent-work packet: Proslync client context, 4 active builds, 6 surfaces, readiness health, dirty/no-git hazards, kickoff commands, verification commands, and handoff contract.
+- Client Cockpit is discoverable from Launchpad/sidebar and the Proslync bench exposes Builds, Surfaces, Queue, Lanes, Intentions, and runtime health through web and CLI projections.
+- Intention backfeed moved from read-only harvest into review workflow: accept/defer/reject/list via CLI and cockpit POST bridge.
+- Native shell repair landed for 0.0.6: Tauri top chrome has drag regions, interactive controls are no-drag, and vApp popout titlebars use the Tauri v2 window API instead of private internals.
+- Functional E2E now verifies runtime report, CLI typecheck/build, web typecheck, Proslync projection, workpack, intentions, cockpit UI, launchpad entry, Tauri drag, and popout titlebar.
+- Fresh `/Users/trajanm4air/Desktop/EMA 0.0.6.app` installed after gated dry-run; previous app backed up at `/Users/trajanm4air/Desktop/EMA 0.0.6.app.backup-2026-05-10T02-01-55-784Z`.
+
+## Session update 2026-05-10 - Proslync-first head-orchestrator reset
+
+- Timeout inflation is not accepted as a fix for cockpit readiness.
+- Cockpit must gain compact projections and deterministic readiness markers.
+- Proslync swarms remain blocked until workpack, agent workspace, intention backfeed, and vApp route/frame parity pass.
+- Dirty-state intake is recorded at `docs/orchestration/head-orchestrator/current-dirty-state-2026-05-10.md`.
+- Current controlling plan is `docs/superpowers/plans/2026-05-10-ema-proslync-first-head-orchestrator-master-plan.md`.
+
+## Session update 2026-05-10 - Sprint 2 cockpit fast path
+
+- Added cockpit performance smoke: `pnpm cockpit:perf`.
+- `ema cockpit projection` and `ema cockpit workpack` no longer load the full intention projection on their fast path; explicit `ema cockpit intentions` remains the full reviewed intention queue path.
+- CLI cockpit projection now reads lane/queue/topbar through one batched daemon subscription instead of separate WebSocket subscriptions.
+- Current measured gate: workpack cold `1343ms`, warm `1134ms`; projection cold `1447ms`, warm `858ms`.
+- Web cockpit projection now uses cheap intention artifact availability instead of shelling out to `ema cockpit intentions` on every page load.

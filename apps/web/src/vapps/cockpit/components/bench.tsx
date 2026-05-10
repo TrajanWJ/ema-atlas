@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export interface BenchTab {
 	readonly id: string;
@@ -17,7 +17,12 @@ export interface BenchProps {
 export function Bench({ tabs, defaultTab }: BenchProps) {
 	const initial = defaultTab ?? tabs[0]?.id ?? "";
 	const [active, setActive] = useState<string>(initial);
-	const tab = tabs.find((entry) => entry.id === active);
+	useEffect(() => {
+		if (defaultTab && tabs.some((entry) => entry.id === defaultTab)) {
+			setActive(defaultTab);
+		}
+	}, [defaultTab, tabs]);
+	const tab = tabs.find((entry) => entry.id === active) ?? tabs[0];
 
 	return (
 		<div className="cockpit-bench">

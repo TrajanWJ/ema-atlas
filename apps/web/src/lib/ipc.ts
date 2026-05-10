@@ -19,8 +19,8 @@ const stateListeners = new Set<(state: ConnectionState) => void>();
 function getClient(): IpcClient {
 	if (singleton) return singleton;
 	const url =
-		typeof process !== "undefined" && process.env?.NEXT_PUBLIC_EMA_IPC_URL
-			? process.env.NEXT_PUBLIC_EMA_IPC_URL
+		typeof process !== "undefined" && process.env?.NEXT_PUBLIC_EMA_DAEMON_URL
+			? process.env.NEXT_PUBLIC_EMA_DAEMON_URL
 			: DEFAULT_URL;
 	const client = createIpcClient({ url, surface: "web" });
 	client.subscribeConnection((state) => {

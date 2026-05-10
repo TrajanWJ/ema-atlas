@@ -1,8 +1,8 @@
 name = "ema_daemon"
-version = "0.0.5"
+version = "0.0.6"
 target = "erlang"
 
-description = "EMA daemon — canonical truth + sync + IPC for 0.0.5."
+description = "EMA daemon — canonical truth + sync + IPC for 0.0.6."
 
 licences = ["Apache-2.0"]
 

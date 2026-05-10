@@ -1,14 +1,31 @@
-'use client';
+import { PopoutPageClient } from "./popout-page-client";
 
-import { use } from "react";
-import { PopoutShell } from "@/src/components/popout/PopoutShell";
+const STATIC_POPOUT_APPS = [
+	"launchpad",
+	"cockpit",
+	"agent-work",
+	"hq",
+	"atlas",
+	"blueprint",
+	"chronicle",
+	"git-ema",
+	"clients",
+	"threads",
+	"wiki",
+	"settings",
+	"place-tools",
+	"terminal",
+	"finder",
+] as const;
+
+export function generateStaticParams() {
+	return STATIC_POPOUT_APPS.map((appId) => ({ appId }));
+}
 
 export default function PopoutPage({
 	params,
 }: {
 	params: Promise<{ appId: string }>;
 }) {
-	const { appId } = use(params);
-
-	return <PopoutShell appIdParam={appId} />;
+	return <PopoutPageClient params={params} />;
 }

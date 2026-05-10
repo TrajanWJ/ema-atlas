@@ -27,7 +27,7 @@ export async function runOrg(args: ParsedArgs): Promise<number> {
 
   if (!name.trim()) {
     emitError(`ema org create: missing organization name`);
-    emitError(`Usage: ema org create --name Founding-Fathers-EMA`);
+    emitError(`Usage: ema org create --name "Trajan's Organization"`);
     return 64;
   }
 

@@ -157,7 +157,7 @@ export const APP_LABELS: Record<AppId, string> = {
 	// EMA additions
 	hq: "HQ",
 	cwt: "Current Work",
-	cockpit: "Cockpit",
+	cockpit: "Client Cockpit",
 	clients: "Clients",
 	"git-ema": "git-ema",
 	"agent-work": "Agent Work",

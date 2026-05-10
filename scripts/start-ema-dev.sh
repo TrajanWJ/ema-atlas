@@ -39,7 +39,7 @@ export npm_config_manage_package_manager_versions=false
 
 cd "$ROOT"
 
-echo "EMA 0.0.5 web dev launcher"
+echo "EMA 0.0.6 web dev launcher"
 echo "root: $ROOT"
 echo "This helper opens the Next.js browser web surface. The desktop app is the Tauri bundle in apps/desktop."
 

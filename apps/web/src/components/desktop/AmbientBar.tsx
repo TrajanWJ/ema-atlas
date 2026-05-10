@@ -287,6 +287,7 @@ export function AmbientBar() {
 	return (
 		<div
 			role="banner"
+			data-tauri-drag-region
 			className={`ambient-bar glass absolute top-0 left-0 right-0 z-50 flex h-10 items-center px-2${wco ? ' ambient-bar-wco' : ''}`}
 		>
 			{/* Tauri-only: macOS-style traffic lights at top-left. CSS hides

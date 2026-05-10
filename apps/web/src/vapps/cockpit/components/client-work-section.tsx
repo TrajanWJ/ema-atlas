@@ -36,7 +36,7 @@ export function ClientWorkSection({ clients, activeRoute }: ClientWorkSectionPro
 				<span className="cockpit-sidebar__caret" aria-hidden>
 					{open ? "v" : ">"}
 				</span>
-				CLIENT WORK
+				CLIENTS
 			</button>
 
 			{open ? (

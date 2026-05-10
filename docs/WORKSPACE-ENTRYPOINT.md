@@ -1,6 +1,6 @@
-# 0.0.5 Workspace Entrypoint
+# 0.0.6 Workspace Entrypoint
 
-Use this repo as the implementation root for EMA `0.0.5`.
+Use this repo as the implementation root for EMA `0.0.6`.
 
 ## Before coding
 
@@ -11,7 +11,7 @@ Read:
 3. `../../Projects/EMA/PROJECT-MAP.md`
 4. `../../Projects/EMA/builds/BUILD-MANIFEST.md`
 5. `../../Projects/EMA/atlas/README.md`
-6. `../../Projects/EMA/atlas/canon/current/ema-0-0-5-current-canon.md`
+6. `../../Projects/EMA/builds/0.0.6/BUILD.md`
 7. `architecture/08-vanilla-workspace.md`
 8. `architecture/09-see-agent-work.md`
 9. `agents/see-agent-work-agent-usage.md`

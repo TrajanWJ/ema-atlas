@@ -142,11 +142,11 @@ function buildPopoutUrl(appId: AppId, windowId: string, companion = false): stri
 	return `${window.location.origin}/popout/${appId}?windowId=${windowId}${suffix}`;
 }
 
-function openTauriCompanionWindow(
+async function openTauriCompanionWindow(
 	windowId: string,
 	appId: AppId,
 	position: WindowPosition,
-): boolean {
+): Promise<boolean> {
 	if (!isTauriRuntime()) return false;
 
 	const popoutSize = POPOUT_WINDOW_SIZES[appId];
@@ -157,25 +157,24 @@ function openTauriCompanionWindow(
 		height: popoutSize?.height ?? position.height,
 	};
 
-	void import("@tauri-apps/api/core")
-		.then(({ invoke }) =>
-			invoke("companion_open_window", {
-				windowId,
-				appId,
-				url: buildPopoutUrl(appId, windowId, true),
-				bounds,
-				transparent: true,
-			}),
-		)
-		.catch((error) => {
-			console.debug("[popout-launcher] Tauri companion open failed", error);
-			useToastStore
-				.getState()
-				.addToast("Native popout failed; window stayed on the desktop", "error");
+	try {
+		const { invoke } = await import("@tauri-apps/api/core");
+		await invoke("companion_open_window", {
+			windowId,
+			appId,
+			url: buildPopoutUrl(appId, windowId, true),
+			bounds,
+			transparent: true,
 		});
-
-	updatePersistedMode(windowId, "popout", bounds.x, bounds.y);
-	return true;
+		updatePersistedMode(windowId, "popout", bounds.x, bounds.y);
+		return true;
+	} catch (error) {
+		console.debug("[popout-launcher] Tauri companion open failed", error);
+		useToastStore
+			.getState()
+			.addToast("Native popout failed; window stayed on the desktop", "error");
+		return false;
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -227,7 +226,7 @@ export interface PopoutAPI {
 		windowId: string,
 		appId: AppId,
 		position: WindowPosition,
-	): Window | null;
+	): Promise<Window | null>;
 	reattach(windowId: string): boolean;
 	isPopout(windowId: string): boolean;
 	focusPopout(windowId: string): void;
@@ -236,7 +235,7 @@ export interface PopoutAPI {
 
 function createPopoutAPI(): PopoutAPI {
 	return {
-		detach(windowId, appId, position) {
+		async detach(windowId, appId, position) {
 			if (isTouchDevice()) return null;
 
 			// Daemon broker first: record desired native companion state and emit
@@ -244,7 +243,7 @@ function createPopoutAPI(): PopoutAPI {
 			// or browser popout path.
 			brokerCompanionWindowOpen(windowId, appId, position);
 
-			if (openTauriCompanionWindow(windowId, appId, position)) {
+			if (await openTauriCompanionWindow(windowId, appId, position)) {
 				return "companion" as unknown as Window;
 			}
 

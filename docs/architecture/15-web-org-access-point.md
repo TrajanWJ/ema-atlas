@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:web-org-access-point -->
+<!-- see-also: ema:host-node-doctrine, ema:transport-auth-decision, ema:google-identity-browser-access -->
+
 # Web Organization Access Point
 
 Status: draft, canonized 2026-04-24.

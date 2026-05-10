@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:transport-auth-survey -->
+<!-- see-also: ema:transport-auth-decision, ema:host-node-doctrine, ema:recovery-bip39, ema:source-intake-source-inventory-2026-05-10 -->
+
 # 11 — Transport, auth, and remote-surface survey
 
 Forward-looking decision survey. Not locked in wave 1 — replication bytes

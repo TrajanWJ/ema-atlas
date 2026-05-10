@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:transport-auth-decision -->
+<!-- see-also: ema:transport-auth-survey, ema:host-node-doctrine, ema:multi-host-conflict-policy, ema:recovery-bip39, ema:source-intake-source-inventory-2026-05-10 -->
+
 # 2026-04-24 — Transport, auth, and remote-surface decisions
 
 **Status:** decided 2026-04-24. Recorded as a decision (rather than a survey)

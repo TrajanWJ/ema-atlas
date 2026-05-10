@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:peer-computer-access -->
+<!-- see-also: ema:host-node-doctrine, ema:transport-auth-decision, ema:transport-auth-survey -->
+
 # 13 — Peer Computer Access
 
 Status: proposed dev/operator rail

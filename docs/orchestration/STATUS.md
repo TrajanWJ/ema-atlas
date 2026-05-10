@@ -1421,14 +1421,22 @@ of the process, not a side research activity.
 - Added `docs/orchestration/next-campaign-cross-pollination-source-intake-2026-05-10.md`.
 - Updated `/Users/trajanm4air/.claude/plans/your-missing-many-pieces-dazzling-tulip.md` with a required source-intake loop and Track 0.
 - Registered the new campaign prompt as `ema:next-campaign-cross-pollination-source-intake` in `Projects/EMA/atlas/knowledge/doc-registry.json`.
+- Implemented the Track 0 seed artifacts:
+  - `packages/contracts/workspace/v0/source-intake.md`
+  - `docs/orchestration/source-intake/query-log-2026-05-10.md`
+  - `docs/orchestration/source-intake/source-inventory-2026-05-10.md`
+  - `docs/orchestration/source-intake/pattern-routing-2026-05-10.md`
+- Registered those source-intake artifacts in `Projects/EMA/atlas/knowledge/doc-registry.json`.
 
 ### Important corrections to the pasted campaign prompt
 
 - The first Proslync Sprint 2 swarm is no longer future work; STATUS already
   records it as completed with backend, app, and presentation queue items closed.
-- `bootstrap/m2-m3-shell-port` is no longer 42+ commits ahead in the verified
-  local state for this revision; it is one commit ahead of
-  `origin/bootstrap/m2-m3-shell-port`.
+- The pasted prompt's "42+ commits ahead" branch state was stale. Latest local
+  verification reports branch `bootstrap/m2-m3-shell-port`, ahead of
+  `origin/bootstrap/m2-m3-shell-port` by 2 commits. Future operators should
+  still re-run `git status --short --branch` before writes and should not switch
+  branches or rewrite history without explicit approval.
 - The revised campaign now starts with source discovery, source posture,
   license/use classification, pattern extraction, and product/entity routing.
 
@@ -1438,3 +1446,8 @@ Every architecture or client-work swarm must produce or update source posture
 unless the work is internal-only. The required spine is:
 
 `SourceQuery -> SourceRecord -> DonorArtifact -> PatternExtraction -> EntityClass/ProductObjectDelta -> QueueItem -> ImplementationArtifact -> VerificationEvidence -> SourceRegistryUpdate`.
+
+The seed inventory now includes Iroh, Automerge, Yjs, OpenTelemetry,
+OpenFeature, OpenFGA, NCAA NIL Assist, NCAA disclosure/transparency, FTC
+endorsement guidance, and Athliance as initial routing sources. No donor code
+was imported in this pass.

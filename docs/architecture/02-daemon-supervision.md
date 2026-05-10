@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:daemon-supervision -->
+<!-- see-also: ema:topology, ema:host-node-doctrine, ema:transport-auth-decision -->
+
 # 02 — Daemon supervision
 
 The daemon is a Gleam/BEAM application. It owns all canonical truth and is

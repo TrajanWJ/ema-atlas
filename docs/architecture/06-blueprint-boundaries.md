@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:blueprint-boundaries -->
+<!-- see-also: ema:multi-host-conflict-policy, ema:workspace-source-intake-contract -->
+
 # 06 — Blueprint boundaries
 
 Blueprint is the first (and initially only) vApp. Its data splits across

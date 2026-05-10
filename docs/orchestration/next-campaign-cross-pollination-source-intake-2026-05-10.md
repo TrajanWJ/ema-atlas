@@ -13,9 +13,13 @@ the operating loop instead of an occasional research prelude.
 
 - Locked architecture source: `/Users/trajanm4air/.claude/plans/your-missing-many-pieces-dazzling-tulip.md`.
 - EMA active build: `/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6`.
-- Branch: `bootstrap/m2-m3-shell-port`.
-- Current local delta at this revision: one commit ahead of `origin/bootstrap/m2-m3-shell-port`, not 42+.
-- EMA daemon/web are up in the latest verification pass.
+- Latest local branch verification at this revision:
+  `bootstrap/m2-m3-shell-port`, ahead of
+  `origin/bootstrap/m2-m3-shell-port` by 2 commits.
+- Do not switch branches, rebase, or force-push without explicit operator
+  instruction.
+- Current checkout has unrelated local/generated dirt; isolate future edits and
+  do not absorb files outside declared scope.
 - First Proslync Sprint 2 swarm is already done:
   - Backend product evidence packet queue item closed.
   - Brand HQ deal-evidence UI queue item closed.
@@ -53,9 +57,9 @@ Run from the parent repo, not a generated worktree:
 ```bash
 cd "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6"
 [ "$(git rev-parse --show-toplevel)" = "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6" ]
-git fetch origin
 git status --short --branch
-git log --oneline origin/bootstrap/m2-m3-shell-port..HEAD | head -20
+git branch --show-current
+git log --oneline -10
 git stash list
 ema ping --json
 ema status --json
@@ -70,8 +74,8 @@ Stop before writes if:
 
 - Codex or another actor owns a touching path in `ema cockpit workpack --project EMA --json`.
 - `git status --short` shows unrelated files outside the planned write scope.
-- `git log origin/bootstrap/m2-m3-shell-port..HEAD` shows new commits you have not
-  read yet.
+- The checked-out branch does not match the operator-approved branch for the
+  campaign.
 - The target change implies opening or merging the umbrella PR.
 
 ## Source-First Operating Contract
@@ -283,4 +287,3 @@ Do not perform these without explicit operator approval:
 - Touch `origin/b1-substrate-parked-2026-05-10`.
 - Start Iroh sidecar revival, browser passkey implementation, distributed
   sequencer, or migration leader election before the doctrine/source tracks land.
-

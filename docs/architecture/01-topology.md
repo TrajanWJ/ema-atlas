@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:topology -->
+<!-- see-also: ema:host-node-doctrine, ema:multi-host-conflict-policy, ema:transport-auth-decision, ema:workspace-source-intake-contract -->
+
 # 01 — Topology
 
 EMA is shaped as a fixed three-level hierarchy:

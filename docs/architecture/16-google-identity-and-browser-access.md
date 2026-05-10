@@ -1,3 +1,6 @@
+<!-- wiki-id: ema:google-identity-browser-access -->
+<!-- see-also: ema:web-org-access-point, ema:transport-auth-decision, ema:recovery-bip39 -->
+
 # 16 — Google identity and browser access
 
 Status: active implementation note, canonized 2026-04-24.

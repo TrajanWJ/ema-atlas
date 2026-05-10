@@ -63,14 +63,23 @@ export function CaptureForm({ projects }: CaptureFormProps) {
 				priority: safePriority,
 				tags,
 			});
-			setResult(
-				response.ok
-					? { ok: true, message: `queued ${response.queue_id}` }
-					: {
-							ok: false,
-							message: response.error ?? response.status ?? "queue capture failed",
-						},
-			);
+			if (response.ok) {
+				setResult({ ok: true, message: `queued ${response.queue_id}` });
+				// Page-level revalidate signal — cockpit projection consumers
+				// can listen for this to refresh without prop drilling.
+				if (typeof window !== "undefined") {
+					window.dispatchEvent(
+						new CustomEvent("cockpit:queue-captured", {
+							detail: { queue_id: response.queue_id, project_id },
+						}),
+					);
+				}
+			} else {
+				setResult({
+					ok: false,
+					message: response.error ?? response.status ?? "queue capture failed",
+				});
+			}
 		});
 	}
 

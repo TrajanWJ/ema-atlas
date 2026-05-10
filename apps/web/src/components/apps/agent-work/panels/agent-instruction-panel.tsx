@@ -1,6 +1,8 @@
 // Region 7 of See Agent Work first screen per SURFACE-SLICE-A.md §"Region 7".
-// Single card: scope summary + agent_instruction + copy-to-clipboard. The
-// prompt block is how external Codex / Claude CLI sessions inherit EMA scope.
+// Single card: scope summary + agent_instruction + copy-to-clipboard.
+// Sprint 4: also exposes a daemon-backed "run agent orient" primary button so
+// the prompt block can be paired with a live orient call. Copy stays present
+// as a secondary affordance for external Codex / Claude CLI sessions.
 import { useCallback, useState } from "react";
 import { EMA_SCOPE } from "@/src/app/mock-projections";
 import type { AgentWorkspacePanelProps } from "./component-types";
@@ -29,6 +31,31 @@ function buildPrompt(agentInstruction: string, missionTitle: string, laneTitle: 
   ].join("\n");
 }
 
+type ExecResponse = {
+  readonly ok?: boolean;
+  readonly status?: string;
+  readonly error?: string;
+  readonly result?: unknown;
+};
+
+async function runAgentOrient(): Promise<string> {
+  const response = await fetch("/api/agent-work/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "agent.orient", args: {} }),
+  });
+  const payload = (await response.json()) as ExecResponse;
+  if (!response.ok || !payload.ok) {
+    throw new Error(payload.error ?? `orient failed (${payload.status ?? `http_${response.status}`})`);
+  }
+  const record =
+    payload.result && typeof payload.result === "object"
+      ? (payload.result as Record<string, unknown>)
+      : {};
+  const scope = (record.workspace_scope as Record<string, unknown> | undefined)?.project;
+  return scope ? `oriented in ${String(scope)}` : "oriented";
+}
+
 export function AgentInstructionPanel({ projection, sourceLabel }: Omit<AgentWorkspacePanelProps, "isLive">) {
   const { missions, lanes } = projection;
   const primaryMission = missions.find((m) => m.status === "active") ?? missions[0];
@@ -39,6 +66,8 @@ export function AgentInstructionPanel({ projection, sourceLabel }: Omit<AgentWor
     primaryLane?.title ?? "(no active lane)",
   );
   const [copied, setCopied] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [orientResult, setOrientResult] = useState<string | null>(null);
 
   const onCopy = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.clipboard) return;
@@ -47,6 +76,19 @@ export function AgentInstructionPanel({ projection, sourceLabel }: Omit<AgentWor
       setTimeout(() => setCopied(false), 1600);
     });
   }, [promptText]);
+
+  const onOrient = useCallback(async () => {
+    setRunning(true);
+    setOrientResult(null);
+    try {
+      const reply = await runAgentOrient();
+      setOrientResult(reply);
+    } catch (error) {
+      setOrientResult(error instanceof Error ? error.message : String(error));
+    } finally {
+      setRunning(false);
+    }
+  }, []);
 
   return (
     <section className="ema-panel ema-saw-region ema-saw-prompt" aria-label="Agent instruction panel">
@@ -79,6 +121,15 @@ export function AgentInstructionPanel({ projection, sourceLabel }: Omit<AgentWor
       <div className="ema-saw-prompt__actions">
         <button
           type="button"
+          className="ema-saw-cmd-btn__action ema-saw-prompt__run"
+          data-action="agent.orient"
+          onClick={onOrient}
+          disabled={running}
+        >
+          {running ? "running" : "run agent orient"}
+        </button>
+        <button
+          type="button"
           className="ema-saw-cmd-btn__copy ema-saw-prompt__copy"
           onClick={onCopy}
         >
@@ -88,6 +139,11 @@ export function AgentInstructionPanel({ projection, sourceLabel }: Omit<AgentWor
           ema agent prompt --actor actor:&lt;id&gt; --mission {primaryMission?.id ?? "<id>"}
         </small>
       </div>
+      {orientResult ? (
+        <p className="ema-saw-cmd-btn__hint" data-result-for="agent.orient">
+          {orientResult}
+        </p>
+      ) : null}
     </section>
   );
 }

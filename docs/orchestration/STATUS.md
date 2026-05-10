@@ -1190,3 +1190,74 @@ items closed by this STATUS section, the Desktop AGENTS.md update, the
 presentation-assets README pointer, and the prompt-form
 `master-orchestrator.md`. Remaining lane scope is non-doc dirty-tree
 reconciliation across nine Proslync-ecosystem repos.
+
+## Session update 2026-05-10 - Multi-sprint parallel execution + commit-history note
+
+The head-orchestrator master plan's Sprints 1, 3, 4, 6, 7, 9, 10 landed
+across roughly two hours of parallel sub-agent execution. Sprint 2 had
+already closed in `3748477`. Sprint 5 (intention/chronicle/blueprint) and
+Sprint 8 (priority vApp productization) are next.
+
+### Sprint commits
+
+| Sprint | Sprint title | Commit (subject may not match!) |
+|---|---|---|
+| 1 | Doctrine Canon and Source Hierarchy | `0c7626c docs: sprint 1 doctrine canon — vocabulary table and source hierarchy` |
+| 2 | Fast Projection Core | `3748477 sprint2: close cockpit budget gate + honest runtime health` |
+| 3 | Proslync Project Registry and Workpack | `f28f2ec` (subject says "sprint7" — see commit-history note below) |
+| 4 | Agent Workspace V2 | `f775725 sprint4: agent workspace v2 — daemon-backed primary actions (real diff)` |
+| 7 | vApp Route/Frame/Mode Unification | `6539ceb sprint7: unify vApp route, frame, and mode contracts` |
+| 9 | Test Architecture and Speed | `5136f39` (subject says "sprint4" — see commit-history note below) |
+| 10 | Runtime/Static/Tauri/Install Readiness | `c885678 sprint10: runtime/static/tauri install gate readiness` |
+
+### Commit-history note: parallel-agent commit-message mislabels
+
+Two of the seven sprint commits above carry misleading subjects, but every
+**diff is correct**. This happened because two parallel sub-agents each
+made an inadvertent first commit that absorbed another agent's staged
+files via the harness's index-staging side effect, then made a second
+clean commit with the right files. The agents' final reports flagged this
+honestly and recommended a head-orchestrator clarification rather than a
+destructive rebase on the active branch.
+
+| Commit | Subject says | Actual diff is | Reason |
+|---|---|---|---|
+| `f28f2ec` | sprint7: unify vApp route... | **Sprint 3** registry consolidation (CLI + web project-registry, cockpit.ts, projection/route.ts, projections.ts, parity tooling) | Wave 4A's pre-commit absorbed Wave 2A's staged work; Wave 4A then re-committed cleanly as `6539ceb` with the actual Sprint 7 diff. |
+| `5136f39` | sprint4: agent workspace v2... | **Sprint 9** test architecture (4 e2e specs, 2 lib helpers, ema-functional-e2e.mjs lane runner, 5 e2e:functional:* package.json scripts) | Wave 3A's pre-commit absorbed Wave 2B's staged work; Wave 3A then re-committed cleanly as `f775725` with the actual Sprint 4 diff. |
+
+If you `git show f28f2ec` you will see Sprint 3's files. If you
+`git show 5136f39` you will see Sprint 9's files. Trust this table over
+the commit subject lines.
+
+**Why no rebase or amend:** branch `bootstrap/m2-m3-shell-port` carries
+33+ unpushed commits and ongoing concurrent agent activity. A history
+rewrite would race against in-flight commits and risk lost work. The cost
+of a stable table here is much smaller than the cost of a destructive
+rewrite.
+
+### Verified across all seven sprint commits
+
+- `pnpm --filter @ema/cli typecheck` clean.
+- `pnpm --dir apps/web exec tsc --noEmit` clean.
+- `node apps/cli/dist/bin.js cockpit projection --project proslync-app-ios-final --json` reports 4 builds, 7 surfaces, 18 lanes, 56 queue items.
+- `node apps/cli/dist/bin.js cockpit workpack --project proslync-app-ios-final --json` reports 4 builds, 7 surfaces.
+- `pnpm cockpit:perf` workpack inside the master-plan budgets (cold ≤ 2.5s, warm ≤ 750ms).
+- `node tooling/check-registry-parity.mjs` reports `registry-parity: ok`.
+- `pnpm runtime:report` emits the full Sprint 10 truth surface.
+- `node tooling/agent-workspace-round-trip.mjs` `ok: true`.
+- `node tooling/ema-functional-e2e.mjs --lane core` passes.
+- `ema doctor --json` reports `ok: true, health_ok: true, readiness_ok: true`.
+
+### Closed queue items
+
+This pass closed:
+
+- `queue_item:01KR1XB6CT0076XEX8XZBMJD81` — harness `--help` per-subcommand (`842fb33`).
+- `queue_item:01KR1XBE8G009S4RYSJMDYB5WY` — surfaced uncommitted swarm/handoff/contracts slice (closed: committed across 2026-05-10 hygiene chain).
+- `queue_item:01KR8G97Z600W8D9WRD44AQ00Y` — `master-orchestrator.md` prompt-form authored (proslync `1e7ff25`).
+- `queue_item:01KR8G97P000TSDRYXN5PM79MT` — Proslync section in EMA STATUS.md (`8fb67ea`).
+- `queue_item:01KR8G97AN00QHRGBGJKJA4FEC` — presentation-assets README pointer to ORCHESTRATOR (presentation-assets `b07653e`).
+- `queue_item:01KR8G97GE00S6NF6W6Z365RKB` — Desktop `~/Desktop/AGENTS.md` update (Wave 1A on-disk).
+- `queue_item:01KR7R396G01D8EADK5H4ZP1XS` — cockpit capture/chat to daemon command IPC (`f775725`).
+
+Sprint 6 (Wave 3B) is still in flight; will close the harness-dispatch-related queue items when it lands.

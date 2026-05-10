@@ -291,6 +291,11 @@ const WikiApp = dynamic(
 	{ ssr: false },
 );
 
+const DuctTapeApp = dynamic(
+	() => import("@/src/components/apps/duct-tape").then((m) => m.DuctTapeApp),
+	{ ssr: false },
+);
+
 function ComingSoon({ appId }: { readonly appId: AppId }) {
 	return (
 		<div
@@ -350,5 +355,6 @@ export function AppContent({ appId }: { readonly appId: AppId }): ReactNode {
 	if (appId === "wiki") return <WikiApp />;
 	if (appId === "threads") return <ThreadsApp />;
 	if (appId === "place-tools") return <PlaceToolsApp />;
+	if (appId === "duct-tape") return <DuctTapeApp />;
 	return <ComingSoon appId={appId} />;
 }

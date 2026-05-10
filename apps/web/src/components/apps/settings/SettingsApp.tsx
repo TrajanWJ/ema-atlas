@@ -106,7 +106,7 @@ export function SettingsApp() {
 	const PageComponent = PAGE_COMPONENTS[activePage];
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+		<div data-app="settings" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 			{/* Live preview strip */}
 			<div
 				style={{

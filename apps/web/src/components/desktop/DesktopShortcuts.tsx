@@ -168,6 +168,7 @@ const APP_ICON_MAP: Record<AppId, React.ReactNode> = {
 	wiki: <NotesIcon size={24} />,
 	threads: <BrainIcon size={24} />,
 	"place-tools": <FolderIcon size={24} />,
+	"duct-tape": <ZapIcon size={24} />,
 };
 
 const APP_DESCRIPTIONS: Record<AppId, string> = {
@@ -218,6 +219,7 @@ const APP_DESCRIPTIONS: Record<AppId, string> = {
 	wiki: 'Durable doctrine, notes, reference memory',
 	threads: 'Project chat — coordination stream with the team',
 	"place-tools": 'place.org personal-productivity surfaces',
+	"duct-tape": 'Runtime substrate — dispatches, executions, tool timeline',
 };
 
 /** Grid layout: fill columns top-to-bottom, then move right */

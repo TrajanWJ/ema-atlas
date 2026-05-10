@@ -50,6 +50,7 @@ export const EMA_VAPP_IDS = [
 	"launchpad",
 	"settings",
 	"place-tools",
+	"duct-tape",
 ] as const satisfies readonly AppId[];
 
 export const APP_IDS = [

@@ -1051,6 +1051,21 @@ export function registerAllApps(): void {
 		menuBar: fileMenuOnly(),
 	});
 
+	// Duct Tape — runtime substrate / harness execution registry. Wave 3B
+	// shipped the shell at `apps/web/src/components/apps/duct-tape/`; Sprint 8
+	// registers it so it appears in the dock, Launchpad, route resolver, and
+	// the `?vapp=duct-tape` URL contract.
+	registerApp({
+		id: "duct-tape",
+		name: "Duct Tape",
+		icon: icon(ZapIcon),
+		defaultSize: sizeOf("duct-tape"),
+		titlebarDotColor: "#facc15",
+		getCurrentStatus: () => null,
+		listFiles: () => [],
+		menuBar: fileMenuOnly(),
+	});
+
 	// ----------------------------------------------------------------------------
 	// Group + dock-order assignment (post-pass).
 	//

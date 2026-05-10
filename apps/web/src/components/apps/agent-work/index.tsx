@@ -24,7 +24,7 @@ export function SeeAgentWorkVApp() {
   const swarmName = projection.swarms[0]?.name ?? "EMA 0.0.6 readiness swarm";
 
   return (
-    <section className="ema-vapp ema-vapp--agent-work ema-saw-root">
+    <section className="ema-vapp ema-vapp--agent-work ema-saw-root" data-app="agent-work">
       <header className="ema-vapp__header ema-vapp__header--split ema-saw-header">
         <div>
           <p className="ema-kicker">Agent Workspace</p>

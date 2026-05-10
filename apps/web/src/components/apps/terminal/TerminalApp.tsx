@@ -150,6 +150,7 @@ export function TerminalApp() {
 
 	return (
 		<div
+			data-app="terminal"
 			className="flex h-full flex-col"
 			style={{
 				fontFamily: "monospace",

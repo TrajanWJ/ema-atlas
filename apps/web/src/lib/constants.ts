@@ -48,6 +48,7 @@ export const DEFAULT_WINDOW_SIZES: Record<AppId, WindowPosition> = {
 	wiki: { x: 150, y: 90, width: 640, height: 520 },
 	threads: { x: 110, y: 70, width: 680, height: 520 },
 	"place-tools": { x: 90, y: 60, width: 720, height: 540 },
+	"duct-tape": { x: 80, y: 50, width: 1040, height: 680 },
 } as const satisfies Record<AppId, WindowPosition>;
 
 /**
@@ -112,6 +113,7 @@ export const POPOUT_WINDOW_SIZES: Record<AppId, { width: number; height: number 
 	wiki: { width: 720, height: 580 },
 	threads: { width: 760, height: 580 },
 	"place-tools": { width: 820, height: 600 },
+	"duct-tape": { width: 1040, height: 680 },
 
 	// Info
 	"about-place": { width: 420, height: 400 },
@@ -166,4 +168,5 @@ export const APP_LABELS: Record<AppId, string> = {
 	wiki: "Wiki",
 	threads: "Threads",
 	"place-tools": "Place Tools",
+	"duct-tape": "Duct Tape",
 } as const satisfies Record<AppId, string>;

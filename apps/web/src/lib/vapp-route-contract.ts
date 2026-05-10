@@ -60,6 +60,7 @@ export const STATIC_POPOUT_VAPPS = [
 	"blueprint",
 	"chronicle",
 	"settings",
+	"duct-tape",
 ] as const satisfies readonly VappId[];
 
 /**

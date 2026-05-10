@@ -44,7 +44,8 @@ export type AppId =
 	| "launchpad"
 	| "wiki"
 	| "threads"
-	| "place-tools";
+	| "place-tools"
+	| "duct-tape";
 
 export interface WindowPosition {
 	readonly x: number;

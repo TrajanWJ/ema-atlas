@@ -1314,6 +1314,7 @@ export function FinderApp() {
 	return (
 		<div
 			ref={containerRef}
+			data-app="finder"
 			className="flex h-full flex-col"
 			style={{
 				overflow: 'hidden',

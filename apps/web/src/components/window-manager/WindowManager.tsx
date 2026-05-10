@@ -5,7 +5,7 @@ import { AnimatePresence } from "motion/react";
 import { useWindowStore } from "@/src/stores/window-store";
 import { useVirtualDesktopStore } from "@/src/stores/virtual-desktop-store";
 import { Window } from "./Window";
-import { AppContent } from "./AppContent";
+import { VAppFrame } from "@/src/components/vapp/VAppFrame";
 
 export function WindowManager() {
 	const windows = useWindowStore((s) => s.windows);
@@ -26,7 +26,7 @@ export function WindowManager() {
 				{visibleWindows.map((win) => (
 					<div key={win.id} className="pointer-events-auto">
 						<Window win={win}>
-							<AppContent appId={win.appId} />
+							<VAppFrame appId={win.appId} mode="vdesktop" />
 						</Window>
 					</div>
 				))}

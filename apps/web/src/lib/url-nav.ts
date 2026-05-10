@@ -19,23 +19,19 @@
 // Note: `shell/vapp-registry` was removed in the place-port. We retain
 // VAppId / isVAppId here as thin shims over the new `AppId` so this URL
 // contract continues to type-check until url-nav is fully ported.
+//
+// Sprint 7 (vApp Route Contract) consolidated alias resolution into
+// `vapp-route-contract.ts`. This module re-uses that resolver so the
+// `?vapp=cwt`, `?panel=cwt`, `/cwt`, and `/popout/cwt` paths all agree.
 import { isAppId } from "./app-ids";
+import { resolveVappRoute } from "./vapp-route-contract";
 import type { AppId } from "../types/window";
 
 export type VAppId = AppId;
 
-const URL_VAPP_ALIASES = {
-	braindump: "brain-dump",
-	"active-builds": "git-ema",
-	// `?vapp=cwt` historically targeted the cwt iframe stub; Slice 4 of
-	// the EMA-absorbs-cwt migration replaced it with the in-process
-	// `cockpit` vApp. The alias keeps the existing deep-link working.
-	cwt: "cockpit",
-} as const satisfies Record<string, AppId>;
-
 function normalizeVAppId(value: string): AppId | null {
-	const alias = URL_VAPP_ALIASES[value as keyof typeof URL_VAPP_ALIASES];
-	if (alias) return alias;
+	const resolved = resolveVappRoute(value);
+	if (resolved) return resolved.id as AppId;
 	return isAppId(value) ? value : null;
 }
 
@@ -189,6 +185,11 @@ function parseVApp(raw: string | null): VAppId | null {
   return raw ? normalizeVAppId(raw) : null;
 }
 
+// Sprint 7 (vApp Route Contract) ruling: the canonical direct route is
+// `/<appId>` (Holodeck). `?panel=<id>` and `?mode=panel&vapp=<id>` remain
+// parseable so legacy deep-links keep working, but consumers should treat
+// them as a Holodeck-style request — the shell opens / focuses the vApp
+// like any other `?vapp=` argument.
 function parsePanel(params: URLSearchParams): VAppId | null {
   const explicitPanel = parseVApp(params.get(URL_PARAMS.panel));
   if (explicitPanel) return explicitPanel;

@@ -40,6 +40,9 @@
 
 import "./cockpit.css";
 
+import { useContext, useEffect, useState } from "react";
+
+import { IpcContext } from "@/src/lib/ipc/provider";
 import { CapturePage } from "./pages/capture";
 import { ClientsBenchPage } from "./pages/clients-bench";
 import { NowPage } from "./pages/now";
@@ -48,11 +51,41 @@ import { TlAboutPage } from "./pages/tl";
 import { Sidebar } from "./components/sidebar";
 import { useCockpitRoute } from "./router";
 
+type CockpitReadyState = "live" | "staged" | "offline";
+
+/**
+ * Sprint 7 readiness: cockpit publishes `data-cockpit-ready` on its
+ * root surface so Sprint 9 tests can wait on the cockpit-specific
+ * marker (stricter than the shared `data-vapp-ready`). Ready signal is
+ * "mounted + IPC not offline" today; Wave 2A will tighten to "first
+ * projection received" once the cockpit projection bridge lands.
+ */
+function useCockpitReady(): CockpitReadyState {
+	const ipc = useContext(IpcContext);
+	const [mounted, setMounted] = useState(false);
+	const [conn, setConn] = useState<string>(() => (ipc ? ipc.getConnectionState() : "idle"));
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	useEffect(() => {
+		if (!ipc) return;
+		const unsub = ipc.subscribeConnection((s) => setConn(s));
+		return unsub;
+	}, [ipc]);
+
+	if (!mounted) return "staged";
+	if (conn === "offline") return "offline";
+	return "live";
+}
+
 export function CockpitApp() {
 	const { route, path } = useCockpitRoute();
+	const readyState = useCockpitReady();
 
 	return (
-		<section data-app="cockpit" className="cockpit-shell">
+		<section data-app="cockpit" data-cockpit-ready={readyState} className="cockpit-shell">
 			<Sidebar activeRoute={path} />
 			<main className="cockpit-main">
 				<div className="cockpit-main__inner">

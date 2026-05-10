@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { AppContent } from "@/src/components/window-manager/AppContent";
+import { VAppFrame } from "@/src/components/vapp/VAppFrame";
 import { PopoutTitleBar } from "./PopoutTitleBar";
-import { APP_LABELS, DEFAULT_WINDOW_SIZES } from "@/src/lib/constants";
+import { APP_LABELS } from "@/src/lib/constants";
+import { resolveVappRoute } from "@/src/lib/vapp-route-contract";
 import type { AppId } from "@/src/types/window";
 
 // ----------------------------------------------------------------------------
-// Validation
+// Validation — delegated to the shared route contract.
 // ----------------------------------------------------------------------------
 
-const VALID_APP_IDS = new Set<string>(Object.keys(DEFAULT_WINDOW_SIZES));
-
-function isValidAppId(value: string): value is AppId {
-	return VALID_APP_IDS.has(value);
+function resolvePopoutAppId(value: string): AppId | null {
+	const resolved = resolveVappRoute(value);
+	return resolved ? (resolved.id as AppId) : null;
 }
 
 // ----------------------------------------------------------------------------
@@ -78,7 +78,8 @@ export function PopoutShell({ appIdParam }: PopoutShellProps) {
 		document.body.style.overflow = 'hidden';
 	}, []);
 
-	if (!isValidAppId(appIdParam)) {
+	const appId = resolvePopoutAppId(appIdParam);
+	if (!appId) {
 		return (
 			<div
 				className="flex h-dvh items-center justify-center"
@@ -92,7 +93,6 @@ export function PopoutShell({ appIdParam }: PopoutShellProps) {
 		);
 	}
 
-	const appId: AppId = appIdParam;
 	const appName = APP_LABELS[appId];
 
 	if (!mounted) {
@@ -156,7 +156,10 @@ export function PopoutShell({ appIdParam }: PopoutShellProps) {
 				className={companion ? "glass" : undefined}
 				style={{
 					flex: 1,
+					minHeight: 0,
 					overflow: "auto",
+					display: "flex",
+					flexDirection: "column",
 					backgroundColor: companion
 						? "rgba(8, 9, 14, 0.75)"
 						: "var(--place-base, #08090E)",
@@ -164,7 +167,7 @@ export function PopoutShell({ appIdParam }: PopoutShellProps) {
 					WebkitBackdropFilter: companion ? "blur(24px)" : undefined,
 				}}
 			>
-				<AppContent appId={appId} />
+				<VAppFrame appId={appId} mode="popout" hideChrome />
 			</div>
 		</div>
 	);

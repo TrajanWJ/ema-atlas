@@ -56,7 +56,24 @@ export function useUrlStateRouter() {
     if (urlState.vapp) {
       openOrFocus(urlState.vapp, openWindow, focusWindow, getWindowsByApp);
     }
-  }, [urlState.windows, urlState.vapps, urlState.vapp, openWindow, focusWindow, getWindowsByApp]);
+
+    // 4. Sprint 7: treat legacy `?panel=…` / `?mode=panel&vapp=…` as a
+    //    Holodeck-shaped request. The canonical route for full-bleed is
+    //    `/<appId>`, but old deep-links land here — open / focus the vApp
+    //    like any other Holodeck target so the panel parameter never
+    //    silently no-ops.
+    if (urlState.panel && urlState.panel !== urlState.vapp) {
+      openOrFocus(urlState.panel, openWindow, focusWindow, getWindowsByApp);
+    }
+  }, [
+    urlState.windows,
+    urlState.vapps,
+    urlState.vapp,
+    urlState.panel,
+    openWindow,
+    focusWindow,
+    getWindowsByApp,
+  ]);
 
   return urlState;
 }

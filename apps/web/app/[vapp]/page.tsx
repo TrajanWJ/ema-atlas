@@ -2,38 +2,26 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { PanelAppFrame } from "@/src/components/apps/PanelAppFrame";
-import { APP_IDS, isAppId } from "@/src/lib/app-ids";
+import { ROUTABLE_VAPPS, VAPP_ALIASES, resolveVappRoute } from "@/src/lib/vapp-route-contract";
 import type { AppId } from "@/src/types/window";
-
-const LEGACY_PANEL_ALIASES = {
-	braindump: "brain-dump",
-	"active-builds": "git-ema",
-} as const satisfies Record<string, AppId>;
-
-const PANEL_ROUTE_IDS = ["braindump", "active-builds", ...APP_IDS] as const;
 
 type PageProps = {
 	readonly params: Promise<{ readonly vapp: string }>;
 };
 
-function resolvePanelAppId(value: string): AppId | null {
-	const alias = LEGACY_PANEL_ALIASES[value as keyof typeof LEGACY_PANEL_ALIASES];
-	if (alias) return alias;
-	return isAppId(value) ? value : null;
-}
-
 export function generateStaticParams() {
-	return PANEL_ROUTE_IDS.map((vapp) => ({ vapp }));
+	const ids = new Set<string>([...ROUTABLE_VAPPS, ...Object.keys(VAPP_ALIASES)]);
+	return [...ids].map((vapp) => ({ vapp }));
 }
 
 export default async function VAppPage({ params }: PageProps) {
 	const { vapp } = await params;
-	const appId = resolvePanelAppId(vapp);
-	if (!appId) notFound();
+	const resolved = resolveVappRoute(vapp);
+	if (!resolved) notFound();
 
 	return (
 		<Suspense fallback={null}>
-			<PanelAppFrame appId={appId} />
+			<PanelAppFrame appId={resolved.id as AppId} />
 		</Suspense>
 	);
 }

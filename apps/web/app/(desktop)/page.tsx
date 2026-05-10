@@ -56,7 +56,10 @@ import type { AppId } from "@/src/types/window";
 import { registerAllApps } from "@/src/lib/app-registrations";
 import { useUrlStateRouter } from "@/src/lib/url-state-router";
 
-// Register all apps into the registry at module load (idempotent — Map.set overwrites)
+// Register all apps into the registry at module load (idempotent — Map.set overwrites).
+// Each window in the WindowManager now wraps `<VAppFrame mode="vdesktop">`, so the
+// vDesktop, Holodeck, and Popout surfaces all share Sprint 7's frame contract
+// (data-app + data-vapp-ready markers, single AppContent dispatch path).
 registerAllApps();
 
 function useDbProxyListener() {

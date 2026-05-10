@@ -117,7 +117,17 @@ if [ "$stopped_any" -eq 0 ]; then
 fi
 
 echo "stop summary:"
-lsof -nP -iTCP:"$DAEMON_PORT" -sTCP:LISTEN || true
-lsof -nP -iTCP:"$WEB_PORT" -sTCP:LISTEN || true
+daemon_listener_after="$(lsof -nP -iTCP:"$DAEMON_PORT" -sTCP:LISTEN || true)"
+web_listener_after="$(lsof -nP -iTCP:"$WEB_PORT" -sTCP:LISTEN || true)"
+[ -n "$daemon_listener_after" ] && echo "$daemon_listener_after"
+[ -n "$web_listener_after" ] && echo "$web_listener_after"
+
+# Final structured line so the reinstall gate can grep stop-result without
+# parsing per-step output. Parsed by tooling/reinstall-ema-0.0.6.mjs.
+if [ -z "$daemon_listener_after" ] && [ -z "$web_listener_after" ]; then
+  echo "stop-result: ports_clear daemon=$DAEMON_PORT web=$WEB_PORT"
+else
+  echo "stop-result: ports_held daemon=$DAEMON_PORT web=$WEB_PORT"
+fi
 
 exit 0

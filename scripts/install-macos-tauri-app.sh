@@ -33,3 +33,6 @@ ditto "$SOURCE_APP" "$TARGET_APP"
 echo "Installed real Tauri desktop app: $TARGET_APP"
 echo "Source: $SOURCE_APP"
 echo "No EMA user data under ~/Library/Application Support was deleted."
+# Final structured line consumed by the reinstall gate (Sprint 10) and the
+# runtime report. Keep keys stable: install-result, target, source.
+echo "install-result: ok target=$TARGET_APP source=$SOURCE_APP"

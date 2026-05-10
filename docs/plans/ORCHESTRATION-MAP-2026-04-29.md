@@ -2,13 +2,13 @@
 
 Date: 2026-04-29
 
-This map consolidates the loose threads from the current EMA 0.0.5 recovery
+This map consolidates the loose threads from the current EMA 0.0.6 recovery
 work: donor recovery from `place.org` / `place-companion`, frontend polish,
 daemon companion work, workspace CLI grammar, and runtime projection debt.
 
 ## Current Build Reality
 
-- Active code root: `Active builds/EMA-0.0.5/`.
+- Active code root: `Active builds/EMA-0.0.6/`.
 - Current web dev surface: `http://localhost:5173`.
 - Current daemon IPC: `ws://127.0.0.1:49555`.
 - Current org/space from `ema status --json`: `Trajan's Organization`

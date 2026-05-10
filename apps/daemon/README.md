@@ -126,7 +126,7 @@ test/                            Mixed Gleam + Elixir tests
   *_test.exs                     ExUnit (run via `mix test`)
 ```
 
-## Status (0.0.5 wave 1)
+## Status (0.0.6 wave 1)
 
 This is scaffolding. The Gleam modules present are skeletons with the
 correct shape (supervisor wiring, actor message types, bounded-context

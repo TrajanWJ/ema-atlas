@@ -1,6 +1,6 @@
 ---
 name: place-companion-bridge
-description: Use when rebuilding EMA 0.0.5 desktop/native popout behavior, transparent frameless windows, localhost companion bridge, Tauri shell integration, or macOS app packaging from place-companion.
+description: Use when rebuilding EMA 0.0.6 desktop/native popout behavior, transparent frameless windows, localhost companion bridge, Tauri shell integration, or macOS app packaging from place-companion.
 ---
 
 # Place Companion Bridge
@@ -38,4 +38,4 @@ Use this skill for native shell and companion behavior. place-companion is the d
 
 - Remove stale app bundles before visual review: `rm -rf apps/desktop/src-tauri/target/release/bundle/macos/EMA.app`.
 - Rebuild from source before checking progress.
-- Verify no installed Desktop app exists at `~/Desktop/EMA 0.0.5.app` unless intentionally installed by `scripts/install-macos-tauri-app.sh`.
+- Verify no installed Desktop app exists at `~/Desktop/EMA 0.0.6.app` unless intentionally installed by `scripts/install-macos-tauri-app.sh`.

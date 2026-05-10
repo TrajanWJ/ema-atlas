@@ -56,7 +56,7 @@ const dispatch = run([
 	"--lane",
 	"lane:smoke",
 	"--cwd",
-	"Active builds/EMA-0.0.5",
+	"Active builds/EMA-0.0.6",
 	"--prompt",
 	"prove Harness Glue",
 ]);

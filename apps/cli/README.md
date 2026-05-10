@@ -1,6 +1,6 @@
 # @ema/cli
 
-Command-line surface for the EMA 0.0.5 daemon.
+Command-line surface for the EMA 0.0.6 daemon.
 
 Speaks the shell-protocol defined in
 `packages/contracts/ipc/shell-protocol.md` over a WebSocket to
@@ -48,7 +48,7 @@ ema <command>                           # global launcher, runs from any cwd
 ```
 
 The wrapper lives at `~/.local/bin/ema`. It resolves the active build via
-`EMA_HOME` (default `~/Desktop/Active builds/EMA-0.0.5`) and execs
+`EMA_HOME` (default `~/Desktop/Active builds/EMA-0.0.6`) and execs
 `apps/cli/dist/bin.js`. To target a different build for one shell:
 
 ```

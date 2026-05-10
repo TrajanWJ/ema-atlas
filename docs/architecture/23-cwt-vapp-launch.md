@@ -63,8 +63,8 @@ field `active_build:`. The current shape:
   },
   "isolation": "none",
   "isolation_note": "...",
-  "data_contract": "Active builds/EMA-0.0.5/docs/architecture/20-cwt-integration.md",
-  "launch_contract": "Active builds/EMA-0.0.5/docs/architecture/23-cwt-vapp-launch.md",
+  "data_contract": "Active builds/EMA-0.0.6/docs/architecture/20-cwt-integration.md",
+  "launch_contract": "Active builds/EMA-0.0.6/docs/architecture/23-cwt-vapp-launch.md",
   "registers_in": "SpaceInstalledVAppsProjection (shell-protocol.md)"
 }
 ```
@@ -174,7 +174,7 @@ it is a forward-looking name reservation.
 
 ```bash
 # Path A — EMA-hosted iframe
-( cd "Active builds/EMA-0.0.5" && pnpm dev:web )         # port 5173
+( cd "Active builds/EMA-0.0.6" && pnpm dev:web )         # port 5173
 ( cd "Active builds/current-work-tracker-trajan" && pnpm dev:web )   # port 3015
 open http://localhost:5173/cwt
 

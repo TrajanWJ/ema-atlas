@@ -9,7 +9,7 @@ The CLI currently resolves agent workspace state as one global EMA daemon worksp
 
 That is not the intended Desktop model. Durable project state lives under `Desktop/Projects/<project>/`, while active coding happens under `Desktop/Active builds/<build>/`. Agent workspace records must follow the project being operated on.
 
-The symptom is visible in `ema tl about --json` from `Active builds/EMA-0.0.5`: the active build is EMA, but `project_record` reports `Projects/EMA/subprojects/agent-workspace-vapp`. All lane, queue, vCalendar, checkup, and report state is therefore read as one shared workspace instead of a project/space-scoped workspace instance.
+The original symptom was visible in `ema tl about --json` from the active EMA build: the active build was EMA, but `project_record` reported `Projects/EMA/subprojects/agent-workspace-vapp`. All lane, queue, vCalendar, checkup, and report state was therefore read as one shared workspace instead of a project/space-scoped workspace instance. Current verification should use `Active builds/EMA-0.0.6`.
 
 Current operator scope as of 2026-04-29:
 
@@ -59,10 +59,10 @@ A resolved scope should be returned as a first-class object and included in JSON
     "project_id": "project:...",
     "project_name": "EMA",
     "project_record": "/Users/trajanm4air/Desktop/Projects/EMA",
-    "active_build": "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5",
-    "build_record": "/Users/trajanm4air/Desktop/Projects/EMA/builds/0.0.5",
+    "active_build": "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6",
+    "build_record": "/Users/trajanm4air/Desktop/Projects/EMA/builds/0.0.6",
     "resolution_source": "cwd-active-build",
-    "cwd": "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.5"
+    "cwd": "/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6"
   }
 }
 ```
@@ -128,9 +128,9 @@ If no flags are provided, the command uses cwd inference.
 Examples:
 
 ```text
-cd ~/Desktop/Active\ builds/EMA-0.0.5
+cd ~/Desktop/Active\ builds/EMA-0.0.6
 ema tl about --json
-# resolves to Projects/EMA, build 0.0.5
+# resolves to Projects/EMA, build 0.0.6
 
 cd ~/Desktop/Projects/duct-tape-onion-harness
 ema queue list --json
@@ -168,7 +168,7 @@ The agent-workspace-vApp may render and operate on many project workspace instan
    - Do not silently move records from `agent-workspace-vapp` into EMA unless their source and scope are clear.
 
 5. Verification
-   - From `Active builds/EMA-0.0.5`, `tl about` reports `Projects/EMA` and build `0.0.5`.
+   - From `Active builds/EMA-0.0.6`, `tl about` reports `Projects/EMA` and build `0.0.6`.
    - From `Projects/EMA`, `queue list` returns the same EMA-scoped queue.
    - From another `Projects/<name>`, `queue list` returns that project's queue or an honest empty scoped queue.
    - `--project EMA` returns EMA from any cwd.

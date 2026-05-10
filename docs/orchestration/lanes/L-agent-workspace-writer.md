@@ -92,7 +92,7 @@ Explicitly **out of scope** for Slice A:
 ## Verification commands
 
 ```bash
-cd "Active builds/EMA-0.0.5"
+cd "Active builds/EMA-0.0.6"
 bash scripts/contract-check.sh
 cd apps/daemon && gleam build && gleam test && cd ../..
 node tooling/m1-round-trip.mjs

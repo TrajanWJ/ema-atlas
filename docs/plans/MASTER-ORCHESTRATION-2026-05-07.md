@@ -122,7 +122,7 @@ Common rules:
 ## Verification baseline (to keep gates honest)
 
 ```bash
-cd "Active builds/EMA-0.0.5"
+cd "Active builds/EMA-0.0.6"
 bash scripts/contract-check.sh
 cd apps/daemon && gleam build && gleam test && cd ../..
 pnpm --filter @ema/cli build

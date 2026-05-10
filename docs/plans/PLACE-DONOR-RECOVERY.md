@@ -2,7 +2,7 @@
 
 Date: 2026-04-29
 
-The current EMA 0.0.5 surface should be rebuilt with `place.org` and `place-companion` as primary donor repos. The goal is not a blind copy; the goal is to recover the mature shell, tokens, polish, app/window grammar, and native companion behavior while preserving EMA's daemon-first product model.
+The current EMA 0.0.6 surface should be rebuilt with `place.org` and `place-companion` as primary donor repos. The goal is not a blind copy; the goal is to recover the mature shell, tokens, polish, app/window grammar, and native companion behavior while preserving EMA's daemon-first product model.
 
 ## Donor Roots
 
@@ -45,7 +45,7 @@ The current EMA 0.0.5 surface should be rebuilt with `place.org` and `place-comp
 
 ## Guardrails
 
-- Active coding stays in `Active builds/EMA-0.0.5/`.
+- Active coding stays in `Active builds/EMA-0.0.6/`.
 - Do not recreate `EMA-atlas/` or `Projects/atlas/` at Desktop root.
 - Do not import donor localStorage/OPFS as canonical EMA truth. EMA's daemon owns truth.
 - Do not delete dirty source work. Generated app bundles are disposable; source folders are not.

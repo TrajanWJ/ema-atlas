@@ -93,8 +93,8 @@ field `active_build:`. Current shape (abbreviated):
   },
   "isolation": "none",
   "isolation_note": "...",
-  "data_contract": "Active builds/EMA-0.0.5/docs/architecture/14-companion-bridge.md",
-  "launch_contract": "Active builds/EMA-0.0.5/docs/architecture/24-harness-vapp-launch.md",
+  "data_contract": "Active builds/EMA-0.0.6/docs/architecture/14-companion-bridge.md",
+  "launch_contract": "Active builds/EMA-0.0.6/docs/architecture/24-harness-vapp-launch.md",
   "registers_in": "SpaceInstalledVAppsProjection (shell-protocol.md)",
   "self_orchestration": {
     "module": "code/web/server/orchestrator/",
@@ -282,7 +282,7 @@ open http://127.0.0.1:3000
 node -e 'import("./server/orchestrator/index.ts").then(m => m.discoverPlans().then(p => console.log("plans:", p.length)))'
 
 # When Path A lands (cwt-style frame-ancestors in EMA next.config.ts):
-( cd "Active builds/EMA-0.0.5" && pnpm dev:web )                  # port 5173
+( cd "Active builds/EMA-0.0.6" && pnpm dev:web )                  # port 5173
 ( cd "Active builds/duct-tape-onion-harness/code/web" && npm run dev )
 open http://localhost:5173/harness
 ```

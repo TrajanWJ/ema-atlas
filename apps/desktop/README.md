@@ -34,15 +34,15 @@ is:
 apps/desktop/src-tauri/target/release/bundle/macos/EMA.app
 ```
 
-To place that built app where a human expects the 0.0.5 desktop app:
+To place that built app where a human expects the 0.0.6 desktop app:
 
 ```
 scripts/install-macos-tauri-app.sh
 ```
 
 Do not replace this with an AppleScript web/dev launcher. The human-facing
-Desktop icon for EMA 0.0.5 is the Tauri bundle installed as
-`~/Desktop/EMA 0.0.5.app`.
+Desktop icon for EMA 0.0.6 is the Tauri bundle installed as
+`~/Desktop/EMA 0.0.6.app`.
 
 ## Tauri capability matrix
 

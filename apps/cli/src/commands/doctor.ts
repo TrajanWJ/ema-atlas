@@ -167,7 +167,11 @@ export async function runDoctor(args: ParsedArgs): Promise<number> {
 			{ id: "T3.2 auto-checkup-tick", status: "partial", note: "v1 on-demand IPC + CLI; periodic actor pending (D.1)" },
 			{ id: "T3.3 auto-grow-agent", status: "ok", note: "package builds; detector tests pass" },
 			{ id: "promote-to-proposal", status: "ok", note: "blueprint.section.promote emits proposal.drafted + mirror" },
-			{ id: "skills-wiki-runtime", status: "missing", note: "design only (H.1, H.2)" },
+			{
+				id: "skills-wiki-runtime",
+				status: "partial",
+				note: "doc-registry-backed ema wiki resolver live; skill catalog + web vApp catalog still pending (H.1, H.2)",
+			},
 			{ id: "replication-writers", status: "missing", note: "ADR 17/18; not implemented (I.2)" },
 			{ id: "incidents-projection", status: "missing", note: "incident.noted lands but no aggregator (O.2)" },
 		];

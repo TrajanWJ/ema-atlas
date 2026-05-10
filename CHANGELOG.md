@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-05-10 — Wiki doc-registry bridge
+
+- `ema wiki` now reads `Projects/EMA/atlas/knowledge/doc-registry.json` as the
+  stable Markdown network source of truth. Existing `list`, `search`, and
+  `get` verbs stay available; new resolver verbs add `resolve`, `path`,
+  `backlinks`, `check`, and `dump`.
+- The CLI preserves atlas-file fallback for `ema wiki get --path ...`, but the
+  primary contract is now the `<!-- wiki-id: ... -->` and
+  `<!-- see-also: ... -->` registry stamp convention used by the global
+  `wiki` resolver.
+
 ## 2026-05-07 — 0.0.6 architecture audit + rearchitecture campaign opened
 
 **Audit and lane plan**

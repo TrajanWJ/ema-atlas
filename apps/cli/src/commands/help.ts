@@ -43,7 +43,7 @@ export const COMMANDS: CommandInfo[] = [
   { name: "handoff request/list/accept/reject/complete", summary: "Record transfer contracts between actors and lanes." },
   { name: "problem log/list/show/solution/link", summary: "Graph recursive problems, solutions, and dependencies." },
   { name: "blueprint status/list", summary: "Show current Blueprint daemon state and explicit projection/writer gaps." },
-  { name: "wiki search/get/list", summary: "Search and read the project atlas/QMD second-brain layer." },
+  { name: "wiki search/get/list/resolve", summary: "Resolve and read stable IDs from the registry-backed Markdown network." },
   { name: "hermes orient/plan/sweep", summary: "Preview the future Hermes orchestrator packet and plan shape. (projection seed)" },
   { name: "harness providers/donors/dispatch", summary: "Prepare Chronicle + Duct Tape Harness Glue rails. (simulated provider ready)" },
   { name: "peer add/doctor/tunnel", summary: "Manage trusted-dev peer rails. (local registry first, SSH first)" },

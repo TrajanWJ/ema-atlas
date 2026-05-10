@@ -636,6 +636,10 @@ pub fn blueprint_planner_projection_json(db: Db) -> String {
   blueprint_planner_projection_json_raw(db)
 }
 
+pub fn intention_review_projection_json(db: Db) -> String {
+  intention_review_projection_json_raw(db)
+}
+
 pub fn vcalendar_projection_json(db: Db) -> String {
   vcalendar_projection_json_raw(db)
 }
@@ -1050,6 +1054,9 @@ fn blueprint_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "blueprint_planner_projection_json")
 fn blueprint_planner_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "intention_review_projection_json")
+fn intention_review_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "vcalendar_projection_json")
 fn vcalendar_projection_json_raw(db: Db) -> String

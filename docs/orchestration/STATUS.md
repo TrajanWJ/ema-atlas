@@ -1327,7 +1327,7 @@ The "Proslync Swarm Launch Gate" in the master plan defines the final go/no-go f
 - ✅ `ema cockpit workpack --project proslync-app-ios-final --json` returns fast and truthful (272/227 ms cold/warm; reports `web=down` honestly when web is not running).
 - ✅ Agent Work can claim a lane and execute a queue/checkup command through `/api/agent-work/exec` (Sprint 4).
 - ✅ Cockpit can create a real queue item from capture/chat through `/api/cockpit/{capture,chat}` (Sprint 4).
-- ⚠ Intentions can be accepted/deferred/rejected and backfed with explicit `--approve reviewed`; Gleam IPC handlers (`intention.review.upsert`, `intention.backfeed.{start,finish}`) are tracked as a Sprint-5 follow-up — CLI runs `daemon_canonical: false` until they wire.
+- ✅ Intentions can be accepted/deferred/rejected and backfed with explicit `--approve reviewed`; Gleam IPC handlers (`intention.review.upsert`, `intention.backfeed.{start,finish}`) are now wired and `ema intention list-reviewed --json` reports `daemon_canonical: true`.
 - ✅ Chronicle vApp renders evidence-link rows with `data-evidence-target` attributes for queue_item, lane, dispatch, execution, blueprint_node, and source_file.
 - ✅ Duct Tape/Harness simulated execution lands in `dispatch.registry`, `execution.registry`, and `tool.timeline` projections (Sprint 6 live-delta; chronicle.activity reused). Note: the running daemon must be restarted to pick up the three new projections.
 - ✅ Holodeck/vDesktop/popout route/frame contract is unified by `VAppFrame`/`VAppChrome`/`VAppSurface` with `data-app` + `data-vapp-ready` markers (Sprint 7).
@@ -1335,7 +1335,7 @@ The "Proslync Swarm Launch Gate" in the master plan defines the final go/no-go f
 - ✅ Static/Tauri parity gated by `tooling/verify-static-popout-parity.mjs` (Sprint 10).
 - ✅ Runtime report shows daemon up, web up status accurately, and installed app present (Sprint 10).
 
-Conclusion: the gate is **substantively cleared**. The single remaining yellow flag (intention IPC handlers + daemon restart for new projections) is a daemon-deploy step, not a doctrine block. Proslync swarm dispatch can begin once the daemon is restarted; single-agent claimed-lane work has been allowed throughout this campaign.
+Conclusion: the gate is **cleared**. The intention IPC handlers are daemon-backed, the daemon has been restarted onto the Sprint 6 projection set, and Proslync swarm dispatch has produced live dispatch/execution/chronicle evidence. The 8 roadmap rows below remain informational next-build gaps under the current doctor contract; they no longer fail `ema doctor --strict --json` when daemon health and readiness are green.
 
 ### Open queue items (deferred to next-build planning, NOT addressed in this campaign)
 
@@ -1365,4 +1365,46 @@ These are the same gaps that were open before the campaign and remain partials a
 7. replication-writers (ADR 17/18; not implemented).
 8. incidents-projection (incident.noted lands but no aggregator).
 
-`ema doctor --strict --json` will continue to fail until these close. None block the master-plan close-out; all are next-build planning items.
+`ema doctor --strict --json` exits 0 when daemon health and readiness are green; these rows remain visible as informational roadmap gaps. None block the master-plan close-out; all are next-build planning items.
+
+## Session update 2026-05-10 - Substrate-complete + first Proslync swarm
+
+This session stayed rooted in `/Users/trajanm4air/Desktop/Active builds/EMA-0.0.6` on `bootstrap/m2-m3-shell-port`; no `.claude/worktrees/*` directory was used.
+
+### EMA substrate completion
+
+- Added daemon command IPC for `intention.review.upsert`, `intention.backfeed.start`, `intention.backfeed.finish`, and `blueprint.mine.requested` in `apps/daemon/src/ema_shell_ipc/ema_shell_ipc.gleam`.
+- Added daemon event-catalog coverage for intention review/backfeed and blueprint mining events in `apps/daemon/src/ema_daemon/event_envelope.gleam`.
+- Added daemon projection plumbing for `intention.review` in `apps/daemon/src/ema_daemon/bus.gleam` and `apps/daemon/src/ema_daemon/sqlite_ffi.gleam`.
+- Added `tooling/ipc-intention-blueprint-smoke.mjs` to exercise all four IPC commands against the live daemon.
+- Restarted the daemon/web stack in parent-repo tmux sessions, activating the Sprint 6 daemon projections on the running stack.
+
+### Runtime proof
+
+- `node tooling/ipc-intention-blueprint-smoke.mjs` -> OK.
+- `ema intention list-reviewed --json` -> `daemon_canonical: true`.
+- `ema harness status --json` -> `dispatch_registry`, `execution_registry`, `tool_timeline`, and `chronicle_activity` all live; `pending_daemon_projections: []`.
+- `ema doctor --strict --json` -> exit 0 with `health_ok=true`, `readiness_ok=true`, and no blocking failures; roadmap gaps remain informational.
+- `/duct-tape?test=1` rendered dispatch/execution evidence in the Duct Tape vApp; screenshot: `.ema-dev/duct-tape-verify.png`.
+
+### Proslync Sprint 2 Brand HQ swarm
+
+Lane: `lane:01KR7K0ZGA009YGND4AHPRJ9BN` (`Sprint 2 — Brand back-office MVP`).
+
+| Scope | Repo | Queue item | Agent report | Status |
+|---|---|---|---|---|
+| Backend product-core persistence | `Active builds/proslync-backend` | `queue_item:01KR8MT4N9003E4K8M8AVD2PRK` | `agent_report:01KR8N6T3Y00SYG1WKQYBQAEMG` | Closed; `bun test`, `bun run typecheck`, and `bun run build` green. |
+| Brand HQ deal-evidence UI | `Active builds/proslync-app-ios-final` | `queue_item:01KR8MT50N004V84948QCJNZEP` | `agent_report:01KR8NEC7200VAT4CBRYG9GRGS` | Closed; `npx tsc --noEmit --pretty false` and targeted ESLint green. |
+| Presentation-assets source-card sync | `Active builds/proslync-presentation-assets-final` | `queue_item:01KR8MT5JM006B5VZZTSWR448W` | `agent_report:01KR8N3EK000QWN5BT5G86HTP5` | Closed; cited source-card paths verified and `git diff --check` green. |
+
+Parent orchestration report: `agent_report:01KR8NKMX50156DJ4T8AD30BV7`.
+
+### Commit map
+
+- EMA substrate + orchestration log: `sprint6: wire intention ipc and launch proslync swarm`.
+- Proslync sibling repos: local swarm diffs only; no push taken and no sibling-repo push should happen without per-repo approval.
+
+### Residual risk
+
+- `cd apps/daemon && gleam test` still has one pre-existing slug-label assertion failure (`ema_daemon_test.git_ema_slug_projects_active_builds_label_test`); `gleam check` is clean.
+- The roadmap rows T1.2/T2.2/T2.3/T3.1/T3.2/skills-wiki-runtime/replication-writers/incidents-projection are not implemented in this session; doctor strict treats them as informational while health/readiness are green.

@@ -82,6 +82,8 @@ pub type Msg {
 
   BlueprintPlannerProjection(reply: Subject(String))
 
+  IntentionReviewProjection(reply: Subject(String))
+
   VcalendarProjection(reply: Subject(String))
 
   IntentGraphProjection(reply: Subject(String))
@@ -601,6 +603,11 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
         reply,
         sqlite_ffi.blueprint_planner_projection_json(state.db),
       )
+      actor.continue(state)
+    }
+
+    IntentionReviewProjection(reply) -> {
+      process.send(reply, sqlite_ffi.intention_review_projection_json(state.db))
       actor.continue(state)
     }
 
@@ -1427,6 +1434,10 @@ pub fn blueprint_projection_json(bus: Subject(Msg)) -> String {
 
 pub fn blueprint_planner_projection_json(bus: Subject(Msg)) -> String {
   process.call(bus, 5000, fn(reply) { BlueprintPlannerProjection(reply) })
+}
+
+pub fn intention_review_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { IntentionReviewProjection(reply) })
 }
 
 pub fn vcalendar_projection_json(bus: Subject(Msg)) -> String {

@@ -225,6 +225,14 @@ pub fn kind_in_catalog(kind: String) -> Bool {
     "blueprint.aspiration.archived" -> True
     "blueprint.decision.locked" -> True
     "blueprint.decision.superseded" -> True
+    "blueprint.mine.requested" -> True
+    "blueprint.section.proposed" -> True
+    "blueprint.mine.completed" -> True
+    "blueprint.mine.failed" -> True
+    "intention.reviewed" -> True
+    "intention.backfeed.requested" -> True
+    "intention.backfeed.completed" -> True
+    "intention.backfeed.failed" -> True
     "attachment.created" -> True
     "attachment.renamed" -> True
     "attachment.deleted" -> True

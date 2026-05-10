@@ -533,9 +533,17 @@ fn handle_bus_delivery(
             bus.blueprint_planner_projection_json(state.bus_subject),
           )
         }
-        "dispatch.started"
-        | "dispatch.scope_granted"
-        | "dispatch.ended" -> {
+        "intention.reviewed"
+        | "intention.backfeed.requested"
+        | "intention.backfeed.completed"
+        | "intention.backfeed.failed" -> {
+          send_projection(
+            conn,
+            "intention.review",
+            bus.intention_review_projection_json(state.bus_subject),
+          )
+        }
+        "dispatch.started" | "dispatch.scope_granted" | "dispatch.ended" -> {
           send_projection(
             conn,
             "dispatch.registry",
@@ -554,9 +562,7 @@ fn handle_bus_delivery(
             bus.execution_registry_projection_json(state.bus_subject),
           )
         }
-        "tool.invoked"
-        | "tool.returned"
-        | "tool.errored" -> {
+        "tool.invoked" | "tool.returned" | "tool.errored" -> {
           send_projection(
             conn,
             "tool.timeline",
@@ -1209,11 +1215,17 @@ fn handle_text(
                   #("body", agent_workspace.opt(incoming.body)),
                   #("plan", agent_workspace.opt(incoming.context)),
                   #("approver_required", json.bool(requires_approval)),
-                  #("proposed_by_actor_id", json.string(actor_or_default(incoming))),
-                  #("status", json.string(case requires_approval {
-                    True -> "created"
-                    False -> "approved"
-                  })),
+                  #(
+                    "proposed_by_actor_id",
+                    json.string(actor_or_default(incoming)),
+                  ),
+                  #(
+                    "status",
+                    json.string(case requires_approval {
+                      True -> "created"
+                      False -> "approved"
+                    }),
+                  ),
                   #("created_at", json.string(now)),
                 ],
               )
@@ -3599,6 +3611,301 @@ fn handle_text(
                 }
               }
             }
+            Some("blueprint.mine.requested") -> {
+              case
+                incoming.org_id,
+                incoming.transcript_path,
+                incoming.transcript_node_id
+              {
+                Some(_org_id), Some(transcript_path), Some(transcript_node_id)
+                ->
+                  handle_workspace_event(
+                    conn,
+                    state,
+                    incoming,
+                    "blueprint.mine.requested",
+                    "transcript_node_id",
+                    Some(transcript_node_id),
+                    Some("event_trail"),
+                    [
+                      #("transcript_path", json.string(transcript_path)),
+                      #("transcript_node_id", json.string(transcript_node_id)),
+                      #(
+                        "requester_actor_id",
+                        json.string(string_or(
+                          incoming.requester_actor_id,
+                          actor_or_default(incoming),
+                        )),
+                      ),
+                      #(
+                        "requested_at",
+                        json.string(string_or(incoming.requested_at, iso_now())),
+                      ),
+                      #(
+                        "section_count",
+                        json.int(int_or(incoming.section_count, 0)),
+                      ),
+                    ],
+                  )
+                _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.transcript_path, or args.transcript_node_id",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("intention.review.upsert") -> {
+              case
+                incoming.org_id,
+                incoming.intent_id,
+                incoming.review_state,
+                incoming.reviewer_actor_id
+              {
+                Some(_org_id),
+                  Some(intent_id),
+                  Some(review_state),
+                  Some(reviewer_actor_id)
+                ->
+                  handle_workspace_event(
+                    conn,
+                    state,
+                    incoming,
+                    "intention.reviewed",
+                    "intent_id",
+                    Some(intent_id),
+                    Some("intention.review"),
+                    [
+                      #("intent_id", json.string(intent_id)),
+                      #("state", json.string(review_state)),
+                      #("reviewer_actor_id", json.string(reviewer_actor_id)),
+                      #("reason", agent_workspace.opt(incoming.reason)),
+                      #(
+                        "evidence_ref",
+                        agent_workspace.opt(incoming.evidence_ref),
+                      ),
+                      #(
+                        "reviewed_at",
+                        json.string(string_or(incoming.reviewed_at, iso_now())),
+                      ),
+                    ],
+                  )
+                _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.intent_id, args.state, or args.reviewer_actor_id",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("intention.backfeed.start") -> {
+              case
+                incoming.org_id,
+                incoming.intent_id,
+                incoming.destination,
+                incoming.target_project,
+                incoming.approve_token
+              {
+                Some(_org_id),
+                  Some(intent_id),
+                  Some(destination),
+                  Some(target_project),
+                  Some("reviewed")
+                ->
+                  handle_workspace_event(
+                    conn,
+                    state,
+                    incoming,
+                    "intention.backfeed.requested",
+                    "intent_id",
+                    Some(intent_id),
+                    Some("intention.review"),
+                    [
+                      #("intent_id", json.string(intent_id)),
+                      #("destination", json.string(destination)),
+                      #("target_project", json.string(target_project)),
+                      #("approve_token", json.string("reviewed")),
+                      #(
+                        "requester_actor_id",
+                        json.string(string_or(
+                          incoming.requester_actor_id,
+                          actor_or_default(incoming),
+                        )),
+                      ),
+                      #(
+                        "requested_at",
+                        json.string(string_or(incoming.requested_at, iso_now())),
+                      ),
+                    ],
+                  )
+                Some(_org_id),
+                  Some(_intent_id),
+                  Some(_destination),
+                  Some(_target_project),
+                  Some(_token)
+                -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "args.approve_token must be reviewed",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+                _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.intent_id, args.destination, args.target_project, or args.approve_token",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
+            Some("intention.backfeed.finish") -> {
+              case
+                incoming.org_id,
+                incoming.intent_id,
+                incoming.destination,
+                incoming.target_project,
+                incoming.outcome
+              {
+                Some(_org_id),
+                  Some(intent_id),
+                  Some(destination),
+                  Some(target_project),
+                  Some("completed")
+                -> {
+                  case incoming.resource_id {
+                    Some(resource_id) ->
+                      handle_workspace_event(
+                        conn,
+                        state,
+                        incoming,
+                        "intention.backfeed.completed",
+                        "intent_id",
+                        Some(intent_id),
+                        Some("intention.review"),
+                        [
+                          #("intent_id", json.string(intent_id)),
+                          #("destination", json.string(destination)),
+                          #("target_project", json.string(target_project)),
+                          #("resource_id", json.string(resource_id)),
+                          #(
+                            "completed_at",
+                            json.string(string_or(
+                              incoming.completed_at,
+                              iso_now(),
+                            )),
+                          ),
+                        ],
+                      )
+                    None -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(
+                            incoming.id,
+                            "invalid_args",
+                            "missing args.resource_id",
+                          ),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                }
+                Some(_org_id),
+                  Some(intent_id),
+                  Some(destination),
+                  Some(target_project),
+                  Some("failed")
+                -> {
+                  case incoming.error_class, incoming.error_message {
+                    Some(error_class), Some(message) ->
+                      handle_workspace_event(
+                        conn,
+                        state,
+                        incoming,
+                        "intention.backfeed.failed",
+                        "intent_id",
+                        Some(intent_id),
+                        Some("intention.review"),
+                        [
+                          #("intent_id", json.string(intent_id)),
+                          #("destination", json.string(destination)),
+                          #("target_project", json.string(target_project)),
+                          #("error_class", json.string(error_class)),
+                          #("message", json.string(message)),
+                          #(
+                            "failed_at",
+                            json.string(string_or(incoming.failed_at, iso_now())),
+                          ),
+                        ],
+                      )
+                    _, _ -> {
+                      let _ =
+                        mist.send_text_frame(
+                          conn,
+                          err(
+                            incoming.id,
+                            "invalid_args",
+                            "missing args.error_class or args.message",
+                          ),
+                        )
+                      mist.continue(state)
+                    }
+                  }
+                }
+                Some(_org_id),
+                  Some(_intent_id),
+                  Some(_destination),
+                  Some(_target_project),
+                  Some(outcome)
+                -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "invalid outcome " <> outcome,
+                      ),
+                    )
+                  mist.continue(state)
+                }
+                _, _, _, _, _ -> {
+                  let _ =
+                    mist.send_text_frame(
+                      conn,
+                      err(
+                        incoming.id,
+                        "invalid_args",
+                        "missing args.org_id, args.intent_id, args.destination, args.target_project, or args.outcome",
+                      ),
+                    )
+                  mist.continue(state)
+                }
+              }
+            }
             Some("vcalendar.block.add") -> {
               case
                 incoming.org_id,
@@ -3991,11 +4298,7 @@ fn handle_text(
               }
             }
             Some("dispatch.end") -> {
-              case
-                incoming.org_id,
-                incoming.dispatch_id,
-                incoming.outcome
-              {
+              case incoming.org_id, incoming.dispatch_id, incoming.outcome {
                 Some(org_id), Some(dispatch_id), Some(outcome) ->
                   case
                     ema_dispatch.end_dispatch(
@@ -4108,9 +4411,11 @@ fn handle_text(
                 incoming.execution_id,
                 incoming.outcome
               {
-                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  outcome,
-                ) -> {
+                Some(org_id),
+                  Some(dispatch_id),
+                  Some(execution_id),
+                  Some(outcome)
+                -> {
                   let duration = case incoming.duration_ms {
                     Some(value) -> value
                     None -> 0
@@ -4175,11 +4480,17 @@ fn handle_text(
                 incoming.session_file_path,
                 incoming.prompt_hash
               {
-                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  provider,
-                ), Some(exit_code), Some(duration_ms), Some(stdout_bytes), Some(
-                  stderr_bytes,
-                ), Some(session_file_path), Some(prompt_hash) -> {
+                Some(org_id),
+                  Some(dispatch_id),
+                  Some(execution_id),
+                  Some(provider),
+                  Some(exit_code),
+                  Some(duration_ms),
+                  Some(stdout_bytes),
+                  Some(stderr_bytes),
+                  Some(session_file_path),
+                  Some(prompt_hash)
+                -> {
                   case
                     ema_exec.complete_execution(
                       bus_subj,
@@ -4241,51 +4552,56 @@ fn handle_text(
                 incoming.error_class,
                 incoming.error_message
               {
-                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  error_class,
-                ), Some(error_message) -> {
-                  let failed =
-                    case
-                      incoming.provider,
-                      incoming.exit_code,
-                      incoming.duration_ms,
-                      incoming.stdout_bytes,
-                      incoming.stderr_bytes,
-                      incoming.session_file_path,
-                      incoming.prompt_hash
-                    {
-                      Some(provider), Some(exit_code), Some(duration_ms), Some(
+                Some(org_id),
+                  Some(dispatch_id),
+                  Some(execution_id),
+                  Some(error_class),
+                  Some(error_message)
+                -> {
+                  let failed = case
+                    incoming.provider,
+                    incoming.exit_code,
+                    incoming.duration_ms,
+                    incoming.stdout_bytes,
+                    incoming.stderr_bytes,
+                    incoming.session_file_path,
+                    incoming.prompt_hash
+                  {
+                    Some(provider),
+                      Some(exit_code),
+                      Some(duration_ms),
+                      Some(stdout_bytes),
+                      Some(stderr_bytes),
+                      Some(session_file_path),
+                      Some(prompt_hash)
+                    ->
+                      ema_exec.fail_execution_with_report(
+                        bus_subj,
+                        org_id,
+                        actor_or_default(incoming),
+                        dispatch_id,
+                        execution_id,
+                        error_class,
+                        error_message,
+                        provider,
+                        exit_code,
+                        duration_ms,
                         stdout_bytes,
-                      ), Some(stderr_bytes), Some(session_file_path), Some(
+                        stderr_bytes,
+                        session_file_path,
                         prompt_hash,
-                      ) ->
-                        ema_exec.fail_execution_with_report(
-                          bus_subj,
-                          org_id,
-                          actor_or_default(incoming),
-                          dispatch_id,
-                          execution_id,
-                          error_class,
-                          error_message,
-                          provider,
-                          exit_code,
-                          duration_ms,
-                          stdout_bytes,
-                          stderr_bytes,
-                          session_file_path,
-                          prompt_hash,
-                        )
-                      _, _, _, _, _, _, _ ->
-                        ema_exec.fail_execution(
-                          bus_subj,
-                          org_id,
-                          actor_or_default(incoming),
-                          dispatch_id,
-                          execution_id,
-                          error_class,
-                          error_message,
-                        )
-                    }
+                      )
+                    _, _, _, _, _, _, _ ->
+                      ema_exec.fail_execution(
+                        bus_subj,
+                        org_id,
+                        actor_or_default(incoming),
+                        dispatch_id,
+                        execution_id,
+                        error_class,
+                        error_message,
+                      )
+                  }
                   case failed {
                     Ok(event_id) -> {
                       let _ =
@@ -4336,11 +4652,17 @@ fn handle_text(
                 incoming.session_file_path,
                 incoming.prompt_hash
               {
-                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  provider,
-                ), Some(timeout_ms), Some(duration_ms), Some(stdout_bytes), Some(
-                  stderr_bytes,
-                ), Some(session_file_path), Some(prompt_hash) -> {
+                Some(org_id),
+                  Some(dispatch_id),
+                  Some(execution_id),
+                  Some(provider),
+                  Some(timeout_ms),
+                  Some(duration_ms),
+                  Some(stdout_bytes),
+                  Some(stderr_bytes),
+                  Some(session_file_path),
+                  Some(prompt_hash)
+                -> {
                   case
                     ema_exec.timeout_execution(
                       bus_subj,
@@ -4402,9 +4724,13 @@ fn handle_text(
                 incoming.source,
                 incoming.body
               {
-                Some(org_id), Some(project_id), Some(kind), Some(title), Some(
-                  source_path,
-                ), Some(body) -> {
+                Some(org_id),
+                  Some(project_id),
+                  Some(kind),
+                  Some(title),
+                  Some(source_path),
+                  Some(body)
+                -> {
                   case
                     ema_artifact.create_artifact(
                       bus_subj,
@@ -4440,7 +4766,10 @@ fn handle_text(
                     }
                     Error(e) -> {
                       let _ =
-                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                        mist.send_text_frame(
+                          conn,
+                          artifact_error(incoming.id, e),
+                        )
                       mist.continue(state)
                     }
                   }
@@ -4469,9 +4798,14 @@ fn handle_text(
                 incoming.source,
                 incoming.body
               {
-                Some(org_id), Some(project_id), Some(artifact_id), Some(kind), Some(
-                  title,
-                ), Some(source_path), Some(body) -> {
+                Some(org_id),
+                  Some(project_id),
+                  Some(artifact_id),
+                  Some(kind),
+                  Some(title),
+                  Some(source_path),
+                  Some(body)
+                -> {
                   case
                     ema_artifact.update_artifact(
                       bus_subj,
@@ -4502,7 +4836,10 @@ fn handle_text(
                     }
                     Error(e) -> {
                       let _ =
-                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                        mist.send_text_frame(
+                          conn,
+                          artifact_error(incoming.id, e),
+                        )
                       mist.continue(state)
                     }
                   }
@@ -4534,11 +4871,17 @@ fn handle_text(
                 incoming.target_kind,
                 incoming.target_value
               {
-                Some(org_id), Some(project_id), Some(artifact_id), Some(kind), Some(
-                  title,
-                ), Some(content_hash), Some(storage_path), Some(bytes), Some(
-                  target_kind,
-                ), Some(target_id) -> {
+                Some(org_id),
+                  Some(project_id),
+                  Some(artifact_id),
+                  Some(kind),
+                  Some(title),
+                  Some(content_hash),
+                  Some(storage_path),
+                  Some(bytes),
+                  Some(target_kind),
+                  Some(target_id)
+                -> {
                   case
                     ema_artifact.link_artifact(
                       bus_subj,
@@ -4572,7 +4915,10 @@ fn handle_text(
                     }
                     Error(e) -> {
                       let _ =
-                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                        mist.send_text_frame(
+                          conn,
+                          artifact_error(incoming.id, e),
+                        )
                       mist.continue(state)
                     }
                   }
@@ -4602,9 +4948,15 @@ fn handle_text(
                 incoming.source,
                 incoming.duration_ms
               {
-                Some(org_id), Some(project_id), Some(artifact_id), Some(kind), Some(
-                  title,
-                ), Some(content_hash), Some(storage_path), Some(bytes) -> {
+                Some(org_id),
+                  Some(project_id),
+                  Some(artifact_id),
+                  Some(kind),
+                  Some(title),
+                  Some(content_hash),
+                  Some(storage_path),
+                  Some(bytes)
+                -> {
                   let reason = case incoming.reason {
                     Some(value) -> value
                     None -> "archived"
@@ -4641,7 +4993,10 @@ fn handle_text(
                     }
                     Error(e) -> {
                       let _ =
-                        mist.send_text_frame(conn, artifact_error(incoming.id, e))
+                        mist.send_text_frame(
+                          conn,
+                          artifact_error(incoming.id, e),
+                        )
                       mist.continue(state)
                     }
                   }
@@ -4669,9 +5024,13 @@ fn handle_text(
                 incoming.source_kind,
                 incoming.source_id
               {
-                Some(org_id), Some(canon_kind), Some(body), Some(content_hash), Some(
-                  source_kind,
-                ), Some(source_id) -> {
+                Some(org_id),
+                  Some(canon_kind),
+                  Some(body),
+                  Some(content_hash),
+                  Some(source_kind),
+                  Some(source_id)
+                -> {
                   case
                     ema_canon.write_canon(
                       bus_subj,
@@ -4734,9 +5093,11 @@ fn handle_text(
                 incoming.superseded_by_canon_id,
                 incoming.reason
               {
-                Some(org_id), Some(canon_id), Some(superseded_by), Some(
-                  rationale,
-                ) -> {
+                Some(org_id),
+                  Some(canon_id),
+                  Some(superseded_by),
+                  Some(rationale)
+                -> {
                   case
                     ema_canon.supersede_canon(
                       bus_subj,
@@ -4791,9 +5152,12 @@ fn handle_text(
                 incoming.tool_name,
                 incoming.args_json
               {
-                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  tool_name,
-                ), Some(args_json) ->
+                Some(org_id),
+                  Some(dispatch_id),
+                  Some(execution_id),
+                  Some(tool_name),
+                  Some(args_json)
+                ->
                   case
                     ema_exec.invoke_tool(
                       bus_subj,
@@ -4849,9 +5213,12 @@ fn handle_text(
                 incoming.tool_name,
                 incoming.result_summary
               {
-                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  tool_name,
-                ), Some(result_summary) ->
+                Some(org_id),
+                  Some(dispatch_id),
+                  Some(execution_id),
+                  Some(tool_name),
+                  Some(result_summary)
+                ->
                   case
                     ema_exec.return_tool(
                       bus_subj,
@@ -4907,9 +5274,13 @@ fn handle_text(
                 incoming.error_class,
                 incoming.error_message
               {
-                Some(org_id), Some(dispatch_id), Some(execution_id), Some(
-                  tool_name,
-                ), Some(error_class), Some(error_message) ->
+                Some(org_id),
+                  Some(dispatch_id),
+                  Some(execution_id),
+                  Some(tool_name),
+                  Some(error_class),
+                  Some(error_message)
+                ->
                   case
                     ema_exec.error_tool(
                       bus_subj,
@@ -5110,6 +5481,22 @@ type Incoming {
     origin_text: Option(String),
     supersedes: Option(String),
     source_node: Option(String),
+    intent_id: Option(String),
+    review_state: Option(String),
+    reviewer_actor_id: Option(String),
+    evidence_ref: Option(String),
+    reviewed_at: Option(String),
+    destination: Option(String),
+    target_project: Option(String),
+    approve_token: Option(String),
+    requester_actor_id: Option(String),
+    requested_at: Option(String),
+    resource_id: Option(String),
+    completed_at: Option(String),
+    failed_at: Option(String),
+    transcript_path: Option(String),
+    transcript_node_id: Option(String),
+    section_count: Option(Int),
     // L2 dispatch/exec/tool additive fields (humble-sketch lane:01KR0RQ6JK).
     intent: Option(String),
     dispatch_id: Option(String),
@@ -5260,6 +5647,22 @@ type IncomingArgs {
     origin_text: Option(String),
     supersedes: Option(String),
     source_node: Option(String),
+    intent_id: Option(String),
+    review_state: Option(String),
+    reviewer_actor_id: Option(String),
+    evidence_ref: Option(String),
+    reviewed_at: Option(String),
+    destination: Option(String),
+    target_project: Option(String),
+    approve_token: Option(String),
+    requester_actor_id: Option(String),
+    requested_at: Option(String),
+    resource_id: Option(String),
+    completed_at: Option(String),
+    failed_at: Option(String),
+    transcript_path: Option(String),
+    transcript_node_id: Option(String),
+    section_count: Option(Int),
     // L2 dispatch/exec/tool additive fields (humble-sketch lane:01KR0RQ6JK).
     intent: Option(String),
     dispatch_id: Option(String),
@@ -5867,6 +6270,86 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
+    use intent_id <- decode.optional_field(
+      "intent_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use review_state <- decode.optional_field(
+      "state",
+      None,
+      decode.optional(decode.string),
+    )
+    use reviewer_actor_id <- decode.optional_field(
+      "reviewer_actor_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use evidence_ref <- decode.optional_field(
+      "evidence_ref",
+      None,
+      decode.optional(decode.string),
+    )
+    use reviewed_at <- decode.optional_field(
+      "reviewed_at",
+      None,
+      decode.optional(decode.string),
+    )
+    use destination <- decode.optional_field(
+      "destination",
+      None,
+      decode.optional(decode.string),
+    )
+    use target_project <- decode.optional_field(
+      "target_project",
+      None,
+      decode.optional(decode.string),
+    )
+    use approve_token <- decode.optional_field(
+      "approve_token",
+      None,
+      decode.optional(decode.string),
+    )
+    use requester_actor_id <- decode.optional_field(
+      "requester_actor_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use requested_at <- decode.optional_field(
+      "requested_at",
+      None,
+      decode.optional(decode.string),
+    )
+    use resource_id <- decode.optional_field(
+      "resource_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use completed_at <- decode.optional_field(
+      "completed_at",
+      None,
+      decode.optional(decode.string),
+    )
+    use failed_at <- decode.optional_field(
+      "failed_at",
+      None,
+      decode.optional(decode.string),
+    )
+    use transcript_path <- decode.optional_field(
+      "transcript_path",
+      None,
+      decode.optional(decode.string),
+    )
+    use transcript_node_id <- decode.optional_field(
+      "transcript_node_id",
+      None,
+      decode.optional(decode.string),
+    )
+    use section_count <- decode.optional_field(
+      "section_count",
+      None,
+      decode.optional(decode.int),
+    )
     // L2 dispatch/exec/tool additive fields (humble-sketch lane:01KR0RQ6JK).
     use intent <- decode.optional_field(
       "intent",
@@ -5993,11 +6476,7 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       None,
       decode.optional(decode.string),
     )
-    use links <- decode.optional_field(
-      "links",
-      [],
-      decode.list(decode.string),
-    )
+    use links <- decode.optional_field("links", [], decode.list(decode.string))
     use read_scopes <- decode.optional_field(
       "read_scopes",
       [],
@@ -6133,6 +6612,22 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       origin_text: origin_text,
       supersedes: supersedes,
       source_node: source_node,
+      intent_id: intent_id,
+      review_state: review_state,
+      reviewer_actor_id: reviewer_actor_id,
+      evidence_ref: evidence_ref,
+      reviewed_at: reviewed_at,
+      destination: destination,
+      target_project: target_project,
+      approve_token: approve_token,
+      requester_actor_id: requester_actor_id,
+      requested_at: requested_at,
+      resource_id: resource_id,
+      completed_at: completed_at,
+      failed_at: failed_at,
+      transcript_path: transcript_path,
+      transcript_node_id: transcript_node_id,
+      section_count: section_count,
       intent: intent,
       dispatch_id: dispatch_id,
       execution_id: execution_id,
@@ -6291,6 +6786,22 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
         origin_text: None,
         supersedes: None,
         source_node: None,
+        intent_id: None,
+        review_state: None,
+        reviewer_actor_id: None,
+        evidence_ref: None,
+        reviewed_at: None,
+        destination: None,
+        target_project: None,
+        approve_token: None,
+        requester_actor_id: None,
+        requested_at: None,
+        resource_id: None,
+        completed_at: None,
+        failed_at: None,
+        transcript_path: None,
+        transcript_node_id: None,
+        section_count: None,
         intent: None,
         dispatch_id: None,
         execution_id: None,
@@ -6443,6 +6954,22 @@ fn decode_envelope(raw: String) -> Result(Incoming, String) {
       origin_text: args.origin_text,
       supersedes: args.supersedes,
       source_node: args.source_node,
+      intent_id: args.intent_id,
+      review_state: args.review_state,
+      reviewer_actor_id: args.reviewer_actor_id,
+      evidence_ref: args.evidence_ref,
+      reviewed_at: args.reviewed_at,
+      destination: args.destination,
+      target_project: args.target_project,
+      approve_token: args.approve_token,
+      requester_actor_id: args.requester_actor_id,
+      requested_at: args.requested_at,
+      resource_id: args.resource_id,
+      completed_at: args.completed_at,
+      failed_at: args.failed_at,
+      transcript_path: args.transcript_path,
+      transcript_node_id: args.transcript_node_id,
+      section_count: args.section_count,
       intent: args.intent,
       dispatch_id: args.dispatch_id,
       execution_id: args.execution_id,
@@ -7338,7 +7865,8 @@ fn exec_error(in_reply_to: String, error: ema_exec.ExecError) -> String {
       err(in_reply_to, "invalid_args", "dispatch_id is required")
     ema_exec.EmptyExecutionId ->
       err(in_reply_to, "invalid_args", "execution_id is required")
-    ema_exec.EmptyKind -> err(in_reply_to, "invalid_args", "exec_kind is required")
+    ema_exec.EmptyKind ->
+      err(in_reply_to, "invalid_args", "exec_kind is required")
     ema_exec.EmptyName -> err(in_reply_to, "invalid_args", "name is required")
     ema_exec.EmptyToolName ->
       err(in_reply_to, "invalid_args", "tool_name is required")
@@ -7794,6 +8322,12 @@ fn send_projection_snapshot_scoped(
         conn,
         "blueprint.planner",
         bus.blueprint_planner_projection_json(bus_subj),
+      )
+    Some("intention.review") ->
+      send_projection(
+        conn,
+        "intention.review",
+        bus.intention_review_projection_json(bus_subj),
       )
     Some("vcalendar.state") ->
       send_projection(

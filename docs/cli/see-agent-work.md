@@ -6,9 +6,13 @@ See Agent Work vApp-specific grammar.
 
 > CLI doctrine (`~/Desktop/AGENTS.md`, 2026-05-07, post-cwt-absorption):
 > EMA's CLI is `ema`. cwt was absorbed into EMA; `~/.local/bin/cwt` is a
-> thin alias for `ema cockpit "$@"`. The cockpit vApp owns project/client/
-> work registry surfacing. See
-> `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md`.
+> thin alias for `ema cockpit "$@"`. The Cockpit vApp owns project/client/
+> work registry surfacing — and is a client/project workbench, not the whole
+> Agent Workspace. See
+> `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md`. For the canonical
+> vocabulary (EMA Project / EMA 0.0.6 active build / Holodeck / vDesktop /
+> Native popout / Agent Workspace / Cockpit / Duct Tape-Harness) see the
+> `Vocabulary` section in the EMA-0.0.6 `AGENTS.md`.
 
 > **Current state:** an `ema` CLI exists in the active build. This document is
 > now the See Agent Work grammar reference for vApp-facing commands; use

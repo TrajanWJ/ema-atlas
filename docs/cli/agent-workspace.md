@@ -1,5 +1,12 @@
 # Agent Workspace CLI Operating Contract
 
+> **Vocabulary.** "Agent Workspace" here means the project-scoped operating
+> surface for lanes, queue, handoffs, dispatches, executions, and evidence.
+> "Cockpit" is the client/project workbench inside that workspace, not the
+> workspace itself. "Duct Tape/Harness" is the AI dispatch seam and execution
+> registry. For the full canonical glossary, see the `Vocabulary` section in
+> the EMA-0.0.6 `AGENTS.md`.
+
 Status: immediate agent-use contract. The daemon registry is the live
 coordination source. Core workspace commands are live through daemon
 writes/projections or explicit file-backed Harness Glue rails:

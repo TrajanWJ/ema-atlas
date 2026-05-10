@@ -2,6 +2,27 @@
 
 You are working in the active EMA build. Read `README.md` and `AGENTS.md` first if you have not. The orchestrator overview is in `../../AGENTS.md`.
 
+## Vocabulary
+
+These terms have one canonical meaning across EMA docs, CLI, web, and atlas
+records. Other docs that reuse them link back here rather than redefining.
+
+| Term | Meaning |
+|---|---|
+| EMA Project | `Projects/EMA/` durable record |
+| EMA 0.0.6 active build | `Active builds/EMA-0.0.6/` code in motion |
+| Holodeck | direct full-page vApp route, `/<appId>` |
+| vDesktop | windowed desktop shell route, `/` with windows |
+| Native popout | Tauri/companion-backed popout window |
+| Agent Workspace | project-scoped operating surface for lanes, queue, handoffs, dispatches, executions, evidence |
+| Cockpit | client/project workbench, not the whole agent workspace |
+| Duct Tape/Harness | AI dispatch seam and execution registry |
+
+CLI doctrine (per `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md`): `ema`
+is the canonical CLI. `cwt` is legacy/alias context and routes through
+`ema cockpit` for current client/project views; the cockpit vApp is a
+client/project workbench, not the whole Agent Workspace.
+
 ## Current Workspace Scope
 
 The active personal EMA daemon scope is:

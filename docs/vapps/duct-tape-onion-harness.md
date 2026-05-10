@@ -1,5 +1,13 @@
 # duct-tape-onion-harness (vApp)
 
+> **Vocabulary.** "Duct Tape/Harness" is EMA's canonical name for the AI
+> dispatch seam and execution registry described below — the surface, the
+> control-plane consumer, and the daemon-side `provider_supervisor` together.
+> It sits inside the project-scoped Agent Workspace; it is not the Cockpit
+> (which is the client/project workbench) and it does not own the holodeck or
+> vDesktop shell. For the canonical glossary, see the `Vocabulary` section in
+> the EMA-0.0.6 `AGENTS.md`.
+
 ## One-line
 
 The central AI dispatch router for EMA. Every AI/LLM call the system

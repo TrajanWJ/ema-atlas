@@ -29,11 +29,16 @@ Read:
 EMA's CLI is `ema` (post-cwt-absorption, 2026-05-07). All record families
 below org/space surface via `ema` verbs.
 
-The cockpit vApp (`?vapp=cockpit` in EMA web; `ema cockpit …` in CLI) owns
+The Cockpit vApp (`?vapp=cockpit` in EMA web; `ema cockpit …` in CLI) owns
 project/client/work registry surfacing — formerly cwt's role. The
 `~/.local/bin/cwt` alias execs `ema cockpit "$@"`; there is no separate
 binary. See `docs/decisions/2026-05-07-cwt-absorbed-by-ema.md` and the
 `Agent Workspace CLI Loop` section in `~/Desktop/AGENTS.md`.
+
+Cockpit is the client/project workbench, not the whole Agent Workspace.
+For the canonical glossary (EMA Project / EMA 0.0.6 active build /
+Holodeck / vDesktop / Native popout / Agent Workspace / Cockpit / Duct
+Tape-Harness) see the `Vocabulary` section in `AGENTS.md`.
 
 ## Environment preflight
 

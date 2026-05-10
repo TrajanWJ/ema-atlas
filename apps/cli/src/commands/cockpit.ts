@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { promisify } from "node:util";
 import type { ParsedArgs } from "../args.js";
@@ -13,6 +13,7 @@ import { readProjectionBatch, renderEmaCommand } from "./workspace-daemon.js";
 const execFileAsync = promisify(execFile);
 const ACTIVE_BUILDS_ROOT = join(DESKTOP_ROOT, "Active builds");
 const INTENTION_STORE_ROOT = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
+const EMA_PIDS_ROOT = join(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "pids");
 
 type LaneRecord = {
   readonly id: string;
@@ -238,11 +239,13 @@ async function loadCockpitProjection(
   const client = inferClient(scope);
   const activeBuilds = await discoverBuilds(scope);
   const surfaces = inferSurfaces(scope);
+  const runtime = readRuntimeFacts();
   const health = healthFor({
     activeBuilds,
     daemonUp: laneProjection != null || queueProjection != null,
     intentionsUp: intentionProjectionAvailable(scope),
     surfaces,
+    runtime,
   });
   const cockpitUrl = cockpitUrlFor(scope, client);
   const homeCurrentProject = topbar?.current_project?.name ?? null;
@@ -582,11 +585,52 @@ function inferSurfaces(scope: WorkspaceScope): CockpitSurface[] {
   ];
 }
 
+type RuntimeFacts = {
+  readonly webUp: boolean;
+  readonly daemonStalePid: boolean;
+  readonly webStalePid: boolean;
+};
+
+function pidAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === "EPERM";
+  }
+}
+
+function readPidFile(name: string): number | null {
+  const path = join(EMA_PIDS_ROOT, `${name}.pid`);
+  if (!existsSync(path)) return null;
+  try {
+    const raw = readFileSync(path, "utf8").trim();
+    if (!raw) return null;
+    const pid = Number(raw);
+    return Number.isFinite(pid) && pid > 0 ? pid : null;
+  } catch {
+    return null;
+  }
+}
+
+function readRuntimeFacts(): RuntimeFacts {
+  const webPid = readPidFile("web");
+  const daemonPid = readPidFile("daemon");
+  const webAlive = webPid != null && pidAlive(webPid);
+  const daemonAlive = daemonPid != null && pidAlive(daemonPid);
+  return {
+    webUp: webAlive,
+    daemonStalePid: daemonPid != null && !daemonAlive,
+    webStalePid: webPid != null && !webAlive,
+  };
+}
+
 function healthFor(input: {
   readonly activeBuilds: readonly CockpitBuild[];
   readonly daemonUp: boolean;
   readonly intentionsUp: boolean;
   readonly surfaces: readonly CockpitSurface[];
+  readonly runtime: RuntimeFacts;
 }): CockpitHealth {
   const gitBuilds = new Map(input.activeBuilds.map((build) => [build.id, build]));
   const gitFactsLoaded = ["proslync-app-ios-final", "proslync-backend", "proslync-presentation-assets-final"].every((id) => {
@@ -595,13 +639,22 @@ function healthFor(input: {
   });
   const desktopStatus = gitBuilds.get("proslync-desktop")?.git_status;
   const desktopExplicit = desktopStatus != null && desktopStatus !== "missing" && desktopStatus !== "unknown";
+  const staleRecords: string[] = [];
+  if (input.runtime.daemonStalePid) staleRecords.push("daemon.pid points to a process that is not running");
+  if (input.runtime.webStalePid) staleRecords.push("web.pid points to a process that is not running");
   return {
     daemon: input.daemonUp ? "up" : "down",
-    web: "up",
+    web: input.runtime.webUp ? "up" : "down",
     dirty_builds: input.activeBuilds.filter((build) => build.git_status === "dirty").length,
     no_git_builds: input.activeBuilds.filter((build) => build.git_status === "no_git").length,
-    stale_records: [],
-    proslync_ready: input.daemonUp && input.intentionsUp && gitFactsLoaded && desktopExplicit && input.surfaces.length >= 6,
+    stale_records: staleRecords,
+    proslync_ready:
+      input.daemonUp &&
+      input.intentionsUp &&
+      input.runtime.webUp &&
+      gitFactsLoaded &&
+      desktopExplicit &&
+      input.surfaces.length >= 6,
   };
 }
 

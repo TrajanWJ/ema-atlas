@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 
@@ -12,6 +12,7 @@ const WEB_ROOT = process.cwd();
 const EMA_ROOT = resolve(WEB_ROOT, "../..");
 const EMA_CLI = join(EMA_ROOT, "apps/cli/dist/bin.js");
 const INTENTION_STORE_ROOT = join(EMA_ROOT, ".ema-dev", "intention-backfeed");
+const EMA_PIDS_ROOT = join(EMA_ROOT, ".ema-dev", "pids");
 const PROSLYNC_APP = "/Users/trajanm4air/Desktop/Active builds/proslync-app-ios-final";
 
 const CLIENT = {
@@ -322,11 +323,13 @@ export async function GET(request: Request) {
 	const project = projectFrom(workspaceScope, status);
 	const lanes = (laneList?.lanes ?? []).map((lane) => normalizeLane(lane, project.id));
 	const queue = (queueList?.queue ?? []).map((item) => normalizeQueue(item, project.id));
+	const runtime = readRuntimeFacts();
 	const health = healthFrom({
 		activeBuilds,
 		daemonUp: Boolean(status?.ok || laneList?.ok || queueList?.ok),
 		intentionsUp: intentionProjectionAvailable(projectName),
 		surfaces: PROSLYNC_SURFACES,
+		runtime,
 	});
 
 	return Response.json(
@@ -384,11 +387,56 @@ function safeName(value: string): string {
 	return value.replace(/[^a-zA-Z0-9._-]+/g, "_");
 }
 
+type RuntimeFacts = {
+	readonly webUp: boolean;
+	readonly daemonStalePid: boolean;
+	readonly webStalePid: boolean;
+};
+
+function pidAlive(pid: number): boolean {
+	try {
+		process.kill(pid, 0);
+		return true;
+	} catch (error) {
+		return (error as NodeJS.ErrnoException).code === "EPERM";
+	}
+}
+
+function readPidFile(name: string): number | null {
+	const path = join(EMA_PIDS_ROOT, `${name}.pid`);
+	if (!existsSync(path)) return null;
+	try {
+		const raw = readFileSync(path, "utf8").trim();
+		if (!raw) return null;
+		const pid = Number(raw);
+		return Number.isFinite(pid) && pid > 0 ? pid : null;
+	} catch {
+		return null;
+	}
+}
+
+function readRuntimeFacts(): RuntimeFacts {
+	// This route only fires when the web server is responding, so web is up by
+	// tautology. A pidfile that doesn't point at this process or a live process
+	// is stale.
+	const webPid = readPidFile("web");
+	const daemonPid = readPidFile("daemon");
+	const webPidIsThis = webPid != null && webPid === process.pid;
+	const webPidAlive = webPid != null && pidAlive(webPid);
+	const daemonAlive = daemonPid != null && pidAlive(daemonPid);
+	return {
+		webUp: true,
+		daemonStalePid: daemonPid != null && !daemonAlive,
+		webStalePid: webPid != null && !(webPidIsThis || webPidAlive),
+	};
+}
+
 function healthFrom(input: {
 	readonly activeBuilds: readonly Awaited<ReturnType<typeof gitFact>>[];
 	readonly daemonUp: boolean;
 	readonly intentionsUp: boolean;
 	readonly surfaces: typeof PROSLYNC_SURFACES;
+	readonly runtime: RuntimeFacts;
 }) {
 	const gitBuilds = new Map<string, (typeof input.activeBuilds)[number]>(
 		input.activeBuilds.map((build) => [build.id, build]),
@@ -399,12 +447,21 @@ function healthFrom(input: {
 	});
 	const desktopStatus = gitBuilds.get("proslync-desktop")?.git_status;
 	const desktopExplicit = desktopStatus != null && desktopStatus !== "missing" && desktopStatus !== "unknown";
+	const staleRecords: string[] = [];
+	if (input.runtime.daemonStalePid) staleRecords.push("daemon.pid points to a process that is not running");
+	if (input.runtime.webStalePid) staleRecords.push("web.pid points to a process that is not running");
 	return {
 		daemon: input.daemonUp ? "up" : "down",
-		web: "up",
+		web: input.runtime.webUp ? "up" : "down",
 		dirty_builds: input.activeBuilds.filter((build) => build.git_status === "dirty").length,
 		no_git_builds: input.activeBuilds.filter((build) => build.git_status === "no_git").length,
-		stale_records: [] as string[],
-		proslync_ready: input.daemonUp && input.intentionsUp && gitFactsLoaded && desktopExplicit && input.surfaces.length >= 6,
+		stale_records: staleRecords,
+		proslync_ready:
+			input.daemonUp &&
+			input.intentionsUp &&
+			input.runtime.webUp &&
+			gitFactsLoaded &&
+			desktopExplicit &&
+			input.surfaces.length >= 6,
 	};
 }

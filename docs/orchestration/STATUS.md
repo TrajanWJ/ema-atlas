@@ -1101,3 +1101,19 @@ Reality check against what is actually on disk (not what old plan docs claimed):
 - CLI cockpit projection now reads lane/queue/topbar through one batched daemon subscription instead of separate WebSocket subscriptions.
 - Current measured gate: workpack cold `1343ms`, warm `1134ms`; projection cold `1447ms`, warm `858ms`.
 - Web cockpit projection now uses cheap intention artifact availability instead of shelling out to `ema cockpit intentions` on every page load.
+
+## Session update 2026-05-10 - Sprint 2 close: budget gate + honest health
+
+- Tightened cockpit perf smoke budgets to the master plan target (cold ≤ 2500 ms, warm ≤ 750 ms for both workpack and projection). Current measured: workpack cold `272ms` / warm `227ms`; projection cold `223ms` / warm `226ms`.
+- Removed the hardcoded `web: "up"` and `stale_records: []` from cockpit health. Both `ema cockpit ...` (CLI) and `/api/cockpit/projection` (web) now read `.ema-dev/pids/{daemon,web}.pid` and check liveness with `process.kill(pid, 0)`.
+- `health.web` now reflects pidfile-backed liveness in the CLI; the web route reports `web: "up"` only because it is itself the responding process. Stale pidfiles surface in `health.stale_records`.
+- `proslync_ready` now requires `runtime.webUp` in addition to the existing daemon/intentions/git/desktop/surface gates. With web currently down, `proslync_ready` is correctly `false` (was previously `true` while web was unreachable).
+- Sprint 2 step 3 ("optimistic readiness") closed; performance budget step closed; remaining Sprint 2 deltas are now implementation-style tweaks rather than budget/truth gates.
+
+Verified:
+
+- `pnpm --filter @ema/cli typecheck`: clean.
+- `pnpm build:cli`: clean.
+- `pnpm --dir apps/web exec tsc --noEmit`: clean.
+- `pnpm cockpit:perf`: passes both workpack and projection at the new tighter budget.
+- `node apps/cli/dist/bin.js cockpit workpack --project proslync-app-ios-final --json`: returns `health.web=down`, two `stale_records`, `proslync_ready=false`.

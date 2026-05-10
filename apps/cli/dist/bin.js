@@ -8670,7 +8670,7 @@ async function exists(path2) {
 
 // src/commands/cockpit.ts
 import { execFile as execFile2 } from "child_process";
-import { existsSync as existsSync12, readdirSync as readdirSync6 } from "fs";
+import { existsSync as existsSync12, readdirSync as readdirSync6, readFileSync as readFileSync10 } from "fs";
 import { basename as basename2, join as join14 } from "path";
 import { promisify as promisify2 } from "util";
 
@@ -9679,6 +9679,7 @@ function parsePositiveInt(value, fallback) {
 var execFileAsync2 = promisify2(execFile2);
 var ACTIVE_BUILDS_ROOT = join14(DESKTOP_ROOT, "Active builds");
 var INTENTION_STORE_ROOT = join14(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
+var EMA_PIDS_ROOT = join14(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "pids");
 async function runCockpit(args) {
   const sub = args.positional[0] ?? "summary";
   if (flagBool(args, "help") || args.flags.h === true || sub === "help") {
@@ -9778,11 +9779,13 @@ async function loadCockpitProjection(args, options = {}) {
   const client = inferClient(scope);
   const activeBuilds = await discoverBuilds(scope);
   const surfaces = inferSurfaces(scope);
+  const runtime = readRuntimeFacts();
   const health = healthFor({
     activeBuilds,
     daemonUp: laneProjection != null || queueProjection != null,
     intentionsUp: intentionProjectionAvailable(scope),
-    surfaces
+    surfaces,
+    runtime
   });
   const cockpitUrl = cockpitUrlFor(scope, client);
   const homeCurrentProject = topbar?.current_project?.name ?? null;
@@ -10090,6 +10093,37 @@ function inferSurfaces(scope) {
     }
   ];
 }
+function pidAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === "EPERM";
+  }
+}
+function readPidFile(name) {
+  const path2 = join14(EMA_PIDS_ROOT, `${name}.pid`);
+  if (!existsSync12(path2)) return null;
+  try {
+    const raw = readFileSync10(path2, "utf8").trim();
+    if (!raw) return null;
+    const pid = Number(raw);
+    return Number.isFinite(pid) && pid > 0 ? pid : null;
+  } catch {
+    return null;
+  }
+}
+function readRuntimeFacts() {
+  const webPid = readPidFile("web");
+  const daemonPid = readPidFile("daemon");
+  const webAlive = webPid != null && pidAlive(webPid);
+  const daemonAlive = daemonPid != null && pidAlive(daemonPid);
+  return {
+    webUp: webAlive,
+    daemonStalePid: daemonPid != null && !daemonAlive,
+    webStalePid: webPid != null && !webAlive
+  };
+}
 function healthFor(input) {
   const gitBuilds = new Map(input.activeBuilds.map((build) => [build.id, build]));
   const gitFactsLoaded = ["proslync-app-ios-final", "proslync-backend", "proslync-presentation-assets-final"].every((id) => {
@@ -10098,13 +10132,16 @@ function healthFor(input) {
   });
   const desktopStatus = gitBuilds.get("proslync-desktop")?.git_status;
   const desktopExplicit = desktopStatus != null && desktopStatus !== "missing" && desktopStatus !== "unknown";
+  const staleRecords = [];
+  if (input.runtime.daemonStalePid) staleRecords.push("daemon.pid points to a process that is not running");
+  if (input.runtime.webStalePid) staleRecords.push("web.pid points to a process that is not running");
   return {
     daemon: input.daemonUp ? "up" : "down",
-    web: "up",
+    web: input.runtime.webUp ? "up" : "down",
     dirty_builds: input.activeBuilds.filter((build) => build.git_status === "dirty").length,
     no_git_builds: input.activeBuilds.filter((build) => build.git_status === "no_git").length,
-    stale_records: [],
-    proslync_ready: input.daemonUp && input.intentionsUp && gitFactsLoaded && desktopExplicit && input.surfaces.length >= 6
+    stale_records: staleRecords,
+    proslync_ready: input.daemonUp && input.intentionsUp && input.runtime.webUp && gitFactsLoaded && desktopExplicit && input.surfaces.length >= 6
   };
 }
 function cockpitUrlFor(scope, client) {
@@ -10333,7 +10370,7 @@ function fail(args, command, errorClass, message, code) {
 }
 
 // src/commands/intent.ts
-import { readFileSync as readFileSync10 } from "fs";
+import { readFileSync as readFileSync11 } from "fs";
 var KINDS = /* @__PURE__ */ new Set(["bootstrap", "feature", "fix", "research", "doctrine", "external"]);
 var STATUSES = /* @__PURE__ */ new Set(["open", "proposed", "accepted", "executing", "satisfied", "superseded", "abandoned"]);
 var ALLOWED_STATUS_TRANSITIONS = {
@@ -10521,7 +10558,7 @@ function changedFields(current, candidate) {
 }
 function readBody(args) {
   const bodyFile = flagString(args, "body-file");
-  if (bodyFile) return readFileSync10(bodyFile, "utf8");
+  if (bodyFile) return readFileSync11(bodyFile, "utf8");
   return flagString(args, "body") ?? null;
 }
 function slugFromTitle(title) {
@@ -10535,7 +10572,7 @@ function fail2(args, command, errorClass, message, code) {
 }
 
 // src/commands/proposal.ts
-import { readFileSync as readFileSync11 } from "fs";
+import { readFileSync as readFileSync12 } from "fs";
 var CLOSED_INTENT_STATUSES = /* @__PURE__ */ new Set(["satisfied", "abandoned", "superseded"]);
 var DECIDED_PROPOSAL_STATUSES = /* @__PURE__ */ new Set(["approved", "rejected", "withdrawn"]);
 async function runProposal(args) {
@@ -10713,7 +10750,7 @@ function proposalPayload(proposalId, proposal) {
 }
 function readFlagOrFile(args, flag, fileFlag) {
   const file = flagString(args, fileFlag);
-  if (file) return readFileSync11(file, "utf8");
+  if (file) return readFileSync12(file, "utf8");
   return flagString(args, flag) ?? null;
 }
 function fail3(args, command, errorClass, message, code) {
@@ -10723,7 +10760,7 @@ function fail3(args, command, errorClass, message, code) {
 }
 
 // src/commands/canon.ts
-import { readFileSync as readFileSync12 } from "fs";
+import { readFileSync as readFileSync13 } from "fs";
 var CANON_KINDS = /* @__PURE__ */ new Set(["execution_result", "decision", "doctrine", "observation", "retro", "direction"]);
 var SOURCE_KINDS = /* @__PURE__ */ new Set(["execution", "proposal", "intent", "manual", "external"]);
 async function runCanon(args) {
@@ -10772,7 +10809,7 @@ async function write(args) {
   if (!SOURCE_KINDS.has(sourceKind)) return fail4(args, "canon.write", "invalid_args", `invalid source kind: ${sourceKind}`, 64);
   const id = flagString(args, "id");
   if (id && canonById(id)) return fail4(args, "canon.write", "duplicate_id", `canon node already exists: ${id}`, 1);
-  const body = readFileSync12(bodyFile, "utf8");
+  const body = readFileSync13(bodyFile, "utf8");
   const links = parseLinks(args);
   if (!links.ok) return fail4(args, "canon.write", "invalid_args", links.error, 64);
   const json = flagBool(args, "json");

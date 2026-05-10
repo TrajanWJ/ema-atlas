@@ -10,14 +10,14 @@ const checks = [
   {
     name: "workpack",
     args: [CLI, "cockpit", "workpack", "--project", PROJECT, "--json"],
-    coldBudgetMs: Number(process.env.EMA_COCKPIT_WORKPACK_COLD_MS ?? 3000),
-    warmBudgetMs: Number(process.env.EMA_COCKPIT_WORKPACK_WARM_MS ?? 1200),
+    coldBudgetMs: Number(process.env.EMA_COCKPIT_WORKPACK_COLD_MS ?? 2500),
+    warmBudgetMs: Number(process.env.EMA_COCKPIT_WORKPACK_WARM_MS ?? 750),
   },
   {
     name: "projection",
     args: [CLI, "cockpit", "projection", "--project", PROJECT, "--json"],
-    coldBudgetMs: Number(process.env.EMA_COCKPIT_PROJECTION_COLD_MS ?? 5000),
-    warmBudgetMs: Number(process.env.EMA_COCKPIT_PROJECTION_WARM_MS ?? 1500),
+    coldBudgetMs: Number(process.env.EMA_COCKPIT_PROJECTION_COLD_MS ?? 2500),
+    warmBudgetMs: Number(process.env.EMA_COCKPIT_PROJECTION_WARM_MS ?? 750),
   },
 ];
 

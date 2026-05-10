@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForVappReady } from "../lib/vapp-readiness";
 
 const USABLE_VAPPS = [
 	"brain-dump",
@@ -56,7 +57,7 @@ test.describe("all usable vApps mount in holodeck mode", () => {
 			page.on("pageerror", (error) => pageErrors.push(error.message));
 
 			await page.goto(`/${appId}?test=1`);
-			await page.waitForLoadState("networkidle");
+			await waitForVappReady(page, { appId });
 
 			await expect(page.locator(`[data-panel-app="${appId}"]`)).toBeVisible({
 				timeout: 10_000,

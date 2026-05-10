@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForVappReady } from "../lib/vapp-readiness";
 
 type VappCase = {
 	readonly appId: string;
@@ -95,7 +96,7 @@ test.describe("Proslync-first priority vApps", () => {
 				localStorage.setItem("place-welcome-dismissed", "true");
 			});
 			await page.goto(entry.path);
-			await page.waitForLoadState("domcontentloaded");
+			await waitForVappReady(page, { appId: entry.appId });
 			await expect(page.locator(`[data-app="${entry.appId}"]`).first()).toBeVisible();
 			for (const assertion of entry.assertions) {
 				await expect(page.getByText(assertion).first()).toBeVisible({

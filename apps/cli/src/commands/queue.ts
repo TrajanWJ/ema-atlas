@@ -171,7 +171,7 @@ async function runClose(args: ParsedArgs): Promise<number> {
 
 async function runShow(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
-  const itemId = flagString(args, "queue-item") ?? flagString(args, "id");
+  const itemId = queueShowItemId(args);
   if (!itemId) {
     emitError("ema queue show: --queue-item or --id is required");
     return 64;
@@ -197,6 +197,15 @@ async function runShow(args: ParsedArgs): Promise<number> {
   else if (!item) emitPretty(`queue item not found: ${itemId}`);
   else emitPretty(JSON.stringify(item, null, 2));
   return item ? 0 : 1;
+}
+
+export function queueShowItemId(args: ParsedArgs): string | undefined {
+  return flagString(args, "queue-item") ?? flagString(args, "id") ?? positionalShowId(args, "show");
+}
+
+function positionalShowId(args: ParsedArgs, verb: string): string | undefined {
+  const offset = args.positional[0] === verb ? 1 : args.positional[1] === verb ? 2 : -1;
+  return offset >= 0 ? args.positional[offset] : undefined;
 }
 
 async function runRecentList(args: ParsedArgs): Promise<number> {

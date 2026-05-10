@@ -4,7 +4,8 @@ import { emitError, emitJson, emitPretty } from "../output.js";
 import { DEFAULT_ACTOR, DEFAULT_ORG, filterProjectScopedRecords, readProjection, sendWorkspaceCommand, workspaceScopeContext } from "./workspace-daemon.js";
 import { runStubContract } from "./stub-contract.js";
 
-type ProblemGraph = { problems: Array<{ id: string; problem_id?: string; title?: string; status?: string; project_id?: string | null }>; solutions: unknown[]; links: unknown[] };
+type ProblemGraph = { problems: ProblemRecord[]; solutions: unknown[]; links: unknown[] };
+type ProblemRecord = { id: string; problem_id?: string; title?: string; status?: string; project_id?: string | null };
 
 export async function runProblem(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0];
@@ -24,7 +25,7 @@ function runProblemHelp(args: ParsedArgs): number {
     commands: [
       { verb: "log", flags: ["title", "project", "lane", "depends-on", "cause", "source", "recurs"], required: ["title"], summary: "Log a recurring blocker or failure pattern." },
       { verb: "list", flags: ["project", "all-projects", "json"], summary: "List problem graph nodes in scope." },
-      { verb: "show", flags: ["problem"], required: ["problem"], summary: "Show a problem with solution and link context." },
+      { verb: "show", flags: ["project", "all-projects", "problem", "id"], required: ["problem or id"], summary: "Show a problem with solution and link context." },
       { verb: "solution", flags: ["problem", "title", "depends-on", "verify", "source"], required: ["problem", "title"], summary: "Attach a candidate or implemented solution to a problem." },
       { verb: "link", flags: ["from", "to", "relation"], required: ["from", "to", "relation"], summary: "Link problem graph nodes to lanes, queue items, or other problems." },
     ],
@@ -102,18 +103,50 @@ async function listProblems(args: ParsedArgs): Promise<number> {
 
 async function showProblem(args: ParsedArgs): Promise<number> {
   const json = flagBool(args, "json");
-  const id = flagString(args, "problem");
+  const id = problemShowId(args);
   if (!id) {
-    emitError("ema problem show: --problem is required");
+    emitError("ema problem show: --problem or --id is required");
     return 64;
   }
   const graph = await loadGraph(args);
   if (!graph) return 1;
-  const problem = graph.problems.find((item) => item.id === id || item.problem_id === id) ?? null;
-  if (json) emitJson({ ok: true, source: "problem.graph", problem, solutions: graph.solutions, links: graph.links });
+  const payload = problemShowJsonPayload(id, graph);
+  const problem = payload.problem;
+  if (json) emitJson(payload);
   else if (problem) emitPretty(JSON.stringify({ problem, solutions: graph.solutions, links: graph.links }, null, 2));
   else emitPretty(`problem not found: ${id}`);
   return problem ? 0 : 1;
+}
+
+export function problemShowId(args: ParsedArgs): string | undefined {
+  return flagString(args, "problem") ?? flagString(args, "id") ?? positionalShowId(args, "show");
+}
+
+function positionalShowId(args: ParsedArgs, verb: string): string | undefined {
+  const offset = args.positional[0] === verb ? 1 : args.positional[1] === verb ? 2 : -1;
+  return offset >= 0 ? args.positional[offset] : undefined;
+}
+
+export function problemShowJsonPayload(id: string, graph: ProblemGraph): {
+  ok: boolean;
+  source: "problem.graph";
+  problem: ProblemRecord | null;
+  solutions: unknown[];
+  links: unknown[];
+  error: { class: "not_found"; message: string } | null;
+} {
+  const problem = graph.problems.find((item) => item.id === id || item.problem_id === id) ?? null;
+  return {
+    ok: problem !== null,
+    source: "problem.graph",
+    problem,
+    solutions: graph.solutions,
+    links: graph.links,
+    error: problem ? null : {
+      class: "not_found",
+      message: `problem not found in resolved workspace scope: ${id}`,
+    },
+  };
 }
 
 async function loadGraph(args: ParsedArgs): Promise<ProblemGraph | null> {

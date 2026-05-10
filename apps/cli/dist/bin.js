@@ -1013,10 +1013,7 @@ function projectRecordPaths(root) {
 function readFileProject(path22) {
   try {
     const raw = readFileSync2(join2(path22, "project.md"), "utf8");
-    const meta = {
-      ...parseMarkdownFields(raw),
-      ...parseFrontmatter2(raw)
-    };
+    const meta = parseProjectMetadata(raw);
     const name = meta.name ?? path22.split(sep).pop() ?? "";
     if (!name) return null;
     return {
@@ -1031,6 +1028,12 @@ function readFileProject(path22) {
   } catch {
     return null;
   }
+}
+function parseProjectMetadata(raw) {
+  return {
+    ...parseMarkdownFields(raw),
+    ...parseFrontmatter2(raw)
+  };
 }
 function mergeProjects(daemon, fileProjects) {
   const merged = /* @__PURE__ */ new Map();
@@ -1068,7 +1071,7 @@ function projectKey(project) {
   return project.id || project.name.toLowerCase() || project.local_path;
 }
 function parseFrontmatter2(raw) {
-  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  const match = raw.match(/^(?:\s*<!--[\s\S]*?-->\s*)*---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
   const out = {};
   for (const line of (match[1] ?? "").split("\n")) {
@@ -3205,7 +3208,7 @@ async function runClose2(args) {
 }
 async function runShow3(args) {
   const json = flagBool(args, "json");
-  const itemId = flagString(args, "queue-item") ?? flagString(args, "id");
+  const itemId = queueShowItemId(args);
   if (!itemId) {
     emitError("ema queue show: --queue-item or --id is required");
     return 64;
@@ -3230,6 +3233,13 @@ async function runShow3(args) {
   } else if (!item) emitPretty(`queue item not found: ${itemId}`);
   else emitPretty(JSON.stringify(item, null, 2));
   return item ? 0 : 1;
+}
+function queueShowItemId(args) {
+  return flagString(args, "queue-item") ?? flagString(args, "id") ?? positionalShowId(args, "show");
+}
+function positionalShowId(args, verb) {
+  const offset = args.positional[0] === verb ? 1 : args.positional[1] === verb ? 2 : -1;
+  return offset >= 0 ? args.positional[offset] : void 0;
 }
 async function runRecentList2(args) {
   const json = flagBool(args, "json");
@@ -3391,7 +3401,7 @@ function runProblemHelp(args) {
     commands: [
       { verb: "log", flags: ["title", "project", "lane", "depends-on", "cause", "source", "recurs"], required: ["title"], summary: "Log a recurring blocker or failure pattern." },
       { verb: "list", flags: ["project", "all-projects", "json"], summary: "List problem graph nodes in scope." },
-      { verb: "show", flags: ["problem"], required: ["problem"], summary: "Show a problem with solution and link context." },
+      { verb: "show", flags: ["project", "all-projects", "problem", "id"], required: ["problem or id"], summary: "Show a problem with solution and link context." },
       { verb: "solution", flags: ["problem", "title", "depends-on", "verify", "source"], required: ["problem", "title"], summary: "Attach a candidate or implemented solution to a problem." },
       { verb: "link", flags: ["from", "to", "relation"], required: ["from", "to", "relation"], summary: "Link problem graph nodes to lanes, queue items, or other problems." }
     ]
@@ -3464,9 +3474,9 @@ async function listProblems(args) {
 }
 async function showProblem(args) {
   const json = flagBool(args, "json");
-  const id = flagString(args, "problem");
+  const id = problemShowId(args);
   if (!id) {
-    emitError("ema problem show: --problem is required");
+    emitError("ema problem show: --problem or --id is required");
     return 64;
   }
   const graph = await loadGraph(args);
@@ -3476,6 +3486,13 @@ async function showProblem(args) {
   else if (problem) emitPretty(JSON.stringify({ problem, solutions: graph.solutions, links: graph.links }, null, 2));
   else emitPretty(`problem not found: ${id}`);
   return problem ? 0 : 1;
+}
+function problemShowId(args) {
+  return flagString(args, "problem") ?? flagString(args, "id") ?? positionalShowId2(args, "show");
+}
+function positionalShowId2(args, verb) {
+  const offset = args.positional[0] === verb ? 1 : args.positional[1] === verb ? 2 : -1;
+  return offset >= 0 ? args.positional[offset] : void 0;
 }
 async function loadGraph(args) {
   const context = await workspaceScopeContext(args);

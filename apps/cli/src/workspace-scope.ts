@@ -402,10 +402,7 @@ function projectRecordPaths(root: string): string[] {
 function readFileProject(path: string): DaemonProject | null {
   try {
     const raw = readFileSync(join(path, "project.md"), "utf8");
-    const meta = {
-      ...parseMarkdownFields(raw),
-      ...parseFrontmatter(raw),
-    };
+    const meta = parseProjectMetadata(raw);
     const name = meta.name ?? path.split(sep).pop() ?? "";
     if (!name) return null;
     return {
@@ -420,6 +417,13 @@ function readFileProject(path: string): DaemonProject | null {
   } catch {
     return null;
   }
+}
+
+export function parseProjectMetadata(raw: string): Record<string, string> {
+  return {
+    ...parseMarkdownFields(raw),
+    ...parseFrontmatter(raw),
+  };
 }
 
 function mergeProjects(daemon: DaemonProject[], fileProjects: DaemonProject[]): DaemonProject[] {
@@ -462,7 +466,7 @@ function projectKey(project: DaemonProject): string {
 }
 
 function parseFrontmatter(raw: string): Record<string, string> {
-  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  const match = raw.match(/^(?:\s*<!--[\s\S]*?-->\s*)*---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
   const out: Record<string, string> = {};
   for (const line of (match[1] ?? "").split("\n")) {

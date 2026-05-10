@@ -1,10 +1,14 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { createHash } from "node:crypto";
+import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, writeFileSync, writeSync } from "node:fs";
+import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
+import { EMA_ACTIVE_BUILD } from "../workspace-state.js";
 import { connect, DaemonUnreachableError, type CommandResult } from "../ws-client.js";
+import { writeCodexRoundtripProof } from "./capability-roundtrip-cache.js";
+import { intentById, proposalsForIntent } from "./pipeline-store.js";
 
 const DEFAULT_ORG = "org:01J00000000000000000000001";
 const DEFAULT_ACTOR = "actor:harness-cli";
@@ -21,15 +25,15 @@ const PROVIDERS = [
 	{
 		id: "codex",
 		kind: "pty",
-		status: "ready",
+		status: "adapter_available",
 		source: "duct-tape-onion-harness",
 		capabilities: ["dispatch", "start", "list", "log", "context", "events", "grep", "stream", "stop"],
-		normalized_events: ["dispatch.started", "execution.started", "tool.invoked", "tool.returned", "execution.ended", "dispatch.ended"],
+		normalized_events: ["dispatch.started", "execution.started", "tool.invoked", "tool.returned", "execution.completed", "execution.failed", "execution.timeout", "dispatch.ended"],
 	},
 	{
 		id: "claude-code",
 		kind: "pty",
-		status: "ready",
+		status: "unsupported_provider_adapter",
 		source: "duct-tape-onion-harness",
 		capabilities: ["dispatch", "start", "list", "log", "context", "events", "grep", "stream", "stop"],
 		normalized_events: ["dispatch.started", "execution.started", "tool.invoked", "tool.returned", "execution.ended", "dispatch.ended"],
@@ -37,7 +41,7 @@ const PROVIDERS = [
 	{
 		id: "hermes",
 		kind: "cli",
-		status: "future_consumer",
+		status: "unsupported_provider_adapter",
 		source: "future-hermes",
 		capabilities: ["dispatch", "stream", "handoff"],
 		normalized_events: ["dispatch.started", "execution.started", "tool.returned", "execution.ended", "dispatch.ended"],
@@ -150,7 +154,7 @@ function runStatus(args: ParsedArgs): number {
 		status: "preparing_for_hermes",
 		boundary: "Harness Glue is usable preparation rail, not Hermes authority.",
 		readiness: {
-			usable_now: ["harness.providers", "harness.donors", "simulated dispatch", "tmux-backed long-running Codex/Claude workers", "lane-assigned sessions", "session context snapshots", "event log replay", "tool timeline replay", "session grep", "stop audit event"],
+			usable_now: ["harness.providers", "harness.donors", "simulated dispatch", "tmux-backed worker session planning", "lane-assigned sessions", "session context snapshots", "event log replay", "tool timeline replay", "session grep", "stop audit event"],
 			pending_daemon_projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
 			pending_provider_adapters: pendingProviders.map((provider) => provider.id),
 		},
@@ -196,7 +200,7 @@ function runStart(args: ParsedArgs): number {
 		ok: true,
 		command: "harness start",
 		status: flagBool(args, "dry-run") ? "dry_run" : "running",
-		daemon_authority: "pending_daemon_writer",
+		daemon_authority: "file_backed_harness_registry",
 		backend: "file_backed_tmux_registry",
 		provider,
 		actor,
@@ -252,7 +256,7 @@ function runList(args: ParsedArgs): number {
 		ok: true,
 		command: "harness list",
 		backend: "file_backed_tmux_registry",
-		daemon_authority: "pending_daemon_writer",
+		daemon_authority: "file_backed_harness_registry",
 		lane: lane ?? null,
 		lane_assignments: lane ? readLaneAssignment(lane) : readLaneAssignments(),
 		executions: records.map((record) => enrichRecordStatus(record)),
@@ -281,7 +285,7 @@ function runAssign(args: ParsedArgs): number {
 		upsertLaneAssignment(lane, updated);
 		appendEvents([event]);
 	}
-	const payload = { ok: true, command: "harness assign", status: flagBool(args, "dry-run") ? "dry_run" : "assigned", daemon_authority: "pending_daemon_writer", lane_id: lane, execution_id: execution, assignment: updated.lane_assignment, event };
+	const payload = { ok: true, command: "harness assign", status: flagBool(args, "dry-run") ? "dry_run" : "assigned", daemon_authority: "file_backed_harness_registry", lane_id: lane, execution_id: execution, assignment: updated.lane_assignment, event };
 	if (flagBool(args, "json")) emitJson(payload);
 	else emitPretty(`${execution} assigned to ${lane}`);
 	return 0;
@@ -304,7 +308,7 @@ function runContext(args: ParsedArgs): number {
 		ok: true,
 		command: "harness context",
 		backend: "file_backed_tmux_registry",
-		daemon_authority: "pending_daemon_writer",
+		daemon_authority: "file_backed_harness_registry",
 		selector: { execution: execution ?? null, lane: lane ?? null },
 		lane_assignment: lane ? readLaneAssignment(lane) : null,
 		executions: records,
@@ -318,7 +322,7 @@ ${record.recent_output?.output ?? ""}`);
 function runEvents(args: ParsedArgs): number {
 	const execution = flagString(args, "execution");
 	const lane = flagString(args, "lane");
-	const payload = { ok: true, command: "harness events", backend: "file_backed_event_log", daemon_authority: "pending_daemon_writer", selector: { execution: execution ?? null, lane: lane ?? null }, events: readEvents({ execution, lane }) };
+	const payload = { ok: true, command: "harness events", backend: "file_backed_event_log", daemon_authority: "file_backed_harness_registry", selector: { execution: execution ?? null, lane: lane ?? null }, events: readEvents({ execution, lane }) };
 	if (flagBool(args, "json")) emitJson(payload);
 	else for (const event of payload.events) emitPretty(`${event.recorded_at ?? ""} ${event.type} ${event.execution_id ?? ""}`);
 	return 0;
@@ -342,7 +346,7 @@ function runGrep(args: ParsedArgs): number {
 			try { return JSON.parse(line); } catch { return { type: "parse_error", raw: line }; }
 		})
 		.filter((entry) => entry.type === "match");
-	const payload = { ok: rg.status === 0 || rg.status === 1, command: "harness grep", backend: "ripgrep_search_bundle", daemon_authority: "pending_daemon_writer", selector: { execution: execution ?? null, lane: lane ?? null }, query, bundle, matches };
+	const payload = { ok: rg.status === 0 || rg.status === 1, command: "harness grep", backend: "ripgrep_search_bundle", daemon_authority: "file_backed_harness_registry", selector: { execution: execution ?? null, lane: lane ?? null }, query, bundle, matches };
 	if (flagBool(args, "json")) emitJson(payload);
 	else emitPretty(matches.map((match) => match.data?.lines?.text ?? "").join(""));
 	return payload.ok ? 0 : 1;
@@ -377,6 +381,8 @@ async function runDispatch(args: ParsedArgs): Promise<number> {
 	const lane = flagString(args, "lane") ?? null;
 	const cwd = flagString(args, "cwd") ?? process.cwd();
 	const prompt = flagString(args, "prompt") ?? "";
+	const intentId = flagString(args, "intent") ?? null;
+	if (provider === "codex") return runCodexDispatch(args, { provider, lane, cwd, prompt, intentId });
 	if (provider !== "simulated") {
 		const pending = {
 			ok: false,
@@ -442,6 +448,417 @@ async function runDispatch(args: ParsedArgs): Promise<number> {
 	return 0;
 }
 
+async function runCodexDispatch(
+	args: ParsedArgs,
+	spec: { provider: string; lane: string | null; cwd: string; prompt: string; intentId: string | null },
+): Promise<number> {
+	const json = flagBool(args, "json");
+	const promptFile = flagString(args, "prompt-file");
+	const mode = flagString(args, "mode") ?? "plan";
+	const approvedProposal = spec.intentId ? approvedProposalForIntent(spec.intentId) : null;
+	if (approvedProposal && !approvedProposal.ok) {
+		return emitCodexDispatchFailure(json, approvedProposal.status, approvedProposal.message);
+	}
+	if (!promptFile && !spec.prompt && !spec.intentId) {
+		emitError("ema harness dispatch --provider codex: --prompt-file or --prompt is required");
+		return 64;
+	}
+	const proposalId = approvedProposal?.ok ? approvedProposal.proposal.proposal_id : null;
+	const prompt = promptFile ? readFileSync(promptFile, "utf8") : spec.prompt || promptForApprovedIntent(spec.intentId, proposalId);
+	const org = flagString(args, "org") ?? DEFAULT_ORG;
+	const actor = flagString(args, "actor") ?? "actor:01J00000000000000000000003";
+	const intent = spec.intentId ?? summarize(prompt);
+	const dryRun = flagBool(args, "dry-run");
+	const useDaemon = !flagBool(args, "no-daemon");
+	const started = new Date().toISOString();
+	let dispatchId = `dispatch:codex:${stableId(`${spec.cwd}:${prompt}:${Date.now()}`)}`;
+	let executionId = `execution:codex:${stableId(`${dispatchId}:${mode}`)}`;
+	const daemonEvents: { type: string; event_id: string }[] = [];
+
+	if (useDaemon) {
+		const opened = await openCodexDaemonLineage({ org, actor, provider: "codex", intent, lane: spec.lane, mode });
+		if (!opened.ok) {
+			const payload = {
+				ok: false,
+				command: "harness dispatch",
+				provider: "codex",
+				status: "daemon_lineage_failed",
+				error: opened.error,
+				remediation: "Retry with --no-daemon for local-only dry inspection, or restart the EMA daemon.",
+			};
+			if (json) emitJson(payload);
+			else emitError(`codex dispatch: ${opened.error}`);
+			return 1;
+		}
+		dispatchId = opened.dispatch_id;
+		executionId = opened.execution_id;
+		daemonEvents.push(...opened.events);
+	}
+
+	if (dryRun) {
+		const payload = {
+			ok: true,
+			command: "harness dispatch",
+			provider: "codex",
+			status: "dry_run",
+			mode,
+			source: useDaemon ? "daemon_canonical_planned" : "local_planned",
+			dispatch: { id: dispatchId, lane: spec.lane, cwd: spec.cwd, prompt_file: promptFile ?? null, intent, proposal_id: proposalId },
+			execution: { id: executionId, provider: "codex", status: "planned", lane: spec.lane, cwd: spec.cwd },
+			events: daemonEvents,
+			argv: codexExecArgv(spec.cwd, prompt),
+		};
+		if (json) emitJson(payload);
+		else emitPretty(`planned codex execution: ${executionId}`);
+		return 0;
+	}
+
+	const timeoutMs = Number.parseInt(flagString(args, "timeout-ms") ?? "60000", 10);
+	const promptHash = sha256(prompt);
+	const sessionFilePath = codexSessionFilePath(executionId);
+	const sessionFileRelative = relative(EMA_ACTIVE_BUILD, sessionFilePath);
+	const result = spawnSync("codex", codexExecArgv(spec.cwd, prompt).slice(1), {
+		cwd: spec.cwd,
+		encoding: "utf8",
+		maxBuffer: 32 * 1024 * 1024,
+		timeout: timeoutMs,
+	});
+	const ended = new Date().toISOString();
+	const timedOut = isTimeoutResult(result);
+	const exitCode = typeof result.status === "number" ? result.status : timedOut ? -1 : 1;
+	const ok = !timedOut && exitCode === 0;
+	const outcome = timedOut ? "timeout" : ok ? "completed" : "failed";
+	const stdout = result.stdout ?? "";
+	const stderr = result.stderr ?? "";
+	writeCodexJsonl(sessionFilePath, stdout);
+	const durationMs = Date.parse(ended) - Date.parse(started);
+	let canonicalCloseError: string | null = null;
+	let canonId: string | null = null;
+	if (useDaemon) {
+		const closed = await closeCodexDaemonLineage({
+			org,
+			actor,
+			provider: "codex",
+			dispatchId,
+			executionId,
+			outcome,
+			exitCode,
+			timeoutMs,
+			durationMs,
+			stdout,
+			stderr,
+			sessionFilePath: sessionFileRelative,
+			promptHash,
+			intentId: spec.intentId,
+			proposalId,
+		});
+		daemonEvents.push(...closed.events);
+		if (closed.ok) canonId = closed.canon_id;
+		if (!closed.ok) canonicalCloseError = closed.error;
+	}
+	const eventTypes = daemonEvents.map((event) => event.type);
+	const canonicalCompleted = useDaemon ? canonicalCloseError === null && eventTypes.includes("execution.completed") : true;
+	const recordOk = ok && canonicalCompleted;
+	const record = {
+		ok: recordOk,
+		command: "harness dispatch",
+		provider: "codex",
+		status: canonicalCloseError ? "canonical_close_failed" : outcome,
+		source: useDaemon ? "daemon_canonical" : "local_codex_exec",
+		mode,
+		actor,
+		lane: spec.lane,
+		cwd: spec.cwd,
+		prompt_summary: intent,
+		dispatch: { id: dispatchId, status: canonicalCloseError ? "canonical_close_failed" : outcome },
+		execution: { id: executionId, provider: "codex", status: outcome, started_at: started, ended_at: ended },
+		canon_id: canonId,
+		stdout,
+		stderr,
+		error: result.error ? String(result.error) : null,
+		canonical_close_error: canonicalCloseError,
+		exit_code: exitCode,
+		duration_ms: durationMs,
+		stdout_bytes: byteLength(stdout),
+		stderr_bytes: byteLength(stderr),
+		session_file_path: sessionFileRelative,
+		prompt_hash: promptHash,
+		invocation_flags: codexInvocationFlags(spec.cwd),
+		events: daemonEvents,
+	};
+	if (recordOk && useDaemon) {
+		writeCodexRoundtripProof({
+			passed_at: ended,
+			execution_id: executionId,
+			codex_version: codexVersion(),
+			invocation_flags: codexInvocationFlags(spec.cwd),
+			prompt_hash: promptHash,
+			session_file_path: sessionFileRelative,
+			events_observed: eventTypes,
+			duration_ms: durationMs,
+			smoke_version: 1,
+		});
+	}
+	writeRecord(record);
+	if (spec.lane) upsertLaneAssignment(spec.lane, record);
+	appendEvents([
+		{ type: "dispatch.started", dispatch_id: dispatchId, execution_id: executionId, lane_id: spec.lane, provider: "codex", actor_id: actor },
+		{ type: "execution.started", dispatch_id: dispatchId, execution_id: executionId, lane_id: spec.lane, provider: "codex", actor_id: actor },
+		{ type: outcome === "completed" ? "execution.completed" : outcome === "timeout" ? "execution.timeout" : "execution.failed", dispatch_id: dispatchId, execution_id: executionId, lane_id: spec.lane, provider: "codex", actor_id: actor, outcome },
+	]);
+	if (json) emitJson(record);
+	else emitPretty(`codex execution ${outcome}: ${executionId}`);
+	return recordOk ? 0 : 1;
+}
+
+function codexExecArgv(cwd: string, prompt: string): string[] {
+	// Validated against codex-cli 0.130.0: JSON read-only exec runs
+	// non-interactively in trusted EMA workspaces without approval flags.
+	return [
+		"codex",
+		"exec",
+		"--json",
+		"--sandbox",
+		"read-only",
+		"--cd",
+		cwd,
+		"--ephemeral",
+		prompt,
+	];
+}
+
+function codexInvocationFlags(cwd: string): string[] {
+	return ["exec", "--json", "--sandbox", "read-only", "--cd", cwd, "--ephemeral"];
+}
+
+async function openCodexDaemonLineage(spec: { org: string; actor: string; provider: string; intent: string; lane: string | null; mode: string }): Promise<
+	| { ok: true; dispatch_id: string; execution_id: string; events: { type: string; event_id: string }[] }
+	| { ok: false; error: string }
+> {
+	let client: Awaited<ReturnType<typeof connect>> | null = null;
+	try {
+		client = await connect({ surface: "desktop" });
+		const start = await client.command("dispatch.start", {
+			org_id: spec.org,
+			actor_id: spec.actor,
+			intent: spec.intent,
+			provider: spec.provider,
+			lane_id: spec.lane,
+		});
+		const startCheck = expectOk(start, "dispatch.start");
+		if (startCheck) return { ok: false, error: startCheck };
+		const dispatchId = (start as { resource?: string }).resource;
+		if (!dispatchId) return { ok: false, error: "dispatch.start returned no resource id" };
+		const execStart = await client.command("execution.start", {
+			org_id: spec.org,
+			actor_id: spec.actor,
+			dispatch_id: dispatchId,
+			exec_kind: "session",
+			name: `codex.${spec.mode}`,
+			provider: spec.provider,
+		});
+		const execStartCheck = expectOk(execStart, "execution.start");
+		if (execStartCheck) return { ok: false, error: execStartCheck };
+		const executionId = (execStart as { resource?: string }).resource;
+		if (!executionId) return { ok: false, error: "execution.start returned no resource id" };
+		const tool = await client.command("tool.invoke", {
+			org_id: spec.org,
+			actor_id: spec.actor,
+			dispatch_id: dispatchId,
+			execution_id: executionId,
+			tool_name: "codex.exec",
+			args_json: JSON.stringify({ mode: spec.mode }),
+			provider: spec.provider,
+		});
+		const toolCheck = expectOk(tool, "tool.invoke");
+		if (toolCheck) return { ok: false, error: toolCheck };
+		return {
+			ok: true,
+			dispatch_id: dispatchId,
+			execution_id: executionId,
+			events: [
+				{ type: "dispatch.started", event_id: (start as { events?: string[] }).events?.[0] ?? "" },
+				{ type: "execution.started", event_id: (execStart as { events?: string[] }).events?.[0] ?? "" },
+				{ type: "tool.invoked", event_id: (tool as { events?: string[] }).events?.[0] ?? "" },
+			],
+		};
+	} catch (err) {
+		return { ok: false, error: err instanceof Error ? err.message : String(err) };
+	} finally {
+		client?.close();
+	}
+}
+
+function approvedProposalForIntent(intentId: string):
+	| { ok: true; proposal: ReturnType<typeof proposalsForIntent>[number] }
+	| { ok: false; status: string; message: string } {
+	const intent = intentById(intentId);
+	if (!intent) return { ok: false, status: "missing_intent", message: `intent not found: ${intentId}` };
+	const approved = proposalsForIntent(intentId).find((proposal) => proposal.status === "approved");
+	if (!approved) return { ok: false, status: "missing_approved_proposal", message: `intent ${intentId} has no approved proposal` };
+	return { ok: true, proposal: approved };
+}
+
+function promptForApprovedIntent(intentId: string | null, proposalId: string | null): string {
+	if (!intentId) return "EMA Codex capability check.";
+	const intent = intentById(intentId);
+	const proposal = proposalId ? proposalsForIntent(intentId).find((candidate) => candidate.proposal_id === proposalId) : null;
+	return [
+		"EMA approved intent execution.",
+		`Intent: ${intentId}`,
+		intent?.title ? `Title: ${intent.title}` : null,
+		intent?.body ? `Body: ${intent.body}` : null,
+		proposal?.proposal_id ? `Approved proposal: ${proposal.proposal_id}` : null,
+		proposal?.plan ? `Plan: ${proposal.plan}` : null,
+		"Sandbox: read-only. Return a concise implementation-readiness result and name any files you inspected.",
+	].filter(Boolean).join("\n");
+}
+
+function emitCodexDispatchFailure(json: boolean, status: string, message: string): number {
+	const payload = {
+		ok: false,
+		command: "harness dispatch",
+		provider: "codex",
+		status,
+		error: { class: "invalid_args", message },
+	};
+	if (json) emitJson(payload);
+	else emitError(`codex dispatch: ${message}`);
+	return 1;
+}
+
+async function closeCodexDaemonLineage(spec: {
+	org: string;
+	actor: string;
+	provider: string;
+	dispatchId: string;
+	executionId: string;
+	outcome: string;
+	exitCode: number;
+	timeoutMs: number;
+	durationMs: number;
+	stdout: string;
+	stderr: string;
+	sessionFilePath: string;
+	promptHash: string;
+	intentId: string | null;
+	proposalId: string | null;
+}): Promise<{ ok: true; events: { type: string; event_id: string }[]; canon_id: string | null } | { ok: false; events: { type: string; event_id: string }[]; error: string; canon_id: string | null }> {
+	let client: Awaited<ReturnType<typeof connect>> | null = null;
+	const events: { type: string; event_id: string }[] = [];
+	let canonId: string | null = null;
+	try {
+		client = await connect({ surface: "desktop" });
+		const toolReturn = await client.command("tool.return", {
+			org_id: spec.org,
+			actor_id: spec.actor,
+			dispatch_id: spec.dispatchId,
+			execution_id: spec.executionId,
+			tool_name: "codex.exec",
+			result_summary: `${spec.outcome}; stdout=${spec.stdout.length} bytes; stderr=${spec.stderr.length} bytes`,
+		});
+		const toolReturnCheck = expectOk(toolReturn, "tool.return");
+		if (toolReturnCheck) return { ok: false, events, error: toolReturnCheck, canon_id: canonId };
+		events.push({ type: "tool.returned", event_id: firstEventId(toolReturn) });
+
+		if (spec.outcome === "completed") {
+			const canonBody = JSON.stringify({
+				exit_code: spec.exitCode,
+				summary: summarizeExecutionResult(spec.stdout, spec.stderr),
+				jsonl_path: spec.sessionFilePath,
+				tool_call_count: countCodexToolCalls(spec.stdout),
+				duration_ms: spec.durationMs,
+			}, null, 2);
+			const links = [
+				spec.proposalId ? `result_of:${spec.proposalId}` : null,
+				spec.intentId ? `fulfills:${spec.intentId}` : null,
+			].filter((value): value is string => Boolean(value));
+			const canonWrite = await client.command("canon.write", {
+				org_id: spec.org,
+				actor_id: "actor:01J00000000000000000000003",
+				canon_kind: "execution_result",
+				body: canonBody,
+				content_hash: sha256(canonBody),
+				source_kind: "execution",
+				source_id: spec.executionId,
+				links,
+			});
+			const canonCheck = expectOk(canonWrite, "canon.write");
+			if (canonCheck) return { ok: false, events, error: canonCheck, canon_id: null };
+			canonId = String((canonWrite as { resource?: string }).resource ?? "");
+			events.push({ type: "canon.written", event_id: firstEventId(canonWrite) });
+			const completed = await client.command("execution.complete", {
+				org_id: spec.org,
+				actor_id: spec.actor,
+				dispatch_id: spec.dispatchId,
+				execution_id: spec.executionId,
+				provider: spec.provider,
+				exit_code: spec.exitCode,
+				duration_ms: spec.durationMs,
+				stdout_bytes: byteLength(spec.stdout),
+				stderr_bytes: byteLength(spec.stderr),
+				session_file_path: spec.sessionFilePath,
+				prompt_hash: spec.promptHash,
+				canon_id: canonId,
+			});
+			const completedCheck = expectOk(completed, "execution.complete");
+			if (completedCheck) return { ok: false, events, error: completedCheck, canon_id: canonId };
+			events.push({ type: "execution.completed", event_id: firstEventId(completed) });
+		} else if (spec.outcome === "timeout") {
+			const timedOut = await client.command("execution.timeout", {
+				org_id: spec.org,
+				actor_id: spec.actor,
+				dispatch_id: spec.dispatchId,
+				execution_id: spec.executionId,
+				provider: spec.provider,
+				timeout_ms: spec.timeoutMs,
+				duration_ms: spec.durationMs,
+				stdout_bytes: byteLength(spec.stdout),
+				stderr_bytes: byteLength(spec.stderr),
+				session_file_path: spec.sessionFilePath,
+				prompt_hash: spec.promptHash,
+			});
+			const timeoutCheck = expectOk(timedOut, "execution.timeout");
+			if (timeoutCheck) return { ok: false, events, error: timeoutCheck, canon_id: canonId };
+			events.push({ type: "execution.timeout", event_id: firstEventId(timedOut) });
+		} else {
+			const failed = await client.command("execution.fail", {
+				org_id: spec.org,
+				actor_id: spec.actor,
+				dispatch_id: spec.dispatchId,
+				execution_id: spec.executionId,
+				error_class: "upstream",
+				message: `codex exec exited ${spec.exitCode}`,
+				provider: spec.provider,
+				exit_code: spec.exitCode,
+				duration_ms: spec.durationMs,
+				stdout_bytes: byteLength(spec.stdout),
+				stderr_bytes: byteLength(spec.stderr),
+				session_file_path: spec.sessionFilePath,
+				prompt_hash: spec.promptHash,
+			});
+			const failedCheck = expectOk(failed, "execution.fail");
+			if (failedCheck) return { ok: false, events, error: failedCheck, canon_id: canonId };
+			events.push({ type: "execution.failed", event_id: firstEventId(failed) });
+		}
+		const dispatchEnd = await client.command("dispatch.end", {
+			org_id: spec.org,
+			actor_id: spec.actor,
+			dispatch_id: spec.dispatchId,
+			outcome: spec.outcome === "completed" ? "ok" : "failed",
+			provider: spec.provider,
+		});
+		const dispatchEndCheck = expectOk(dispatchEnd, "dispatch.end");
+		if (dispatchEndCheck) return { ok: false, events, error: dispatchEndCheck, canon_id: canonId };
+		events.push({ type: "dispatch.ended", event_id: firstEventId(dispatchEnd) });
+		return { ok: true, events, canon_id: canonId };
+	} catch (err) {
+		return { ok: false, events, error: err instanceof Error ? err.message : String(err), canon_id: canonId };
+	} finally {
+		client?.close();
+	}
+}
+
 interface DaemonDispatchSpec {
 	org: string;
 	actor: string;
@@ -464,6 +881,8 @@ interface DaemonDispatchOk {
 		dispatch: { id: string; lane: string | null; cwd: string; prompt: string; intent: string };
 		execution: { id: string; provider: string; status: string; lane: string | null; cwd: string };
 		events: { type: string; event_id: string }[];
+		sleep_seconds?: number;
+		canon_id?: string | null;
 	};
 }
 
@@ -526,6 +945,28 @@ async function tryDaemonDispatch(spec: DaemonDispatchSpec): Promise<DaemonDispat
 		const toolInvokeCheck = expectOk(toolInvoke, "tool.invoke");
 		if (toolInvokeCheck) return { ok: false, fallback: false, error: toolInvokeCheck };
 		const toolInvokeEventId = (toolInvoke as { events?: string[] }).events?.[0] ?? "";
+		const sleepSeconds = simulatedSleepSeconds(spec.prompt);
+		if (sleepSeconds !== null) {
+			return {
+				ok: true,
+				payload: {
+					ok: true,
+					command: "harness dispatch",
+					provider,
+					status: "simulated_execution_running",
+					source: "daemon_canonical",
+					projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
+					dispatch: { id: dispatchId, lane, cwd: spec.cwd, prompt: spec.prompt, intent },
+					execution: { id: executionId, provider, status: "running", lane, cwd: spec.cwd },
+					events: [
+						{ type: "dispatch.started", event_id: dispatchEventId },
+						{ type: "execution.started", event_id: execStartEventId },
+						{ type: "tool.invoked", event_id: toolInvokeEventId },
+					],
+					sleep_seconds: sleepSeconds,
+				},
+			};
+		}
 
 		const toolReturn = await client.command("tool.return", {
 			org_id: org,
@@ -538,6 +979,28 @@ async function tryDaemonDispatch(spec: DaemonDispatchSpec): Promise<DaemonDispat
 		const toolReturnCheck = expectOk(toolReturn, "tool.return");
 		if (toolReturnCheck) return { ok: false, fallback: false, error: toolReturnCheck };
 		const toolReturnEventId = (toolReturn as { events?: string[] }).events?.[0] ?? "";
+
+		const canonBody = JSON.stringify({
+			exit_code: 0,
+			summary: "simulated provider completed",
+			jsonl_path: null,
+			tool_call_count: 1,
+			duration_ms: 1,
+		}, null, 2);
+		const canonWrite = await client.command("canon.write", {
+			org_id: org,
+			actor_id: actor,
+			canon_kind: "execution_result",
+			body: canonBody,
+			content_hash: sha256(canonBody),
+			source_kind: "execution",
+			source_id: executionId,
+			links: [],
+		});
+		const canonCheck = expectOk(canonWrite, "canon.write");
+		if (canonCheck) return { ok: false, fallback: false, error: canonCheck };
+		const canonId = String((canonWrite as { resource?: string }).resource ?? "");
+		const canonEventId = (canonWrite as { events?: string[] }).events?.[0] ?? "";
 
 		const execEnd = await client.command("execution.end", {
 			org_id: org,
@@ -573,11 +1036,13 @@ async function tryDaemonDispatch(spec: DaemonDispatchSpec): Promise<DaemonDispat
 				projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
 				dispatch: { id: dispatchId, lane, cwd: spec.cwd, prompt: spec.prompt, intent },
 				execution: { id: executionId, provider, status: "completed", lane, cwd: spec.cwd },
+				canon_id: canonId,
 				events: [
 					{ type: "dispatch.started", event_id: dispatchEventId },
 					{ type: "execution.started", event_id: execStartEventId },
 					{ type: "tool.invoked", event_id: toolInvokeEventId },
 					{ type: "tool.returned", event_id: toolReturnEventId },
+					{ type: "canon.written", event_id: canonEventId },
 					{ type: "execution.ended", event_id: execEndEventId },
 					{ type: "dispatch.ended", event_id: dispatchEndEventId },
 				],
@@ -594,6 +1059,64 @@ function expectOk(result: CommandResult, op: string): string | null {
 	if (result.ok === true) return null;
 	const error = result.error;
 	return `${op}: ${error.class}: ${error.message}`;
+}
+
+function firstEventId(result: CommandResult): string {
+	return (result as { events?: string[] }).events?.[0] ?? "";
+}
+
+function byteLength(value: string): number {
+	return Buffer.byteLength(value, "utf8");
+}
+
+function sha256(value: string): string {
+	return createHash("sha256").update(value).digest("hex");
+}
+
+function isTimeoutResult(result: ReturnType<typeof spawnSync>): boolean {
+	const err = result.error as (Error & { code?: string }) | undefined;
+	return err?.code === "ETIMEDOUT";
+}
+
+function codexSessionDir(): string {
+	return join(EMA_ACTIVE_BUILD, ".ema-dev", "harness-glue", "codex");
+}
+
+function codexSessionFilePath(executionId: string): string {
+	return join(codexSessionDir(), `${sanitizeFile(executionId)}.jsonl`);
+}
+
+function writeCodexJsonl(path: string, stdout: string): void {
+	mkdirSync(codexSessionDir(), { recursive: true });
+	const fd = openSync(path, "a");
+	try {
+		const lines = stdout.trim().length > 0 ? stdout.trimEnd().split("\n") : [];
+		for (const line of lines) {
+			writeSync(fd, `${line}\n`);
+			fsyncSync(fd);
+		}
+		if (lines.length === 0) {
+			writeSync(fd, `${JSON.stringify({ type: "empty_stream", recorded_at: new Date().toISOString() })}\n`);
+			fsyncSync(fd);
+		}
+	} finally {
+		closeSync(fd);
+	}
+}
+
+function countCodexToolCalls(stdout: string): number {
+	return stdout.split("\n").filter((line) => line.includes("\"tool\"") || line.includes("\"tool_call\"") || line.includes("\"function_call\"")).length;
+}
+
+function summarizeExecutionResult(stdout: string, stderr: string): string {
+	const stdoutLines = stdout.trim().split("\n").filter(Boolean);
+	if (stdoutLines.length > 0) return stdoutLines.slice(-3).join("\n").slice(0, 1200);
+	return (stderr.trim() || "codex exec completed with no stdout").slice(0, 1200);
+}
+
+function codexVersion(): string {
+	const result = spawnSync("codex", ["--version"], { encoding: "utf8", timeout: 5_000 });
+	return result.status === 0 ? result.stdout.trim() : "unknown";
 }
 
 function runStream(args: ParsedArgs): number {
@@ -656,6 +1179,14 @@ function runSearch(args: ParsedArgs): number {
 
 function projections(): string[] {
 	return ["harness.providers", "dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"];
+}
+
+function simulatedSleepSeconds(prompt: string): number | null {
+	const match = prompt.trim().match(/^smoke:sleep:(\d+)$/);
+	if (!match) return null;
+	const seconds = Number.parseInt(match[1] ?? "", 10);
+	if (!Number.isFinite(seconds) || seconds <= 0) return null;
+	return Math.min(seconds, 60);
 }
 
 function timeline(executionId: string, lane: string | null, cwd: string, prompt: string) {
@@ -746,7 +1277,7 @@ function upsertLaneAssignment(lane: string, record: any): void {
 		prompt_summary: record.prompt_summary,
 		updated_at: new Date().toISOString(),
 	});
-	writeFileSync(laneAssignmentPath(lane), JSON.stringify({ lane_id: lane, backend: "file_backed_lane_session_registry", daemon_authority: "pending_daemon_writer", sessions }, null, 2) + "\n");
+	writeFileSync(laneAssignmentPath(lane), JSON.stringify({ lane_id: lane, backend: "file_backed_lane_session_registry", daemon_authority: "file_backed_harness_registry", sessions }, null, 2) + "\n");
 }
 
 function readLaneAssignment(lane: string): any | null {
@@ -827,7 +1358,7 @@ function writeSearchBundle(records: any[]): string {
 function providerCommand(provider: string, cwd: string, prompt: string): string {
 	const quotedCwd = shellQuote(cwd);
 	const quotedPrompt = shellQuote(prompt);
-	if (provider === "codex") return `cd ${quotedCwd} && export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH" && codex exec --full-auto ${quotedPrompt}`;
+	if (provider === "codex") return `cd ${quotedCwd} && export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH" && codex exec --sandbox workspace-write ${quotedPrompt}`;
 	return `cd ${quotedCwd} && export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH" && claude`;
 }
 

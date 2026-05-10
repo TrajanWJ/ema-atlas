@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
+process.env.EMA_IROH_MODE ??= "dev-loopback";
 
 function run(args) {
 	const output = execFileSync("/bin/bash", ["scripts/run-cli.sh", ...args, "--json"], {
@@ -34,8 +35,8 @@ const status = run(["harness", "status"]);
 assert(status.boundary.includes("not Hermes authority"), "harness status must keep Hermes authority boundary");
 assert(status.readiness.pending_daemon_projections.includes("dispatch.registry"), "dispatch.registry pending status missing");
 assert(status.providers.ready.includes("simulated"), "harness status must show simulated provider ready");
-assert(status.providers.ready.includes("codex"), "harness status must show codex tmux provider ready");
-assert(status.providers.ready.includes("claude-code"), "harness status must show claude-code tmux provider ready");
+assert(status.providers.pending.some((provider) => provider.id === "codex" && provider.status === "adapter_available"), "harness status must not mark codex ready without roundtrip proof");
+assert(status.providers.pending.some((provider) => provider.id === "claude-code" && provider.status === "unsupported_provider_adapter"), "harness status must keep claude-code pending");
 assert(status.readiness.usable_now.includes("lane-assigned sessions"), "harness status must expose lane-assigned sessions as usable now");
 
 const dryStart = run(["harness", "start", "--provider", "codex", "--name", "smoke", "--lane", "lane:smoke", "--cwd", root, "--prompt", "smoke long-running worker", "--dry-run"]);

@@ -1,3 +1,4 @@
+<!-- wiki-id: ema:cwt-absorbed-decision -->
 # cwt Absorbed by EMA — 2026-05-07
 
 > Status: **accepted, supersedes

@@ -1,3 +1,4 @@
+<!-- wiki-id: ema:head-orchestrator -->
 # EMA Proslync-First Head-Orchestrator Master Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` for implementation, with one worker per disjoint track and a head orchestrator reviewing integration after each sprint. Steps use checkbox (`- [ ]`) syntax for tracking.

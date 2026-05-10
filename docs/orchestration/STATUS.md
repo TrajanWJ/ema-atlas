@@ -1,3 +1,4 @@
+<!-- wiki-id: ema:status -->
 # EMA 0.0.6 Orchestration Status
 
 Canonical live ledger for the 0.0.6 buildout (continues the 0.0.5 ledger after

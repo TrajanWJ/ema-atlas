@@ -1,3 +1,4 @@
+<!-- wiki-id: ema:operating-model -->
 # Swarm Operating Model
 
 EMA swarm coordination follows this control loop:

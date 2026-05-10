@@ -4,12 +4,17 @@
 // Run after a change to know if cohesion is intact.
 
 import type { ParsedArgs } from "../args.js";
-import { flagBool } from "../args.js";
+import { flagBool, flagString } from "../args.js";
 import { connect, type ProjectionEnvelope } from "../ws-client.js";
 import { emitJson, emitPretty } from "../output.js";
 import { reportError } from "./ping.js";
 import { runStubContract } from "./stub-contract.js";
 import { buildReadiness, type ReadinessBlocker } from "./readiness.js";
+import {
+	buildContext as buildWorkspaceContext,
+	runAudit as runWorkspaceAudit,
+} from "../lib/workspace-audit/index.js";
+import type { WorkspaceAuditReport } from "../lib/workspace-audit/types.js";
 
 interface DoctorReport {
 	ok: boolean;
@@ -113,15 +118,26 @@ export async function runDoctor(args: ParsedArgs): Promise<number> {
 		return runStubContract(args, {
 			noun: "doctor",
 			status: "available",
-			usage: "Usage: ema doctor [--strict] [--json]",
+			usage: "Usage: ema doctor [--strict] [--json] [--workspace [--apply] [--with-stash] [--with-remotes] [--with-branches]]",
 			docRef: "docs/cli/agent-workspace.md",
 			commands: [
 				{ verb: "run", flags: ["strict", "json"], summary: "Check daemon health separately from execution readiness blockers." },
+				{
+					verb: "workspace",
+					flags: ["workspace", "apply", "with-stash", "with-remotes", "with-branches", "json", "verbose", "desktop-root"],
+					summary: "Audit the desktop workspace (Active builds + Projects) for drift across 12 categories. --apply fixes Class A only.",
+				},
 			],
 		});
 	}
 	const json = flagBool(args, "json");
 	const strict = flagBool(args, "strict");
+
+	// `--workspace` is an entirely separate code path: pure-CLI filesystem +
+	// git audit. Does not touch the daemon. Returns its own JSON shape.
+	if (flagBool(args, "workspace")) {
+		return runWorkspaceDoctor(args, json);
+	}
 	try {
 		const [bp, planner, graph, vcal, laneReg, queueReg] = await Promise.all([
 			readChannel<BlueprintProj>("blueprint.sections", 1500),
@@ -265,4 +281,62 @@ export async function runDoctor(args: ParsedArgs): Promise<number> {
 	} catch (err) {
 		return reportError(err, json);
 	}
+}
+
+// `ema doctor --workspace` — runs the 12-module audit kernel against the
+// desktop workspace. Emits a structured report. With `--apply`, performs
+// Class A fixes (and any Class B opted-in via sub-flag gates).
+async function runWorkspaceDoctor(args: ParsedArgs, json: boolean): Promise<number> {
+	try {
+		const ctx = await buildWorkspaceContext({
+			desktopRoot: flagString(args, "desktop-root"),
+			emaRoot: flagString(args, "ema-root"),
+			apply: flagBool(args, "apply"),
+			withStash: flagBool(args, "with-stash"),
+			withRemotes: flagBool(args, "with-remotes"),
+			withBranches: flagBool(args, "with-branches"),
+			verbose: flagBool(args, "verbose"),
+		});
+		const report = await runWorkspaceAudit(ctx);
+		if (json) {
+			emitJson(report);
+		} else {
+			emitWorkspacePretty(report);
+		}
+		return report.totals.by_severity.error > 0 || report.totals.by_severity.warn > 0 ? 1 : 0;
+	} catch (err) {
+		return reportError(err, json);
+	}
+}
+
+function emitWorkspacePretty(report: WorkspaceAuditReport): void {
+	emitPretty(`# ema doctor --workspace`);
+	emitPretty(`scanned:          ${report.scanned_at}`);
+	emitPretty(`desktop root:     ${report.desktop_root}`);
+	emitPretty(`gates:            apply=${report.gates.apply} stash=${report.gates.with_stash} remotes=${report.gates.with_remotes} branches=${report.gates.with_branches}`);
+	emitPretty("");
+	emitPretty(`findings:         ${report.totals.findings} (${report.totals.by_severity.error} error · ${report.totals.by_severity.warn} warn · ${report.totals.by_severity.info} info)`);
+	emitPretty(`auto-fixable (A): ${report.totals.auto_fixable_class_a}`);
+	emitPretty("");
+	for (const m of report.modules) {
+		const tag = m.skipped ? "skipped" : `${m.findings.length} finding${m.findings.length === 1 ? "" : "s"}`;
+		emitPretty(`[${m.category}] ${tag}${m.skipped && m.skip_reason ? ` (${m.skip_reason})` : ""}`);
+		for (const f of m.findings) {
+			const sev = f.severity === "error" ? "!" : f.severity === "warn" ? "~" : ".";
+			emitPretty(`  ${sev} [${f.fix_class}] ${f.note}`);
+			if (f.suggested_fix) emitPretty(`      → ${f.suggested_fix}`);
+		}
+	}
+	if (report.applied) {
+		const ok = report.applied.filter((a) => a.applied).length;
+		const skipped = report.applied.filter((a) => !a.applied).length;
+		emitPretty("");
+		emitPretty(`applied:          ${ok} fixed · ${skipped} skipped`);
+		for (const a of report.applied) {
+			if (a.applied) emitPretty(`  + ${a.finding_id}`);
+			else emitPretty(`  - ${a.finding_id}: ${a.skipped_reason ?? a.error ?? "skipped"}`);
+		}
+	}
+	emitPretty("");
+	emitPretty(`status:           ${report.ok ? "clean" : "drift detected"}`);
 }

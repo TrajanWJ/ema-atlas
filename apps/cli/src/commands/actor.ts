@@ -3,12 +3,41 @@ import { flagBool, flagString } from "../args.js";
 import { connect } from "../ws-client.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
 import { reportError } from "./ping.js";
-import { runStubContract } from "./stub-contract.js";
+import { maybeRunVerbHelp, runStubContract, type StubCommand } from "./stub-contract.js";
 import { actorById, actorRecords, eventsMentioning } from "./pipeline-store.js";
 import { DEFAULT_ORG } from "./workspace-daemon.js";
 
+const ACTOR_COMMANDS: StubCommand[] = [
+  {
+    verb: "register",
+    flags: ["id", "kind", "display-name", "dispatch", "perspective", "json"],
+    required: ["id", "kind", "display-name"],
+    summary: "Register a human or agent actor through the daemon canonical writer.",
+  },
+  {
+    verb: "list",
+    flags: ["kind", "json"],
+    summary: "List actors by replaying actor.created events.",
+  },
+  {
+    verb: "show",
+    flags: ["json"],
+    required: ["id"],
+    summary: "Show one actor and the event rows that mention it.",
+  },
+];
+
+const ACTOR_STUB_OPTS = {
+  noun: "actor",
+  status: "available",
+  docRef: "packages/contracts/events/actor.md",
+  commands: ACTOR_COMMANDS,
+};
+
 export async function runActor(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, ACTOR_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help(args);
   if (verb === "register") return register(args);
   if (verb === "list") return list(args);
@@ -18,30 +47,7 @@ export async function runActor(args: ParsedArgs): Promise<number> {
 }
 
 function help(args: ParsedArgs): number {
-  return runStubContract(args, {
-    noun: "actor",
-    status: "available",
-    docRef: "packages/contracts/events/actor.md",
-    commands: [
-      {
-        verb: "register",
-        flags: ["id", "kind", "display-name", "dispatch", "perspective", "json"],
-        required: ["id", "kind", "display-name"],
-        summary: "Register a human or agent actor through the daemon canonical writer.",
-      },
-      {
-        verb: "list",
-        flags: ["kind", "json"],
-        summary: "List actors by replaying actor.created events.",
-      },
-      {
-        verb: "show",
-        flags: ["json"],
-        required: ["id"],
-        summary: "Show one actor and the event rows that mention it.",
-      },
-    ],
-  });
+  return runStubContract(args, ACTOR_STUB_OPTS);
 }
 
 async function register(args: ParsedArgs): Promise<number> {

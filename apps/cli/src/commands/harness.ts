@@ -9,6 +9,85 @@ import { EMA_ACTIVE_BUILD } from "../workspace-state.js";
 import { connect, DaemonUnreachableError, type CommandResult } from "../ws-client.js";
 import { writeCodexRoundtripProof } from "./capability-roundtrip-cache.js";
 import { intentById, proposalsForIntent } from "./pipeline-store.js";
+import { maybeRunVerbHelp, runStubContract, type StubCommand } from "./stub-contract.js";
+
+const HARNESS_DOC_REF = "docs/architecture/18-harness-glue.md";
+
+const HARNESS_COMMANDS: StubCommand[] = [
+  { verb: "providers", summary: "List Harness Glue providers and normalized event rails." },
+  { verb: "sessions", summary: "List provider session capabilities (first slice mirrors providers)." },
+  { verb: "status", summary: "Summarize Harness Glue readiness, pending daemon projections, and next adapter work." },
+  { verb: "donors", summary: "Show Chronicle and Duct Tape donor roles for future Hermes preparation." },
+  {
+    verb: "start",
+    flags: ["provider", "cwd", "prompt", "name", "lane", "actor", "dry-run", "json"],
+    required: ["provider (codex|claude-code)"],
+    summary: "Start a long-running Codex or Claude worker in a tmux-backed Harness session.",
+  },
+  {
+    verb: "list",
+    flags: ["lane", "json"],
+    summary: "List file-backed Harness Glue execution records, filterable by --lane.",
+  },
+  {
+    verb: "assign",
+    flags: ["lane", "execution", "dry-run", "json"],
+    required: ["lane", "execution"],
+    summary: "Assign an existing Harness execution/session to a lane.",
+  },
+  {
+    verb: "context",
+    flags: ["execution", "lane", "lines", "json"],
+    required: ["execution or lane"],
+    summary: "Return latest status, registry record, events, and recent session output for an execution or lane.",
+  },
+  {
+    verb: "events",
+    flags: ["execution", "lane", "json"],
+    summary: "Read Harness Glue event log entries for an execution or lane.",
+  },
+  {
+    verb: "grep",
+    flags: ["query", "q", "execution", "lane", "json"],
+    required: ["query"],
+    summary: "Ripgrep over registry, event log, and captured session output.",
+  },
+  {
+    verb: "log",
+    flags: ["execution", "session", "lines", "json"],
+    required: ["execution"],
+    summary: "Capture recent tmux output for a Harness execution.",
+  },
+  {
+    verb: "dispatch",
+    flags: ["provider", "cwd", "prompt", "prompt-file", "mode", "lane", "intent", "org", "actor", "no-daemon", "dry-run", "timeout-ms", "json"],
+    summary: "Dispatch work to a provider; simulated provider is ready now.",
+  },
+  {
+    verb: "stream",
+    flags: ["execution", "lane", "cwd", "prompt", "json"],
+    required: ["execution"],
+    summary: "Stream normalized execution/tool events for an execution.",
+  },
+  {
+    verb: "stop",
+    flags: ["execution", "session", "record-only", "actor", "json"],
+    required: ["execution"],
+    summary: "Request execution stop and emit an audit-friendly event.",
+  },
+  {
+    verb: "search",
+    flags: ["query", "json"],
+    summary: "Search Chronicle/Harness activity once chronicle.activity is daemon-backed.",
+  },
+];
+
+const HARNESS_STUB_OPTS = {
+  noun: "harness",
+  status: "preparing_for_hermes",
+  docRef: HARNESS_DOC_REF,
+  commands: HARNESS_COMMANDS,
+};
 
 const DEFAULT_ORG = "org:01J00000000000000000000001";
 const DEFAULT_ACTOR = "actor:harness-cli";
@@ -65,6 +144,8 @@ const DONORS = [
 
 export function runHarness(args: ParsedArgs): number | Promise<number> {
 	const verb = args.positional[0] ?? "providers";
+	const helpExit = maybeRunVerbHelp(args, HARNESS_STUB_OPTS);
+	if (helpExit !== null) return helpExit;
 	if (flagBool(args, "help") || args.flags.h === true || verb === "help") return runHarnessHelp(args);
 	if (verb === "providers" || verb === "sessions") return runProviders(args, verb);
 	if (verb === "status") return runStatus(args);
@@ -85,30 +166,7 @@ export function runHarness(args: ParsedArgs): number | Promise<number> {
 }
 
 function runHarnessHelp(args: ParsedArgs): number {
-	const commands = [
-		{ verb: "providers", summary: "List Harness Glue providers and normalized event rails." },
-		{ verb: "sessions", summary: "List provider session capabilities (first slice mirrors providers)." },
-		{ verb: "status", summary: "Summarize Harness Glue readiness, pending daemon projections, and next adapter work." },
-		{ verb: "donors", summary: "Show Chronicle and Duct Tape donor roles for future Hermes preparation." },
-		{ verb: "start", summary: "Start a long-running Codex or Claude worker in a tmux-backed Harness session." },
-		{ verb: "list", summary: "List file-backed Harness Glue execution records, filterable by --lane." },
-		{ verb: "assign", summary: "Assign an existing Harness execution/session to a lane." },
-		{ verb: "context", summary: "Return latest status, registry record, events, and recent session output for an execution or lane." },
-		{ verb: "events", summary: "Read Harness Glue event log entries for an execution or lane." },
-		{ verb: "grep", summary: "Ripgrep over registry, event log, and captured session output." },
-		{ verb: "log", summary: "Capture recent tmux output for a Harness execution." },
-		{ verb: "dispatch", summary: "Dispatch work to a provider; simulated provider is ready now." },
-		{ verb: "stream", summary: "Stream normalized execution/tool events for an execution." },
-		{ verb: "stop", summary: "Request execution stop and emit an audit-friendly event." },
-		{ verb: "search", summary: "Search Chronicle/Harness activity once chronicle.activity is daemon-backed." },
-	];
-	if (flagBool(args, "json")) {
-		emitJson({ noun: "harness", status: "preparing_for_hermes", commands, projections: projections(), donors: DONORS });
-		return 0;
-	}
-	emitPretty("ema harness — Harness Glue preparation rail");
-	for (const command of commands) emitPretty(`  ${command.verb.padEnd(10)} ${command.summary}`);
-	return 0;
+	return runStubContract(args, HARNESS_STUB_OPTS);
 }
 
 function runProviders(args: ParsedArgs, verb: string): number {

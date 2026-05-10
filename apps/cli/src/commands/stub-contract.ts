@@ -17,6 +17,36 @@ type StubOptions = {
   usage?: string;
 };
 
+export function maybeRunVerbHelp(args: ParsedArgs, opts: StubOptions): number | null {
+  const verb = args.positional[0];
+  const help = flagBool(args, "help") || args.flags.h === true;
+  if (!verb || !help) return null;
+  const cmd = opts.commands.find((c) => c.verb === verb);
+  if (!cmd) return null;
+  const flags = cmd.flags ?? [];
+  const required = cmd.required ?? [];
+  if (flagBool(args, "json")) {
+    emitJson({
+      noun: opts.noun,
+      verb: cmd.verb,
+      summary: cmd.summary,
+      flags: flags.map((f) => `--${f}`),
+      required: required.map((f) => `--${f}`),
+      doc: opts.docRef,
+    });
+    return 0;
+  }
+  emitPretty(`ema ${opts.noun} ${cmd.verb} — ${cmd.summary}`);
+  emitPretty("");
+  emitPretty(`Usage: ema ${opts.noun} ${cmd.verb} [flags...] [--json]`);
+  emitPretty("");
+  if (flags.length > 0) emitPretty(`  flags: ${flags.map((f) => `--${f}`).join(", ")}`);
+  if (required.length > 0) emitPretty(`  required: ${required.map((f) => `--${f}`).join(", ")}`);
+  emitPretty("");
+  emitPretty(`Docs: ${opts.docRef}`);
+  return 0;
+}
+
 export function runStubContract(args: ParsedArgs, opts: StubOptions): number {
   const verb = args.positional[0];
   const json = flagBool(args, "json");

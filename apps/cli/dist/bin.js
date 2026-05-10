@@ -372,6 +372,35 @@ async function connect(opts = {}) {
 }
 
 // src/commands/stub-contract.ts
+function maybeRunVerbHelp(args, opts) {
+  const verb = args.positional[0];
+  const help11 = flagBool(args, "help") || args.flags.h === true;
+  if (!verb || !help11) return null;
+  const cmd = opts.commands.find((c) => c.verb === verb);
+  if (!cmd) return null;
+  const flags = cmd.flags ?? [];
+  const required = cmd.required ?? [];
+  if (flagBool(args, "json")) {
+    emitJson({
+      noun: opts.noun,
+      verb: cmd.verb,
+      summary: cmd.summary,
+      flags: flags.map((f) => `--${f}`),
+      required: required.map((f) => `--${f}`),
+      doc: opts.docRef
+    });
+    return 0;
+  }
+  emitPretty(`ema ${opts.noun} ${cmd.verb} \u2014 ${cmd.summary}`);
+  emitPretty("");
+  emitPretty(`Usage: ema ${opts.noun} ${cmd.verb} [flags...] [--json]`);
+  emitPretty("");
+  if (flags.length > 0) emitPretty(`  flags: ${flags.map((f) => `--${f}`).join(", ")}`);
+  if (required.length > 0) emitPretty(`  required: ${required.map((f) => `--${f}`).join(", ")}`);
+  emitPretty("");
+  emitPretty(`Docs: ${opts.docRef}`);
+  return 0;
+}
 function runStubContract(args, opts) {
   const verb = args.positional[0];
   const json = flagBool(args, "json");
@@ -2624,8 +2653,65 @@ async function loadMissions(args) {
 
 // src/commands/lane.ts
 var DOC_REF2 = "docs/cli/agent-workspace.md";
+var LANE_COMMANDS = [
+  {
+    verb: "open",
+    flags: ["mission", "title", "scope", "done-when", "depends-on"],
+    required: ["title"],
+    summary: "Open an ownership track inside a mission or workstream."
+  },
+  {
+    verb: "list",
+    flags: ["mission", "project", "status", "all-projects"],
+    summary: "List lanes in scope."
+  },
+  {
+    verb: "show",
+    flags: ["project", "all-projects", "lane", "id"],
+    required: ["lane or id"],
+    summary: "Show lane owner, scope, protected paths, queue items, blockers, and handoffs."
+  },
+  {
+    verb: "claim",
+    flags: ["lane", "actor", "scope", "goal", "next", "refresh-by", "blocker"],
+    required: ["lane", "actor", "scope", "goal", "next"],
+    summary: "Claim or refresh lane ownership with exact scope and next step."
+  },
+  {
+    verb: "release",
+    flags: ["lane", "actor", "handoff", "reason"],
+    required: ["lane", "actor"],
+    summary: "Release lane ownership after handoff or completion."
+  },
+  {
+    verb: "block",
+    flags: ["lane", "reason", "depends-on", "escalate-to"],
+    required: ["lane", "reason"],
+    summary: "Mark a lane blocked and name the dependency or escalation path."
+  },
+  {
+    verb: "move",
+    flags: ["lane", "status"],
+    required: ["lane", "status"],
+    summary: "Move a lane through idea/ready/active/review/blocked/done."
+  },
+  {
+    verb: "close",
+    flags: ["lane", "reason", "verify"],
+    required: ["lane"],
+    summary: "Close a lane after result, verification, and handoff are recorded."
+  }
+];
+var LANE_STUB_OPTS = {
+  noun: "lane",
+  status: "available",
+  docRef: DOC_REF2,
+  commands: LANE_COMMANDS
+};
 async function runLane(args) {
   const verb = args.positional[0];
+  const helpExit = maybeRunVerbHelp(args, LANE_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (verb === "open") return runOpen(args);
   if (verb === "list") return runRecentList(args);
   if (verb === "show") return runShow2(args);
@@ -2634,60 +2720,7 @@ async function runLane(args) {
   if (verb === "block") return runBlock2(args);
   if (verb === "release") return runRelease(args);
   if (verb === "close") return runClose(args);
-  return runStubContract(args, {
-    noun: "lane",
-    status: "available",
-    docRef: DOC_REF2,
-    commands: [
-      {
-        verb: "open",
-        flags: ["mission", "title", "scope", "done-when", "depends-on"],
-        required: ["title"],
-        summary: "Open an ownership track inside a mission or workstream."
-      },
-      {
-        verb: "list",
-        flags: ["mission", "project", "status", "all-projects"],
-        summary: "List lanes in scope."
-      },
-      {
-        verb: "show",
-        flags: ["project", "all-projects", "lane", "id"],
-        required: ["lane or id"],
-        summary: "Show lane owner, scope, protected paths, queue items, blockers, and handoffs."
-      },
-      {
-        verb: "claim",
-        flags: ["lane", "actor", "scope", "goal", "next", "refresh-by", "blocker"],
-        required: ["lane", "actor", "scope", "goal", "next"],
-        summary: "Claim or refresh lane ownership with exact scope and next step."
-      },
-      {
-        verb: "release",
-        flags: ["lane", "actor", "handoff", "reason"],
-        required: ["lane", "actor"],
-        summary: "Release lane ownership after handoff or completion."
-      },
-      {
-        verb: "block",
-        flags: ["lane", "reason", "depends-on", "escalate-to"],
-        required: ["lane", "reason"],
-        summary: "Mark a lane blocked and name the dependency or escalation path."
-      },
-      {
-        verb: "move",
-        flags: ["lane", "status"],
-        required: ["lane", "status"],
-        summary: "Move a lane through idea/ready/active/review/blocked/done."
-      },
-      {
-        verb: "close",
-        flags: ["lane", "reason", "verify"],
-        required: ["lane"],
-        summary: "Close a lane after result, verification, and handoff are recorded."
-      }
-    ]
-  });
+  return runStubContract(args, LANE_STUB_OPTS);
 }
 async function runOpen(args) {
   const title = flagString(args, "title");
@@ -2888,56 +2921,60 @@ async function loadLanes(args) {
 
 // src/commands/queue.ts
 var DOC_REF3 = "docs/cli/agent-workspace.md";
+var QUEUE_COMMANDS = [
+  {
+    verb: "add",
+    flags: ["title", "project", "mission", "lane", "depends-on", "blocked-by", "why", "done-when", "source"],
+    required: ["title", "why"],
+    summary: "Log follow-up work discovered during execution, with dependency and done-when fields."
+  },
+  {
+    verb: "list",
+    flags: ["project", "mission", "lane", "status", "all-projects"],
+    summary: "List queued follow-ups and dependency blockers."
+  },
+  {
+    verb: "show",
+    flags: ["project", "all-projects", "queue-item", "id"],
+    required: ["queue-item or id"],
+    summary: "Show a queue item, its dependencies, evidence, and ready condition."
+  },
+  {
+    verb: "ready",
+    flags: ["queue-item", "reason"],
+    required: ["queue-item"],
+    summary: "Mark a queue item ready after dependencies clear."
+  },
+  {
+    verb: "block",
+    flags: ["queue-item", "blocked-by", "reason"],
+    required: ["queue-item", "blocked-by"],
+    summary: "Record why a queue item cannot run yet."
+  },
+  {
+    verb: "close",
+    flags: ["queue-item", "result", "verify"],
+    required: ["queue-item"],
+    summary: "Close a queue item with result and verification notes."
+  }
+];
+var QUEUE_STUB_OPTS = {
+  noun: "queue",
+  status: "available",
+  docRef: DOC_REF3,
+  commands: QUEUE_COMMANDS
+};
 async function runQueue(args) {
   const verb = args.positional[0];
+  const helpExit = maybeRunVerbHelp(args, QUEUE_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (verb === "add") return runAdd(args);
   if (verb === "list") return runRecentList2(args);
   if (verb === "show") return runShow3(args);
   if (verb === "ready") return runReady(args);
   if (verb === "block") return runBlock3(args);
   if (verb === "close") return runClose2(args);
-  return runStubContract(args, {
-    noun: "queue",
-    status: "available",
-    docRef: DOC_REF3,
-    commands: [
-      {
-        verb: "add",
-        flags: ["title", "project", "mission", "lane", "depends-on", "blocked-by", "why", "done-when", "source"],
-        required: ["title", "why"],
-        summary: "Log follow-up work discovered during execution, with dependency and done-when fields."
-      },
-      {
-        verb: "list",
-        flags: ["project", "mission", "lane", "status", "all-projects"],
-        summary: "List queued follow-ups and dependency blockers."
-      },
-      {
-        verb: "show",
-        flags: ["project", "all-projects", "queue-item", "id"],
-        required: ["queue-item or id"],
-        summary: "Show a queue item, its dependencies, evidence, and ready condition."
-      },
-      {
-        verb: "ready",
-        flags: ["queue-item", "reason"],
-        required: ["queue-item"],
-        summary: "Mark a queue item ready after dependencies clear."
-      },
-      {
-        verb: "block",
-        flags: ["queue-item", "blocked-by", "reason"],
-        required: ["queue-item", "blocked-by"],
-        summary: "Record why a queue item cannot run yet."
-      },
-      {
-        verb: "close",
-        flags: ["queue-item", "result", "verify"],
-        required: ["queue-item"],
-        summary: "Close a queue item with result and verification notes."
-      }
-    ]
-  });
+  return runStubContract(args, QUEUE_STUB_OPTS);
 }
 async function runAdd(args) {
   const title = flagString(args, "title");
@@ -5646,6 +5683,81 @@ function boolish(value) {
 }
 
 // src/commands/harness.ts
+var HARNESS_DOC_REF = "docs/architecture/18-harness-glue.md";
+var HARNESS_COMMANDS = [
+  { verb: "providers", summary: "List Harness Glue providers and normalized event rails." },
+  { verb: "sessions", summary: "List provider session capabilities (first slice mirrors providers)." },
+  { verb: "status", summary: "Summarize Harness Glue readiness, pending daemon projections, and next adapter work." },
+  { verb: "donors", summary: "Show Chronicle and Duct Tape donor roles for future Hermes preparation." },
+  {
+    verb: "start",
+    flags: ["provider", "cwd", "prompt", "name", "lane", "actor", "dry-run", "json"],
+    required: ["provider (codex|claude-code)"],
+    summary: "Start a long-running Codex or Claude worker in a tmux-backed Harness session."
+  },
+  {
+    verb: "list",
+    flags: ["lane", "json"],
+    summary: "List file-backed Harness Glue execution records, filterable by --lane."
+  },
+  {
+    verb: "assign",
+    flags: ["lane", "execution", "dry-run", "json"],
+    required: ["lane", "execution"],
+    summary: "Assign an existing Harness execution/session to a lane."
+  },
+  {
+    verb: "context",
+    flags: ["execution", "lane", "lines", "json"],
+    required: ["execution or lane"],
+    summary: "Return latest status, registry record, events, and recent session output for an execution or lane."
+  },
+  {
+    verb: "events",
+    flags: ["execution", "lane", "json"],
+    summary: "Read Harness Glue event log entries for an execution or lane."
+  },
+  {
+    verb: "grep",
+    flags: ["query", "q", "execution", "lane", "json"],
+    required: ["query"],
+    summary: "Ripgrep over registry, event log, and captured session output."
+  },
+  {
+    verb: "log",
+    flags: ["execution", "session", "lines", "json"],
+    required: ["execution"],
+    summary: "Capture recent tmux output for a Harness execution."
+  },
+  {
+    verb: "dispatch",
+    flags: ["provider", "cwd", "prompt", "prompt-file", "mode", "lane", "intent", "org", "actor", "no-daemon", "dry-run", "timeout-ms", "json"],
+    summary: "Dispatch work to a provider; simulated provider is ready now."
+  },
+  {
+    verb: "stream",
+    flags: ["execution", "lane", "cwd", "prompt", "json"],
+    required: ["execution"],
+    summary: "Stream normalized execution/tool events for an execution."
+  },
+  {
+    verb: "stop",
+    flags: ["execution", "session", "record-only", "actor", "json"],
+    required: ["execution"],
+    summary: "Request execution stop and emit an audit-friendly event."
+  },
+  {
+    verb: "search",
+    flags: ["query", "json"],
+    summary: "Search Chronicle/Harness activity once chronicle.activity is daemon-backed."
+  }
+];
+var HARNESS_STUB_OPTS = {
+  noun: "harness",
+  status: "preparing_for_hermes",
+  docRef: HARNESS_DOC_REF,
+  commands: HARNESS_COMMANDS
+};
 var DEFAULT_ORG5 = "org:01J00000000000000000000001";
 var DEFAULT_ACTOR5 = "actor:harness-cli";
 var PROVIDERS = [
@@ -5698,6 +5810,8 @@ var DONORS = [
 ];
 function runHarness(args) {
   const verb = args.positional[0] ?? "providers";
+  const helpExit = maybeRunVerbHelp(args, HARNESS_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return runHarnessHelp(args);
   if (verb === "providers" || verb === "sessions") return runProviders(args, verb);
   if (verb === "status") return runStatus3(args);
@@ -5717,30 +5831,7 @@ function runHarness(args) {
   return 64;
 }
 function runHarnessHelp(args) {
-  const commands = [
-    { verb: "providers", summary: "List Harness Glue providers and normalized event rails." },
-    { verb: "sessions", summary: "List provider session capabilities (first slice mirrors providers)." },
-    { verb: "status", summary: "Summarize Harness Glue readiness, pending daemon projections, and next adapter work." },
-    { verb: "donors", summary: "Show Chronicle and Duct Tape donor roles for future Hermes preparation." },
-    { verb: "start", summary: "Start a long-running Codex or Claude worker in a tmux-backed Harness session." },
-    { verb: "list", summary: "List file-backed Harness Glue execution records, filterable by --lane." },
-    { verb: "assign", summary: "Assign an existing Harness execution/session to a lane." },
-    { verb: "context", summary: "Return latest status, registry record, events, and recent session output for an execution or lane." },
-    { verb: "events", summary: "Read Harness Glue event log entries for an execution or lane." },
-    { verb: "grep", summary: "Ripgrep over registry, event log, and captured session output." },
-    { verb: "log", summary: "Capture recent tmux output for a Harness execution." },
-    { verb: "dispatch", summary: "Dispatch work to a provider; simulated provider is ready now." },
-    { verb: "stream", summary: "Stream normalized execution/tool events for an execution." },
-    { verb: "stop", summary: "Request execution stop and emit an audit-friendly event." },
-    { verb: "search", summary: "Search Chronicle/Harness activity once chronicle.activity is daemon-backed." }
-  ];
-  if (flagBool(args, "json")) {
-    emitJson({ noun: "harness", status: "preparing_for_hermes", commands, projections: projections(), donors: DONORS });
-    return 0;
-  }
-  emitPretty("ema harness \u2014 Harness Glue preparation rail");
-  for (const command of commands) emitPretty(`  ${command.verb.padEnd(10)} ${command.summary}`);
-  return 0;
+  return runStubContract(args, HARNESS_STUB_OPTS);
 }
 function runProviders(args, verb) {
   const payload = {
@@ -10243,8 +10334,35 @@ function agentWorkpackFor(projection2) {
 }
 
 // src/commands/actor.ts
+var ACTOR_COMMANDS = [
+  {
+    verb: "register",
+    flags: ["id", "kind", "display-name", "dispatch", "perspective", "json"],
+    required: ["id", "kind", "display-name"],
+    summary: "Register a human or agent actor through the daemon canonical writer."
+  },
+  {
+    verb: "list",
+    flags: ["kind", "json"],
+    summary: "List actors by replaying actor.created events."
+  },
+  {
+    verb: "show",
+    flags: ["json"],
+    required: ["id"],
+    summary: "Show one actor and the event rows that mention it."
+  }
+];
+var ACTOR_STUB_OPTS = {
+  noun: "actor",
+  status: "available",
+  docRef: "packages/contracts/events/actor.md",
+  commands: ACTOR_COMMANDS
+};
 async function runActor(args) {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, ACTOR_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help3(args);
   if (verb === "register") return register(args);
   if (verb === "list") return list3(args);
@@ -10253,30 +10371,7 @@ async function runActor(args) {
   return 64;
 }
 function help3(args) {
-  return runStubContract(args, {
-    noun: "actor",
-    status: "available",
-    docRef: "packages/contracts/events/actor.md",
-    commands: [
-      {
-        verb: "register",
-        flags: ["id", "kind", "display-name", "dispatch", "perspective", "json"],
-        required: ["id", "kind", "display-name"],
-        summary: "Register a human or agent actor through the daemon canonical writer."
-      },
-      {
-        verb: "list",
-        flags: ["kind", "json"],
-        summary: "List actors by replaying actor.created events."
-      },
-      {
-        verb: "show",
-        flags: ["json"],
-        required: ["id"],
-        summary: "Show one actor and the event rows that mention it."
-      }
-    ]
-  });
+  return runStubContract(args, ACTOR_STUB_OPTS);
 }
 async function register(args) {
   const actorId = flagString(args, "id");
@@ -10371,6 +10466,28 @@ function fail(args, command, errorClass, message, code) {
 
 // src/commands/intent.ts
 import { readFileSync as readFileSync11 } from "fs";
+var INTENT_COMMANDS = [
+  {
+    verb: "create",
+    flags: ["id", "title", "kind", "actor", "project", "space", "body", "body-file", "exit-condition", "json"],
+    required: ["id", "title", "kind", "actor"],
+    summary: "Create a canonical pipeline-floor intent."
+  },
+  { verb: "list", flags: ["project", "space", "actor", "status", "kind", "json"], summary: "List canonical intents." },
+  { verb: "show", flags: ["json"], required: ["id"], summary: "Show one intent with events and linked proposals." },
+  {
+    verb: "update",
+    flags: ["title", "status", "body", "body-file", "exit-condition", "actor", "reason", "json"],
+    required: ["id", "actor", "reason", "at least one changed field"],
+    summary: "Update an intent and emit intent.updated."
+  }
+];
+var INTENT_STUB_OPTS = {
+  noun: "intent",
+  status: "available",
+  docRef: "packages/contracts/events/intent.md",
+  commands: INTENT_COMMANDS
+};
 var KINDS = /* @__PURE__ */ new Set(["bootstrap", "feature", "fix", "research", "doctrine", "external"]);
 var STATUSES = /* @__PURE__ */ new Set(["open", "proposed", "accepted", "executing", "satisfied", "superseded", "abandoned"]);
 var ALLOWED_STATUS_TRANSITIONS = {
@@ -10384,6 +10501,8 @@ var ALLOWED_STATUS_TRANSITIONS = {
 };
 async function runIntent(args) {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, INTENT_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help4(args);
   if (verb === "create") return create(args);
   if (verb === "list") return list4(args);
@@ -10393,27 +10512,7 @@ async function runIntent(args) {
   return 64;
 }
 function help4(args) {
-  return runStubContract(args, {
-    noun: "intent",
-    status: "available",
-    docRef: "packages/contracts/events/intent.md",
-    commands: [
-      {
-        verb: "create",
-        flags: ["id", "title", "kind", "actor", "project", "space", "body", "body-file", "exit-condition", "json"],
-        required: ["id", "title", "kind", "actor"],
-        summary: "Create a canonical pipeline-floor intent."
-      },
-      { verb: "list", flags: ["project", "space", "actor", "status", "kind", "json"], summary: "List canonical intents." },
-      { verb: "show", flags: ["json"], required: ["id"], summary: "Show one intent with events and linked proposals." },
-      {
-        verb: "update",
-        flags: ["title", "status", "body", "body-file", "exit-condition", "actor", "reason", "json"],
-        required: ["id", "actor", "reason", "at least one changed field"],
-        summary: "Update an intent and emit intent.updated."
-      }
-    ]
-  });
+  return runStubContract(args, INTENT_STUB_OPTS);
 }
 async function create(args) {
   const intentId = flagString(args, "id");
@@ -10573,10 +10672,30 @@ function fail2(args, command, errorClass, message, code) {
 
 // src/commands/proposal.ts
 import { readFileSync as readFileSync12 } from "fs";
+var PROPOSAL_COMMANDS = [
+  {
+    verb: "create",
+    flags: ["id", "intent", "title", "body", "body-file", "plan", "plan-file", "proposed-by", "no-approval-required", "json"],
+    required: ["id", "intent", "title", "proposed-by"],
+    summary: "Create a canonical proposal under an intent."
+  },
+  { verb: "approve", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Approve a proposal." },
+  { verb: "reject", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Reject a proposal." },
+  { verb: "list", flags: ["intent", "status", "json"], summary: "List proposals." },
+  { verb: "show", flags: ["json"], required: ["id"], summary: "Show one proposal with events and parent intent." }
+];
+var PROPOSAL_STUB_OPTS = {
+  noun: "proposal",
+  status: "available",
+  docRef: "packages/contracts/events/proposal.md",
+  commands: PROPOSAL_COMMANDS
+};
 var CLOSED_INTENT_STATUSES = /* @__PURE__ */ new Set(["satisfied", "abandoned", "superseded"]);
 var DECIDED_PROPOSAL_STATUSES = /* @__PURE__ */ new Set(["approved", "rejected", "withdrawn"]);
 async function runProposal(args) {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, PROPOSAL_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help5(args);
   if (verb === "create") return create2(args);
   if (verb === "approve") return decide(args, "approve");
@@ -10587,23 +10706,7 @@ async function runProposal(args) {
   return 64;
 }
 function help5(args) {
-  return runStubContract(args, {
-    noun: "proposal",
-    status: "available",
-    docRef: "packages/contracts/events/proposal.md",
-    commands: [
-      {
-        verb: "create",
-        flags: ["id", "intent", "title", "body", "body-file", "plan", "plan-file", "proposed-by", "no-approval-required", "json"],
-        required: ["id", "intent", "title", "proposed-by"],
-        summary: "Create a canonical proposal under an intent."
-      },
-      { verb: "approve", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Approve a proposal." },
-      { verb: "reject", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Reject a proposal." },
-      { verb: "list", flags: ["intent", "status", "json"], summary: "List proposals." },
-      { verb: "show", flags: ["json"], required: ["id"], summary: "Show one proposal with events and parent intent." }
-    ]
-  });
+  return runStubContract(args, PROPOSAL_STUB_OPTS);
 }
 async function create2(args) {
   const proposalId = flagString(args, "id");
@@ -10761,10 +10864,34 @@ function fail3(args, command, errorClass, message, code) {
 
 // src/commands/canon.ts
 import { readFileSync as readFileSync13 } from "fs";
+var CANON_COMMANDS = [
+  {
+    verb: "write",
+    flags: ["kind", "body-file", "source-kind", "source-id", "written-by", "id", "approved-by", "link", "json"],
+    required: ["kind", "body-file", "source-kind", "source-id", "written-by"],
+    summary: "Write a daemon-canonical canon node."
+  },
+  { verb: "show", flags: ["json"], required: ["id"], summary: "Show one canon node with links and events." },
+  { verb: "list", flags: ["kind", "source-kind", "source-id", "linked-to", "json"], summary: "List canon nodes." },
+  {
+    verb: "supersede",
+    flags: ["by", "actor", "rationale", "json"],
+    required: ["old-id", "by", "actor", "rationale"],
+    summary: "Mark an existing canon node superseded by another canon node."
+  }
+];
+var CANON_STUB_OPTS = {
+  noun: "canon",
+  status: "available",
+  docRef: "packages/contracts/events/canon.md",
+  commands: CANON_COMMANDS
+};
 var CANON_KINDS = /* @__PURE__ */ new Set(["execution_result", "decision", "doctrine", "observation", "retro", "direction"]);
 var SOURCE_KINDS = /* @__PURE__ */ new Set(["execution", "proposal", "intent", "manual", "external"]);
 async function runCanon(args) {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, CANON_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help6(args);
   if (verb === "write") return write(args);
   if (verb === "show") return show5(args);
@@ -10774,27 +10901,7 @@ async function runCanon(args) {
   return 64;
 }
 function help6(args) {
-  return runStubContract(args, {
-    noun: "canon",
-    status: "available",
-    docRef: "packages/contracts/events/canon.md",
-    commands: [
-      {
-        verb: "write",
-        flags: ["kind", "body-file", "source-kind", "source-id", "written-by", "id", "approved-by", "link", "json"],
-        required: ["kind", "body-file", "source-kind", "source-id", "written-by"],
-        summary: "Write a daemon-canonical canon node."
-      },
-      { verb: "show", flags: ["json"], required: ["id"], summary: "Show one canon node with links and events." },
-      { verb: "list", flags: ["kind", "source-kind", "source-id", "linked-to", "json"], summary: "List canon nodes." },
-      {
-        verb: "supersede",
-        flags: ["by", "actor", "rationale", "json"],
-        required: ["old-id", "by", "actor", "rationale"],
-        summary: "Mark an existing canon node superseded by another canon node."
-      }
-    ]
-  });
+  return runStubContract(args, CANON_STUB_OPTS);
 }
 async function write(args) {
   const kind = flagString(args, "kind");

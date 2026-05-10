@@ -4,7 +4,7 @@ import { flagBool, flagString } from "../args.js";
 import { connect } from "../ws-client.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
 import { reportError } from "./ping.js";
-import { runStubContract } from "./stub-contract.js";
+import { maybeRunVerbHelp, runStubContract, type StubCommand } from "./stub-contract.js";
 import { DEFAULT_ORG } from "./workspace-daemon.js";
 import {
   actorById,
@@ -15,11 +15,33 @@ import {
   type ProposalRecord,
 } from "./pipeline-store.js";
 
+const PROPOSAL_COMMANDS: StubCommand[] = [
+  {
+    verb: "create",
+    flags: ["id", "intent", "title", "body", "body-file", "plan", "plan-file", "proposed-by", "no-approval-required", "json"],
+    required: ["id", "intent", "title", "proposed-by"],
+    summary: "Create a canonical proposal under an intent.",
+  },
+  { verb: "approve", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Approve a proposal." },
+  { verb: "reject", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Reject a proposal." },
+  { verb: "list", flags: ["intent", "status", "json"], summary: "List proposals." },
+  { verb: "show", flags: ["json"], required: ["id"], summary: "Show one proposal with events and parent intent." },
+];
+
+const PROPOSAL_STUB_OPTS = {
+  noun: "proposal",
+  status: "available",
+  docRef: "packages/contracts/events/proposal.md",
+  commands: PROPOSAL_COMMANDS,
+};
+
 const CLOSED_INTENT_STATUSES = new Set(["satisfied", "abandoned", "superseded"]);
 const DECIDED_PROPOSAL_STATUSES = new Set(["approved", "rejected", "withdrawn"]);
 
 export async function runProposal(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, PROPOSAL_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help(args);
   if (verb === "create") return create(args);
   if (verb === "approve") return decide(args, "approve");
@@ -31,23 +53,7 @@ export async function runProposal(args: ParsedArgs): Promise<number> {
 }
 
 function help(args: ParsedArgs): number {
-  return runStubContract(args, {
-    noun: "proposal",
-    status: "available",
-    docRef: "packages/contracts/events/proposal.md",
-    commands: [
-      {
-        verb: "create",
-        flags: ["id", "intent", "title", "body", "body-file", "plan", "plan-file", "proposed-by", "no-approval-required", "json"],
-        required: ["id", "intent", "title", "proposed-by"],
-        summary: "Create a canonical proposal under an intent.",
-      },
-      { verb: "approve", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Approve a proposal." },
-      { verb: "reject", flags: ["actor", "rationale", "json"], required: ["id", "actor", "rationale"], summary: "Reject a proposal." },
-      { verb: "list", flags: ["intent", "status", "json"], summary: "List proposals." },
-      { verb: "show", flags: ["json"], required: ["id"], summary: "Show one proposal with events and parent intent." },
-    ],
-  });
+  return runStubContract(args, PROPOSAL_STUB_OPTS);
 }
 
 async function create(args: ParsedArgs): Promise<number> {

@@ -1,7 +1,7 @@
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
-import { runStubContract } from "./stub-contract.js";
+import { maybeRunVerbHelp, runStubContract, type StubCommand } from "./stub-contract.js";
 import {
   DEFAULT_ACTOR,
   DEFAULT_ORG,
@@ -13,6 +13,51 @@ import {
 } from "./workspace-daemon.js";
 
 const DOC_REF = "docs/cli/agent-workspace.md";
+
+const QUEUE_COMMANDS: StubCommand[] = [
+  {
+    verb: "add",
+    flags: ["title", "project", "mission", "lane", "depends-on", "blocked-by", "why", "done-when", "source"],
+    required: ["title", "why"],
+    summary: "Log follow-up work discovered during execution, with dependency and done-when fields.",
+  },
+  {
+    verb: "list",
+    flags: ["project", "mission", "lane", "status", "all-projects"],
+    summary: "List queued follow-ups and dependency blockers.",
+  },
+  {
+    verb: "show",
+    flags: ["project", "all-projects", "queue-item", "id"],
+    required: ["queue-item or id"],
+    summary: "Show a queue item, its dependencies, evidence, and ready condition.",
+  },
+  {
+    verb: "ready",
+    flags: ["queue-item", "reason"],
+    required: ["queue-item"],
+    summary: "Mark a queue item ready after dependencies clear.",
+  },
+  {
+    verb: "block",
+    flags: ["queue-item", "blocked-by", "reason"],
+    required: ["queue-item", "blocked-by"],
+    summary: "Record why a queue item cannot run yet.",
+  },
+  {
+    verb: "close",
+    flags: ["queue-item", "result", "verify"],
+    required: ["queue-item"],
+    summary: "Close a queue item with result and verification notes.",
+  },
+];
+
+const QUEUE_STUB_OPTS = {
+  noun: "queue",
+  status: "available",
+  docRef: DOC_REF,
+  commands: QUEUE_COMMANDS,
+};
 
 type QueueRecord = {
   id: string;
@@ -35,6 +80,8 @@ type QueueLoadResult = {
 
 export async function runQueue(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0];
+  const helpExit = maybeRunVerbHelp(args, QUEUE_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (verb === "add") return runAdd(args);
   if (verb === "list") return runRecentList(args);
   if (verb === "show") return runShow(args);
@@ -42,48 +89,7 @@ export async function runQueue(args: ParsedArgs): Promise<number> {
   if (verb === "block") return runBlock(args);
   if (verb === "close") return runClose(args);
 
-  return runStubContract(args, {
-    noun: "queue",
-    status: "available",
-    docRef: DOC_REF,
-    commands: [
-      {
-        verb: "add",
-        flags: ["title", "project", "mission", "lane", "depends-on", "blocked-by", "why", "done-when", "source"],
-        required: ["title", "why"],
-        summary: "Log follow-up work discovered during execution, with dependency and done-when fields.",
-      },
-      {
-        verb: "list",
-        flags: ["project", "mission", "lane", "status", "all-projects"],
-        summary: "List queued follow-ups and dependency blockers.",
-      },
-      {
-        verb: "show",
-        flags: ["project", "all-projects", "queue-item", "id"],
-        required: ["queue-item or id"],
-        summary: "Show a queue item, its dependencies, evidence, and ready condition.",
-      },
-      {
-        verb: "ready",
-        flags: ["queue-item", "reason"],
-        required: ["queue-item"],
-        summary: "Mark a queue item ready after dependencies clear.",
-      },
-      {
-        verb: "block",
-        flags: ["queue-item", "blocked-by", "reason"],
-        required: ["queue-item", "blocked-by"],
-        summary: "Record why a queue item cannot run yet.",
-      },
-      {
-        verb: "close",
-        flags: ["queue-item", "result", "verify"],
-        required: ["queue-item"],
-        summary: "Close a queue item with result and verification notes.",
-      },
-    ],
-  });
+  return runStubContract(args, QUEUE_STUB_OPTS);
 }
 
 async function runAdd(args: ParsedArgs): Promise<number> {

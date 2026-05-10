@@ -1,7 +1,7 @@
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
-import { runStubContract } from "./stub-contract.js";
+import { maybeRunVerbHelp, runStubContract, type StubCommand } from "./stub-contract.js";
 import {
   DEFAULT_ACTOR,
   DEFAULT_ORG,
@@ -13,6 +13,63 @@ import {
 } from "./workspace-daemon.js";
 
 const DOC_REF = "docs/cli/agent-workspace.md";
+
+const LANE_COMMANDS: StubCommand[] = [
+  {
+    verb: "open",
+    flags: ["mission", "title", "scope", "done-when", "depends-on"],
+    required: ["title"],
+    summary: "Open an ownership track inside a mission or workstream.",
+  },
+  {
+    verb: "list",
+    flags: ["mission", "project", "status", "all-projects"],
+    summary: "List lanes in scope.",
+  },
+  {
+    verb: "show",
+    flags: ["project", "all-projects", "lane", "id"],
+    required: ["lane or id"],
+    summary: "Show lane owner, scope, protected paths, queue items, blockers, and handoffs.",
+  },
+  {
+    verb: "claim",
+    flags: ["lane", "actor", "scope", "goal", "next", "refresh-by", "blocker"],
+    required: ["lane", "actor", "scope", "goal", "next"],
+    summary: "Claim or refresh lane ownership with exact scope and next step.",
+  },
+  {
+    verb: "release",
+    flags: ["lane", "actor", "handoff", "reason"],
+    required: ["lane", "actor"],
+    summary: "Release lane ownership after handoff or completion.",
+  },
+  {
+    verb: "block",
+    flags: ["lane", "reason", "depends-on", "escalate-to"],
+    required: ["lane", "reason"],
+    summary: "Mark a lane blocked and name the dependency or escalation path.",
+  },
+  {
+    verb: "move",
+    flags: ["lane", "status"],
+    required: ["lane", "status"],
+    summary: "Move a lane through idea/ready/active/review/blocked/done.",
+  },
+  {
+    verb: "close",
+    flags: ["lane", "reason", "verify"],
+    required: ["lane"],
+    summary: "Close a lane after result, verification, and handoff are recorded.",
+  },
+];
+
+const LANE_STUB_OPTS = {
+  noun: "lane",
+  status: "available",
+  docRef: DOC_REF,
+  commands: LANE_COMMANDS,
+};
 
 type LaneRecord = {
   id: string;
@@ -33,6 +90,8 @@ type LaneLoadResult = {
 
 export async function runLane(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0];
+  const helpExit = maybeRunVerbHelp(args, LANE_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (verb === "open") return runOpen(args);
   if (verb === "list") return runRecentList(args);
   if (verb === "show") return runShow(args);
@@ -42,60 +101,7 @@ export async function runLane(args: ParsedArgs): Promise<number> {
   if (verb === "release") return runRelease(args);
   if (verb === "close") return runClose(args);
 
-  return runStubContract(args, {
-    noun: "lane",
-    status: "available",
-    docRef: DOC_REF,
-    commands: [
-      {
-        verb: "open",
-        flags: ["mission", "title", "scope", "done-when", "depends-on"],
-        required: ["title"],
-        summary: "Open an ownership track inside a mission or workstream.",
-      },
-      {
-        verb: "list",
-        flags: ["mission", "project", "status", "all-projects"],
-        summary: "List lanes in scope.",
-      },
-      {
-        verb: "show",
-        flags: ["project", "all-projects", "lane", "id"],
-        required: ["lane or id"],
-        summary: "Show lane owner, scope, protected paths, queue items, blockers, and handoffs.",
-      },
-      {
-        verb: "claim",
-        flags: ["lane", "actor", "scope", "goal", "next", "refresh-by", "blocker"],
-        required: ["lane", "actor", "scope", "goal", "next"],
-        summary: "Claim or refresh lane ownership with exact scope and next step.",
-      },
-      {
-        verb: "release",
-        flags: ["lane", "actor", "handoff", "reason"],
-        required: ["lane", "actor"],
-        summary: "Release lane ownership after handoff or completion.",
-      },
-      {
-        verb: "block",
-        flags: ["lane", "reason", "depends-on", "escalate-to"],
-        required: ["lane", "reason"],
-        summary: "Mark a lane blocked and name the dependency or escalation path.",
-      },
-      {
-        verb: "move",
-        flags: ["lane", "status"],
-        required: ["lane", "status"],
-        summary: "Move a lane through idea/ready/active/review/blocked/done.",
-      },
-      {
-        verb: "close",
-        flags: ["lane", "reason", "verify"],
-        required: ["lane"],
-        summary: "Close a lane after result, verification, and handoff are recorded.",
-      },
-    ],
-  });
+  return runStubContract(args, LANE_STUB_OPTS);
 }
 
 async function runOpen(args: ParsedArgs): Promise<number> {

@@ -4,7 +4,7 @@ import { flagBool, flagString, flagStrings } from "../args.js";
 import { connect } from "../ws-client.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
 import { reportError } from "./ping.js";
-import { runStubContract } from "./stub-contract.js";
+import { maybeRunVerbHelp, runStubContract, type StubCommand } from "./stub-contract.js";
 import { DEFAULT_ORG } from "./workspace-daemon.js";
 import {
   CANONICAL_DB,
@@ -18,6 +18,30 @@ import {
   tableExists,
   type CanonicalEventRow,
 } from "./pipeline-store.js";
+
+const CANON_COMMANDS: StubCommand[] = [
+  {
+    verb: "write",
+    flags: ["kind", "body-file", "source-kind", "source-id", "written-by", "id", "approved-by", "link", "json"],
+    required: ["kind", "body-file", "source-kind", "source-id", "written-by"],
+    summary: "Write a daemon-canonical canon node.",
+  },
+  { verb: "show", flags: ["json"], required: ["id"], summary: "Show one canon node with links and events." },
+  { verb: "list", flags: ["kind", "source-kind", "source-id", "linked-to", "json"], summary: "List canon nodes." },
+  {
+    verb: "supersede",
+    flags: ["by", "actor", "rationale", "json"],
+    required: ["old-id", "by", "actor", "rationale"],
+    summary: "Mark an existing canon node superseded by another canon node.",
+  },
+];
+
+const CANON_STUB_OPTS = {
+  noun: "canon",
+  status: "available",
+  docRef: "packages/contracts/events/canon.md",
+  commands: CANON_COMMANDS,
+};
 
 const CANON_KINDS = new Set(["execution_result", "decision", "doctrine", "observation", "retro", "direction"]);
 const SOURCE_KINDS = new Set(["execution", "proposal", "intent", "manual", "external"]);
@@ -54,6 +78,8 @@ type CanonFilters = {
 
 export async function runCanon(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, CANON_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help(args);
   if (verb === "write") return write(args);
   if (verb === "show") return show(args);
@@ -64,27 +90,7 @@ export async function runCanon(args: ParsedArgs): Promise<number> {
 }
 
 function help(args: ParsedArgs): number {
-  return runStubContract(args, {
-    noun: "canon",
-    status: "available",
-    docRef: "packages/contracts/events/canon.md",
-    commands: [
-      {
-        verb: "write",
-        flags: ["kind", "body-file", "source-kind", "source-id", "written-by", "id", "approved-by", "link", "json"],
-        required: ["kind", "body-file", "source-kind", "source-id", "written-by"],
-        summary: "Write a daemon-canonical canon node.",
-      },
-      { verb: "show", flags: ["json"], required: ["id"], summary: "Show one canon node with links and events." },
-      { verb: "list", flags: ["kind", "source-kind", "source-id", "linked-to", "json"], summary: "List canon nodes." },
-      {
-        verb: "supersede",
-        flags: ["by", "actor", "rationale", "json"],
-        required: ["old-id", "by", "actor", "rationale"],
-        summary: "Mark an existing canon node superseded by another canon node.",
-      },
-    ],
-  });
+  return runStubContract(args, CANON_STUB_OPTS);
 }
 
 async function write(args: ParsedArgs): Promise<number> {

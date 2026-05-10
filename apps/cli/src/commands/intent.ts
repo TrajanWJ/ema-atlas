@@ -4,7 +4,7 @@ import { flagBool, flagString } from "../args.js";
 import { connect } from "../ws-client.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
 import { reportError } from "./ping.js";
-import { runStubContract } from "./stub-contract.js";
+import { maybeRunVerbHelp, runStubContract, type StubCommand } from "./stub-contract.js";
 import { DEFAULT_ORG } from "./workspace-daemon.js";
 import {
   eventsMentioning,
@@ -13,6 +13,30 @@ import {
   proposalsForIntent,
   type IntentRecord,
 } from "./pipeline-store.js";
+
+const INTENT_COMMANDS: StubCommand[] = [
+  {
+    verb: "create",
+    flags: ["id", "title", "kind", "actor", "project", "space", "body", "body-file", "exit-condition", "json"],
+    required: ["id", "title", "kind", "actor"],
+    summary: "Create a canonical pipeline-floor intent.",
+  },
+  { verb: "list", flags: ["project", "space", "actor", "status", "kind", "json"], summary: "List canonical intents." },
+  { verb: "show", flags: ["json"], required: ["id"], summary: "Show one intent with events and linked proposals." },
+  {
+    verb: "update",
+    flags: ["title", "status", "body", "body-file", "exit-condition", "actor", "reason", "json"],
+    required: ["id", "actor", "reason", "at least one changed field"],
+    summary: "Update an intent and emit intent.updated.",
+  },
+];
+
+const INTENT_STUB_OPTS = {
+  noun: "intent",
+  status: "available",
+  docRef: "packages/contracts/events/intent.md",
+  commands: INTENT_COMMANDS,
+};
 
 const KINDS = new Set(["bootstrap", "feature", "fix", "research", "doctrine", "external"]);
 const STATUSES = new Set(["open", "proposed", "accepted", "executing", "satisfied", "superseded", "abandoned"]);
@@ -28,6 +52,8 @@ const ALLOWED_STATUS_TRANSITIONS: Record<string, readonly string[]> = {
 
 export async function runIntent(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0] ?? "help";
+  const helpExit = maybeRunVerbHelp(args, INTENT_STUB_OPTS);
+  if (helpExit !== null) return helpExit;
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return help(args);
   if (verb === "create") return create(args);
   if (verb === "list") return list(args);
@@ -38,27 +64,7 @@ export async function runIntent(args: ParsedArgs): Promise<number> {
 }
 
 function help(args: ParsedArgs): number {
-  return runStubContract(args, {
-    noun: "intent",
-    status: "available",
-    docRef: "packages/contracts/events/intent.md",
-    commands: [
-      {
-        verb: "create",
-        flags: ["id", "title", "kind", "actor", "project", "space", "body", "body-file", "exit-condition", "json"],
-        required: ["id", "title", "kind", "actor"],
-        summary: "Create a canonical pipeline-floor intent.",
-      },
-      { verb: "list", flags: ["project", "space", "actor", "status", "kind", "json"], summary: "List canonical intents." },
-      { verb: "show", flags: ["json"], required: ["id"], summary: "Show one intent with events and linked proposals." },
-      {
-        verb: "update",
-        flags: ["title", "status", "body", "body-file", "exit-condition", "actor", "reason", "json"],
-        required: ["id", "actor", "reason", "at least one changed field"],
-        summary: "Update an intent and emit intent.updated.",
-      },
-    ],
-  });
+  return runStubContract(args, INTENT_STUB_OPTS);
 }
 
 async function create(args: ParsedArgs): Promise<number> {

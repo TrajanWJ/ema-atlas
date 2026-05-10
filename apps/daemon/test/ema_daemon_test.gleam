@@ -7,6 +7,7 @@ import ema_blueprint/planner_nodes
 import ema_collab/ema_collab
 import ema_daemon/bus
 import ema_daemon/event_envelope.{Envelope}
+import ema_daemon/supervisor
 import ema_identity/ema_device_keys
 import ema_identity/ema_identity
 import ema_identity/ema_pairing
@@ -15,10 +16,15 @@ import ema_orgs/ema_orgs
 import ema_replication/ema_collab_sync
 import ema_replication/ema_peers
 import ema_replication/ema_replication
+import ema_replication/inbound_router
+import ema_replication/sidecar
+import ema_replication/sidecar_protocol
 import ema_swarm_coordination/agent_workspace
 import ema_swarm_coordination/first_boot
 import ema_vcalendar/ema_vcalendar
+import gleam/bit_array
 import gleam/erlang/process
+import gleam/json
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/string
@@ -185,6 +191,117 @@ pub fn replication_collab_sync_decision_is_transport_free_test() {
     ema_replication.CollabPeerAhead(peer_revision: 4, local_revision: 3),
   )
   should.equal(ema_replication.replication_enabled(), False)
+  let assert Error(ema_replication.Deferred(_)) =
+    ema_replication.placement_allowed(ema_replication.Peer("device:test"))
+}
+
+pub fn supervisor_children_reports_sidecar_test() {
+  should.equal(list.contains(supervisor.children(), "sidecar"), True)
+}
+
+pub fn sidecar_protocol_round_trips_all_b1_message_kinds_test() {
+  let messages = [
+    sidecar_protocol.Message(1, "msg:ping", sidecar_protocol.HealthPing),
+    sidecar_protocol.Message(
+      1,
+      "msg:pong",
+      sidecar_protocol.HealthPong(
+        sidecar_version: "iroh-dev",
+        node_id: "node:a",
+      ),
+    ),
+    sidecar_protocol.Message(
+      1,
+      "msg:dial",
+      sidecar_protocol.PeerDial(
+        peer_node_id: "node:b",
+        stream_purpose: "collab_frames",
+      ),
+    ),
+    sidecar_protocol.Message(
+      1,
+      "msg:dialed",
+      sidecar_protocol.PeerDialed(stream_id: "stream:1", peer_node_id: "node:b"),
+    ),
+    sidecar_protocol.Message(
+      1,
+      "msg:close",
+      sidecar_protocol.PeerClose(peer_node_id: "node:b", stream_id: "stream:1"),
+    ),
+    sidecar_protocol.Message(
+      1,
+      "msg:disconnected",
+      sidecar_protocol.PeerDisconnected(
+        stream_id: "stream:1",
+        peer_node_id: "node:b",
+        reason: "test",
+      ),
+    ),
+    sidecar_protocol.Message(
+      1,
+      "msg:send",
+      sidecar_protocol.FrameSend(
+        peer_node_id: "node:b",
+        stream_id: "stream:1",
+        payload_b64: "eyJmcmFtZSI6MX0=",
+      ),
+    ),
+    sidecar_protocol.Message(
+      1,
+      "msg:received",
+      sidecar_protocol.FrameReceived(
+        peer_node_id: "node:a",
+        stream_id: "stream:1",
+        payload_b64: "eyJmcmFtZSI6Mn0=",
+      ),
+    ),
+    sidecar_protocol.Message(
+      1,
+      "msg:error",
+      sidecar_protocol.SidecarError(
+        correlate_id: "msg:send",
+        error_kind: "dial_failed",
+        message: "cannot reach peer",
+      ),
+    ),
+  ]
+
+  list.each(messages, fn(message) {
+    let assert Ok(parsed) =
+      sidecar_protocol.decode_message(sidecar_protocol.encode_message(message))
+    should.equal(parsed, message)
+  })
+}
+
+pub fn sidecar_protocol_stream_parser_buffers_partial_frames_test() {
+  let message =
+    sidecar_protocol.Message(
+      1,
+      "msg:received",
+      sidecar_protocol.FrameReceived(
+        peer_node_id: "node:a",
+        stream_id: "stream:1",
+        payload_b64: "eyJ0ZXh0IjoiSGVsbG8ifQ==",
+      ),
+    )
+  let frame = sidecar_protocol.encode_frame(message)
+  let assert Ok(first) = bit_array.slice(frame, at: 0, take: 5)
+  let assert Ok(second) =
+    bit_array.slice(frame, at: 5, take: bit_array.byte_size(frame) - 5)
+
+  let parser = sidecar_protocol.new_parser()
+  let assert Ok(sidecar_protocol.ParseResult(parser: parser, messages: [])) =
+    sidecar_protocol.push(parser, first)
+  let assert Ok(sidecar_protocol.ParseResult(messages: [parsed], ..)) =
+    sidecar_protocol.push(parser, second)
+
+  should.equal(parsed, message)
+}
+
+pub fn sidecar_protocol_rejects_malformed_json_frame_test() {
+  let malformed = <<0, 0, 0, 7, "notjson":utf8>>
+  let assert Error(sidecar_protocol.MalformedJson(_)) =
+    sidecar_protocol.push(sidecar_protocol.new_parser(), malformed)
 }
 
 pub fn org_create_appends_default_space_test() {
@@ -663,6 +780,200 @@ pub fn replication_collab_apply_requires_trusted_peer_test() {
     )
 
   should.equal(string.contains(snapshot.data_json, "Peer frame"), True)
+  should.equal(
+    string.contains(snapshot.data_json, "\"updated_by\":\"" <> peer_device),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn inbound_router_drops_untrusted_peer_frame_test() {
+  let path = tmp_path("ema-inbound-router-untrusted.db")
+  let _ = delete_file(path)
+
+  let assert Ok(bus_started) = bus.start(path)
+  let bus_subject = bus_started.data
+  let assert Ok(collab_started) = ema_collab.start(path)
+  let collab_subject = collab_started.data
+  let peer_device = "device:01TESTFRIENDMACBOOK000000001"
+
+  let result =
+    inbound_router.route_received_frame(
+      bus_subject,
+      collab_subject,
+      inbound_router.StreamContext(
+        org_id: "org:test",
+        peer_device: peer_device,
+        document_id: ema_collab.default_document_id,
+      ),
+      inbound_router_frame("collab_frame:router-untrusted", 1, "Blocked frame"),
+    )
+
+  should.equal(result, inbound_router.DroppedPeerNotTrusted)
+
+  let _ = delete_file(path)
+}
+
+pub fn inbound_router_drops_revision_gap_without_crashing_test() {
+  let path = tmp_path("ema-inbound-router-gap.db")
+  let _ = delete_file(path)
+
+  let assert Ok(bus_started) = bus.start(path)
+  let bus_subject = bus_started.data
+  let assert Ok(collab_started) = ema_collab.start(path)
+  let collab_subject = collab_started.data
+  let peer_device = "device:01TESTFRIENDMACBOOK000000001"
+  let assert Ok(_) = trust_test_peer(bus_subject, peer_device)
+
+  let result =
+    inbound_router.route_received_frame(
+      bus_subject,
+      collab_subject,
+      inbound_router.StreamContext(
+        org_id: "org:test",
+        peer_device: peer_device,
+        document_id: ema_collab.default_document_id,
+      ),
+      inbound_router_frame("collab_frame:router-gap", 3, "Gap frame"),
+    )
+
+  let assert inbound_router.DroppedRevisionGap(reason) = result
+  should.equal(string.contains(reason, "collab_revision_gap"), True)
+
+  let _ = delete_file(path)
+}
+
+pub fn inbound_router_applies_trusted_sequential_peer_frame_test() {
+  let path = tmp_path("ema-inbound-router-applies.db")
+  let _ = delete_file(path)
+
+  let assert Ok(bus_started) = bus.start(path)
+  let bus_subject = bus_started.data
+  let assert Ok(collab_started) = ema_collab.start(path)
+  let collab_subject = collab_started.data
+  let peer_device = "device:01TESTFRIENDMACBOOK000000001"
+  let assert Ok(_) = trust_test_peer(bus_subject, peer_device)
+
+  let result =
+    inbound_router.route_received_frame(
+      bus_subject,
+      collab_subject,
+      inbound_router.StreamContext(
+        org_id: "org:test",
+        peer_device: peer_device,
+        document_id: ema_collab.default_document_id,
+      ),
+      inbound_router_frame(
+        "collab_frame:router-apply",
+        1,
+        "Trusted router frame",
+      ),
+    )
+
+  let assert inbound_router.Applied(snapshot) = result
+  should.equal(
+    string.contains(snapshot.data_json, "Trusted router frame"),
+    True,
+  )
+  should.equal(
+    string.contains(snapshot.data_json, "\"updated_by\":\"" <> peer_device),
+    True,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn sidecar_dev_loopback_tracks_health_and_stream_lifecycle_test() {
+  let path = tmp_path("ema-sidecar-health.db")
+  let _ = delete_file(path)
+
+  let assert Ok(bus_started) = bus.start(path)
+  let bus_subject = bus_started.data
+  let assert Ok(collab_started) = ema_collab.start(path)
+  let collab_subject = collab_started.data
+
+  let assert Ok(started) =
+    sidecar.start_link(sidecar.Config(
+      daemon_id: "daemon:test-a",
+      runtime_dir: "/tmp",
+      mode: sidecar.DevLoopback(node_id: "iroh-node:a"),
+      bus_subject: bus_subject,
+      collab_subject: collab_subject,
+      heartbeat_interval_ms: 5000,
+    ))
+  let sidecar_subject = started.data
+
+  let assert Ok(health) = sidecar.health(sidecar_subject)
+  should.equal(health.status, sidecar.Reachable)
+  should.equal(health.node_id, "iroh-node:a")
+
+  let assert Ok(stream_id) =
+    sidecar.dial_peer(sidecar_subject, "iroh-node:b", "collab_frames")
+  should.equal(
+    sidecar.peer_health(sidecar_subject, "iroh-node:b"),
+    sidecar.Reachable,
+  )
+
+  let assert Ok(Nil) = sidecar.close_stream(sidecar_subject, stream_id)
+  should.equal(
+    sidecar.peer_health(sidecar_subject, "iroh-node:b"),
+    sidecar.Unreachable,
+  )
+
+  let _ = delete_file(path)
+}
+
+pub fn sidecar_received_frame_routes_through_trust_gate_test() {
+  let path = tmp_path("ema-sidecar-receive-routes.db")
+  let _ = delete_file(path)
+
+  let assert Ok(bus_started) = bus.start(path)
+  let bus_subject = bus_started.data
+  let assert Ok(collab_started) = ema_collab.start(path)
+  let collab_subject = collab_started.data
+  let peer_device = "device:01TESTFRIENDMACBOOK000000001"
+  let assert Ok(_) = trust_test_peer(bus_subject, peer_device)
+
+  let assert Ok(started) =
+    sidecar.start_link(sidecar.Config(
+      daemon_id: "daemon:test-a",
+      runtime_dir: "/tmp",
+      mode: sidecar.DevLoopback(node_id: "iroh-node:a"),
+      bus_subject: bus_subject,
+      collab_subject: collab_subject,
+      heartbeat_interval_ms: 5000,
+    ))
+  let sidecar_subject = started.data
+  let assert Ok(stream_id) =
+    sidecar.dial_peer(sidecar_subject, "iroh-node:b", "collab_frames")
+  let assert Ok(Nil) =
+    sidecar.register_stream_context(
+      sidecar_subject,
+      stream_id,
+      inbound_router.StreamContext(
+        org_id: "org:test",
+        peer_device: peer_device,
+        document_id: ema_collab.default_document_id,
+      ),
+    )
+
+  let result =
+    sidecar.receive_frame(
+      sidecar_subject,
+      inbound_router_frame_for_stream(
+        stream_id,
+        "collab_frame:sidecar-apply",
+        1,
+        "Sidecar routed frame",
+      ),
+    )
+
+  let assert inbound_router.Applied(snapshot) = result
+  should.equal(
+    string.contains(snapshot.data_json, "Sidecar routed frame"),
+    True,
+  )
   should.equal(
     string.contains(snapshot.data_json, "\"updated_by\":\"" <> peer_device),
     True,
@@ -1682,6 +1993,56 @@ pub fn tick_auto_checkups_uses_per_lane_org_test() {
 /// an envelope. The richer silent-zero diagnostic ("no_due_lanes" vs
 /// "already_within_window") tracked in
 /// queue_item:01KQE5P02F015GF0KXM6KHZWWR will layer on top of this.
+fn inbound_router_frame(
+  frame_id: String,
+  revision: Int,
+  body: String,
+) -> sidecar_protocol.Message {
+  inbound_router_frame_for_stream("stream:test", frame_id, revision, body)
+}
+
+fn inbound_router_frame_for_stream(
+  stream_id: String,
+  frame_id: String,
+  revision: Int,
+  body: String,
+) -> sidecar_protocol.Message {
+  let payload =
+    json.to_string(
+      json.object([
+        #("frame_id", json.string(frame_id)),
+        #("revision", json.int(revision)),
+        #("body", json.string(body)),
+        #("created_at", json.string("2026-05-10T12:00:00Z")),
+      ]),
+    )
+
+  sidecar_protocol.Message(
+    1,
+    "msg:inbound-router-test",
+    sidecar_protocol.FrameReceived(
+      peer_node_id: "iroh-node:test-peer",
+      stream_id: stream_id,
+      payload_b64: sidecar_protocol.payload_to_b64(bit_array.from_string(
+        payload,
+      )),
+    ),
+  )
+}
+
+fn trust_test_peer(bus_subject: process.Subject(bus.Msg), peer_device: String) {
+  ema_peers.establish_trust(
+    bus_subject,
+    "org:test",
+    peer_device,
+    "ed25519:peer-public-key",
+    "ed25519:local-public-key",
+    "qr_ble_hybrid",
+    "ceremony:test-pairing-001",
+    "proof:test-lineage-signature",
+  )
+}
+
 @external(erlang, "ema_test_helpers", "tmp_path")
 fn tmp_path(suffix: String) -> String
 

@@ -7990,6 +7990,16 @@ function inferSurfaces(scope) {
       path: join8(ACTIVE_BUILDS_ROOT, "proslync-presentation-assets-final/docs/plans/proslync-role-happiness-master-plan-2026-05-09/README.md"),
       local_url: null,
       status: "live"
+    },
+    {
+      id: "hero-website",
+      label: "Hero website",
+      role: "Remote narrative surface for AD wedge, demo proof, and launch story.",
+      owner: "Proslync website",
+      build_id: "proslync-website",
+      path: "https://github.com/TrajanWJ/proslync-website",
+      local_url: "https://proslync-hero.vercel.app",
+      status: "queued"
     }
   ];
 }

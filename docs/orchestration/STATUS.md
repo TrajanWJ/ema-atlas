@@ -1408,3 +1408,32 @@ Parent orchestration report: `agent_report:01KR8NKMX50156DJ4T8AD30BV7`.
 
 - `cd apps/daemon && gleam test` still has one pre-existing slug-label assertion failure (`ema_daemon_test.git_ema_slug_projects_active_builds_label_test`); `gleam check` is clean.
 - The roadmap rows T1.2/T2.2/T2.3/T3.1/T3.2/skills-wiki-runtime/replication-writers/incidents-projection are not implemented in this session; doctor strict treats them as informational while health/readiness are green.
+
+## Session update 2026-05-10 - Source-intake campaign revision
+
+This session revised the next architecture campaign prompt after the user
+explicitly asked for more cross-pollination and open-source sourcing to be part
+of the process, not a side research activity.
+
+### Changed
+
+- Added `docs/orchestration/next-campaign-cross-pollination-source-intake-2026-05-10.md`.
+- Updated `/Users/trajanm4air/.claude/plans/your-missing-many-pieces-dazzling-tulip.md` with a required source-intake loop and Track 0.
+- Registered the new campaign prompt as `ema:next-campaign-cross-pollination-source-intake` in `Projects/EMA/atlas/knowledge/doc-registry.json`.
+
+### Important corrections to the pasted campaign prompt
+
+- The first Proslync Sprint 2 swarm is no longer future work; STATUS already
+  records it as completed with backend, app, and presentation queue items closed.
+- `bootstrap/m2-m3-shell-port` is no longer 42+ commits ahead in the verified
+  local state for this revision; it is one commit ahead of
+  `origin/bootstrap/m2-m3-shell-port`.
+- The revised campaign now starts with source discovery, source posture,
+  license/use classification, pattern extraction, and product/entity routing.
+
+### New process invariant
+
+Every architecture or client-work swarm must produce or update source posture
+unless the work is internal-only. The required spine is:
+
+`SourceQuery -> SourceRecord -> DonorArtifact -> PatternExtraction -> EntityClass/ProductObjectDelta -> QueueItem -> ImplementationArtifact -> VerificationEvidence -> SourceRegistryUpdate`.

@@ -429,7 +429,15 @@ function IntentionsPanel({
 
 	const { stats } = intentions;
 	return (
-		<div className="cockpit-stack">
+		<div className="cockpit-stack" data-intention-review-source="hybrid">
+			<p className="cockpit-row__meta" data-intention-review-state="banner">
+				<span className="cockpit-pill cockpit-pill--neutral">
+					review state: file fallback (daemon handler pending)
+				</span>
+				<span className="cockpit-mono">
+					events: intention.reviewed, intention.backfeed.{`{requested,completed,failed}`}
+				</span>
+			</p>
 			<div className="cockpit-stat-grid">
 				<IntentionStat label="sources" value={stats.sources_seen} />
 				<IntentionStat label="candidates" value={stats.candidate_intents} />

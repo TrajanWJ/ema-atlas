@@ -6,8 +6,12 @@ import { flagBool, flagString } from "../args.js";
 import { emitError, emitJson, emitPretty } from "../output.js";
 import { DESKTOP_ROOT } from "../workspace-state.js";
 import { resolveWorkspaceScope } from "../workspace-scope.js";
+import { connect, type ProjectionEnvelope } from "../ws-client.js";
 import { runQueue } from "./queue.js";
 import { runWorkspace } from "./workspace.js";
+
+const DEFAULT_ORG = "org:01J00000000000000000000001";
+const DEFAULT_ACTOR = "actor:dev-console";
 
 type SourceType =
   | "codex_session"
@@ -89,6 +93,7 @@ export async function runIntention(args: ParsedArgs): Promise<number> {
   if (verb === "harvest") return harvest(args);
   if (verb === "projection") return projection(args);
   if (verb === "list") return list(args);
+  if (verb === "list-reviewed") return listReviewed(args);
   if (verb === "show") return show(args);
   if (verb === "backfeed") return backfeed(args);
   if (verb === "review") return reviewFromVerb(args);
@@ -97,7 +102,7 @@ export async function runIntention(args: ParsedArgs): Promise<number> {
   if (verb === "defer") return reviewIntent(args, "deferred");
 
   emitError(`ema intention: unknown subcommand "${verb}"`);
-  emitError("Usage: ema intention [harvest|projection|list|show|review|accept|reject|defer|backfeed] [--project <name>] [--json]");
+  emitError("Usage: ema intention [harvest|projection|list|list-reviewed|show|review|accept|reject|defer|backfeed] [--project <name>] [--json]");
   return 64;
 }
 
@@ -219,9 +224,21 @@ async function backfeed(args: ParsedArgs): Promise<number> {
     return 64;
   }
 
+  // Best-effort daemon-canonical emit: intention.backfeed.requested.
+  // Falls back silently when the daemon has no IPC handler for the command.
+  const requesterActor = flagString(args, "reviewer") ?? DEFAULT_ACTOR;
+  const beforeOutcome = await tryEmitBackfeedRequested({
+    intent_id: intent.id,
+    destination,
+    target_project: targetProject,
+    approve_token: "reviewed",
+    requester_actor_id: requesterActor,
+  });
+
+  let exitCode: number;
   if (destination === "artifact") {
     const bodyPath = writeBackfeedBody(intent);
-    return runWorkspace({
+    exitCode = await runWorkspace({
       positional: ["artifact", "add"],
       flags: {
         ...args.flags,
@@ -231,19 +248,50 @@ async function backfeed(args: ParsedArgs): Promise<number> {
         "body-file": bodyPath,
       },
     });
+  } else {
+    exitCode = await runQueue({
+      positional: ["add"],
+      flags: {
+        ...args.flags,
+        project: targetProject,
+        title: intent.title,
+        why: `${intent.raw_text.slice(0, 400)} Evidence: ${intent.evidence_ref}`,
+        "done-when": `Reviewed intention is either shipped, rejected, or merged into the current project plan. Source: ${intent.id}`,
+        source: intent.evidence_ref,
+      },
+    });
   }
 
-  return runQueue({
-    positional: ["add"],
-    flags: {
-      ...args.flags,
-      project: targetProject,
-      title: intent.title,
-      why: `${intent.raw_text.slice(0, 400)} Evidence: ${intent.evidence_ref}`,
-      "done-when": `Reviewed intention is either shipped, rejected, or merged into the current project plan. Source: ${intent.id}`,
-      source: intent.evidence_ref,
-    },
-  });
+  if (exitCode === 0) {
+    await tryEmitBackfeedCompleted({
+      intent_id: intent.id,
+      destination,
+      target_project: targetProject,
+    });
+  } else {
+    await tryEmitBackfeedFailed({
+      intent_id: intent.id,
+      destination,
+      target_project: targetProject,
+      error_class: "backfeed_writer_error",
+      message: `${destination} writer exited with code ${exitCode}`,
+    });
+  }
+
+  if (flagBool(args, "json")) {
+    // Emit a small daemon-canonical envelope after the writer's own JSON.
+    emitJson({
+      ok: exitCode === 0,
+      command: "intention.backfeed",
+      mode: "live",
+      destination,
+      target_project: targetProject,
+      intent_id: intent.id,
+      daemon_canonical: beforeOutcome.daemon_canonical,
+      daemon_status: beforeOutcome.status,
+    });
+  }
+  return exitCode;
 }
 
 async function reviewFromVerb(args: ParsedArgs): Promise<number> {
@@ -277,12 +325,72 @@ async function reviewIntent(args: ParsedArgs, state: Exclude<ReviewState, "new">
     reason,
     reviewed_at: new Date().toISOString(),
   };
+
+  // Best-effort daemon-canonical emit. Always also write the JSON file as
+  // migration/import evidence and as the read fallback while the daemon
+  // command handler is not yet wired.
+  const daemon = await tryEmitIntentionReviewed({
+    intent_id: id,
+    state,
+    reviewer_actor_id: reviewer,
+    reason,
+    evidence_ref: found.intent.evidence_ref,
+    reviewed_at: review.reviewed_at,
+  });
+
   const reviews = readReviews().filter((item) => item.intent_id !== id);
   writeReviews([...reviews, review]);
   const reviewedProjection = applyReviews(found.projection);
   const reviewedIntent = findIntent(reviewedProjection, id)?.intent ?? { ...found.intent, review_state: state };
-  emit(args, { ok: true, command: `intention.${state}`, review, intent: reviewedIntent }, () => {
-    emitPretty(`${id} -> ${state}`);
+  emit(args, {
+    ok: true,
+    command: `intention.${state}`,
+    review,
+    intent: reviewedIntent,
+    daemon_canonical: daemon.daemon_canonical,
+    daemon_status: daemon.status,
+  }, () => {
+    emitPretty(`${id} -> ${state}${daemon.daemon_canonical ? " (daemon)" : " (file fallback)"}`);
+  });
+  return 0;
+}
+
+async function listReviewed(args: ParsedArgs): Promise<number> {
+  // Returns the daemon-canonical intention.review projection if available,
+  // falling back to the file-backed reviews.json when the daemon has no
+  // record yet. The file format is the migration/import evidence path.
+  const daemonReviews = await tryReadReviewProjection();
+  const fileReviews = readReviews();
+  const merged = new Map<string, IntentionReview & { source: "daemon" | "file" }>();
+  for (const r of fileReviews) {
+    merged.set(r.intent_id, { ...r, source: "file" });
+  }
+  for (const r of daemonReviews) {
+    merged.set(r.intent_id, {
+      intent_id: r.intent_id,
+      state: r.state,
+      reviewer: r.reviewer_actor_id,
+      reason: r.reason,
+      reviewed_at: r.reviewed_at,
+      source: "daemon",
+    });
+  }
+  const items = Array.from(merged.values()).sort((a, b) =>
+    (b.reviewed_at ?? "").localeCompare(a.reviewed_at ?? ""),
+  );
+  emit(args, {
+    ok: true,
+    command: "intention.list-reviewed",
+    daemon_canonical: daemonReviews.length > 0,
+    reviews: items,
+  }, () => {
+    if (items.length === 0) {
+      emitPretty("No reviewed intentions yet.");
+      return;
+    }
+    for (const r of items) {
+      emitPretty(`${r.intent_id} [${r.state}] (${r.source}) ${r.reviewed_at}`);
+    }
   });
   return 0;
 }
@@ -301,6 +409,7 @@ function printHelp(): void {
   emitPretty("  ema intention projection --project proslync-app-ios-final [--json]");
   emitPretty("  ema intention list --project proslync-app-ios-final [--tag lost_followup] [--json]");
   emitPretty("  ema intention list --project proslync-app-ios-final --state accepted [--json]");
+  emitPretty("  ema intention list-reviewed [--json]");
   emitPretty("  ema intention show --intent <id> [--json]");
   emitPretty("  ema intention accept --intent <id> --reason <text> --reviewer actor:trajan [--json]");
   emitPretty("  ema intention reject --intent <id> --reason <text> --reviewer actor:trajan [--json]");
@@ -308,6 +417,16 @@ function printHelp(): void {
   emitPretty("  ema intention review --intent <id> --state accepted|rejected|deferred --reason <text> [--json]");
   emitPretty("  ema intention backfeed --intent <id> --destination queue --dry-run [--json]");
   emitPretty("  ema intention backfeed --intent <id> --destination queue|artifact --approve reviewed [--json]");
+  emitPretty("");
+  emitPretty("Daemon-canonical state:");
+  emitPretty("  Sprint 5 emits intention.reviewed and intention.backfeed.{requested,completed,failed}");
+  emitPretty("  events. The daemon IPC handlers are not yet wired; the CLI falls back to");
+  emitPretty("  .ema-dev/intention-backfeed/reviews.json (migration evidence path) and prints");
+  emitPretty("  daemon_canonical=false on JSON output until the handlers ship.");
+  emitPretty("  See packages/contracts/events/intention.md.");
+  emitPretty("");
+  emitPretty("Guarded backfeed:");
+  emitPretty("  Non-dry-run requires --approve reviewed AND review_state=accepted. No auto-promotion.");
 }
 
 function printProjection(value: IntentionProjection): void {
@@ -833,4 +952,181 @@ function parsePositiveInt(value: string | undefined, fallback: number): number {
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 5: best-effort daemon-canonical emission for intention.* events.
+// The Gleam daemon does not yet expose handlers for these commands. The CLI
+// attempts the command and returns a result indicating whether the daemon
+// accepted it. When unsupported, the caller still proceeds with file-backed
+// review state (the migration evidence path).
+// ---------------------------------------------------------------------------
+
+type DaemonEmitOutcome = {
+  daemon_canonical: boolean;
+  status: "emitted" | "blocked_missing_ipc_handler" | "transport_unavailable" | "rejected";
+};
+
+type DaemonReview = {
+  intent_id: string;
+  state: ReviewState;
+  reviewer_actor_id: string;
+  reason: string;
+  reviewed_at: string;
+  backfeed_state: string;
+  backfeed_destination: string;
+  backfeed_target_project: string;
+  backfeed_resource_id: string;
+  backfeed_error_class: string;
+  backfeed_message: string;
+  updated_at: string;
+};
+
+async function tryEmitIntentionReviewed(payload: {
+  intent_id: string;
+  state: ReviewState;
+  reviewer_actor_id: string;
+  reason: string;
+  evidence_ref: string;
+  reviewed_at: string;
+}): Promise<DaemonEmitOutcome> {
+  return tryEmitDaemonCommand("intention.review.upsert", {
+    org_id: DEFAULT_ORG,
+    actor_id: payload.reviewer_actor_id,
+    intent_id: payload.intent_id,
+    state: payload.state,
+    reviewer_actor_id: payload.reviewer_actor_id,
+    reason: payload.reason,
+    evidence_ref: payload.evidence_ref,
+    reviewed_at: payload.reviewed_at,
+  });
+}
+
+async function tryEmitBackfeedRequested(payload: {
+  intent_id: string;
+  destination: string;
+  target_project: string;
+  approve_token: "reviewed";
+  requester_actor_id: string;
+}): Promise<DaemonEmitOutcome> {
+  return tryEmitDaemonCommand("intention.backfeed.start", {
+    org_id: DEFAULT_ORG,
+    actor_id: payload.requester_actor_id,
+    intent_id: payload.intent_id,
+    destination: payload.destination,
+    target_project: payload.target_project,
+    approve_token: payload.approve_token,
+    requester_actor_id: payload.requester_actor_id,
+    requested_at: new Date().toISOString(),
+  });
+}
+
+async function tryEmitBackfeedCompleted(payload: {
+  intent_id: string;
+  destination: string;
+  target_project: string;
+  resource_id?: string;
+}): Promise<DaemonEmitOutcome> {
+  return tryEmitDaemonCommand("intention.backfeed.finish", {
+    org_id: DEFAULT_ORG,
+    actor_id: DEFAULT_ACTOR,
+    intent_id: payload.intent_id,
+    destination: payload.destination,
+    target_project: payload.target_project,
+    outcome: "completed",
+    resource_id: payload.resource_id ?? "",
+    completed_at: new Date().toISOString(),
+  });
+}
+
+async function tryEmitBackfeedFailed(payload: {
+  intent_id: string;
+  destination: string;
+  target_project: string;
+  error_class: string;
+  message: string;
+}): Promise<DaemonEmitOutcome> {
+  return tryEmitDaemonCommand("intention.backfeed.finish", {
+    org_id: DEFAULT_ORG,
+    actor_id: DEFAULT_ACTOR,
+    intent_id: payload.intent_id,
+    destination: payload.destination,
+    target_project: payload.target_project,
+    outcome: "failed",
+    error_class: payload.error_class,
+    message: payload.message,
+    failed_at: new Date().toISOString(),
+  });
+}
+
+async function tryEmitDaemonCommand(
+  op: string,
+  argsObj: Record<string, unknown>,
+): Promise<DaemonEmitOutcome> {
+  try {
+    const c = await connect({ surface: "desktop" });
+    try {
+      const result = await c.command(op, argsObj);
+      if (result.ok === true) {
+        return { daemon_canonical: true, status: "emitted" };
+      }
+      const message = (result.error?.message ?? "").toLowerCase();
+      const isMissingHandler =
+        result.error?.class === "unknown_command" ||
+        message.includes("unknown command") ||
+        message.includes("no handler");
+      if (isMissingHandler) {
+        return { daemon_canonical: false, status: "blocked_missing_ipc_handler" };
+      }
+      return { daemon_canonical: false, status: "rejected" };
+    } finally {
+      c.close();
+    }
+  } catch {
+    return { daemon_canonical: false, status: "transport_unavailable" };
+  }
+}
+
+async function tryReadReviewProjection(): Promise<DaemonReview[]> {
+  try {
+    const c = await connect({ surface: "desktop" });
+    try {
+      const data = await readProjectionShape(c, "intention.review");
+      if (!data) return [];
+      const reviews = (data as { reviews?: unknown }).reviews;
+      if (!Array.isArray(reviews)) return [];
+      return reviews.filter(isDaemonReview);
+    } finally {
+      c.close();
+    }
+  } catch {
+    return [];
+  }
+}
+
+function readProjectionShape(
+  c: { onMessage: (fn: (msg: unknown) => void) => void; subscribe: (channel: string) => void },
+  channel: string,
+): Promise<Record<string, unknown> | null> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), 1500);
+    c.onMessage((msg) => {
+      const env = msg as ProjectionEnvelope;
+      if (env.type === "projection" && env.name === channel) {
+        clearTimeout(timer);
+        resolve(env.data);
+      }
+    });
+    c.subscribe(channel);
+  });
+}
+
+function isDaemonReview(value: unknown): value is DaemonReview {
+  if (!value || typeof value !== "object") return false;
+  const r = value as Record<string, unknown>;
+  return (
+    typeof r.intent_id === "string" &&
+    typeof r.state === "string" &&
+    (r.state === "accepted" || r.state === "rejected" || r.state === "deferred" || r.state === "new")
+  );
 }

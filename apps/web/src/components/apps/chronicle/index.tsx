@@ -59,6 +59,7 @@ export function ChronicleApp() {
 	return (
 		<section
 			data-app="chronicle"
+			data-vapp-ready="1"
 			className="grid h-full min-h-0 grid-cols-[220px_minmax(0,1fr)_300px] overflow-hidden"
 			style={{ color: "var(--place-text-primary)" }}
 		>
@@ -164,7 +165,11 @@ function EventList({
 	return (
 		<ol className="flex flex-col gap-1">
 			{events.map((event) => (
-				<li key={event.id}>
+				<li
+					key={event.id}
+					data-evidence-source={event.source}
+					data-evidence-kind={event.kind}
+				>
 					<button
 						type="button"
 						onClick={() => onSelect(event.session_id)}
@@ -252,10 +257,16 @@ function SessionPanel({
 			</header>
 			<ol className="min-h-0 flex-1 overflow-auto px-3 py-3">
 				{events.map((event) => (
-					<li key={event.id} className="border-l border-white/10 pb-3 pl-3 text-xs">
+					<li
+						key={event.id}
+						className="border-l border-white/10 pb-3 pl-3 text-xs"
+						data-evidence-source={event.source}
+						data-evidence-kind={event.kind}
+					>
 						<p className="font-mono text-white/35">{formatTime(event.ts)}</p>
 						<p className="mt-1 text-white/75">{event.label || event.kind}</p>
 						<p className="mt-1 font-mono text-[10px] text-white/35">{event.kind}</p>
+						<EvidenceLinkRow event={event} />
 					</li>
 				))}
 			</ol>
@@ -317,4 +328,125 @@ function formatTime(value: string): string {
 		minute: "2-digit",
 		second: "2-digit",
 	}).format(date);
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 5: evidence-link wiring.
+//
+// Each chronicle event's (source, kind) is mapped to an evidence target that
+// the operator can pivot to. Real payload-keyed evidence (queue_item_id,
+// dispatch_id, execution_id, blueprint_node_id) is not yet surfaced through
+// `chronicle.activity` — this maps the visible source dimension to the most
+// likely target vApp scope. Each link carries a `data-evidence-target`
+// attribute for E2E tests; a click navigates to the target vApp scope where
+// possible. Until cross-vApp routing fully resolves payload ids, the link is
+// scoped to the destination vApp's index view.
+// ---------------------------------------------------------------------------
+
+type EvidenceLink = {
+	kind: string;             // queue_item, lane, dispatch, execution, blueprint_node, source_file
+	target_vapp: string;      // cockpit | blueprint | hq | duct-tape | finder
+	href: string;             // ?vapp=...&...
+	label: string;
+};
+
+function evidenceLinksForEvent(event: ChronicleEvent): EvidenceLink[] {
+	const links: EvidenceLink[] = [];
+	const source = event.source;
+	const kind = event.kind;
+
+	if (source === "queue_item") {
+		links.push({
+			kind: "queue_item",
+			target_vapp: "cockpit",
+			href: `?vapp=cockpit&intent=${encodeURIComponent(event.session_id)}`,
+			label: "open in cockpit",
+		});
+	}
+	if (source === "lane") {
+		links.push({
+			kind: "lane",
+			target_vapp: "cockpit",
+			href: `?vapp=cockpit&lane=${encodeURIComponent(event.session_id)}`,
+			label: "open lane",
+		});
+	}
+	if (source === "dispatch" || kind.startsWith("dispatch.")) {
+		links.push({
+			kind: "dispatch",
+			target_vapp: "duct-tape",
+			href: `?vapp=duct-tape&dispatch=${encodeURIComponent(event.session_id)}`,
+			label: "view dispatch",
+		});
+	}
+	if (source === "execution" || kind.startsWith("execution.")) {
+		links.push({
+			kind: "execution",
+			target_vapp: "duct-tape",
+			href: `?vapp=duct-tape&execution=${encodeURIComponent(event.session_id)}`,
+			label: "view execution",
+		});
+	}
+	if (source === "blueprint" || kind.startsWith("blueprint.")) {
+		links.push({
+			kind: "blueprint_node",
+			target_vapp: "blueprint",
+			href: `?vapp=blueprint&node=${encodeURIComponent(event.session_id)}`,
+			label: "open in blueprint",
+		});
+	}
+	if (event.project_id) {
+		links.push({
+			kind: "source_file",
+			target_vapp: "finder",
+			href: `?vapp=finder&project=${encodeURIComponent(event.project_id)}`,
+			label: `project ${shortId(event.project_id)}`,
+		});
+	}
+	return links;
+}
+
+function EvidenceLinkRow({ event }: { event: ChronicleEvent }) {
+	const links = evidenceLinksForEvent(event);
+	if (links.length === 0) {
+		return (
+			<p
+				className="mt-1 text-[10px] text-white/30"
+				data-evidence-target="none"
+			>
+				No linked evidence on this event.
+			</p>
+		);
+	}
+	return (
+		<ul
+			className="mt-1 flex flex-wrap gap-1.5"
+			data-evidence-target-count={links.length}
+		>
+			{links.map((link) => (
+				<li key={`${link.kind}:${link.href}`}>
+					<a
+						href={link.href}
+						data-evidence-target={link.kind}
+						data-evidence-target-vapp={link.target_vapp}
+						className="inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-white/65"
+						style={{
+							background: "rgba(255,255,255,0.04)",
+							borderColor: "rgba(255,255,255,0.10)",
+						}}
+					>
+						<span
+							className="h-1.5 w-1.5 rounded-full"
+							style={{ background: sourceColor(link.kind) }}
+						/>
+						<span>{link.kind}</span>
+						<span className="text-white/40">·</span>
+						<span className="normal-case tracking-normal text-white/55">
+							{link.label}
+						</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	);
 }

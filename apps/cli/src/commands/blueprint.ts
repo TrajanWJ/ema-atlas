@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { ParsedArgs } from "../args.js";
 import { flagBool, flagString } from "../args.js";
 import { connect, type ProjectionEnvelope } from "../ws-client.js";
@@ -101,18 +103,23 @@ const COMMANDS: BlueprintCommand[] = [
     summary: "Lock or list Blueprint canon-facing decisions.",
     status: "available",
   },
+  {
+    verb: "mine",
+    flags: ["transcript", "dry-run", "json"],
+    required: ["transcript"],
+    summary: "Mine a markdown transcript into Blueprint section/decision/aspiration/GAC nodes.",
+    status: "available",
+  },
 ];
 
 export async function runBlueprint(args: ParsedArgs): Promise<number> {
   const verb = args.positional[0];
   const subverb = args.positional[1];
-  const help =
-    flagBool(args, "help") ||
-    args.flags.h === true ||
-    verb === undefined ||
-    verb === "help";
+  const helpFlag = flagBool(args, "help") || args.flags.h === true;
+  const help = helpFlag || verb === undefined || verb === "help";
 
-  if (help) return runHelp(args);
+  // Per-subcommand --help is handled by the subcommand itself (e.g. `mine`).
+  if (help && verb !== "mine") return runHelp(args);
   if (verb === "status") return runStatus(args);
   if (verb === "list" || verb === "documents" || verb === "sections")
     return runList(args);
@@ -187,8 +194,10 @@ export async function runBlueprint(args: ParsedArgs): Promise<number> {
     return 64;
   }
 
+  if (verb === "mine") return runMine(args);
+
   emitError(
-    `ema blueprint: unknown subcommand "${verb}" (expected: help | status | list | document | section | gac | blocker | aspiration | decision | graph)`,
+    `ema blueprint: unknown subcommand "${verb}" (expected: help | status | list | document | section | gac | blocker | aspiration | decision | graph | mine)`,
   );
   emitError(`See ${DOC_REF} for the structural event contract.`);
   return 64;
@@ -234,6 +243,11 @@ function runHelp(args: ParsedArgs): number {
   emitPretty("  ema blueprint blocker open --title \"...\" --description \"...\"");
   emitPretty("  ema blueprint aspiration capture --title \"...\" --body \"...\"");
   emitPretty("  ema blueprint decision lock --title \"...\" --body \"...\"");
+  emitPretty("");
+  emitPretty("Mining (Sprint 5):");
+  emitPretty("  ema blueprint mine --transcript <path> --dry-run [--json]");
+  emitPretty("  ema blueprint mine --transcript <path> [--json]");
+  emitPretty("  See `ema blueprint mine --help` for the heuristic.");
   return 0;
 }
 
@@ -962,4 +976,254 @@ function readArray(data: Record<string, unknown> | null, key: string): unknown[]
   if (!data) return [];
   const value = data[key];
   return Array.isArray(value) ? value : [];
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 5: blueprint mine.
+//
+// `ema blueprint mine --transcript <path> [--dry-run] [--json]`
+//
+// Heuristic (until the mining writer at apps/daemon/src/ema_blueprint/mine.gleam
+// lands):
+//
+//   * Top-level `## ` headings become Blueprint sections (target_kind=section).
+//   * Subsequent paragraphs until the next heading become the section body.
+//   * Lines beginning with `Decision:` extract as target_kind=decision.
+//   * Lines beginning with `GAC:` (or matching the spec's `## Lost threads
+//     catalogued` table rows) extract as target_kind=gac.
+//   * Lines beginning with `Aspiration:` extract as target_kind=aspiration.
+//   * `### ` and deeper headings stay as nested target_kind=note records.
+//
+// `--dry-run` returns the parsed structure without writing.
+// Without `--dry-run`, the CLI attempts the daemon command
+// `blueprint.mine.requested`; until the handler ships, that returns
+// `blocked_missing_ipc_handler` and the CLI surfaces the dry-run output as
+// the artifact.
+//
+// Spec: Projects/EMA/atlas/incubating/blueprint-v0-mining-spec.md
+// Events: packages/contracts/events/blueprint.md (Mining events section).
+// ---------------------------------------------------------------------------
+
+type MinedSection = {
+  title: string;
+  level: number;
+  body: string;
+  line_range: { start: number; end: number };
+  target_kind: "section" | "decision" | "aspiration" | "gac" | "note";
+  source_path: string;
+};
+
+async function runMine(args: ParsedArgs): Promise<number> {
+  const json = flagBool(args, "json");
+  const transcript = flagString(args, "transcript");
+  const dryRun = flagBool(args, "dry-run");
+
+  if (flagBool(args, "help") || args.flags.h === true) {
+    return runMineHelp(json);
+  }
+
+  if (!transcript) {
+    emitError("ema blueprint mine: --transcript <path> is required");
+    return 64;
+  }
+  const path = resolve(transcript);
+  if (!existsSync(path)) {
+    emitError(`ema blueprint mine: transcript not found: ${path}`);
+    return 1;
+  }
+
+  let body: string;
+  try {
+    body = readFileSync(path, "utf8");
+  } catch (err) {
+    emitError(`ema blueprint mine: cannot read transcript: ${(err as Error).message}`);
+    return 1;
+  }
+
+  const sections = mineTranscript(body, path);
+
+  if (dryRun) {
+    const payload = {
+      ok: true,
+      command: "blueprint mine",
+      mode: "dry_run",
+      transcript_path: path,
+      transcript_node_id: stableHash(path),
+      section_count: sections.length,
+      sections,
+      doc: DOC_REF,
+    };
+    if (json) emitJson(payload);
+    else {
+      emitPretty(`# blueprint mine (dry-run)`);
+      emitPretty(`transcript: ${path}`);
+      emitPretty(`sections: ${sections.length}`);
+      for (const s of sections) {
+        emitPretty(
+          `  [${s.target_kind.padEnd(10)}] L${s.level} (${s.line_range.start}-${s.line_range.end}) ${s.title}`,
+        );
+      }
+    }
+    return 0;
+  }
+
+  // Non-dry-run: attempt daemon command. Until the handler ships this returns
+  // blocked_missing_ipc_handler — surface the dry-run mining as the artifact.
+  return send(
+    "blueprint.mine.requested",
+    optionalArgs({
+      org_id: flagString(args, "org") ?? DEFAULT_ORG,
+      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR,
+      transcript_path: path,
+      transcript_node_id: stableHash(path),
+      section_count: sections.length,
+    }),
+    {
+      json,
+      human: `submitted ${sections.length} mined section(s) from ${path}`,
+      resourceLabel: "transcript",
+    },
+  );
+}
+
+function runMineHelp(json: boolean): number {
+  const help = {
+    ok: true,
+    command: "blueprint mine help",
+    usage: [
+      "ema blueprint mine --transcript <path> --dry-run [--json]",
+      "ema blueprint mine --transcript <path> [--json]",
+    ],
+    flags: {
+      "--transcript": "absolute or relative path to a markdown transcript",
+      "--dry-run": "parse only; emit the structured preview without writing events",
+      "--json": "emit structured JSON output",
+    },
+    heuristic: [
+      "## headings become sections (target_kind=section)",
+      "### and deeper become target_kind=note nested under the parent section",
+      "Lines starting with 'Decision:' become target_kind=decision",
+      "Lines starting with 'GAC:' become target_kind=gac",
+      "Lines starting with 'Aspiration:' become target_kind=aspiration",
+      "Each mined record carries source_path + line_range for traceability",
+    ],
+    spec: "Projects/EMA/atlas/incubating/blueprint-v0-mining-spec.md",
+    events: "packages/contracts/events/blueprint.md (Mining events section)",
+    daemon_handler_status:
+      "blueprint.mine.requested handler not yet wired; dry-run is the supported mode until the writer lands",
+  };
+  if (json) emitJson(help);
+  else {
+    emitPretty("# ema blueprint mine — help");
+    emitPretty("");
+    emitPretty("Usage:");
+    for (const u of help.usage) emitPretty(`  ${u}`);
+    emitPretty("");
+    emitPretty("Flags:");
+    for (const [flag, desc] of Object.entries(help.flags)) {
+      emitPretty(`  ${flag.padEnd(14)} ${desc}`);
+    }
+    emitPretty("");
+    emitPretty("## Heuristic");
+    for (const h of help.heuristic) emitPretty(`  - ${h}`);
+    emitPretty("");
+    emitPretty(`spec:  ${help.spec}`);
+    emitPretty(`events: ${help.events}`);
+    emitPretty(`status: ${help.daemon_handler_status}`);
+  }
+  return 0;
+}
+
+export function mineTranscript(body: string, sourcePath: string): MinedSection[] {
+  const lines = body.split(/\r?\n/);
+  const sections: MinedSection[] = [];
+
+  let current: MinedSection | null = null;
+  let bodyLines: string[] = [];
+
+  const closeCurrent = (endLine: number) => {
+    if (!current) return;
+    current.body = bodyLines.join("\n").trim();
+    current.line_range.end = endLine;
+    sections.push(current);
+    current = null;
+    bodyLines = [];
+  };
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i] ?? "";
+    const lineNumber = i + 1;
+    const headingMatch = line.match(/^(#{2,6})\s+(.+?)\s*$/);
+    if (headingMatch) {
+      closeCurrent(lineNumber - 1);
+      const level = (headingMatch[1] ?? "").length;
+      const title = headingMatch[2] ?? "";
+      const target_kind: MinedSection["target_kind"] = level === 2 ? "section" : "note";
+      current = {
+        title,
+        level,
+        body: "",
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind,
+        source_path: sourcePath,
+      };
+      continue;
+    }
+    if (current) bodyLines.push(line);
+
+    // Inline typed-record extraction: emits a flat record alongside the
+    // current section. These point back to the section by line_range.
+    const decisionMatch = line.match(/^\s*Decision:\s*(.+?)\s*$/i);
+    if (decisionMatch) {
+      sections.push({
+        title: decisionMatch[1] ?? "",
+        level: (current?.level ?? 2) + 1,
+        body: line.trim(),
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind: "decision",
+        source_path: sourcePath,
+      });
+      continue;
+    }
+    const gacMatch = line.match(/^\s*GAC:\s*(.+?)\s*$/i);
+    if (gacMatch) {
+      sections.push({
+        title: gacMatch[1] ?? "",
+        level: (current?.level ?? 2) + 1,
+        body: line.trim(),
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind: "gac",
+        source_path: sourcePath,
+      });
+      continue;
+    }
+    const aspirationMatch = line.match(/^\s*Aspiration:\s*(.+?)\s*$/i);
+    if (aspirationMatch) {
+      sections.push({
+        title: aspirationMatch[1] ?? "",
+        level: (current?.level ?? 2) + 1,
+        body: line.trim(),
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind: "aspiration",
+        source_path: sourcePath,
+      });
+      continue;
+    }
+  }
+  closeCurrent(lines.length);
+
+  return sections;
+}
+
+function stableHash(value: string): string {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < value.length; i += 1) {
+    const ch = value.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return `bp-mine:${(h2 >>> 0).toString(16).padStart(8, "0")}${(h1 >>> 0).toString(16).padStart(8, "0")}`;
 }

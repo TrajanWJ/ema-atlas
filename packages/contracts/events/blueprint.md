@@ -264,3 +264,57 @@ payload {
   by:             user:<ulid>
 }
 ```
+
+## Mining events (Sprint 5)
+
+The `ema blueprint mine --transcript <path>` flow extracts structured nodes
+from a markdown transcript using section-heading parsing (per
+`Projects/EMA/atlas/incubating/blueprint-v0-mining-spec.md`). The daemon
+handler `blueprint.mine.requested` is not yet wired (returns
+`blocked_missing_ipc_handler`); the CLI ships dry-run and falls back to a
+local artifact write until the handler lands.
+
+### `blueprint.mine.requested`
+```
+payload {
+  transcript_path:    string
+  transcript_node_id: string                   % stable hash of the path
+  requester_actor_id: actor:<ulid> | string
+  requested_at:       iso8601
+}
+```
+
+### `blueprint.section.proposed`
+```
+payload {
+  proposal_id:        blueprint_proposal:<ulid> | hash
+  transcript_node_id: string
+  title:              string
+  level:              integer                   % 2 = ##, 3 = ###, ...
+  body:               string
+  line_range:         { start: integer, end: integer }
+  target_kind:        "section" | "decision" | "aspiration" | "gac" | "note"
+  source_path:        string
+  proposed_at:        iso8601
+}
+```
+
+### `blueprint.mine.completed`
+```
+payload {
+  transcript_node_id: string
+  created_node_ids:   string[]
+  duration_ms:        integer
+  completed_at:       iso8601
+}
+```
+
+### `blueprint.mine.failed`
+```
+payload {
+  transcript_node_id: string
+  error_class:        string
+  message:            string
+  failed_at:          iso8601
+}
+```

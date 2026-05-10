@@ -202,7 +202,7 @@ var Client = class {
     return await this.sendHello();
   }
   openSocket() {
-    return new Promise((resolve2, reject) => {
+    return new Promise((resolve3, reject) => {
       let settled = false;
       const ws = new WebSocket(this.url);
       this.ws = ws;
@@ -213,7 +213,7 @@ var Client = class {
         ws.on("message", (raw) => this.handleRaw(raw));
         ws.on("close", () => this.handleClose());
         ws.on("error", (err) => this.handleSocketError(err));
-        resolve2();
+        resolve3();
       };
       const onErr = (err) => {
         if (settled) return;
@@ -227,7 +227,7 @@ var Client = class {
     });
   }
   sendHello() {
-    return new Promise((resolve2, reject) => {
+    return new Promise((resolve3, reject) => {
       const id = nextId();
       const timer = setTimeout(() => {
         reject(new ProtocolError("hello timed out"));
@@ -237,12 +237,12 @@ var Client = class {
           clearTimeout(timer);
           this.handlers = this.handlers.filter((h) => h !== handler);
           this.hello = msg;
-          resolve2(msg);
+          resolve3(msg);
         } else if (msg.type === "hello") {
           clearTimeout(timer);
           this.handlers = this.handlers.filter((h) => h !== handler);
           this.hello = msg;
-          resolve2(msg);
+          resolve3(msg);
         }
       };
       this.handlers.push(handler);
@@ -257,7 +257,7 @@ var Client = class {
   }
   /** Send a command, return the daemon's command_result. */
   command(op, args = {}) {
-    return new Promise((resolve2, reject) => {
+    return new Promise((resolve3, reject) => {
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
         reject(new ProtocolError("socket not open"));
         return;
@@ -267,13 +267,13 @@ var Client = class {
         this.pendingCommands.delete(id);
         reject(new ProtocolError(`command ${op} timed out`));
       }, COMMAND_TIMEOUT_MS);
-      this.pendingCommands.set(id, { resolve: resolve2, reject, timer });
+      this.pendingCommands.set(id, { resolve: resolve3, reject, timer });
       this.sendRaw({ v: 0, id, type: "command", op, args });
     });
   }
   /** Send ping, resolve with RTT ms. */
   ping() {
-    return new Promise((resolve2, reject) => {
+    return new Promise((resolve3, reject) => {
       if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
         reject(new ProtocolError("socket not open"));
         return;
@@ -284,7 +284,7 @@ var Client = class {
         this.pendingPings.delete(id);
         reject(new ProtocolError("ping timed out"));
       }, 15e3);
-      this.pendingPings.set(id, { sentAt, resolve: resolve2, reject, timer });
+      this.pendingPings.set(id, { sentAt, resolve: resolve3, reject, timer });
       this.sendRaw({ v: 0, id, type: "ping" });
     });
   }
@@ -972,14 +972,14 @@ function isDirectory(path2) {
 async function loadDaemonProjects() {
   try {
     const c = await connect({ surface: "desktop" });
-    const projects = await new Promise((resolve2) => {
-      const timer = setTimeout(() => resolve2([]), DAEMON_PROJECTION_TIMEOUT_MS);
+    const projects = await new Promise((resolve3) => {
+      const timer = setTimeout(() => resolve3([]), DAEMON_PROJECTION_TIMEOUT_MS);
       c.onMessage((msg) => {
         if (msg.type !== "projection") return;
         if (msg.name !== "project.filesystem_status") return;
         clearTimeout(timer);
         const data = msg.data;
-        resolve2((data?.projects ?? []).map(toDaemonProject));
+        resolve3((data?.projects ?? []).map(toDaemonProject));
       });
       c.subscribe("project.filesystem_status");
     });
@@ -1082,14 +1082,14 @@ function parseMarkdownFields(raw) {
 async function loadDaemonTopbar() {
   try {
     const c = await connect({ surface: "desktop" });
-    const topbar = await new Promise((resolve2) => {
-      const timer = setTimeout(() => resolve2(null), DAEMON_PROJECTION_TIMEOUT_MS);
+    const topbar = await new Promise((resolve3) => {
+      const timer = setTimeout(() => resolve3(null), DAEMON_PROJECTION_TIMEOUT_MS);
       c.onMessage((msg) => {
         if (msg.type !== "projection") return;
         if (msg.name !== "topbar") return;
         clearTimeout(timer);
         const d = msg.data ?? {};
-        resolve2({
+        resolve3({
           current_org: pickIdName(d.current_org),
           current_space: pickIdName(d.current_space),
           current_project: pickIdName(d.current_project)
@@ -1144,7 +1144,7 @@ async function runStatus(args) {
   const json = flagBool(args, "json");
   try {
     const c = await connect({ surface: "desktop" });
-    const data = await new Promise((resolve2, reject) => {
+    const data = await new Promise((resolve3, reject) => {
       const timer = setTimeout(
         () => reject(new Error("timed out waiting for topbar projection")),
         PROJECTION_TIMEOUT_MS
@@ -1152,7 +1152,7 @@ async function runStatus(args) {
       c.onMessage((msg) => {
         if (msg.type === "projection" && msg.name === "topbar") {
           clearTimeout(timer);
-          resolve2(msg.data);
+          resolve3(msg.data);
         }
       });
       const userId = c.hello?.accepted_device_id ?? null;
@@ -1401,10 +1401,10 @@ async function runEvents(args) {
     if (device) {
       c.subscribe(`user.${device}.orgs`);
     }
-    await new Promise((resolve2) => {
+    await new Promise((resolve3) => {
       const shutdown = () => {
         c.close();
-        resolve2();
+        resolve3();
       };
       process.on("SIGINT", shutdown);
       process.on("SIGTERM", shutdown);
@@ -1559,12 +1559,12 @@ async function readProjection(args, spec) {
     const scopeContext = await workspaceScopeContext(args);
     const projectId = !scopeContext.allProjects && scopeContext.scope.project_id ? scopeContext.scope.project_id : null;
     const c = await connect({ surface: "desktop" });
-    const value = await new Promise((resolve2) => {
-      const timer = setTimeout(() => resolve2(spec.pick({})), 1200);
+    const value = await new Promise((resolve3) => {
+      const timer = setTimeout(() => resolve3(spec.pick({})), 1200);
       c.onMessage((msg) => {
         if (msg.type === "projection" && msg.name === spec.name) {
           clearTimeout(timer);
-          resolve2(spec.pick(msg.data ?? {}));
+          resolve3(spec.pick(msg.data ?? {}));
         }
       });
       c.subscribe(spec.name, projectId ? { project_id: projectId } : void 0);
@@ -1585,12 +1585,12 @@ async function readProjectionBatch(args, specs, timeoutMs = 1200) {
     const c = await connect({ surface: "desktop" });
     const values = /* @__PURE__ */ new Map();
     const wanted = new Set(specs.map((spec) => spec.name));
-    const result = await new Promise((resolve2) => {
+    const result = await new Promise((resolve3) => {
       let settled = false;
       const finish = () => {
         if (settled) return;
         settled = true;
-        resolve2(specs.map((spec) => values.has(spec.name) ? values.get(spec.name) : spec.pick({})));
+        resolve3(specs.map((spec) => values.has(spec.name) ? values.get(spec.name) : spec.pick({})));
       };
       const timer = setTimeout(finish, timeoutMs);
       c.onMessage((msg) => {
@@ -2093,12 +2093,12 @@ function phaseToMode(phase, setAt, heuristicMode) {
 async function readVcalendarState() {
   try {
     const c = await connect({ surface: "desktop" });
-    const data = await new Promise((resolve2) => {
+    const data = await new Promise((resolve3) => {
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          resolve2(null);
+          resolve3(null);
         }
       }, 1500);
       c.onMessage((msg) => {
@@ -2106,7 +2106,7 @@ async function readVcalendarState() {
           if (!settled) {
             settled = true;
             clearTimeout(timer);
-            resolve2(msg.data);
+            resolve3(msg.data);
           }
         }
       });
@@ -2232,12 +2232,12 @@ async function runTickCheckups(args) {
 async function runReadQuery(_args, json, opts) {
   try {
     const c = await connect({ surface: "desktop" });
-    const eventTrailRows = await new Promise((resolve2) => {
+    const eventTrailRows = await new Promise((resolve3) => {
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          resolve2([]);
+          resolve3([]);
         }
       }, 1200);
       c.onMessage((msg) => {
@@ -2246,7 +2246,7 @@ async function runReadQuery(_args, json, opts) {
           if (!settled) {
             settled = true;
             clearTimeout(timer);
-            resolve2(data.events ?? []);
+            resolve3(data.events ?? []);
           }
         }
       });
@@ -3347,15 +3347,15 @@ async function loadRecentWorkspaceTrail(args) {
     const c = await connect({ surface: "desktop" });
     let lanes = null;
     let queue = null;
-    const result = await new Promise((resolve2) => {
-      const timer = setTimeout(() => resolve2({
+    const result = await new Promise((resolve3) => {
+      const timer = setTimeout(() => resolve3({
         lanes: lanes ?? [],
         queue: queue ?? []
       }), 1200);
       const finish = () => {
         if (lanes && queue) {
           clearTimeout(timer);
-          resolve2({ lanes, queue });
+          resolve3({ lanes, queue });
         }
       };
       c.onMessage((msg) => {
@@ -4076,6 +4076,8 @@ function countByStatus2(records) {
 }
 
 // src/commands/blueprint.ts
+import { existsSync as existsSync4, readFileSync as readFileSync4 } from "fs";
+import { resolve } from "path";
 var DOC_REF5 = "packages/contracts/events/blueprint.md";
 var STRUCTURAL_PROJECTION = "blueprint.sections";
 var PLANNER_PROJECTION = "blueprint.planner";
@@ -4157,13 +4159,21 @@ var COMMANDS2 = [
     flags: ["title", "body", "supersedes", "source-node"],
     summary: "Lock or list Blueprint canon-facing decisions.",
     status: "available"
+  },
+  {
+    verb: "mine",
+    flags: ["transcript", "dry-run", "json"],
+    required: ["transcript"],
+    summary: "Mine a markdown transcript into Blueprint section/decision/aspiration/GAC nodes.",
+    status: "available"
   }
 ];
 async function runBlueprint(args) {
   const verb = args.positional[0];
   const subverb = args.positional[1];
-  const help11 = flagBool(args, "help") || args.flags.h === true || verb === void 0 || verb === "help";
-  if (help11) return runHelp2(args);
+  const helpFlag = flagBool(args, "help") || args.flags.h === true;
+  const help11 = helpFlag || verb === void 0 || verb === "help";
+  if (help11 && verb !== "mine") return runHelp2(args);
   if (verb === "status") return runStatus2(args);
   if (verb === "list" || verb === "documents" || verb === "sections")
     return runList(args);
@@ -4230,8 +4240,9 @@ async function runBlueprint(args) {
     );
     return 64;
   }
+  if (verb === "mine") return runMine(args);
   emitError(
-    `ema blueprint: unknown subcommand "${verb}" (expected: help | status | list | document | section | gac | blocker | aspiration | decision | graph)`
+    `ema blueprint: unknown subcommand "${verb}" (expected: help | status | list | document | section | gac | blocker | aspiration | decision | graph | mine)`
   );
   emitError(`See ${DOC_REF5} for the structural event contract.`);
   return 64;
@@ -4275,6 +4286,11 @@ function runHelp2(args) {
   emitPretty('  ema blueprint blocker open --title "..." --description "..."');
   emitPretty('  ema blueprint aspiration capture --title "..." --body "..."');
   emitPretty('  ema blueprint decision lock --title "..." --body "..."');
+  emitPretty("");
+  emitPretty("Mining (Sprint 5):");
+  emitPretty("  ema blueprint mine --transcript <path> --dry-run [--json]");
+  emitPretty("  ema blueprint mine --transcript <path> [--json]");
+  emitPretty("  See `ema blueprint mine --help` for the heuristic.");
   return 0;
 }
 async function runStatus2(args) {
@@ -4894,16 +4910,16 @@ function optionalArgs(args) {
   return Object.fromEntries(Object.entries(args).filter(([, value]) => value !== void 0));
 }
 function readProjection2(c, channel) {
-  return new Promise((resolve2) => {
+  return new Promise((resolve3) => {
     const timer = setTimeout(
-      () => resolve2({ received: false, name: channel, data: null }),
+      () => resolve3({ received: false, name: channel, data: null }),
       1500
     );
     c.onMessage((msg) => {
       const env = msg;
       if (env.type === "projection" && env.name === channel) {
         clearTimeout(timer);
-        resolve2({ received: true, name: channel, data: env.data });
+        resolve3({ received: true, name: channel, data: env.data });
       }
     });
     c.subscribe(channel);
@@ -4936,6 +4952,201 @@ function readArray(data, key) {
   if (!data) return [];
   const value = data[key];
   return Array.isArray(value) ? value : [];
+}
+async function runMine(args) {
+  const json = flagBool(args, "json");
+  const transcript = flagString(args, "transcript");
+  const dryRun = flagBool(args, "dry-run");
+  if (flagBool(args, "help") || args.flags.h === true) {
+    return runMineHelp(json);
+  }
+  if (!transcript) {
+    emitError("ema blueprint mine: --transcript <path> is required");
+    return 64;
+  }
+  const path2 = resolve(transcript);
+  if (!existsSync4(path2)) {
+    emitError(`ema blueprint mine: transcript not found: ${path2}`);
+    return 1;
+  }
+  let body;
+  try {
+    body = readFileSync4(path2, "utf8");
+  } catch (err) {
+    emitError(`ema blueprint mine: cannot read transcript: ${err.message}`);
+    return 1;
+  }
+  const sections = mineTranscript(body, path2);
+  if (dryRun) {
+    const payload = {
+      ok: true,
+      command: "blueprint mine",
+      mode: "dry_run",
+      transcript_path: path2,
+      transcript_node_id: stableHash(path2),
+      section_count: sections.length,
+      sections,
+      doc: DOC_REF5
+    };
+    if (json) emitJson(payload);
+    else {
+      emitPretty(`# blueprint mine (dry-run)`);
+      emitPretty(`transcript: ${path2}`);
+      emitPretty(`sections: ${sections.length}`);
+      for (const s of sections) {
+        emitPretty(
+          `  [${s.target_kind.padEnd(10)}] L${s.level} (${s.line_range.start}-${s.line_range.end}) ${s.title}`
+        );
+      }
+    }
+    return 0;
+  }
+  return send3(
+    "blueprint.mine.requested",
+    optionalArgs({
+      org_id: flagString(args, "org") ?? DEFAULT_ORG4,
+      actor_id: flagString(args, "actor") ?? DEFAULT_ACTOR4,
+      transcript_path: path2,
+      transcript_node_id: stableHash(path2),
+      section_count: sections.length
+    }),
+    {
+      json,
+      human: `submitted ${sections.length} mined section(s) from ${path2}`,
+      resourceLabel: "transcript"
+    }
+  );
+}
+function runMineHelp(json) {
+  const help11 = {
+    ok: true,
+    command: "blueprint mine help",
+    usage: [
+      "ema blueprint mine --transcript <path> --dry-run [--json]",
+      "ema blueprint mine --transcript <path> [--json]"
+    ],
+    flags: {
+      "--transcript": "absolute or relative path to a markdown transcript",
+      "--dry-run": "parse only; emit the structured preview without writing events",
+      "--json": "emit structured JSON output"
+    },
+    heuristic: [
+      "## headings become sections (target_kind=section)",
+      "### and deeper become target_kind=note nested under the parent section",
+      "Lines starting with 'Decision:' become target_kind=decision",
+      "Lines starting with 'GAC:' become target_kind=gac",
+      "Lines starting with 'Aspiration:' become target_kind=aspiration",
+      "Each mined record carries source_path + line_range for traceability"
+    ],
+    spec: "Projects/EMA/atlas/incubating/blueprint-v0-mining-spec.md",
+    events: "packages/contracts/events/blueprint.md (Mining events section)",
+    daemon_handler_status: "blueprint.mine.requested handler not yet wired; dry-run is the supported mode until the writer lands"
+  };
+  if (json) emitJson(help11);
+  else {
+    emitPretty("# ema blueprint mine \u2014 help");
+    emitPretty("");
+    emitPretty("Usage:");
+    for (const u of help11.usage) emitPretty(`  ${u}`);
+    emitPretty("");
+    emitPretty("Flags:");
+    for (const [flag, desc] of Object.entries(help11.flags)) {
+      emitPretty(`  ${flag.padEnd(14)} ${desc}`);
+    }
+    emitPretty("");
+    emitPretty("## Heuristic");
+    for (const h of help11.heuristic) emitPretty(`  - ${h}`);
+    emitPretty("");
+    emitPretty(`spec:  ${help11.spec}`);
+    emitPretty(`events: ${help11.events}`);
+    emitPretty(`status: ${help11.daemon_handler_status}`);
+  }
+  return 0;
+}
+function mineTranscript(body, sourcePath) {
+  const lines = body.split(/\r?\n/);
+  const sections = [];
+  let current = null;
+  let bodyLines = [];
+  const closeCurrent = (endLine) => {
+    if (!current) return;
+    current.body = bodyLines.join("\n").trim();
+    current.line_range.end = endLine;
+    sections.push(current);
+    current = null;
+    bodyLines = [];
+  };
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i] ?? "";
+    const lineNumber = i + 1;
+    const headingMatch = line.match(/^(#{2,6})\s+(.+?)\s*$/);
+    if (headingMatch) {
+      closeCurrent(lineNumber - 1);
+      const level = (headingMatch[1] ?? "").length;
+      const title = headingMatch[2] ?? "";
+      const target_kind = level === 2 ? "section" : "note";
+      current = {
+        title,
+        level,
+        body: "",
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind,
+        source_path: sourcePath
+      };
+      continue;
+    }
+    if (current) bodyLines.push(line);
+    const decisionMatch = line.match(/^\s*Decision:\s*(.+?)\s*$/i);
+    if (decisionMatch) {
+      sections.push({
+        title: decisionMatch[1] ?? "",
+        level: (current?.level ?? 2) + 1,
+        body: line.trim(),
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind: "decision",
+        source_path: sourcePath
+      });
+      continue;
+    }
+    const gacMatch = line.match(/^\s*GAC:\s*(.+?)\s*$/i);
+    if (gacMatch) {
+      sections.push({
+        title: gacMatch[1] ?? "",
+        level: (current?.level ?? 2) + 1,
+        body: line.trim(),
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind: "gac",
+        source_path: sourcePath
+      });
+      continue;
+    }
+    const aspirationMatch = line.match(/^\s*Aspiration:\s*(.+?)\s*$/i);
+    if (aspirationMatch) {
+      sections.push({
+        title: aspirationMatch[1] ?? "",
+        level: (current?.level ?? 2) + 1,
+        body: line.trim(),
+        line_range: { start: lineNumber, end: lineNumber },
+        target_kind: "aspiration",
+        source_path: sourcePath
+      });
+      continue;
+    }
+  }
+  closeCurrent(lines.length);
+  return sections;
+}
+function stableHash(value) {
+  let h1 = 3735928559;
+  let h2 = 1103547991;
+  for (let i = 0; i < value.length; i += 1) {
+    const ch = value.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507) ^ Math.imul(h2 ^ h2 >>> 13, 3266489909);
+  h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507) ^ Math.imul(h1 ^ h1 >>> 13, 3266489909);
+  return `bp-mine:${(h2 >>> 0).toString(16).padStart(8, "0")}${(h1 >>> 0).toString(16).padStart(8, "0")}`;
 }
 
 // src/commands/wiki.ts
@@ -5514,7 +5725,7 @@ function parseLimit2(args, fallback) {
 }
 
 // src/commands/hermes.ts
-import { existsSync as existsSync4 } from "fs";
+import { existsSync as existsSync5 } from "fs";
 var HERMES_ACTOR = "actor:hermes";
 var DOCS = [
   "README.md",
@@ -5603,7 +5814,7 @@ async function runHermesOrient(args, verb) {
     { name: "chronicle.activity", status: "pending_daemon_projection" }
   ];
   const resumePacket = {
-    docs_read: DOCS.map((doc) => ({ path: doc, present: existsSync4(`${summary.root}/${doc}`) })),
+    docs_read: DOCS.map((doc) => ({ path: doc, present: existsSync5(`${summary.root}/${doc}`) })),
     dirty_tree: { status: "not_computed", command: "git status --short" },
     daemon_projections: projections2,
     open_lanes: daemonRecent.lanes.filter((lane) => lane.status !== "done").slice(0, 8),
@@ -5726,12 +5937,12 @@ function nextActions(lane, blockedCount) {
 
 // src/commands/harness.ts
 import { createHash as createHash2 } from "crypto";
-import { closeSync, existsSync as existsSync6, fsyncSync, mkdirSync as mkdirSync3, openSync, readFileSync as readFileSync5, readdirSync as readdirSync4, writeFileSync as writeFileSync3, writeSync } from "fs";
+import { closeSync, existsSync as existsSync7, fsyncSync, mkdirSync as mkdirSync3, openSync, readFileSync as readFileSync6, readdirSync as readdirSync4, writeFileSync as writeFileSync3, writeSync } from "fs";
 import { join as join5, relative as relative3 } from "path";
 import { spawnSync as spawnSync2 } from "child_process";
 
 // src/commands/capability-roundtrip-cache.ts
-import { existsSync as existsSync5, mkdirSync as mkdirSync2, readFileSync as readFileSync4, writeFileSync as writeFileSync2 } from "fs";
+import { existsSync as existsSync6, mkdirSync as mkdirSync2, readFileSync as readFileSync5, writeFileSync as writeFileSync2 } from "fs";
 import { dirname as dirname2, join as join4 } from "path";
 var CACHE_ROOT = join4(EMA_ACTIVE_BUILD, ".ema-dev", "capability-roundtrips");
 var CODEX_ROUNDTRIP_PROOF_PATH = join4(EMA_ACTIVE_BUILD, ".ema-dev", "codex-roundtrip", "last-proof.json");
@@ -5755,9 +5966,9 @@ function readFreshRoundtrip(provider, ttlMs = CODEX_ROUNDTRIP_PROOF_TTL_MS) {
     };
   }
   const path2 = roundtripCachePath(provider);
-  if (!existsSync5(path2)) return { ok: false, reason: "missing recent successful roundtrip", entry: null };
+  if (!existsSync6(path2)) return { ok: false, reason: "missing recent successful roundtrip", entry: null };
   try {
-    const entry = JSON.parse(readFileSync4(path2, "utf8"));
+    const entry = JSON.parse(readFileSync5(path2, "utf8"));
     const completedAt = Date.parse(entry.completed_at);
     if (!Number.isFinite(completedAt)) return { ok: false, reason: "cached roundtrip timestamp is invalid", entry };
     const age = Date.now() - completedAt;
@@ -5772,11 +5983,11 @@ function readFreshRoundtrip(provider, ttlMs = CODEX_ROUNDTRIP_PROOF_TTL_MS) {
   }
 }
 function readFreshCodexRoundtripProof(ttlMs = CODEX_ROUNDTRIP_PROOF_TTL_MS) {
-  if (!existsSync5(CODEX_ROUNDTRIP_PROOF_PATH)) {
+  if (!existsSync6(CODEX_ROUNDTRIP_PROOF_PATH)) {
     return { ok: false, reason: `missing Codex roundtrip proof at ${CODEX_ROUNDTRIP_PROOF_PATH}`, proof: null };
   }
   try {
-    const proof = JSON.parse(readFileSync4(CODEX_ROUNDTRIP_PROOF_PATH, "utf8"));
+    const proof = JSON.parse(readFileSync5(CODEX_ROUNDTRIP_PROOF_PATH, "utf8"));
     const passedAt = Date.parse(proof.passed_at);
     if (!Number.isFinite(passedAt)) return { ok: false, reason: "Codex roundtrip proof timestamp is invalid", proof };
     const age = Date.now() - passedAt;
@@ -6586,7 +6797,7 @@ async function runCodexDispatch(args, spec) {
     return 64;
   }
   const proposalId = approvedProposal?.ok ? approvedProposal.proposal.proposal_id : null;
-  const prompt = promptFile ? readFileSync5(promptFile, "utf8") : spec.prompt || promptForApprovedIntent(spec.intentId, proposalId);
+  const prompt = promptFile ? readFileSync6(promptFile, "utf8") : spec.prompt || promptForApprovedIntent(spec.intentId, proposalId);
   const org = flagString(args, "org") ?? DEFAULT_ORG5;
   const actor = flagString(args, "actor") ?? "actor:01J00000000000000000000003";
   const intent = spec.intentId ?? summarize(prompt);
@@ -7241,8 +7452,8 @@ async function readHarnessProjections() {
   try {
     const seen = /* @__PURE__ */ new Map();
     const finished = /* @__PURE__ */ new Set();
-    const ready = new Promise((resolve2) => {
-      const timer = setTimeout(() => resolve2(), 1500);
+    const ready = new Promise((resolve3) => {
+      const timer = setTimeout(() => resolve3(), 1500);
       client.onMessage((msg) => {
         if (msg.type !== "projection") return;
         const name = msg.name;
@@ -7253,7 +7464,7 @@ async function readHarnessProjections() {
         finished.add(name);
         if (finished.size >= HARNESS_PROJECTION_CHANNELS.length) {
           clearTimeout(timer);
-          resolve2();
+          resolve3();
         }
       });
       for (const channel of HARNESS_PROJECTION_CHANNELS) client.subscribe(channel);
@@ -7326,13 +7537,13 @@ function writeRecord(record) {
 }
 function readRecord(executionId) {
   const path2 = registryPath(executionId);
-  if (!existsSync6(path2)) return null;
-  return JSON.parse(readFileSync5(path2, "utf8"));
+  if (!existsSync7(path2)) return null;
+  return JSON.parse(readFileSync6(path2, "utf8"));
 }
 function readRecords2() {
   const dir = registryDir();
-  if (!existsSync6(dir)) return [];
-  return readdirSync4(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync5(join5(dir, file), "utf8")));
+  if (!existsSync7(dir)) return [];
+  return readdirSync4(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync6(join5(dir, file), "utf8")));
 }
 function laneAssignmentsDir() {
   return join5(harnessGlueRoot(), "lane-sessions");
@@ -7365,13 +7576,13 @@ function upsertLaneAssignment(lane, record) {
 }
 function readLaneAssignment(lane) {
   const path2 = laneAssignmentPath(lane);
-  if (!existsSync6(path2)) return null;
-  return JSON.parse(readFileSync5(path2, "utf8"));
+  if (!existsSync7(path2)) return null;
+  return JSON.parse(readFileSync6(path2, "utf8"));
 }
 function readLaneAssignments() {
   const dir = laneAssignmentsDir();
-  if (!existsSync6(dir)) return [];
-  return readdirSync4(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync5(join5(dir, file), "utf8")));
+  if (!existsSync7(dir)) return [];
+  return readdirSync4(dir).filter((file) => file.endsWith(".json")).map((file) => JSON.parse(readFileSync6(join5(dir, file), "utf8")));
 }
 function appendEvents(events2) {
   mkdirSync3(harnessGlueRoot(), { recursive: true });
@@ -7382,8 +7593,8 @@ function appendEvents(events2) {
 function readEvents(selector) {
   const path2 = eventLogPath();
   let events2 = [];
-  if (existsSync6(path2)) {
-    events2 = readFileSync5(path2, "utf8").split("\n").filter(Boolean).map((line) => {
+  if (existsSync7(path2)) {
+    events2 = readFileSync6(path2, "utf8").split("\n").filter(Boolean).map((line) => {
       try {
         return JSON.parse(line);
       } catch {
@@ -7470,7 +7681,7 @@ function stableId2(input) {
 
 // src/commands/peer.ts
 import { execFileSync as execFileSync2 } from "child_process";
-import { existsSync as existsSync7, readFileSync as readFileSync6, writeFileSync as writeFileSync4 } from "fs";
+import { existsSync as existsSync8, readFileSync as readFileSync7, writeFileSync as writeFileSync4 } from "fs";
 import { dirname as dirname3, join as join6 } from "path";
 var REGISTRY_PATH2 = join6(EMA_ACTIVE_BUILD, ".ema", "peers.json");
 function runPeer(args) {
@@ -7601,7 +7812,7 @@ function localChecks() {
     commandCheck("node", ["--version"]),
     commandCheck("pnpm", ["--version"]),
     commandCheck("gleam", ["--version"]),
-    { name: "workspace", ok: existsSync7(EMA_ACTIVE_BUILD), detail: EMA_ACTIVE_BUILD },
+    { name: "workspace", ok: existsSync8(EMA_ACTIVE_BUILD), detail: EMA_ACTIVE_BUILD },
     { name: "daemon_port", ok: true, optional: true, detail: "49555 expected; use ema status --json for live handshake" },
     { name: "web_port", ok: true, optional: true, detail: "5173 expected; browser/web verification is separate" }
   ];
@@ -7624,16 +7835,16 @@ function commandCheck(name, args) {
   }
 }
 function loadPeers() {
-  if (!existsSync7(REGISTRY_PATH2)) return [];
+  if (!existsSync8(REGISTRY_PATH2)) return [];
   try {
-    const parsed = JSON.parse(readFileSync6(REGISTRY_PATH2, "utf8"));
+    const parsed = JSON.parse(readFileSync7(REGISTRY_PATH2, "utf8"));
     return Array.isArray(parsed.peers) ? parsed.peers : [];
   } catch {
     return [];
   }
 }
 function savePeers(peers) {
-  if (!existsSync7(dirname3(REGISTRY_PATH2))) execFileSync2("mkdir", ["-p", dirname3(REGISTRY_PATH2)]);
+  if (!existsSync8(dirname3(REGISTRY_PATH2))) execFileSync2("mkdir", ["-p", dirname3(REGISTRY_PATH2)]);
   writeFileSync4(REGISTRY_PATH2, `${JSON.stringify({ peers }, null, 2)}
 `);
 }
@@ -7666,14 +7877,14 @@ async function runGap(args) {
 }
 async function readLanes() {
   const c = await connect({ surface: "desktop" });
-  const lanes = await new Promise((resolve2) => {
-    const timer = setTimeout(() => resolve2([]), 1500);
+  const lanes = await new Promise((resolve3) => {
+    const timer = setTimeout(() => resolve3([]), 1500);
     c.onMessage((msg) => {
       const env = msg;
       if (env.type === "projection" && env.name === "lane.registry") {
         clearTimeout(timer);
         const data = env.data;
-        resolve2(data?.lanes ?? []);
+        resolve3(data?.lanes ?? []);
       }
     });
     c.subscribe("lane.registry");
@@ -7868,11 +8079,11 @@ async function runClose3(args) {
 }
 
 // src/commands/readiness.ts
-import { existsSync as existsSync9, mkdirSync as mkdirSync4, readFileSync as readFileSync8, writeFileSync as writeFileSync5 } from "fs";
+import { existsSync as existsSync10, mkdirSync as mkdirSync4, readFileSync as readFileSync9, writeFileSync as writeFileSync5 } from "fs";
 import { dirname as dirname4, join as join8 } from "path";
 
 // src/commands/capability.ts
-import { existsSync as existsSync8, readFileSync as readFileSync7, statSync as statSync4 } from "fs";
+import { existsSync as existsSync9, readFileSync as readFileSync8, statSync as statSync4 } from "fs";
 import { spawnSync as spawnSync3 } from "child_process";
 import { join as join7 } from "path";
 async function runCapability(args) {
@@ -7904,7 +8115,7 @@ async function capabilityReport(args, options = {}) {
     join7(EMA_ACTIVE_BUILD, "docs", "WORKSPACE-ENTRYPOINT.md"),
     "/Users/trajanm4air/Desktop/Projects/EMA/atlas/canon/current/ema-0-0-5-current-canon.md",
     "/Users/trajanm4air/Desktop/Projects/EMA/atlas/workspace/README.md"
-  ].map((path2) => ({ path: path2, exists: existsSync8(path2), stale_marker: existsSync8(path2) ? containsStaleMarker(path2) : false }));
+  ].map((path2) => ({ path: path2, exists: existsSync9(path2), stale_marker: existsSync9(path2) ? containsStaleMarker(path2) : false }));
   return {
     ok: daemon.ok && db.ok,
     command: "capability.list",
@@ -8018,7 +8229,7 @@ function codexCapability(options) {
   return cap("codex", "roundtrip-failed", commands, smoke.evidence, true);
 }
 function runCodexCapabilitySmoke() {
-  const cli = process.argv[1] && existsSync8(process.argv[1]) ? process.argv[1] : join7(EMA_ACTIVE_BUILD, "apps", "cli", "dist", "bin.js");
+  const cli = process.argv[1] && existsSync9(process.argv[1]) ? process.argv[1] : join7(EMA_ACTIVE_BUILD, "apps", "cli", "dist", "bin.js");
   const result = spawnSync3(process.execPath, [
     cli,
     "harness",
@@ -8096,18 +8307,18 @@ async function daemonStatus() {
 function cliFreshness() {
   const src = join7(EMA_ACTIVE_BUILD, "apps", "cli", "src", "bin.ts");
   const dist = join7(EMA_ACTIVE_BUILD, "apps", "cli", "dist", "bin.js");
-  const srcMtime = existsSync8(src) ? statSync4(src).mtimeMs : null;
-  const distMtime = existsSync8(dist) ? statSync4(dist).mtimeMs : null;
+  const srcMtime = existsSync9(src) ? statSync4(src).mtimeMs : null;
+  const distMtime = existsSync9(dist) ? statSync4(dist).mtimeMs : null;
   return {
     source: src,
     dist,
-    dist_exists: existsSync8(dist),
+    dist_exists: existsSync9(dist),
     dist_older_than_source: srcMtime !== null && distMtime !== null ? distMtime < srcMtime : null
   };
 }
 function containsStaleMarker(path2) {
   try {
-    const text = readFileSync7(path2, "utf8");
+    const text = readFileSync8(path2, "utf8");
     return /0\.0\.5|EMA-0\.0\.5|Founding-Fathers-EMA/.test(text);
   } catch {
     return false;
@@ -8177,7 +8388,7 @@ async function classifySubstrate() {
   const artifactWriter = classifyArtifactWriter();
   const canonWriter = classifyCanonWriter();
   const components = {
-    daemon_runtime: existsSync9(join8(EMA_ACTIVE_BUILD, "apps", "daemon", "src", "ema_daemon", "supervisor.gleam")) ? "beam" : "absent",
+    daemon_runtime: existsSync10(join8(EMA_ACTIVE_BUILD, "apps", "daemon", "src", "ema_daemon", "supervisor.gleam")) ? "beam" : "absent",
     // This means canonical pipeline-floor `intent.created`, not legacy
     // harvested-session `ema intention ...` behavior.
     intent_writer: intentWriter,
@@ -8250,9 +8461,9 @@ function classifyArtifactWriter() {
   return "absent";
 }
 function readSourceIfPresent(path2) {
-  if (!existsSync9(path2)) return null;
+  if (!existsSync10(path2)) return null;
   try {
-    return readFileSync8(path2, "utf8");
+    return readFileSync9(path2, "utf8");
   } catch {
     return null;
   }
@@ -8298,9 +8509,9 @@ async function classifyIntentWriter() {
   }
 }
 function readIntentWriterCache() {
-  if (!existsSync9(INTENT_WRITER_CACHE_PATH)) return null;
+  if (!existsSync10(INTENT_WRITER_CACHE_PATH)) return null;
   try {
-    const parsed = JSON.parse(readFileSync8(INTENT_WRITER_CACHE_PATH, "utf8"));
+    const parsed = JSON.parse(readFileSync9(INTENT_WRITER_CACHE_PATH, "utf8"));
     if (typeof parsed.ok !== "boolean" || typeof parsed.checked_at !== "string") return null;
     return { ok: parsed.ok, checked_at: parsed.checked_at, reason: typeof parsed.reason === "string" ? parsed.reason : "" };
   } catch {
@@ -8350,7 +8561,7 @@ function deriveBlockers(substrate, capability, restartProof) {
   return blockers;
 }
 function readRestartProofState() {
-  if (!existsSync9(RESTART_PROOF_PATH)) {
+  if (!existsSync10(RESTART_PROOF_PATH)) {
     return {
       fresh: false,
       path: RESTART_PROOF_PATH,
@@ -8360,7 +8571,7 @@ function readRestartProofState() {
     };
   }
   try {
-    const parsed = JSON.parse(readFileSync8(RESTART_PROOF_PATH, "utf8"));
+    const parsed = JSON.parse(readFileSync9(RESTART_PROOF_PATH, "utf8"));
     const passedAt = typeof parsed.passed_at === "string" ? parsed.passed_at : null;
     const passedMs = passedAt ? Date.parse(passedAt) : Number.NaN;
     if (!Number.isFinite(passedMs)) {
@@ -8404,13 +8615,13 @@ function readRestartProofState() {
 async function readChannel(channel, timeoutMs) {
   try {
     const c = await connect({ surface: "desktop" });
-    const data = await new Promise((resolve2) => {
-      const timer = setTimeout(() => resolve2(null), timeoutMs);
+    const data = await new Promise((resolve3) => {
+      const timer = setTimeout(() => resolve3(null), timeoutMs);
       c.onMessage((msg) => {
         const env = msg;
         if (env.type === "projection" && env.name === channel) {
           clearTimeout(timer);
-          resolve2(env.data);
+          resolve3(env.data);
         }
       });
       c.subscribe(channel);
@@ -8756,7 +8967,7 @@ async function runScan(args) {
 // src/commands/cwt.ts
 import { access, readFile as readFile2 } from "fs/promises";
 import { homedir } from "os";
-import { join as join11, resolve } from "path";
+import { join as join11, resolve as resolve2 } from "path";
 
 // src/commands/cwt-ingest-writer.ts
 import { readFile } from "fs/promises";
@@ -9036,13 +9247,13 @@ async function readRecords3(root, dir, only) {
   return rows;
 }
 async function readProjection3(client, name, key) {
-  return new Promise((resolve2) => {
-    const timer = setTimeout(() => resolve2([]), 1500);
+  return new Promise((resolve3) => {
+    const timer = setTimeout(() => resolve3([]), 1500);
     client.onMessage((msg) => {
       if (msg.type !== "projection" || msg.name !== name) return;
       clearTimeout(timer);
       const data = msg.data ?? {};
-      resolve2(data[key] ?? []);
+      resolve3(data[key] ?? []);
     });
     client.subscribe(name);
   });
@@ -9238,8 +9449,8 @@ function projectStoragePolicy2() {
 }
 function projectionRoot(args) {
   const raw = flagString(args, "root");
-  if (raw) return resolve(raw);
-  return resolve(
+  if (raw) return resolve2(raw);
+  return resolve2(
     homedir(),
     "Desktop",
     "Space shared files-uploads-vDesktop-vFilesystem-root",
@@ -9267,7 +9478,7 @@ async function exists2(path2) {
 
 // src/commands/cockpit.ts
 import { execFile as execFile2 } from "child_process";
-import { existsSync as existsSync12, readFileSync as readFileSync10 } from "fs";
+import { existsSync as existsSync13, readFileSync as readFileSync11 } from "fs";
 import { basename as basename2, join as join14 } from "path";
 import { promisify as promisify2 } from "util";
 
@@ -9420,12 +9631,12 @@ function getRegistryForProject(slug) {
 }
 
 // src/commands/intention.ts
-import { existsSync as existsSync11, mkdirSync as mkdirSync5, readFileSync as readFileSync9, readdirSync as readdirSync5, statSync as statSync5, writeFileSync as writeFileSync6 } from "fs";
+import { existsSync as existsSync12, mkdirSync as mkdirSync5, readFileSync as readFileSync10, readdirSync as readdirSync5, statSync as statSync5, writeFileSync as writeFileSync6 } from "fs";
 import { homedir as homedir2 } from "os";
 import { basename, dirname as dirname5, join as join13 } from "path";
 
 // src/commands/workspace.ts
-import { existsSync as existsSync10 } from "fs";
+import { existsSync as existsSync11 } from "fs";
 import { join as join12 } from "path";
 var CONTRACT_KINDS = /* @__PURE__ */ new Set(["report", "note", "output", "session_log", "proof", "other"]);
 var LEGACY_KIND_ALIASES = /* @__PURE__ */ new Set(["plan", "handoff", "context_bundle", "session_export"]);
@@ -9472,7 +9683,7 @@ async function addArtifact(args) {
   const bodyFile = flagString(args, "body-file");
   if (!kind) return usage(`invalid --kind ${rawKind}`);
   if (!title || !bodyFile) return usage("artifact add requires --title and --body-file");
-  if (!existsSync10(bodyFile)) return usage(`body file not found: ${bodyFile}`);
+  if (!existsSync11(bodyFile)) return usage(`body file not found: ${bodyFile}`);
   const projectId = projectIdFor(scope);
   const body = readText(bodyFile);
   const result = await artifactCommand("artifact.create", scope, {
@@ -9504,7 +9715,7 @@ async function updateArtifact(args) {
   const id = flagString(args, "artifact") ?? args.positional[2];
   const bodyFile = flagString(args, "body-file");
   if (!id || !bodyFile) return usage("artifact update requires --artifact and --body-file");
-  if (!existsSync10(bodyFile)) return usage(`body file not found: ${bodyFile}`);
+  if (!existsSync11(bodyFile)) return usage(`body file not found: ${bodyFile}`);
   const scope = await resolveWorkspaceScope({ args });
   const current = findArtifact(scope, id);
   if (!current) return notFound(args, "workspace.artifact.update", scope, id);
@@ -9563,7 +9774,7 @@ async function showArtifact(args) {
   const state = listCanonicalArtifacts(scope);
   const artifact = state.artifacts.find((row) => row.id === id) ?? null;
   const links = state.links.filter((link) => link.artifact_id === id);
-  const body = artifact && existsSync10(artifact.path) ? readText(artifact.path) : null;
+  const body = artifact && existsSync11(artifact.path) ? readText(artifact.path) : null;
   const payload = {
     ok: Boolean(artifact),
     command: "workspace.artifact.show",
@@ -9797,6 +10008,8 @@ function daemonError(args, command, result) {
 }
 
 // src/commands/intention.ts
+var DEFAULT_ORG7 = "org:01J00000000000000000000001";
+var DEFAULT_ACTOR7 = "actor:dev-console";
 var STORE_ROOT = join13(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
 var REVIEWS_PATH = join13(STORE_ROOT, "reviews.json");
 var DEFAULT_PROJECT = "proslync-app-ios-final";
@@ -9809,6 +10022,7 @@ async function runIntention(args) {
   if (verb === "harvest") return harvest(args);
   if (verb === "projection") return projection(args);
   if (verb === "list") return list2(args);
+  if (verb === "list-reviewed") return listReviewed(args);
   if (verb === "show") return show(args);
   if (verb === "backfeed") return backfeed(args);
   if (verb === "review") return reviewFromVerb(args);
@@ -9816,7 +10030,7 @@ async function runIntention(args) {
   if (verb === "reject") return reviewIntent(args, "rejected");
   if (verb === "defer") return reviewIntent(args, "deferred");
   emitError(`ema intention: unknown subcommand "${verb}"`);
-  emitError("Usage: ema intention [harvest|projection|list|show|review|accept|reject|defer|backfeed] [--project <name>] [--json]");
+  emitError("Usage: ema intention [harvest|projection|list|list-reviewed|show|review|accept|reject|defer|backfeed] [--project <name>] [--json]");
   return 64;
 }
 async function loadIntentionProjection(args) {
@@ -9928,9 +10142,18 @@ async function backfeed(args) {
     emitError("ema intention backfeed: non-dry-run requires an accepted review state");
     return 64;
   }
+  const requesterActor = flagString(args, "reviewer") ?? DEFAULT_ACTOR7;
+  const beforeOutcome = await tryEmitBackfeedRequested({
+    intent_id: intent.id,
+    destination,
+    target_project: targetProject,
+    approve_token: "reviewed",
+    requester_actor_id: requesterActor
+  });
+  let exitCode;
   if (destination === "artifact") {
     const bodyPath = writeBackfeedBody(intent);
-    return runWorkspace({
+    exitCode = await runWorkspace({
       positional: ["artifact", "add"],
       flags: {
         ...args.flags,
@@ -9940,18 +10163,47 @@ async function backfeed(args) {
         "body-file": bodyPath
       }
     });
+  } else {
+    exitCode = await runQueue({
+      positional: ["add"],
+      flags: {
+        ...args.flags,
+        project: targetProject,
+        title: intent.title,
+        why: `${intent.raw_text.slice(0, 400)} Evidence: ${intent.evidence_ref}`,
+        "done-when": `Reviewed intention is either shipped, rejected, or merged into the current project plan. Source: ${intent.id}`,
+        source: intent.evidence_ref
+      }
+    });
   }
-  return runQueue({
-    positional: ["add"],
-    flags: {
-      ...args.flags,
-      project: targetProject,
-      title: intent.title,
-      why: `${intent.raw_text.slice(0, 400)} Evidence: ${intent.evidence_ref}`,
-      "done-when": `Reviewed intention is either shipped, rejected, or merged into the current project plan. Source: ${intent.id}`,
-      source: intent.evidence_ref
-    }
-  });
+  if (exitCode === 0) {
+    await tryEmitBackfeedCompleted({
+      intent_id: intent.id,
+      destination,
+      target_project: targetProject
+    });
+  } else {
+    await tryEmitBackfeedFailed({
+      intent_id: intent.id,
+      destination,
+      target_project: targetProject,
+      error_class: "backfeed_writer_error",
+      message: `${destination} writer exited with code ${exitCode}`
+    });
+  }
+  if (flagBool(args, "json")) {
+    emitJson({
+      ok: exitCode === 0,
+      command: "intention.backfeed",
+      mode: "live",
+      destination,
+      target_project: targetProject,
+      intent_id: intent.id,
+      daemon_canonical: beforeOutcome.daemon_canonical,
+      daemon_status: beforeOutcome.status
+    });
+  }
+  return exitCode;
 }
 async function reviewFromVerb(args) {
   const raw = flagString(args, "state");
@@ -9982,12 +10234,63 @@ async function reviewIntent(args, state) {
     reason,
     reviewed_at: (/* @__PURE__ */ new Date()).toISOString()
   };
+  const daemon = await tryEmitIntentionReviewed({
+    intent_id: id,
+    state,
+    reviewer_actor_id: reviewer,
+    reason,
+    evidence_ref: found.intent.evidence_ref,
+    reviewed_at: review.reviewed_at
+  });
   const reviews = readReviews().filter((item) => item.intent_id !== id);
   writeReviews([...reviews, review]);
   const reviewedProjection = applyReviews(found.projection);
   const reviewedIntent = findIntent(reviewedProjection, id)?.intent ?? { ...found.intent, review_state: state };
-  emit(args, { ok: true, command: `intention.${state}`, review, intent: reviewedIntent }, () => {
-    emitPretty(`${id} -> ${state}`);
+  emit(args, {
+    ok: true,
+    command: `intention.${state}`,
+    review,
+    intent: reviewedIntent,
+    daemon_canonical: daemon.daemon_canonical,
+    daemon_status: daemon.status
+  }, () => {
+    emitPretty(`${id} -> ${state}${daemon.daemon_canonical ? " (daemon)" : " (file fallback)"}`);
+  });
+  return 0;
+}
+async function listReviewed(args) {
+  const daemonReviews = await tryReadReviewProjection();
+  const fileReviews = readReviews();
+  const merged = /* @__PURE__ */ new Map();
+  for (const r of fileReviews) {
+    merged.set(r.intent_id, { ...r, source: "file" });
+  }
+  for (const r of daemonReviews) {
+    merged.set(r.intent_id, {
+      intent_id: r.intent_id,
+      state: r.state,
+      reviewer: r.reviewer_actor_id,
+      reason: r.reason,
+      reviewed_at: r.reviewed_at,
+      source: "daemon"
+    });
+  }
+  const items = Array.from(merged.values()).sort(
+    (a, b) => (b.reviewed_at ?? "").localeCompare(a.reviewed_at ?? "")
+  );
+  emit(args, {
+    ok: true,
+    command: "intention.list-reviewed",
+    daemon_canonical: daemonReviews.length > 0,
+    reviews: items
+  }, () => {
+    if (items.length === 0) {
+      emitPretty("No reviewed intentions yet.");
+      return;
+    }
+    for (const r of items) {
+      emitPretty(`${r.intent_id} [${r.state}] (${r.source}) ${r.reviewed_at}`);
+    }
   });
   return 0;
 }
@@ -10004,6 +10307,7 @@ function printHelp() {
   emitPretty("  ema intention projection --project proslync-app-ios-final [--json]");
   emitPretty("  ema intention list --project proslync-app-ios-final [--tag lost_followup] [--json]");
   emitPretty("  ema intention list --project proslync-app-ios-final --state accepted [--json]");
+  emitPretty("  ema intention list-reviewed [--json]");
   emitPretty("  ema intention show --intent <id> [--json]");
   emitPretty("  ema intention accept --intent <id> --reason <text> --reviewer actor:trajan [--json]");
   emitPretty("  ema intention reject --intent <id> --reason <text> --reviewer actor:trajan [--json]");
@@ -10011,6 +10315,16 @@ function printHelp() {
   emitPretty("  ema intention review --intent <id> --state accepted|rejected|deferred --reason <text> [--json]");
   emitPretty("  ema intention backfeed --intent <id> --destination queue --dry-run [--json]");
   emitPretty("  ema intention backfeed --intent <id> --destination queue|artifact --approve reviewed [--json]");
+  emitPretty("");
+  emitPretty("Daemon-canonical state:");
+  emitPretty("  Sprint 5 emits intention.reviewed and intention.backfeed.{requested,completed,failed}");
+  emitPretty("  events. The daemon IPC handlers are not yet wired; the CLI falls back to");
+  emitPretty("  .ema-dev/intention-backfeed/reviews.json (migration evidence path) and prints");
+  emitPretty("  daemon_canonical=false on JSON output until the handlers ship.");
+  emitPretty("  See packages/contracts/events/intention.md.");
+  emitPretty("");
+  emitPretty("Guarded backfeed:");
+  emitPretty("  Non-dry-run requires --approve reviewed AND review_state=accepted. No auto-promotion.");
 }
 function printProjection(value) {
   emitPretty(`${value.project ?? "(unresolved project)"} intention projection`);
@@ -10054,14 +10368,14 @@ function discoverSources(project) {
     ...expandGlob(join13(home, ".codex/archived_sessions"))
   ];
   const seen = /* @__PURE__ */ new Set();
-  return paths.filter((path2) => existsSync11(path2) && safeStat(path2)?.isFile()).filter((path2) => {
+  return paths.filter((path2) => existsSync12(path2) && safeStat(path2)?.isFile()).filter((path2) => {
     if (seen.has(path2)) return false;
     seen.add(path2);
     return true;
   }).map((path2) => sourceForPath(path2, project));
 }
 function expandGlob(root) {
-  if (!existsSync11(root)) return [];
+  if (!existsSync12(root)) return [];
   const out = [];
   const stack = [root];
   while (stack.length > 0 && out.length < 500) {
@@ -10127,7 +10441,7 @@ function parseSources(sources, maxRecordsPerSource) {
 }
 function parseSource(source, maxRecords) {
   try {
-    const body = readFileSync9(source.path, "utf8");
+    const body = readFileSync10(source.path, "utf8");
     if (source.path.endsWith(".jsonl")) {
       return body.split("\n").slice(0, maxRecords).flatMap((line, index) => parseJsonLine(source, line, index + 1));
     }
@@ -10259,17 +10573,17 @@ function sourceForPath(path2, project) {
 }
 function readStoredProjection(project) {
   const path2 = storePath(project);
-  if (!existsSync11(path2)) return null;
+  if (!existsSync12(path2)) return null;
   try {
-    return JSON.parse(readFileSync9(path2, "utf8"));
+    return JSON.parse(readFileSync10(path2, "utf8"));
   } catch {
     return null;
   }
 }
 function readReviews() {
-  if (!existsSync11(REVIEWS_PATH)) return [];
+  if (!existsSync12(REVIEWS_PATH)) return [];
   try {
-    const parsed = JSON.parse(readFileSync9(REVIEWS_PATH, "utf8"));
+    const parsed = JSON.parse(readFileSync10(REVIEWS_PATH, "utf8"));
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isReview);
   } catch {
@@ -10302,12 +10616,12 @@ function findIntent(projection2, id) {
   return intent ? { projection: projection2, intent } : null;
 }
 function findIntentAcrossStore(id) {
-  if (!existsSync11(STORE_ROOT)) return null;
+  if (!existsSync12(STORE_ROOT)) return null;
   for (const name of readdirSync5(STORE_ROOT)) {
     if (name === "reviews.json") continue;
     if (!name.endsWith(".json")) continue;
     try {
-      const projection2 = applyReviews(JSON.parse(readFileSync9(join13(STORE_ROOT, name), "utf8")));
+      const projection2 = applyReviews(JSON.parse(readFileSync10(join13(STORE_ROOT, name), "utf8")));
       const found = findIntent(projection2, id);
       if (found) return found;
     } catch {
@@ -10418,6 +10732,110 @@ function parsePositiveInt(value, fallback) {
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+async function tryEmitIntentionReviewed(payload) {
+  return tryEmitDaemonCommand("intention.review.upsert", {
+    org_id: DEFAULT_ORG7,
+    actor_id: payload.reviewer_actor_id,
+    intent_id: payload.intent_id,
+    state: payload.state,
+    reviewer_actor_id: payload.reviewer_actor_id,
+    reason: payload.reason,
+    evidence_ref: payload.evidence_ref,
+    reviewed_at: payload.reviewed_at
+  });
+}
+async function tryEmitBackfeedRequested(payload) {
+  return tryEmitDaemonCommand("intention.backfeed.start", {
+    org_id: DEFAULT_ORG7,
+    actor_id: payload.requester_actor_id,
+    intent_id: payload.intent_id,
+    destination: payload.destination,
+    target_project: payload.target_project,
+    approve_token: payload.approve_token,
+    requester_actor_id: payload.requester_actor_id,
+    requested_at: (/* @__PURE__ */ new Date()).toISOString()
+  });
+}
+async function tryEmitBackfeedCompleted(payload) {
+  return tryEmitDaemonCommand("intention.backfeed.finish", {
+    org_id: DEFAULT_ORG7,
+    actor_id: DEFAULT_ACTOR7,
+    intent_id: payload.intent_id,
+    destination: payload.destination,
+    target_project: payload.target_project,
+    outcome: "completed",
+    resource_id: payload.resource_id ?? "",
+    completed_at: (/* @__PURE__ */ new Date()).toISOString()
+  });
+}
+async function tryEmitBackfeedFailed(payload) {
+  return tryEmitDaemonCommand("intention.backfeed.finish", {
+    org_id: DEFAULT_ORG7,
+    actor_id: DEFAULT_ACTOR7,
+    intent_id: payload.intent_id,
+    destination: payload.destination,
+    target_project: payload.target_project,
+    outcome: "failed",
+    error_class: payload.error_class,
+    message: payload.message,
+    failed_at: (/* @__PURE__ */ new Date()).toISOString()
+  });
+}
+async function tryEmitDaemonCommand(op, argsObj) {
+  try {
+    const c = await connect({ surface: "desktop" });
+    try {
+      const result = await c.command(op, argsObj);
+      if (result.ok === true) {
+        return { daemon_canonical: true, status: "emitted" };
+      }
+      const message = (result.error?.message ?? "").toLowerCase();
+      const isMissingHandler = result.error?.class === "unknown_command" || message.includes("unknown command") || message.includes("no handler");
+      if (isMissingHandler) {
+        return { daemon_canonical: false, status: "blocked_missing_ipc_handler" };
+      }
+      return { daemon_canonical: false, status: "rejected" };
+    } finally {
+      c.close();
+    }
+  } catch {
+    return { daemon_canonical: false, status: "transport_unavailable" };
+  }
+}
+async function tryReadReviewProjection() {
+  try {
+    const c = await connect({ surface: "desktop" });
+    try {
+      const data = await readProjectionShape(c, "intention.review");
+      if (!data) return [];
+      const reviews = data.reviews;
+      if (!Array.isArray(reviews)) return [];
+      return reviews.filter(isDaemonReview);
+    } finally {
+      c.close();
+    }
+  } catch {
+    return [];
+  }
+}
+function readProjectionShape(c, channel) {
+  return new Promise((resolve3) => {
+    const timer = setTimeout(() => resolve3(null), 1500);
+    c.onMessage((msg) => {
+      const env = msg;
+      if (env.type === "projection" && env.name === channel) {
+        clearTimeout(timer);
+        resolve3(env.data);
+      }
+    });
+    c.subscribe(channel);
+  });
+}
+function isDaemonReview(value) {
+  if (!value || typeof value !== "object") return false;
+  const r = value;
+  return typeof r.intent_id === "string" && typeof r.state === "string" && (r.state === "accepted" || r.state === "rejected" || r.state === "deferred" || r.state === "new");
 }
 
 // src/commands/cockpit.ts
@@ -10737,7 +11155,7 @@ async function discoverBuilds(scope, registry2) {
 }
 function intentionProjectionAvailable(scope) {
   const project = scope.project_name ?? "unresolved";
-  return existsSync12(join14(INTENTION_STORE_ROOT, `${safeName2(project)}.json`));
+  return existsSync13(join14(INTENTION_STORE_ROOT, `${safeName2(project)}.json`));
 }
 async function gitFact(path2, registryBuild) {
   const id = registryBuild?.id ?? basename2(path2);
@@ -10749,10 +11167,10 @@ async function gitFact(path2, registryBuild) {
     repo_url: registryBuild?.repoUrl ?? null,
     dev_command: registryBuild?.devCommand ?? null
   };
-  if (!existsSync12(path2)) {
+  if (!existsSync13(path2)) {
     return { ...base, branch: null, head: null, dirty_count: null, git_status: "missing" };
   }
-  if (!existsSync12(join14(path2, ".git"))) {
+  if (!existsSync13(join14(path2, ".git"))) {
     return { ...base, branch: null, head: null, dirty_count: null, git_status: "no_git" };
   }
   const [branch, head, status2] = await Promise.all([
@@ -10788,9 +11206,9 @@ function pidAlive(pid) {
 }
 function readPidFile(name) {
   const path2 = join14(EMA_PIDS_ROOT, `${name}.pid`);
-  if (!existsSync12(path2)) return null;
+  if (!existsSync13(path2)) return null;
   try {
-    const raw = readFileSync10(path2, "utf8").trim();
+    const raw = readFileSync11(path2, "utf8").trim();
     if (!raw) return null;
     const pid = Number(raw);
     return Number.isFinite(pid) && pid > 0 ? pid : null;
@@ -11027,7 +11445,7 @@ function fail(args, command, errorClass, message, code) {
 }
 
 // src/commands/intent.ts
-import { readFileSync as readFileSync11 } from "fs";
+import { readFileSync as readFileSync12 } from "fs";
 var INTENT_COMMANDS = [
   {
     verb: "create",
@@ -11219,7 +11637,7 @@ function changedFields(current, candidate) {
 }
 function readBody(args) {
   const bodyFile = flagString(args, "body-file");
-  if (bodyFile) return readFileSync11(bodyFile, "utf8");
+  if (bodyFile) return readFileSync12(bodyFile, "utf8");
   return flagString(args, "body") ?? null;
 }
 function slugFromTitle(title) {
@@ -11233,7 +11651,7 @@ function fail2(args, command, errorClass, message, code) {
 }
 
 // src/commands/proposal.ts
-import { readFileSync as readFileSync12 } from "fs";
+import { readFileSync as readFileSync13 } from "fs";
 var PROPOSAL_COMMANDS = [
   {
     verb: "create",
@@ -11415,7 +11833,7 @@ function proposalPayload(proposalId, proposal) {
 }
 function readFlagOrFile(args, flag, fileFlag) {
   const file = flagString(args, fileFlag);
-  if (file) return readFileSync12(file, "utf8");
+  if (file) return readFileSync13(file, "utf8");
   return flagString(args, flag) ?? null;
 }
 function fail3(args, command, errorClass, message, code) {
@@ -11425,7 +11843,7 @@ function fail3(args, command, errorClass, message, code) {
 }
 
 // src/commands/canon.ts
-import { readFileSync as readFileSync13 } from "fs";
+import { readFileSync as readFileSync14 } from "fs";
 var CANON_COMMANDS = [
   {
     verb: "write",
@@ -11478,7 +11896,7 @@ async function write(args) {
   if (!SOURCE_KINDS.has(sourceKind)) return fail4(args, "canon.write", "invalid_args", `invalid source kind: ${sourceKind}`, 64);
   const id = flagString(args, "id");
   if (id && canonById(id)) return fail4(args, "canon.write", "duplicate_id", `canon node already exists: ${id}`, 1);
-  const body = readFileSync13(bodyFile, "utf8");
+  const body = readFileSync14(bodyFile, "utf8");
   const links = parseLinks(args);
   if (!links.ok) return fail4(args, "canon.write", "invalid_args", links.error, 64);
   const json = flagBool(args, "json");

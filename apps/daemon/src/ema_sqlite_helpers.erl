@@ -75,6 +75,7 @@
     dispatch_registry_projection_json/1,
     execution_registry_projection_json/1,
     tool_timeline_projection_json/2,
+    intention_review_projection_json/1,
     peer_is_trusted/3,
     collab_open_document/5,
     collab_replace_document/5,
@@ -3654,3 +3655,121 @@ tool_timeline_json(Item) ->
 first_nonempty([]) -> <<>>;
 first_nonempty([<<>> | Rest]) -> first_nonempty(Rest);
 first_nonempty([V | _]) -> V.
+
+%% ---------------------------------------------------------------------------
+%% Sprint 5: intention review projection (daemon-canonical review state).
+%%
+%% Reduces over `intention.reviewed` and `intention.backfeed.{requested,
+%% completed,failed}` events. Replaces `.ema-dev/intention-backfeed/reviews.json`
+%% as canonical truth once the corresponding command handlers ship.
+%% Until then, this projection returns an empty array for installs that have
+%% not yet emitted any intention.* events. The CLI falls back to the file
+%% format on a per-intent basis when this projection is empty for the given
+%% intent_id.
+%% ---------------------------------------------------------------------------
+
+intention_review_projection_json(Db) ->
+    Events = select_events_like(Db, <<"intention.%">>, 1000),
+    Map = lists:foldl(fun apply_intention_event/2, #{}, Events),
+    Items = sort_by_updated(maps:values(Map)),
+    Array = join_json([intention_review_json(Item) || Item <- Items]),
+    iolist_to_binary([
+        <<"{\"source\":\"daemon_events\",">>,
+        <<"\"reviews\":[">>, Array, <<"]}">>
+    ]).
+
+apply_intention_event({Txid, Kind, Ts, Payload}, Acc) ->
+    IntentId = extract_json_string(Payload, <<"intent_id">>),
+    case IntentId of
+        <<>> -> Acc;
+        _ ->
+            Existing = maps:get(IntentId, Acc, intention_default(IntentId)),
+            Updated = update_intention(Existing, Kind, Ts, Txid, Payload),
+            Acc#{IntentId => Updated}
+    end.
+
+intention_default(IntentId) ->
+    #{
+        id => IntentId,
+        intent_id => IntentId,
+        state => <<"new">>,
+        reviewer_actor_id => <<>>,
+        reason => <<>>,
+        reviewed_at => <<>>,
+        backfeed_state => <<"none">>,
+        backfeed_destination => <<>>,
+        backfeed_target_project => <<>>,
+        backfeed_resource_id => <<>>,
+        backfeed_error_class => <<>>,
+        backfeed_message => <<>>,
+        ts => <<>>,
+        txid => 0
+    }.
+
+update_intention(Existing, <<"intention.reviewed">>, Ts, Txid, Payload) ->
+    Existing#{
+        state => extract_json_string(Payload, <<"state">>),
+        reviewer_actor_id => extract_json_string(Payload, <<"reviewer_actor_id">>),
+        reason => extract_json_string(Payload, <<"reason">>),
+        reviewed_at => first_nonempty([
+            extract_json_string(Payload, <<"reviewed_at">>),
+            Ts
+        ]),
+        ts => Ts,
+        txid => Txid
+    };
+update_intention(Existing, <<"intention.backfeed.requested">>, Ts, Txid, Payload) ->
+    Existing#{
+        backfeed_state => <<"requested">>,
+        backfeed_destination => extract_json_string(Payload, <<"destination">>),
+        backfeed_target_project => extract_json_string(Payload, <<"target_project">>),
+        ts => Ts,
+        txid => Txid
+    };
+update_intention(Existing, <<"intention.backfeed.completed">>, Ts, Txid, Payload) ->
+    Existing#{
+        backfeed_state => <<"completed">>,
+        backfeed_destination => first_nonempty([
+            extract_json_string(Payload, <<"destination">>),
+            maps:get(backfeed_destination, Existing, <<>>)
+        ]),
+        backfeed_target_project => first_nonempty([
+            extract_json_string(Payload, <<"target_project">>),
+            maps:get(backfeed_target_project, Existing, <<>>)
+        ]),
+        backfeed_resource_id => extract_json_string(Payload, <<"resource_id">>),
+        ts => Ts,
+        txid => Txid
+    };
+update_intention(Existing, <<"intention.backfeed.failed">>, Ts, Txid, Payload) ->
+    Existing#{
+        backfeed_state => <<"failed">>,
+        backfeed_destination => first_nonempty([
+            extract_json_string(Payload, <<"destination">>),
+            maps:get(backfeed_destination, Existing, <<>>)
+        ]),
+        backfeed_error_class => extract_json_string(Payload, <<"error_class">>),
+        backfeed_message => extract_json_string(Payload, <<"message">>),
+        ts => Ts,
+        txid => Txid
+    };
+update_intention(Existing, _Kind, Ts, Txid, _Payload) ->
+    Existing#{ts => Ts, txid => Txid}.
+
+intention_review_json(Item) ->
+    [
+        <<"{">>,
+        <<"\"intent_id\":">>, nullable_json_string(maps:get(intent_id, Item, <<>>)),
+        <<",\"state\":">>, nullable_json_string(maps:get(state, Item, <<>>)),
+        <<",\"reviewer_actor_id\":">>, nullable_json_string(maps:get(reviewer_actor_id, Item, <<>>)),
+        <<",\"reason\":">>, nullable_json_string(maps:get(reason, Item, <<>>)),
+        <<",\"reviewed_at\":">>, nullable_json_string(maps:get(reviewed_at, Item, <<>>)),
+        <<",\"backfeed_state\":">>, nullable_json_string(maps:get(backfeed_state, Item, <<>>)),
+        <<",\"backfeed_destination\":">>, nullable_json_string(maps:get(backfeed_destination, Item, <<>>)),
+        <<",\"backfeed_target_project\":">>, nullable_json_string(maps:get(backfeed_target_project, Item, <<>>)),
+        <<",\"backfeed_resource_id\":">>, nullable_json_string(maps:get(backfeed_resource_id, Item, <<>>)),
+        <<",\"backfeed_error_class\":">>, nullable_json_string(maps:get(backfeed_error_class, Item, <<>>)),
+        <<",\"backfeed_message\":">>, nullable_json_string(maps:get(backfeed_message, Item, <<>>)),
+        <<",\"updated_at\":">>, nullable_json_string(maps:get(ts, Item, <<>>)),
+        <<"}">>
+    ].

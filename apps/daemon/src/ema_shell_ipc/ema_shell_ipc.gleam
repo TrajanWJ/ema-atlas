@@ -533,6 +533,36 @@ fn handle_bus_delivery(
             bus.blueprint_planner_projection_json(state.bus_subject),
           )
         }
+        "dispatch.started"
+        | "dispatch.scope_granted"
+        | "dispatch.ended" -> {
+          send_projection(
+            conn,
+            "dispatch.registry",
+            bus.dispatch_registry_projection_json(state.bus_subject),
+          )
+        }
+        "execution.started"
+        | "execution.completed"
+        | "execution.ended"
+        | "execution.failed"
+        | "execution.timeout"
+        | "execution.interrupted_by_restart" -> {
+          send_projection(
+            conn,
+            "execution.registry",
+            bus.execution_registry_projection_json(state.bus_subject),
+          )
+        }
+        "tool.invoked"
+        | "tool.returned"
+        | "tool.errored" -> {
+          send_projection(
+            conn,
+            "tool.timeline",
+            bus.tool_timeline_projection_json(state.bus_subject, 200),
+          )
+        }
         _ -> Nil
       }
       mist.continue(state)
@@ -7776,6 +7806,24 @@ fn send_projection_snapshot_scoped(
         conn,
         "intent_graph",
         bus.intent_graph_projection_json(bus_subj),
+      )
+    Some("dispatch.registry") ->
+      send_projection(
+        conn,
+        "dispatch.registry",
+        bus.dispatch_registry_projection_json(bus_subj),
+      )
+    Some("execution.registry") ->
+      send_projection(
+        conn,
+        "execution.registry",
+        bus.execution_registry_projection_json(bus_subj),
+      )
+    Some("tool.timeline") ->
+      send_projection(
+        conn,
+        "tool.timeline",
+        bus.tool_timeline_projection_json(bus_subj, 200),
       )
     Some("companion.status") ->
       send_projection(

@@ -103,7 +103,7 @@ var COMMANDS = [
   { name: "handoff request/list/accept/reject/complete", summary: "Record transfer contracts between actors and lanes." },
   { name: "problem log/list/show/solution/link", summary: "Graph recursive problems, solutions, and dependencies." },
   { name: "blueprint status/list", summary: "Show current Blueprint daemon state and explicit projection/writer gaps." },
-  { name: "wiki search/get/list", summary: "Search and read the project atlas/QMD second-brain layer." },
+  { name: "wiki search/get/list/resolve", summary: "Resolve and read stable IDs from the registry-backed Markdown network." },
   { name: "hermes orient/plan/sweep", summary: "Preview the future Hermes orchestrator packet and plan shape. (projection seed)" },
   { name: "harness providers/donors/dispatch", summary: "Prepare Chronicle + Duct Tape Harness Glue rails. (simulated provider ready)" },
   { name: "peer add/doctor/tunnel", summary: "Manage trusted-dev peer rails. (local registry first, SSH first)" },
@@ -4941,9 +4941,15 @@ function readArray(data, key) {
 // src/commands/wiki.ts
 import { promises as fs } from "fs";
 import path from "path";
+var REGISTRY_PATH = process.env.WIKI_REGISTRY?.trim() || path.join(
+  DESKTOP_ROOT,
+  "Projects",
+  "EMA",
+  "atlas",
+  "knowledge",
+  "doc-registry.json"
+);
 var ATLAS_ROOT = path.join(DESKTOP_ROOT, "Projects", "EMA", "atlas");
-var DOC_REF6 = "Projects/EMA/atlas/knowledge/ROOT-MAP.md";
-var MAX_FILES = 2500;
 async function runWiki(args) {
   const verb = args.positional[0];
   if (flagBool(args, "help") || args.flags.h === true || verb === void 0 || verb === "help") {
@@ -4952,41 +4958,71 @@ async function runWiki(args) {
   if (verb === "list") return runList2(args);
   if (verb === "search") return runSearch(args);
   if (verb === "get" || verb === "show") return runGet(args);
-  emitError(`ema wiki: unknown subcommand "${verb}" (expected: list | search | get)`);
+  if (verb === "resolve") return runResolve(args);
+  if (verb === "path") return runPath(args);
+  if (verb === "backlinks") return runBacklinks(args);
+  if (verb === "check") return runCheck(args);
+  if (verb === "dump") return runDump(args);
+  emitError(
+    `ema wiki: unknown subcommand "${verb}" (expected: list | search | get | resolve | path | backlinks | check | dump)`
+  );
   return 64;
 }
-function runHelp3(args) {
+async function runHelp3(args) {
   const json = flagBool(args, "json");
   const body = {
     ok: true,
     noun: "wiki",
-    status: "atlas_file_index",
-    atlas_root: ATLAS_ROOT,
+    status: "doc_registry",
+    source: "doc_registry",
+    registry_path: REGISTRY_PATH,
+    workspace_root: DESKTOP_ROOT,
     commands: [
-      "ema wiki list [--limit 20] [--json]",
+      "ema wiki list [--limit 20] [--ns N] [--tag T] [--project P] [--json]",
       "ema wiki search --query <text> [--limit 10] [--json]",
-      "ema wiki get --path <atlas-relative-path> [--json]"
+      "ema wiki get <wiki-id> [--json]",
+      "ema wiki resolve <wiki-id> [--json]",
+      "ema wiki path <absolute-or-workspace-relative-path> [--json]",
+      "ema wiki backlinks <wiki-id> [--json]",
+      "ema wiki check [--json]",
+      "ema wiki dump [--json]"
     ],
-    doc: DOC_REF6
+    wikilinks: [
+      "[[namespace:slug]]",
+      "<!-- wiki-id: namespace:slug -->",
+      "<!-- see-also: id1, id2, id3 -->"
+    ]
   };
   if (json) emitJson(body);
   else {
-    emitPretty("ema wiki \u2014 atlas/QMD second-brain search");
-    emitPretty(`atlas_root: ${ATLAS_ROOT}`);
+    emitPretty("ema wiki \u2014 registry-backed markdown network");
+    emitPretty(`registry: ${REGISTRY_PATH}`);
     emitPretty("Usage:");
     for (const command of body.commands) emitPretty(`  ${command}`);
-    emitPretty(`Docs: ${DOC_REF6}`);
+    emitPretty("");
+    emitPretty("Native links:");
+    for (const link of body.wikilinks) emitPretty(`  ${link}`);
   }
   return 0;
 }
 async function runList2(args) {
   const json = flagBool(args, "json");
   const limit = parseLimit2(args, 30);
-  const notes = (await loadNotes()).slice(0, limit);
-  if (json) emitJson({ ok: true, command: "wiki list", source: "atlas_files", notes });
-  else {
-    emitPretty(`# wiki list  (source: atlas_files)`);
-    for (const note of notes) emitPretty(`${note.path} \u2014 ${note.title}`);
+  const rows = filterRows(await registryRows(), args).slice(0, limit);
+  if (json) {
+    emitJson({
+      ok: true,
+      command: "wiki list",
+      source: "doc_registry",
+      registry_path: REGISTRY_PATH,
+      docs: rows
+    });
+  } else {
+    emitPretty("# wiki list  (source: doc_registry)");
+    const width = Math.max(...rows.map((row) => row.id.length), 10);
+    for (const row of rows) {
+      emitPretty(`${row.id.padEnd(width)}  ${row.title ?? "(untitled)"}`);
+    }
   }
   return 0;
 }
@@ -4999,112 +5035,473 @@ async function runSearch(args) {
   }
   const limit = parseLimit2(args, 10);
   const q = query.toLowerCase();
-  const scored = (await loadNotes()).map((note) => ({ note, score: scoreNote(note, q) })).filter((item) => item.score > 0).sort((a, b) => b.score - a.score).slice(0, limit).map((item) => item.note);
-  if (json) emitJson({ ok: true, command: "wiki search", source: "atlas_files", query, notes: scored });
-  else {
+  const rows = (await registryRows()).map((row) => ({ row, score: scoreRow(row, q) })).filter((item) => item.score > 0).sort((a, b) => b.score - a.score || a.row.id.localeCompare(b.row.id)).slice(0, limit).map((item) => item.row);
+  if (json) {
+    emitJson({
+      ok: true,
+      command: "wiki search",
+      source: "doc_registry",
+      registry_path: REGISTRY_PATH,
+      query,
+      docs: rows
+    });
+  } else {
     emitPretty(`# wiki search "${query}"`);
-    for (const note of scored) {
-      emitPretty(`${note.path} \u2014 ${note.title}`);
-      if (note.excerpt) emitPretty(`  ${note.excerpt}`);
+    const width = Math.max(...rows.map((row) => row.id.length), 10);
+    for (const row of rows) {
+      emitPretty(`${row.id.padEnd(width)}  ${row.title ?? "(untitled)"}`);
+      if (row.description) emitPretty(`  ${row.description}`);
     }
   }
   return 0;
 }
 async function runGet(args) {
   const json = flagBool(args, "json");
-  const rel = flagString(args, "path") ?? args.positional[1];
-  if (!rel) {
-    emitError("ema wiki get: --path is required");
+  const target = flagString(args, "id") ?? args.positional[1];
+  const relPath = flagString(args, "path");
+  if (!target && !relPath) {
+    emitError("ema wiki get: <wiki-id> or --path is required");
     return 64;
   }
-  const safePath = path.normalize(rel).replace(/^(\.\.[/\\])+/, "");
-  const abs = path.resolve(ATLAS_ROOT, safePath);
-  const rootWithSep = `${path.resolve(ATLAS_ROOT)}${path.sep}`;
-  if (abs !== path.resolve(ATLAS_ROOT) && !abs.startsWith(rootWithSep)) {
-    emitError("ema wiki get: path must stay inside Projects/EMA/atlas");
+  const registry2 = await loadRegistry();
+  const row = target ? rowForId(registry2, target) : rowForPath(registry2, relPath ?? "");
+  if (row) {
+    return emitDocContent(json, row);
+  }
+  if (relPath) return emitAtlasPath(json, relPath);
+  emitError(`ema wiki get: unknown id "${target}"`);
+  return 1;
+}
+async function runResolve(args) {
+  const json = flagBool(args, "json");
+  const id = args.positional[1];
+  if (!id) {
+    emitError("ema wiki resolve: <wiki-id> is required");
     return 64;
+  }
+  const registry2 = await loadRegistry();
+  const row = rowForId(registry2, id);
+  if (!row) {
+    emitError(`ema wiki resolve: unknown id "${id}"`);
+    if (json) {
+      emitJson({
+        ok: false,
+        command: "wiki resolve",
+        source: "doc_registry",
+        id,
+        error: "unknown_id"
+      });
+    }
+    return 1;
+  }
+  const withExistence = await rowWithExistence(row);
+  if (json) {
+    emitJson({
+      ok: withExistence.exists,
+      command: "wiki resolve",
+      source: "doc_registry",
+      registry_path: REGISTRY_PATH,
+      doc: withExistence
+    });
+  } else {
+    emitPretty(withExistence.absolute_path);
+    if (!withExistence.exists) {
+      emitError(
+        `ema wiki resolve: WARNING path does not exist: ${withExistence.absolute_path}`
+      );
+    }
+  }
+  return withExistence.exists ? 0 : 2;
+}
+async function runPath(args) {
+  const json = flagBool(args, "json");
+  const input = args.positional[1];
+  if (!input) {
+    emitError(
+      "ema wiki path: <absolute-or-workspace-relative-path> is required"
+    );
+    return 64;
+  }
+  const registry2 = await loadRegistry();
+  const row = rowForPath(registry2, input);
+  if (!row) {
+    emitError(`ema wiki path: no registered id for ${input}`);
+    if (json)
+      emitJson({
+        ok: false,
+        command: "wiki path",
+        source: "doc_registry",
+        path: input
+      });
+    return 1;
+  }
+  const withExistence = await rowWithExistence(row);
+  if (json) {
+    emitJson({
+      ok: true,
+      command: "wiki path",
+      source: "doc_registry",
+      registry_path: REGISTRY_PATH,
+      doc: withExistence
+    });
+  } else {
+    emitPretty(withExistence.id);
+  }
+  return 0;
+}
+async function runBacklinks(args) {
+  const json = flagBool(args, "json");
+  const id = args.positional[1];
+  if (!id) {
+    emitError("ema wiki backlinks: <wiki-id> is required");
+    return 64;
+  }
+  const registry2 = await loadRegistry();
+  const row = rowForId(registry2, id);
+  if (!row) {
+    emitError(`ema wiki backlinks: unknown id "${id}"`);
+    return 1;
+  }
+  const backlinks = await findBacklinks(registry2, id);
+  if (json) {
+    emitJson({
+      ok: true,
+      command: "wiki backlinks",
+      source: "doc_registry",
+      registry_path: REGISTRY_PATH,
+      id,
+      backlinks
+    });
+  } else if (backlinks.length === 0) {
+    emitPretty(`(no backlinks to ${id})`);
+  } else {
+    const width = Math.max(...backlinks.map((link) => link.id.length), 10);
+    for (const link of backlinks)
+      emitPretty(`${link.id.padEnd(width)}  via ${link.via}`);
+  }
+  return 0;
+}
+async function runCheck(args) {
+  const json = flagBool(args, "json");
+  const registry2 = await loadRegistry();
+  const audit = await auditRegistry(registry2);
+  const ok = audit.issues.length === 0;
+  if (json) {
+    emitJson({
+      ok,
+      command: "wiki check",
+      source: "doc_registry",
+      registry_path: REGISTRY_PATH,
+      entries: Object.keys(registry2.docs).length,
+      markdown_count: audit.markdownCount,
+      stamped_count: audit.stamped.length,
+      unstamped: audit.unstamped,
+      issues: audit.issues
+    });
+  } else {
+    emitPretty(
+      `wiki check: ${Object.keys(registry2.docs).length} entries in registry`
+    );
+    emitPretty("---");
+    if (audit.missingCount === 0) emitPretty("  all paths resolve cleanly");
+    for (const issue of audit.issues) {
+      if (issue.kind === "missing_path")
+        emitPretty(`  MISSING  ${issue.id}  (${issue.path})`);
+      if (issue.kind === "read_error")
+        emitPretty(`  READ-ERROR  ${issue.id}  ${issue.message ?? ""}`);
+      if (issue.kind === "id_mismatch") {
+        emitPretty(
+          `  ID-MISMATCH  registered=${issue.id}  stamped=${issue.stamped}  (${issue.path})`
+        );
+      }
+    }
+    emitPretty("---");
+    emitPretty(
+      `stamped:    ${audit.stamped.length} / ${audit.markdownCount} markdown docs`
+    );
+    if (audit.unstamped.length > 0) {
+      emitPretty(
+        `unstamped:  ${audit.unstamped.length} docs (no <!-- wiki-id: ... --> at top)`
+      );
+      for (const id of audit.unstamped) emitPretty(`  - ${id}`);
+    }
+    emitPretty("---");
+    emitPretty(`issues: ${audit.issues.length}`);
+  }
+  return ok ? 0 : 1;
+}
+async function runDump(args) {
+  const json = flagBool(args, "json");
+  const registry2 = await loadRegistry();
+  if (json) {
+    emitJson({
+      ok: true,
+      command: "wiki dump",
+      source: "doc_registry",
+      registry: registry2
+    });
+  } else {
+    const rows = await registryRows();
+    for (const row of rows) {
+      emitPretty(row.id);
+      emitPretty(`  path:    ${row.path}`);
+      emitPretty(`  title:   ${row.title ?? "(untitled)"}`);
+      emitPretty(`  project: ${row.project ?? "(workspace)"}`);
+      emitPretty(`  tags:    ${(row.tags ?? []).join(",")}`);
+      emitPretty("");
+    }
+  }
+  return 0;
+}
+async function loadRegistry() {
+  try {
+    const raw = await fs.readFile(REGISTRY_PATH, "utf8");
+    const parsed = JSON.parse(raw);
+    return {
+      ...parsed,
+      docs: parsed.docs ?? {}
+    };
+  } catch (err) {
+    emitError(
+      `ema wiki: registry unavailable at ${REGISTRY_PATH}: ${err instanceof Error ? err.message : String(err)}`
+    );
+    throw err;
+  }
+}
+async function registryRows() {
+  const registry2 = await loadRegistry();
+  const rows = await Promise.all(
+    Object.entries(registry2.docs).map(
+      async ([id, doc]) => rowWithExistence(toRow(id, doc))
+    )
+  );
+  return rows.sort((a, b) => a.id.localeCompare(b.id));
+}
+function filterRows(rows, args) {
+  const ns = flagString(args, "ns");
+  const tag = flagString(args, "tag");
+  const project = flagString(args, "project");
+  return rows.filter((row) => {
+    if (ns && !row.id.startsWith(`${ns}:`)) return false;
+    if (tag && !(row.tags ?? []).includes(tag)) return false;
+    if (project && row.project !== project) return false;
+    return true;
+  });
+}
+function rowForId(registry2, id) {
+  const doc = registry2.docs[id];
+  return doc ? toRow(id, doc) : null;
+}
+function rowForPath(registry2, input) {
+  const rel = workspaceRelativePath(input);
+  if (!rel) return null;
+  for (const [id, doc] of Object.entries(registry2.docs)) {
+    if (normalizePath(doc.path) === rel) return toRow(id, doc);
+  }
+  return null;
+}
+function toRow(id, doc) {
+  const absolutePath = path.resolve(DESKTOP_ROOT, doc.path);
+  return {
+    ...doc,
+    id,
+    absolute_path: absolutePath,
+    exists: false
+  };
+}
+async function rowWithExistence(row) {
+  return {
+    ...row,
+    exists: await exists(row.absolute_path)
+  };
+}
+async function emitDocContent(json, row) {
+  const withExistence = await rowWithExistence(row);
+  if (!withExistence.exists) {
+    emitError(
+      `ema wiki get: path does not exist: ${withExistence.absolute_path}`
+    );
+    if (json)
+      emitJson({
+        ok: false,
+        command: "wiki get",
+        source: "doc_registry",
+        doc: withExistence
+      });
+    return 2;
   }
   try {
-    const content = await fs.readFile(abs, "utf8");
-    const note = noteFromContent(safePath, content);
-    if (json) emitJson({ ok: true, command: "wiki get", source: "atlas_files", note, content });
-    else {
-      emitPretty(`# ${note.title}`);
-      emitPretty(`path: ${note.path}`);
+    const content = await fs.readFile(withExistence.absolute_path, "utf8");
+    if (json) {
+      emitJson({
+        ok: true,
+        command: "wiki get",
+        source: "doc_registry",
+        registry_path: REGISTRY_PATH,
+        doc: withExistence,
+        content
+      });
+    } else {
+      emitPretty(`# ${withExistence.title ?? withExistence.id}`);
+      emitPretty(`id: ${withExistence.id}`);
+      emitPretty(`path: ${withExistence.absolute_path}`);
+      if (withExistence.tags?.length)
+        emitPretty(`tags: ${withExistence.tags.join(", ")}`);
+      if (withExistence.description)
+        emitPretty(`description: ${withExistence.description}`);
       emitPretty("");
       emitPretty(content);
     }
     return 0;
   } catch (err) {
-    emitError(`ema wiki get: ${err instanceof Error ? err.message : String(err)}`);
+    emitError(
+      `ema wiki get: ${err instanceof Error ? err.message : String(err)}`
+    );
     return 1;
   }
 }
-async function loadNotes() {
-  const files = await walk(ATLAS_ROOT);
-  const notes = [];
-  for (const file of files.slice(0, MAX_FILES)) {
-    const rel = path.relative(ATLAS_ROOT, file);
+async function emitAtlasPath(json, relPath) {
+  const safePath = path.normalize(relPath).replace(/^(\.\.[/\\])+/, "");
+  const absPath = path.resolve(ATLAS_ROOT, safePath);
+  const rootWithSep = `${path.resolve(ATLAS_ROOT)}${path.sep}`;
+  if (absPath !== path.resolve(ATLAS_ROOT) && !absPath.startsWith(rootWithSep)) {
+    emitError("ema wiki get: path must stay inside Projects/EMA/atlas");
+    return 64;
+  }
+  try {
+    const content = await fs.readFile(absPath, "utf8");
+    if (json) {
+      emitJson({
+        ok: true,
+        command: "wiki get",
+        source: "atlas_file_fallback",
+        path: safePath,
+        absolute_path: absPath,
+        content
+      });
+    } else {
+      emitPretty(content);
+    }
+    return 0;
+  } catch (err) {
+    emitError(
+      `ema wiki get: ${err instanceof Error ? err.message : String(err)}`
+    );
+    return 1;
+  }
+}
+async function findBacklinks(registry2, target) {
+  const links = [];
+  const seeAlsoRe = /<!--\s*see-also:\s*([^>]*?)\s*-->/g;
+  const wikiLinkRe = /\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]/g;
+  for (const [id, doc] of Object.entries(registry2.docs)) {
+    if (id === target) continue;
+    const absPath = path.resolve(DESKTOP_ROOT, doc.path);
+    if (!doc.path.endsWith(".md") || !await exists(absPath)) continue;
+    let text = "";
     try {
-      const content = await fs.readFile(file, "utf8");
-      notes.push(noteFromContent(rel, content));
+      text = await fs.readFile(absPath, "utf8");
     } catch {
+      continue;
+    }
+    if (hasWikilink(text, target, wikiLinkRe)) {
+      links.push({ id, via: "wikilink", path: absPath });
+      continue;
+    }
+    if (hasSeeAlso(text.slice(0, 4e3), target, seeAlsoRe)) {
+      links.push({ id, via: "see-also", path: absPath });
     }
   }
-  return notes.sort((a, b) => a.path.localeCompare(b.path));
+  return links.sort((a, b) => a.id.localeCompare(b.id));
 }
-async function walk(root) {
-  const out = [];
-  async function visit(dir) {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.name === "node_modules" || entry.name === ".git" || entry.name === ".next") continue;
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (entry.name === "archive") continue;
-        await visit(full);
-      } else if (entry.isFile() && (entry.name.endsWith(".md") || entry.name.endsWith(".qmd"))) {
-        out.push(full);
+function hasWikilink(text, target, wikiLinkRe) {
+  wikiLinkRe.lastIndex = 0;
+  for (const match of text.matchAll(wikiLinkRe)) {
+    if (match[1]?.trim() === target) return true;
+  }
+  return false;
+}
+function hasSeeAlso(text, target, seeAlsoRe) {
+  seeAlsoRe.lastIndex = 0;
+  for (const match of text.matchAll(seeAlsoRe)) {
+    const ids = (match[1] ?? "").split(",").map((part) => part.trim());
+    if (ids.includes(target)) return true;
+  }
+  return false;
+}
+async function auditRegistry(registry2) {
+  const issues = [];
+  const stamped = [];
+  const unstamped = [];
+  let markdownCount = 0;
+  let missingCount = 0;
+  const stampRe = /<!--\s*wiki-id:\s*([\w-]+:[\w-]+)\s*-->/;
+  for (const [id, doc] of Object.entries(registry2.docs)) {
+    const absPath = path.resolve(DESKTOP_ROOT, doc.path);
+    const existsPath = await exists(absPath);
+    if (!existsPath) {
+      missingCount += 1;
+      issues.push({ kind: "missing_path", id, path: absPath });
+      continue;
+    }
+    if (!doc.path.endsWith(".md")) continue;
+    markdownCount += 1;
+    try {
+      const text = await fs.readFile(absPath, "utf8");
+      const stamp = stampRe.exec(text.slice(0, 2e3))?.[1]?.trim();
+      if (!stamp) {
+        unstamped.push(id);
+        continue;
       }
+      stamped.push(id);
+      if (stamp !== id)
+        issues.push({ kind: "id_mismatch", id, path: absPath, stamped: stamp });
+    } catch (err) {
+      issues.push({
+        kind: "read_error",
+        id,
+        path: absPath,
+        message: err instanceof Error ? err.message : String(err)
+      });
     }
   }
-  await visit(root);
-  return out;
-}
-function noteFromContent(rel, content) {
-  const frontmatter = parseFrontmatter3(content);
-  const body = content.replace(/^---[\s\S]*?---\n*/m, "");
-  const heading = body.match(/^#\s+(.+)$/m)?.[1]?.trim();
-  const fallback = path.basename(rel).replace(/\.(qmd|md)$/i, "").replace(/[-_]/g, " ");
   return {
-    path: rel,
-    title: frontmatter.title ?? heading ?? fallback,
-    node_id: frontmatter.node_id ?? frontmatter.id ?? null,
-    node_type: frontmatter.node_type ?? frontmatter.type ?? null,
-    status: frontmatter.status ?? null,
-    excerpt: body.split(/\r?\n/).map((line) => line.trim()).filter((line) => line && !line.startsWith("#")).slice(0, 2).join(" ").slice(0, 240)
+    markdownCount,
+    missingCount,
+    stamped: stamped.sort(),
+    unstamped: unstamped.sort(),
+    issues
   };
 }
-function parseFrontmatter3(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/m);
-  if (!match?.[1]) return {};
-  const out = {};
-  for (const line of match[1].split(/\r?\n/)) {
-    const m = line.match(/^([A-Za-z0-9_-]+):\s*(.+)$/);
-    if (m?.[1] && m[2]) out[m[1]] = m[2].replace(/^["']|["']$/g, "").trim();
-  }
-  return out;
+function workspaceRelativePath(input) {
+  const absPath = path.isAbsolute(input) ? path.resolve(input) : path.resolve(DESKTOP_ROOT, input);
+  const rel = path.relative(DESKTOP_ROOT, absPath);
+  if (rel.startsWith("..") || path.isAbsolute(rel)) return null;
+  return normalizePath(rel);
 }
-function scoreNote(note, query) {
-  const haystack = `${note.path}
-${note.title}
-${note.node_id ?? ""}
-${note.node_type ?? ""}
-${note.excerpt}`.toLowerCase();
+function normalizePath(input) {
+  return input.split(path.sep).join("/");
+}
+async function exists(absPath) {
+  try {
+    await fs.access(absPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+function scoreRow(row, query) {
+  const haystack = `${row.id}
+${row.title ?? ""}
+${row.description ?? ""}
+${row.project ?? ""}
+${(row.tags ?? []).join(" ")}
+${row.path}`.toLowerCase();
   let score = 0;
   for (const term of query.split(/\s+/).filter(Boolean)) {
-    if (note.title.toLowerCase().includes(term)) score += 8;
-    if (note.path.toLowerCase().includes(term)) score += 5;
+    if (row.id.toLowerCase().includes(term)) score += 12;
+    if ((row.title ?? "").toLowerCase().includes(term)) score += 8;
+    if (row.path.toLowerCase().includes(term)) score += 5;
     if (haystack.includes(term)) score += 1;
   }
   return score;
@@ -5865,9 +6262,11 @@ function runDonors(args) {
   }
   return 0;
 }
-function runStatus3(args) {
+async function runStatus3(args) {
   const readyProviders = PROVIDERS.filter((provider) => provider.status === "ready");
   const pendingProviders = PROVIDERS.filter((provider) => provider.status !== "ready");
+  const projectionStatus = await readHarnessProjections();
+  const stillPending = Object.entries(projectionStatus).filter(([, value]) => value.status !== "live").map(([key]) => key);
   const payload = {
     ok: true,
     command: "harness status",
@@ -5875,8 +6274,14 @@ function runStatus3(args) {
     boundary: "Harness Glue is usable preparation rail, not Hermes authority.",
     readiness: {
       usable_now: ["harness.providers", "harness.donors", "simulated dispatch", "tmux-backed worker session planning", "lane-assigned sessions", "session context snapshots", "event log replay", "tool timeline replay", "session grep", "stop audit event"],
-      pending_daemon_projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
+      pending_daemon_projections: stillPending,
       pending_provider_adapters: pendingProviders.map((provider) => provider.id)
+    },
+    projections: {
+      dispatch_registry: projectionStatus["dispatch.registry"],
+      execution_registry: projectionStatus["execution.registry"],
+      tool_timeline: projectionStatus["tool.timeline"],
+      chronicle_activity: projectionStatus["chronicle.activity"]
     },
     providers: {
       ready: readyProviders.map((provider) => provider.id),
@@ -5895,7 +6300,7 @@ function runStatus3(args) {
     emitPretty("harness status");
     emitPretty(`  status: ${payload.status}`);
     emitPretty(`  ready providers: ${payload.providers.ready.join(", ") || "none"}`);
-    emitPretty(`  pending daemon projections: ${payload.readiness.pending_daemon_projections.join(", ")}`);
+    emitPretty(`  pending daemon projections: ${payload.readiness.pending_daemon_projections.join(", ") || "none"}`);
   }
   return 0;
 }
@@ -5965,18 +6370,27 @@ function runStart(args) {
   else emitPretty(`${provider} running in tmux session ${session}`);
   return 0;
 }
-function runList3(args) {
+async function runList3(args) {
   const lane = flagString(args, "lane");
   let records = readRecords2();
   if (lane) records = records.filter((record) => record.lane === lane || record.lane_assignment?.lane_id === lane);
+  const projectionStatus = await readHarnessProjections();
+  const dispatchProjection = projectionStatus["dispatch.registry"];
+  const executionProjection = projectionStatus["execution.registry"];
+  const filteredDispatches = lane && Array.isArray(dispatchProjection.records) ? dispatchProjection.records.filter((entry) => typeof entry === "object" && entry !== null && entry.lane_id === lane) : dispatchProjection.records;
+  const filteredExecutions = lane && Array.isArray(executionProjection.records) ? executionProjection.records : executionProjection.records;
   const payload = {
     ok: true,
     command: "harness list",
     backend: "file_backed_tmux_registry",
-    daemon_authority: "file_backed_harness_registry",
+    daemon_authority: "canonical_events",
     lane: lane ?? null,
     lane_assignments: lane ? readLaneAssignment(lane) : readLaneAssignments(),
-    executions: records.map((record) => enrichRecordStatus(record))
+    executions: records.map((record) => enrichRecordStatus(record)),
+    projections: {
+      dispatch_registry: { ...dispatchProjection, records: filteredDispatches },
+      execution_registry: { ...executionProjection, records: filteredExecutions }
+    }
   };
   if (flagBool(args, "json")) emitJson(payload);
   else for (const record of payload.executions) emitPretty(`${record.execution?.id ?? "execution:unknown"} ${record.provider ?? "unknown"} ${record.execution?.tmux_session ?? "no-session"} ${record.runtime?.tmux ?? "unknown"} ${record.status ?? "unknown"}`);
@@ -6006,7 +6420,7 @@ function runAssign(args) {
   else emitPretty(`${execution} assigned to ${lane}`);
   return 0;
 }
-function runContext(args) {
+async function runContext(args) {
   const execution = flagString(args, "execution");
   const lane = flagString(args, "lane");
   const lines = Number(flagString(args, "lines") ?? "120");
@@ -6019,14 +6433,23 @@ function runContext(args) {
       events: readEvents({ execution: enriched.execution?.id, lane: enriched.lane ?? enriched.lane_assignment?.lane_id ?? null })
     };
   });
+  const projectionStatus = await readHarnessProjections();
+  const toolTimeline = projectionStatus["tool.timeline"];
+  const chronicle = projectionStatus["chronicle.activity"];
+  const recentTools = Array.isArray(toolTimeline.records) ? toolTimeline.records.filter((entry) => !execution || typeof entry === "object" && entry !== null && entry.execution_id === execution).slice(-12) : [];
+  const recentChronicle = Array.isArray(chronicle.records) ? chronicle.records.slice(0, 12) : [];
   const payload = {
     ok: true,
     command: "harness context",
     backend: "file_backed_tmux_registry",
-    daemon_authority: "file_backed_harness_registry",
+    daemon_authority: "canonical_events",
     selector: { execution: execution ?? null, lane: lane ?? null },
     lane_assignment: lane ? readLaneAssignment(lane) : null,
-    executions: records
+    executions: records,
+    projections: {
+      tool_timeline: { ...toolTimeline, records: recentTools },
+      chronicle_activity: { ...chronicle, records: recentChronicle }
+    }
   };
   if (flagBool(args, "json")) emitJson(payload);
   else for (const record of records) emitPretty(`${record.execution?.id ?? "execution:unknown"} ${record.runtime?.tmux ?? "unknown"}
@@ -6790,6 +7213,78 @@ function runSearch2(args) {
 function projections() {
   return ["harness.providers", "dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"];
 }
+var HARNESS_PROJECTION_CHANNELS = [
+  "dispatch.registry",
+  "execution.registry",
+  "tool.timeline",
+  "chronicle.activity"
+];
+async function readHarnessProjections() {
+  const result = {
+    "dispatch.registry": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] },
+    "execution.registry": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] },
+    "tool.timeline": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] },
+    "chronicle.activity": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] }
+  };
+  let client;
+  try {
+    client = await connect({ surface: "desktop" });
+  } catch (err) {
+    if (err instanceof DaemonUnreachableError) {
+      for (const channel of HARNESS_PROJECTION_CHANNELS) {
+        result[channel] = { status: "unavailable", count: 0, source: "unavailable", records: [] };
+      }
+      return result;
+    }
+    return result;
+  }
+  try {
+    const seen = /* @__PURE__ */ new Map();
+    const finished = /* @__PURE__ */ new Set();
+    const ready = new Promise((resolve2) => {
+      const timer = setTimeout(() => resolve2(), 1500);
+      client.onMessage((msg) => {
+        if (msg.type !== "projection") return;
+        const name = msg.name;
+        if (!name || !HARNESS_PROJECTION_CHANNELS.includes(name)) return;
+        const data = msg.data;
+        const records = extractProjectionRecords(name, data);
+        seen.set(name, records);
+        finished.add(name);
+        if (finished.size >= HARNESS_PROJECTION_CHANNELS.length) {
+          clearTimeout(timer);
+          resolve2();
+        }
+      });
+      for (const channel of HARNESS_PROJECTION_CHANNELS) client.subscribe(channel);
+    });
+    await ready;
+    for (const channel of HARNESS_PROJECTION_CHANNELS) {
+      const records = seen.get(channel) ?? [];
+      result[channel] = {
+        status: finished.has(channel) ? "live" : "pending_daemon_projection",
+        count: records.length,
+        source: finished.has(channel) ? "daemon_events" : "unavailable",
+        records
+      };
+    }
+  } finally {
+    client.close();
+  }
+  return result;
+}
+function extractProjectionRecords(channel, data) {
+  if (!data || typeof data !== "object") return [];
+  const obj = data;
+  if (channel === "dispatch.registry" && Array.isArray(obj.dispatches)) return obj.dispatches;
+  if (channel === "execution.registry" && Array.isArray(obj.executions)) return obj.executions;
+  if (channel === "tool.timeline" && Array.isArray(obj.tools)) return obj.tools;
+  if (channel === "chronicle.activity") {
+    if (Array.isArray(obj.events)) return obj.events;
+    if (Array.isArray(obj.items)) return obj.items;
+  }
+  return [];
+}
 function simulatedSleepSeconds(prompt) {
   const match = prompt.trim().match(/^smoke:sleep:(\d+)$/);
   if (!match) return null;
@@ -6977,7 +7472,7 @@ function stableId2(input) {
 import { execFileSync as execFileSync2 } from "child_process";
 import { existsSync as existsSync7, readFileSync as readFileSync6, writeFileSync as writeFileSync4 } from "fs";
 import { dirname as dirname3, join as join6 } from "path";
-var REGISTRY_PATH = join6(EMA_ACTIVE_BUILD, ".ema", "peers.json");
+var REGISTRY_PATH2 = join6(EMA_ACTIVE_BUILD, ".ema", "peers.json");
 function runPeer(args) {
   const verb = args.positional[0] ?? "doctor";
   if (flagBool(args, "help") || args.flags.h === true || verb === "help") return runPeerHelp(args);
@@ -6999,7 +7494,7 @@ function runPeerHelp(args) {
     { verb: "sudo-check", summary: "Check explicit grant/sudo readiness without ambient control." }
   ];
   if (flagBool(args, "json")) {
-    emitJson({ noun: "peer", status: "local_registry_first", commands, registry: REGISTRY_PATH });
+    emitJson({ noun: "peer", status: "local_registry_first", commands, registry: REGISTRY_PATH2 });
     return 0;
   }
   emitPretty("ema peer \u2014 trusted-dev peer execution rail");
@@ -7024,7 +7519,7 @@ function runAdd2(args) {
   };
   peers.push(record);
   savePeers(peers);
-  if (flagBool(args, "json")) emitJson({ ok: true, command: "peer add", registry: REGISTRY_PATH, peer: record });
+  if (flagBool(args, "json")) emitJson({ ok: true, command: "peer add", registry: REGISTRY_PATH2, peer: record });
   else emitPretty(`peer registered: ${id}`);
   return 0;
 }
@@ -7129,17 +7624,17 @@ function commandCheck(name, args) {
   }
 }
 function loadPeers() {
-  if (!existsSync7(REGISTRY_PATH)) return [];
+  if (!existsSync7(REGISTRY_PATH2)) return [];
   try {
-    const parsed = JSON.parse(readFileSync6(REGISTRY_PATH, "utf8"));
+    const parsed = JSON.parse(readFileSync6(REGISTRY_PATH2, "utf8"));
     return Array.isArray(parsed.peers) ? parsed.peers : [];
   } catch {
     return [];
   }
 }
 function savePeers(peers) {
-  if (!existsSync7(dirname3(REGISTRY_PATH))) execFileSync2("mkdir", ["-p", dirname3(REGISTRY_PATH)]);
-  writeFileSync4(REGISTRY_PATH, `${JSON.stringify({ peers }, null, 2)}
+  if (!existsSync7(dirname3(REGISTRY_PATH2))) execFileSync2("mkdir", ["-p", dirname3(REGISTRY_PATH2)]);
+  writeFileSync4(REGISTRY_PATH2, `${JSON.stringify({ peers }, null, 2)}
 `);
 }
 
@@ -7992,7 +8487,11 @@ async function runDoctor2(args) {
       { id: "T3.2 auto-checkup-tick", status: "partial", note: "v1 on-demand IPC + CLI; periodic actor pending (D.1)" },
       { id: "T3.3 auto-grow-agent", status: "ok", note: "package builds; detector tests pass" },
       { id: "promote-to-proposal", status: "ok", note: "blueprint.section.promote emits proposal.drafted + mirror" },
-      { id: "skills-wiki-runtime", status: "missing", note: "design only (H.1, H.2)" },
+      {
+        id: "skills-wiki-runtime",
+        status: "partial",
+        note: "doc-registry-backed ema wiki resolver live; skill catalog + web vApp catalog still pending (H.1, H.2)"
+      },
       { id: "replication-writers", status: "missing", note: "ADR 17/18; not implemented (I.2)" },
       { id: "incidents-projection", status: "missing", note: "incident.noted lands but no aggregator (O.2)" }
     ];
@@ -8645,14 +9144,14 @@ function projectStoragePolicy() {
 }
 
 // src/commands/cwt.ts
-var DOC_REF7 = "docs/architecture/20-cwt-integration.md";
+var DOC_REF6 = "docs/architecture/20-cwt-integration.md";
 async function runCwt(args) {
   const verb = args.positional[0];
   if (!verb || verb === "help" || flagBool(args, "help") || args.flags.h === true) {
     return runStubContract(args, {
       noun: "cwt",
       status: "available",
-      docRef: DOC_REF7,
+      docRef: DOC_REF6,
       commands: [
         {
           verb: "status",
@@ -8694,7 +9193,7 @@ async function runStatus4(args) {
     return 1;
   }
   const statePath = join11(root, manifest.local_n_sync?.current_state ?? "local-n-sync/current-state.md");
-  const stateExists = await exists(statePath);
+  const stateExists = await exists2(statePath);
   const result = {
     ok: true,
     source: "cwt.shared_files",
@@ -8757,7 +9256,7 @@ async function readJson2(path2) {
     return null;
   }
 }
-async function exists(path2) {
+async function exists2(path2) {
   try {
     await access(path2);
     return true;
@@ -8768,9 +9267,157 @@ async function exists(path2) {
 
 // src/commands/cockpit.ts
 import { execFile as execFile2 } from "child_process";
-import { existsSync as existsSync12, readdirSync as readdirSync6, readFileSync as readFileSync10 } from "fs";
+import { existsSync as existsSync12, readFileSync as readFileSync10 } from "fs";
 import { basename as basename2, join as join14 } from "path";
 import { promisify as promisify2 } from "util";
+
+// src/project-registry/proslync.ts
+var ACTIVE_BUILDS_ROOT = "/Users/trajanm4air/Desktop/Active builds";
+var Proslync = {
+  projectSlug: "proslync-app-ios-final",
+  projectId: "project:01KR0FKC3Q028AX7DK658J8D99",
+  clientId: "client:ms-wilson",
+  clientName: "Ms. Wilson",
+  clientColor: "#d49a6a",
+  projectRecordPath: "/Users/trajanm4air/Desktop/Projects/proslync-app-ios-final",
+  activeBuilds: [
+    {
+      id: "proslync-app-ios-final",
+      label: "Proslync iOS app",
+      role: "mobile mirror, athlete/brand/persona flows",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-app-ios-final`,
+      repoUrl: "https://github.com/TrajanWJ/proslync-app-ios-final",
+      devCommand: "npx expo start"
+    },
+    {
+      id: "proslync-backend",
+      label: "Proslync backend",
+      role: "Bun/Hono/Drizzle API and product-core persistence",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-backend`,
+      repoUrl: "https://github.com/TrajanWJ/proslync-backend-final",
+      devCommand: "bun --hot src/server.ts"
+    },
+    {
+      id: "proslync-desktop",
+      label: "Proslync desktop",
+      role: "AD cockpit and Brand HQ desktop surface",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-desktop`,
+      repoUrl: "https://github.com/TrajanWJ/proslync-desktop-site-final",
+      devCommand: "pnpm dev"
+    },
+    {
+      id: "proslync-presentation-assets-final",
+      label: "Presentation assets",
+      role: "master plan, research capture, client narrative",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-presentation-assets-final`,
+      repoUrl: "https://github.com/TrajanWJ/proslync-presentation-assets-final",
+      devCommand: null
+    }
+  ],
+  surfaces: [
+    {
+      id: "ad-cockpit",
+      label: "AD cockpit",
+      role: "Buyer control room: revenue share, cap context, compliance health.",
+      owner: "Proslync desktop",
+      buildId: "proslync-desktop",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-desktop/app/ad/page.tsx`,
+      localUrl: "http://localhost:3021/ad",
+      status: "planned"
+    },
+    {
+      id: "brand-hq",
+      label: "Brand HQ",
+      role: "Open-deal workflow, ranked applicants, rationale, and trust metadata.",
+      owner: "Proslync desktop",
+      buildId: "proslync-desktop",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-desktop/app/brand/page.tsx`,
+      localUrl: "http://localhost:3021/brand",
+      status: "candidate"
+    },
+    {
+      id: "nil-deal-detail",
+      label: "NIL Deal Detail",
+      role: "Cross-role spine: packet, deliverables, review tracks, audit timeline.",
+      owner: "Proslync iOS app",
+      buildId: "proslync-app-ios-final",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-app-ios-final/app/deal/[id].tsx`,
+      localUrl: null,
+      status: "planned"
+    },
+    {
+      id: "nil-manager",
+      label: "NIL Manager",
+      role: "Consent-aware review queue and approval gates.",
+      owner: "Proslync iOS app",
+      buildId: "proslync-app-ios-final",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-app-ios-final/components/nil-manager/nil-manager-view.tsx`,
+      localUrl: null,
+      status: "candidate"
+    },
+    {
+      id: "backend-api",
+      label: "Backend API",
+      role: "Product-core objects, routes, seed data, and trust metadata.",
+      owner: "Proslync backend",
+      buildId: "proslync-backend",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-backend/src`,
+      localUrl: "http://localhost:3020/api/health",
+      status: "candidate"
+    },
+    {
+      id: "master-plan",
+      label: "Master plan and assets",
+      role: "Client story, role happiness, research, and presentation proof.",
+      owner: "Presentation assets",
+      buildId: "proslync-presentation-assets-final",
+      path: `${ACTIVE_BUILDS_ROOT}/proslync-presentation-assets-final/docs/plans/proslync-role-happiness-master-plan-2026-05-09/README.md`,
+      localUrl: null,
+      status: "live"
+    },
+    {
+      id: "hero-website",
+      label: "Hero website",
+      role: "Remote narrative surface for AD wedge, demo proof, and launch story.",
+      owner: "Proslync website",
+      buildId: "proslync-website",
+      path: "https://github.com/TrajanWJ/proslync-website",
+      localUrl: "https://proslync-hero.vercel.app",
+      status: "queued"
+    }
+  ],
+  canonicalPlans: [
+    "/Users/trajanm4air/Desktop/Active builds/proslync-app-ios-final/PLAN.md",
+    "/Users/trajanm4air/Desktop/Active builds/proslync-app-ios-final/ORCHESTRATOR.md",
+    "/Users/trajanm4air/Desktop/Active builds/proslync-presentation-assets-final/docs/plans/proslync-role-happiness-master-plan-2026-05-09/README.md",
+    "/Users/trajanm4air/Desktop/Active builds/proslync-presentation-assets-final/docs/research/prep-capture-2026-05-09/mrs-wilson-asks-extracted.md"
+  ],
+  verificationCommands: [
+    "pnpm --filter @ema/cli typecheck",
+    "pnpm build:cli",
+    "pnpm --dir apps/web exec tsc --noEmit",
+    "ema cockpit workpack --project proslync-app-ios-final --json"
+  ],
+  requiredQueueGates: [],
+  recommendedLanes: [
+    "lane:01KR7K0ZGA009YGND4AHPRJ9BN",
+    "lane:01KR7K1ARD00B24MDAZFQVCEFN",
+    "lane:01KR7HPFFV000QCZ4XCQY718VB",
+    "lane:01KR7K1B4Q00CNGW965NX52J5A",
+    "lane:01KR7KN7XV0185XD90VVV2YPBJ"
+  ]
+};
+
+// src/project-registry/index.ts
+var REGISTRY = [Proslync];
+function getRegistryForProject(slug) {
+  if (!slug) return null;
+  for (const entry of REGISTRY) {
+    if (entry.projectSlug === slug) return entry;
+    if (entry.projectId === slug) return entry;
+  }
+  return null;
+}
 
 // src/commands/intention.ts
 import { existsSync as existsSync11, mkdirSync as mkdirSync5, readFileSync as readFileSync9, readdirSync as readdirSync5, statSync as statSync5, writeFileSync as writeFileSync6 } from "fs";
@@ -9775,7 +10422,6 @@ function parsePositiveInt(value, fallback) {
 
 // src/commands/cockpit.ts
 var execFileAsync2 = promisify2(execFile2);
-var ACTIVE_BUILDS_ROOT = join14(DESKTOP_ROOT, "Active builds");
 var INTENTION_STORE_ROOT = join14(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "intention-backfeed");
 var EMA_PIDS_ROOT = join14(DESKTOP_ROOT, "Active builds", "EMA-0.0.6", ".ema-dev", "pids");
 async function runCockpit(args) {
@@ -9874,9 +10520,10 @@ async function loadCockpitProjection(args, options = {}) {
   const projectId = scope.project_id;
   const lanes = filterProject(laneProjection ?? [], projectId);
   const queue = filterProject(queueProjection ?? [], projectId);
-  const client = inferClient(scope);
-  const activeBuilds = await discoverBuilds(scope);
-  const surfaces = inferSurfaces(scope);
+  const registry2 = registryForScope(scope);
+  const client = clientFromRegistry(registry2);
+  const activeBuilds = await discoverBuilds(scope, registry2);
+  const surfaces = surfacesFromRegistry(registry2);
   const runtime = readRuntimeFacts();
   const health = healthFor({
     activeBuilds,
@@ -10054,38 +10701,53 @@ function filterProject(records, projectId) {
   if (!projectId) return [...records];
   return records.filter((record) => record.project_id == null || record.project_id === projectId);
 }
-function inferClient(scope) {
-  if (scope.project_name?.startsWith("proslync")) {
-    return { id: "client:ms-wilson", name: "Ms. Wilson", color: "#d49a6a" };
-  }
-  return null;
+function registryForScope(scope) {
+  return getRegistryForProject(scope.project_name) ?? getRegistryForProject(scope.project_id);
 }
-async function discoverBuilds(scope) {
-  const paths = /* @__PURE__ */ new Set();
-  if (scope.active_build) paths.add(scope.active_build);
-  const family = projectFamily(scope.project_name);
-  if (family && existsSync12(ACTIVE_BUILDS_ROOT)) {
-    for (const name of readdirSync6(ACTIVE_BUILDS_ROOT)) {
-      if (name === family || name.startsWith(`${family}-`)) {
-        paths.add(join14(ACTIVE_BUILDS_ROOT, name));
-      }
-    }
+function clientFromRegistry(registry2) {
+  if (!registry2 || !registry2.clientId || !registry2.clientName) return null;
+  return { id: registry2.clientId, name: registry2.clientName, color: registry2.clientColor };
+}
+function surfacesFromRegistry(registry2) {
+  if (!registry2) return [];
+  return registry2.surfaces.map((surface) => surfaceToCockpit(surface));
+}
+function surfaceToCockpit(surface) {
+  return {
+    id: surface.id,
+    label: surface.label,
+    role: surface.role,
+    owner: surface.owner,
+    build_id: surface.buildId,
+    path: surface.path,
+    local_url: surface.localUrl,
+    status: surface.status
+  };
+}
+async function discoverBuilds(scope, registry2) {
+  const registryByPath = /* @__PURE__ */ new Map();
+  if (registry2) {
+    for (const build of registry2.activeBuilds) registryByPath.set(build.path, build);
   }
-  return await Promise.all([...paths].sort().map((path2) => gitFact(path2)));
+  const paths = /* @__PURE__ */ new Set();
+  for (const path2 of registryByPath.keys()) paths.add(path2);
+  if (scope.active_build) paths.add(scope.active_build);
+  const sorted = [...paths].sort();
+  return await Promise.all(sorted.map((path2) => gitFact(path2, registryByPath.get(path2) ?? null)));
 }
 function intentionProjectionAvailable(scope) {
   const project = scope.project_name ?? "unresolved";
   return existsSync12(join14(INTENTION_STORE_ROOT, `${safeName2(project)}.json`));
 }
-async function gitFact(path2) {
-  const id = basename2(path2);
+async function gitFact(path2, registryBuild) {
+  const id = registryBuild?.id ?? basename2(path2);
   const base = {
     id,
-    label: labelForBuild(id),
-    role: roleForBuild(id),
+    label: registryBuild?.label ?? id,
+    role: registryBuild?.role ?? "active build",
     path: path2,
-    repo_url: repoForBuild(id),
-    dev_command: devCommandForBuild(id)
+    repo_url: registryBuild?.repoUrl ?? null,
+    dev_command: registryBuild?.devCommand ?? null
   };
   if (!existsSync12(path2)) {
     return { ...base, branch: null, head: null, dirty_count: null, git_status: "missing" };
@@ -10115,81 +10777,6 @@ async function run(command, args, cwd) {
     maxBuffer: 4 * 1024 * 1024
   });
   return stdout.trim();
-}
-function inferSurfaces(scope) {
-  if (!scope.project_name?.startsWith("proslync")) return [];
-  return [
-    {
-      id: "ad-cockpit",
-      label: "AD cockpit",
-      role: "Buyer control room: revenue share, cap context, compliance health.",
-      owner: "Proslync desktop",
-      build_id: "proslync-desktop",
-      path: join14(ACTIVE_BUILDS_ROOT, "proslync-desktop/app/ad/page.tsx"),
-      local_url: "http://localhost:3021/ad",
-      status: "planned"
-    },
-    {
-      id: "brand-hq",
-      label: "Brand HQ",
-      role: "Open-deal workflow, ranked applicants, rationale, and trust metadata.",
-      owner: "Proslync desktop",
-      build_id: "proslync-desktop",
-      path: join14(ACTIVE_BUILDS_ROOT, "proslync-desktop/app/brand/page.tsx"),
-      local_url: "http://localhost:3021/brand",
-      status: "candidate"
-    },
-    {
-      id: "nil-deal-detail",
-      label: "NIL Deal Detail",
-      role: "Cross-role spine: packet, deliverables, review tracks, audit timeline.",
-      owner: "Proslync iOS app",
-      build_id: "proslync-app-ios-final",
-      path: join14(ACTIVE_BUILDS_ROOT, "proslync-app-ios-final/app/deal/[id].tsx"),
-      local_url: null,
-      status: "planned"
-    },
-    {
-      id: "nil-manager",
-      label: "NIL Manager",
-      role: "Consent-aware review queue and approval gates.",
-      owner: "Proslync iOS app",
-      build_id: "proslync-app-ios-final",
-      path: join14(ACTIVE_BUILDS_ROOT, "proslync-app-ios-final/components/nil-manager/nil-manager-view.tsx"),
-      local_url: null,
-      status: "candidate"
-    },
-    {
-      id: "backend-api",
-      label: "Backend API",
-      role: "Product-core objects, routes, seed data, and trust metadata.",
-      owner: "Proslync backend",
-      build_id: "proslync-backend",
-      path: join14(ACTIVE_BUILDS_ROOT, "proslync-backend/src"),
-      local_url: "http://localhost:3020/api/health",
-      status: "candidate"
-    },
-    {
-      id: "master-plan",
-      label: "Master plan and assets",
-      role: "Client story, role happiness, research, and presentation proof.",
-      owner: "Presentation assets",
-      build_id: "proslync-presentation-assets-final",
-      path: join14(ACTIVE_BUILDS_ROOT, "proslync-presentation-assets-final/docs/plans/proslync-role-happiness-master-plan-2026-05-09/README.md"),
-      local_url: null,
-      status: "live"
-    },
-    {
-      id: "hero-website",
-      label: "Hero website",
-      role: "Remote narrative surface for AD wedge, demo proof, and launch story.",
-      owner: "Proslync website",
-      build_id: "proslync-website",
-      path: "https://github.com/TrajanWJ/proslync-website",
-      local_url: "https://proslync-hero.vercel.app",
-      status: "queued"
-    }
-  ];
 }
 function pidAlive(pid) {
   try {
@@ -10249,40 +10836,8 @@ function cockpitUrlFor(scope, client) {
   }
   return `http://localhost:5173/cockpit#/personal/${scope.project_id}`;
 }
-function projectFamily(name) {
-  if (!name) return null;
-  if (name.startsWith("proslync")) return "proslync";
-  return name;
-}
 function safeName2(value) {
   return value.replace(/[^a-zA-Z0-9._-]+/g, "_");
-}
-function labelForBuild(id) {
-  if (id === "proslync-app-ios-final") return "Proslync iOS app";
-  if (id === "proslync-backend") return "Proslync backend";
-  if (id === "proslync-desktop") return "Proslync desktop";
-  if (id === "proslync-presentation-assets-final") return "Presentation assets";
-  return id;
-}
-function roleForBuild(id) {
-  if (id === "proslync-app-ios-final") return "mobile mirror, athlete/brand/persona flows";
-  if (id === "proslync-backend") return "Bun/Hono/Drizzle API and product-core persistence";
-  if (id === "proslync-desktop") return "AD cockpit and Brand HQ desktop surface";
-  if (id === "proslync-presentation-assets-final") return "master plan, research capture, client narrative";
-  return "active build";
-}
-function repoForBuild(id) {
-  if (id === "proslync-app-ios-final") return "https://github.com/TrajanWJ/proslync-app-ios-final";
-  if (id === "proslync-backend") return "https://github.com/TrajanWJ/proslync-backend-final";
-  if (id === "proslync-desktop") return "https://github.com/TrajanWJ/proslync-desktop-site-final";
-  if (id === "proslync-presentation-assets-final") return "https://github.com/TrajanWJ/proslync-presentation-assets-final";
-  return null;
-}
-function devCommandForBuild(id) {
-  if (id === "proslync-app-ios-final") return "npx expo start";
-  if (id === "proslync-backend") return "bun --hot src/server.ts";
-  if (id === "proslync-desktop") return "pnpm dev";
-  return null;
 }
 function agentWorkpackFor(projection2) {
   const dirtyBuilds = projection2.active_builds.filter((build) => build.git_status === "dirty");

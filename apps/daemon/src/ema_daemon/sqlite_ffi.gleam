@@ -644,6 +644,18 @@ pub fn intent_graph_projection_json(db: Db) -> String {
   intent_graph_projection_json_raw(db)
 }
 
+pub fn dispatch_registry_projection_json(db: Db) -> String {
+  dispatch_registry_projection_json_raw(db)
+}
+
+pub fn execution_registry_projection_json(db: Db) -> String {
+  execution_registry_projection_json_raw(db)
+}
+
+pub fn tool_timeline_projection_json(db: Db, limit: Int) -> String {
+  tool_timeline_projection_json_raw(db, limit)
+}
+
 /// Returns the per-lane scope tuple `#(org_id, space_id, project_id,
 /// lane_id, cadence)` for every active/claimed lane that is due for an
 /// auto-checkup. Each lane's actual scope is captured from its own
@@ -1044,6 +1056,15 @@ fn vcalendar_projection_json_raw(db: Db) -> String
 
 @external(erlang, "ema_sqlite_helpers", "intent_graph_projection_json")
 fn intent_graph_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "dispatch_registry_projection_json")
+fn dispatch_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "execution_registry_projection_json")
+fn execution_registry_projection_json_raw(db: Db) -> String
+
+@external(erlang, "ema_sqlite_helpers", "tool_timeline_projection_json")
+fn tool_timeline_projection_json_raw(db: Db, limit: Int) -> String
 
 @external(erlang, "ema_sqlite_helpers", "auto_checkup_due_lanes")
 fn auto_checkup_due_lanes_raw(

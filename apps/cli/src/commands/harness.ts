@@ -203,9 +203,13 @@ function runDonors(args: ParsedArgs): number {
 	return 0;
 }
 
-function runStatus(args: ParsedArgs): number {
+async function runStatus(args: ParsedArgs): Promise<number> {
 	const readyProviders = PROVIDERS.filter((provider) => provider.status === "ready");
 	const pendingProviders = PROVIDERS.filter((provider) => provider.status !== "ready");
+	const projectionStatus = await readHarnessProjections();
+	const stillPending = (Object.entries(projectionStatus) as [string, HarnessProjectionStatus][])
+		.filter(([, value]) => value.status !== "live")
+		.map(([key]) => key);
 	const payload = {
 		ok: true,
 		command: "harness status",
@@ -213,8 +217,14 @@ function runStatus(args: ParsedArgs): number {
 		boundary: "Harness Glue is usable preparation rail, not Hermes authority.",
 		readiness: {
 			usable_now: ["harness.providers", "harness.donors", "simulated dispatch", "tmux-backed worker session planning", "lane-assigned sessions", "session context snapshots", "event log replay", "tool timeline replay", "session grep", "stop audit event"],
-			pending_daemon_projections: ["dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"],
+			pending_daemon_projections: stillPending,
 			pending_provider_adapters: pendingProviders.map((provider) => provider.id),
+		},
+		projections: {
+			dispatch_registry: projectionStatus["dispatch.registry"],
+			execution_registry: projectionStatus["execution.registry"],
+			tool_timeline: projectionStatus["tool.timeline"],
+			chronicle_activity: projectionStatus["chronicle.activity"],
 		},
 		providers: {
 			ready: readyProviders.map((provider) => provider.id),
@@ -233,7 +243,7 @@ function runStatus(args: ParsedArgs): number {
 		emitPretty("harness status");
 		emitPretty(`  status: ${payload.status}`);
 		emitPretty(`  ready providers: ${payload.providers.ready.join(", ") || "none"}`);
-		emitPretty(`  pending daemon projections: ${payload.readiness.pending_daemon_projections.join(", ")}`);
+		emitPretty(`  pending daemon projections: ${payload.readiness.pending_daemon_projections.join(", ") || "none"}`);
 	}
 	return 0;
 }
@@ -306,18 +316,31 @@ function runStart(args: ParsedArgs): number {
 	return 0;
 }
 
-function runList(args: ParsedArgs): number {
+async function runList(args: ParsedArgs): Promise<number> {
 	const lane = flagString(args, "lane");
 	let records = readRecords();
 	if (lane) records = records.filter((record) => record.lane === lane || record.lane_assignment?.lane_id === lane);
+	const projectionStatus = await readHarnessProjections();
+	const dispatchProjection = projectionStatus["dispatch.registry"];
+	const executionProjection = projectionStatus["execution.registry"];
+	const filteredDispatches = lane && Array.isArray(dispatchProjection.records)
+		? dispatchProjection.records.filter((entry) => typeof entry === "object" && entry !== null && (entry as { lane_id?: string }).lane_id === lane)
+		: dispatchProjection.records;
+	const filteredExecutions = lane && Array.isArray(executionProjection.records)
+		? executionProjection.records
+		: executionProjection.records;
 	const payload = {
 		ok: true,
 		command: "harness list",
 		backend: "file_backed_tmux_registry",
-		daemon_authority: "file_backed_harness_registry",
+		daemon_authority: "canonical_events",
 		lane: lane ?? null,
 		lane_assignments: lane ? readLaneAssignment(lane) : readLaneAssignments(),
 		executions: records.map((record) => enrichRecordStatus(record)),
+		projections: {
+			dispatch_registry: { ...dispatchProjection, records: filteredDispatches },
+			execution_registry: { ...executionProjection, records: filteredExecutions },
+		},
 	};
 	if (flagBool(args, "json")) emitJson(payload);
 	else for (const record of payload.executions) emitPretty(`${record.execution?.id ?? "execution:unknown"} ${record.provider ?? "unknown"} ${record.execution?.tmux_session ?? "no-session"} ${record.runtime?.tmux ?? "unknown"} ${record.status ?? "unknown"}`);
@@ -349,7 +372,7 @@ function runAssign(args: ParsedArgs): number {
 	return 0;
 }
 
-function runContext(args: ParsedArgs): number {
+async function runContext(args: ParsedArgs): Promise<number> {
 	const execution = flagString(args, "execution");
 	const lane = flagString(args, "lane");
 	const lines = Number(flagString(args, "lines") ?? "120");
@@ -362,14 +385,29 @@ function runContext(args: ParsedArgs): number {
 			events: readEvents({ execution: enriched.execution?.id, lane: enriched.lane ?? enriched.lane_assignment?.lane_id ?? null }),
 		};
 	});
+	const projectionStatus = await readHarnessProjections();
+	const toolTimeline = projectionStatus["tool.timeline"];
+	const chronicle = projectionStatus["chronicle.activity"];
+	const recentTools = Array.isArray(toolTimeline.records)
+		? toolTimeline.records
+			.filter((entry) => !execution || (typeof entry === "object" && entry !== null && (entry as { execution_id?: string }).execution_id === execution))
+			.slice(-12)
+		: [];
+	const recentChronicle = Array.isArray(chronicle.records)
+		? chronicle.records.slice(0, 12)
+		: [];
 	const payload = {
 		ok: true,
 		command: "harness context",
 		backend: "file_backed_tmux_registry",
-		daemon_authority: "file_backed_harness_registry",
+		daemon_authority: "canonical_events",
 		selector: { execution: execution ?? null, lane: lane ?? null },
 		lane_assignment: lane ? readLaneAssignment(lane) : null,
 		executions: records,
+		projections: {
+			tool_timeline: { ...toolTimeline, records: recentTools },
+			chronicle_activity: { ...chronicle, records: recentChronicle },
+		},
 	};
 	if (flagBool(args, "json")) emitJson(payload);
 	else for (const record of records) emitPretty(`${record.execution?.id ?? "execution:unknown"} ${record.runtime?.tmux ?? "unknown"}
@@ -1237,6 +1275,88 @@ function runSearch(args: ParsedArgs): number {
 
 function projections(): string[] {
 	return ["harness.providers", "dispatch.registry", "execution.registry", "tool.timeline", "chronicle.activity"];
+}
+
+const HARNESS_PROJECTION_CHANNELS = [
+	"dispatch.registry",
+	"execution.registry",
+	"tool.timeline",
+	"chronicle.activity",
+] as const;
+
+type HarnessProjectionStatus = {
+	status: "live" | "pending_daemon_projection" | "unavailable";
+	count: number;
+	source: "daemon_events" | "client_fallback" | "unavailable";
+	records: unknown[];
+};
+
+async function readHarnessProjections(): Promise<Record<string, HarnessProjectionStatus>> {
+	const result: Record<string, HarnessProjectionStatus> = {
+		"dispatch.registry": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] },
+		"execution.registry": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] },
+		"tool.timeline": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] },
+		"chronicle.activity": { status: "pending_daemon_projection", count: 0, source: "unavailable", records: [] },
+	};
+	let client;
+	try {
+		client = await connect({ surface: "desktop" });
+	} catch (err) {
+		if (err instanceof DaemonUnreachableError) {
+			for (const channel of HARNESS_PROJECTION_CHANNELS) {
+				result[channel] = { status: "unavailable", count: 0, source: "unavailable", records: [] };
+			}
+			return result;
+		}
+		return result;
+	}
+	try {
+		const seen = new Map<string, unknown[]>();
+		const finished = new Set<string>();
+		const ready = new Promise<void>((resolve) => {
+			const timer = setTimeout(() => resolve(), 1500);
+			client.onMessage((msg) => {
+				if (msg.type !== "projection") return;
+				const name = (msg as { name?: string }).name;
+				if (!name || !HARNESS_PROJECTION_CHANNELS.includes(name as typeof HARNESS_PROJECTION_CHANNELS[number])) return;
+				const data = (msg as { data?: unknown }).data;
+				const records = extractProjectionRecords(name, data);
+				seen.set(name, records);
+				finished.add(name);
+				if (finished.size >= HARNESS_PROJECTION_CHANNELS.length) {
+					clearTimeout(timer);
+					resolve();
+				}
+			});
+			for (const channel of HARNESS_PROJECTION_CHANNELS) client.subscribe(channel);
+		});
+		await ready;
+		for (const channel of HARNESS_PROJECTION_CHANNELS) {
+			const records = seen.get(channel) ?? [];
+			result[channel] = {
+				status: finished.has(channel) ? "live" : "pending_daemon_projection",
+				count: records.length,
+				source: finished.has(channel) ? "daemon_events" : "unavailable",
+				records,
+			};
+		}
+	} finally {
+		client.close();
+	}
+	return result;
+}
+
+function extractProjectionRecords(channel: string, data: unknown): unknown[] {
+	if (!data || typeof data !== "object") return [];
+	const obj = data as Record<string, unknown>;
+	if (channel === "dispatch.registry" && Array.isArray(obj.dispatches)) return obj.dispatches as unknown[];
+	if (channel === "execution.registry" && Array.isArray(obj.executions)) return obj.executions as unknown[];
+	if (channel === "tool.timeline" && Array.isArray(obj.tools)) return obj.tools as unknown[];
+	if (channel === "chronicle.activity") {
+		if (Array.isArray(obj.events)) return obj.events as unknown[];
+		if (Array.isArray(obj.items)) return obj.items as unknown[];
+	}
+	return [];
 }
 
 function simulatedSleepSeconds(prompt: string): number | null {

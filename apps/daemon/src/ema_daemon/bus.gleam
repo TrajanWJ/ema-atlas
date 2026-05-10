@@ -86,6 +86,12 @@ pub type Msg {
 
   IntentGraphProjection(reply: Subject(String))
 
+  DispatchRegistryProjection(reply: Subject(String))
+
+  ExecutionRegistryProjection(reply: Subject(String))
+
+  ToolTimelineProjection(limit: Int, reply: Subject(String))
+
   DesktopPresenceProjection(reply: Subject(String))
 
   DesktopPresenceJoin(request: ema_presence.JoinRequest, reply: Subject(String))
@@ -605,6 +611,30 @@ fn handle(state: State, msg: Msg) -> actor.Next(State, Msg) {
 
     IntentGraphProjection(reply) -> {
       process.send(reply, sqlite_ffi.intent_graph_projection_json(state.db))
+      actor.continue(state)
+    }
+
+    DispatchRegistryProjection(reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.dispatch_registry_projection_json(state.db),
+      )
+      actor.continue(state)
+    }
+
+    ExecutionRegistryProjection(reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.execution_registry_projection_json(state.db),
+      )
+      actor.continue(state)
+    }
+
+    ToolTimelineProjection(limit, reply) -> {
+      process.send(
+        reply,
+        sqlite_ffi.tool_timeline_projection_json(state.db, limit),
+      )
       actor.continue(state)
     }
 
@@ -1405,6 +1435,18 @@ pub fn vcalendar_projection_json(bus: Subject(Msg)) -> String {
 
 pub fn intent_graph_projection_json(bus: Subject(Msg)) -> String {
   process.call(bus, 5000, fn(reply) { IntentGraphProjection(reply) })
+}
+
+pub fn dispatch_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { DispatchRegistryProjection(reply) })
+}
+
+pub fn execution_registry_projection_json(bus: Subject(Msg)) -> String {
+  process.call(bus, 5000, fn(reply) { ExecutionRegistryProjection(reply) })
+}
+
+pub fn tool_timeline_projection_json(bus: Subject(Msg), limit: Int) -> String {
+  process.call(bus, 5000, fn(reply) { ToolTimelineProjection(limit, reply) })
 }
 
 /// Returns the per-lane scope tuple

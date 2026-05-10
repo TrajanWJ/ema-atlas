@@ -72,6 +72,9 @@
     intent_graph_projection_json/1,
     auto_checkup_due_lanes/1,
     running_executions/1,
+    dispatch_registry_projection_json/1,
+    execution_registry_projection_json/1,
+    tool_timeline_projection_json/2,
     peer_is_trusted/3,
     collab_open_document/5,
     collab_replace_document/5,
@@ -3252,3 +3255,402 @@ inspect_reason(Reason) when is_atom(Reason) ->
     atom_to_binary(Reason, utf8);
 inspect_reason(Reason) ->
     iolist_to_binary(io_lib:format("~p", [Reason])).
+
+%% ---------------------------------------------------------------------------
+%% Sprint 6 — Harness / Duct Tape projections
+%%
+%% First slice: read-only reductions over the canonical event log. Live deltas
+%% are wired through ema_shell_ipc.gleam which re-runs these projections on the
+%% relevant `dispatch.*` / `execution.*` / `tool.*` / `agent.*` event kinds.
+%% ---------------------------------------------------------------------------
+
+dispatch_registry_projection_json(Db) ->
+    Events = select_events_like(Db, <<"dispatch.%">>, 1000),
+    Map = lists:foldl(fun apply_dispatch_event/2, #{}, Events),
+    Items = sort_by_updated(maps:values(Map)),
+    Array = join_json([dispatch_registry_json(Item) || Item <- Items]),
+    iolist_to_binary([
+        <<"{\"source\":\"daemon_events\",">>,
+        <<"\"dispatches\":[">>, Array, <<"]}">>
+    ]).
+
+execution_registry_projection_json(Db) ->
+    Events = select_events_like(Db, <<"execution.%">>, 1000),
+    Map = lists:foldl(fun apply_execution_event/2, #{}, Events),
+    Items = sort_by_updated(maps:values(Map)),
+    Array = join_json([execution_registry_json(Item) || Item <- Items]),
+    iolist_to_binary([
+        <<"{\"source\":\"daemon_events\",">>,
+        <<"\"executions\":[">>, Array, <<"]}">>
+    ]).
+
+tool_timeline_projection_json(Db, Limit) ->
+    LimitInt = clamp_limit(Limit, 200, 1000),
+    Events = select_events_like(Db, <<"tool.%">>, LimitInt),
+    Map = lists:foldl(fun apply_tool_event/2, #{}, Events),
+    Items = sort_by_started(maps:values(Map)),
+    Array = join_json([tool_timeline_json(Item) || Item <- Items]),
+    iolist_to_binary([
+        <<"{\"source\":\"daemon_events\",">>,
+        <<"\"tools\":[">>, Array, <<"]}">>
+    ]).
+
+clamp_limit(Limit, _Default, Max) when is_integer(Limit), Limit > 0 ->
+    case Limit > Max of
+        true -> Max;
+        false -> Limit
+    end;
+clamp_limit(_Other, Default, _Max) -> Default.
+
+apply_dispatch_event({Txid, Kind, Ts, Payload}, Acc) ->
+    DispatchId = extract_json_string(Payload, <<"dispatch_id">>),
+    case DispatchId of
+        <<>> -> Acc;
+        _ ->
+            Existing = maps:get(DispatchId, Acc, dispatch_default(DispatchId)),
+            Updated = update_dispatch(Existing, Kind, Ts, Txid, Payload),
+            Acc#{DispatchId => Updated}
+    end.
+
+dispatch_default(DispatchId) ->
+    #{
+        id => DispatchId,
+        status => <<"unknown">>,
+        provider => <<>>,
+        intent => <<>>,
+        prompt_hash => <<>>,
+        lane_id => <<>>,
+        intent_id => <<>>,
+        actor_id => <<>>,
+        org_id => <<>>,
+        space_id => <<>>,
+        project_id => <<>>,
+        started_at => <<>>,
+        ended_at => <<>>,
+        outcome => <<>>,
+        ts => <<>>,
+        txid => 0
+    }.
+
+update_dispatch(Existing, <<"dispatch.started">>, Ts, Txid, Payload) ->
+    Existing#{
+        status => <<"started">>,
+        provider => first_nonempty([extract_json_string(Payload, <<"provider">>), maps:get(provider, Existing, <<>>)]),
+        intent => first_nonempty([extract_json_string(Payload, <<"intent">>), maps:get(intent, Existing, <<>>)]),
+        prompt_hash => first_nonempty([extract_json_string(Payload, <<"prompt_hash">>), maps:get(prompt_hash, Existing, <<>>)]),
+        lane_id => first_nonempty([extract_json_string(Payload, <<"lane_id">>), maps:get(lane_id, Existing, <<>>)]),
+        intent_id => first_nonempty([extract_json_string(Payload, <<"intent_id">>), maps:get(intent_id, Existing, <<>>)]),
+        actor_id => first_nonempty([extract_json_string(Payload, <<"initiator">>), extract_json_string(Payload, <<"actor_id">>), maps:get(actor_id, Existing, <<>>)]),
+        org_id => first_nonempty([extract_json_string(Payload, <<"org_id">>), maps:get(org_id, Existing, <<>>)]),
+        space_id => first_nonempty([extract_json_string(Payload, <<"space_id">>), maps:get(space_id, Existing, <<>>)]),
+        project_id => first_nonempty([extract_json_string(Payload, <<"project_id">>), maps:get(project_id, Existing, <<>>)]),
+        started_at => Ts,
+        ts => Ts,
+        txid => Txid
+    };
+update_dispatch(Existing, <<"dispatch.ended">>, Ts, Txid, Payload) ->
+    Outcome = extract_json_string(Payload, <<"outcome">>),
+    Existing#{
+        status => case Outcome of
+            <<>> -> <<"ended">>;
+            _ -> <<"ended">>
+        end,
+        outcome => Outcome,
+        ended_at => Ts,
+        ts => Ts,
+        txid => Txid
+    };
+update_dispatch(Existing, <<"dispatch.scope_granted">>, Ts, Txid, _Payload) ->
+    Existing#{ts => Ts, txid => Txid};
+update_dispatch(Existing, _Kind, Ts, Txid, _Payload) ->
+    Existing#{ts => Ts, txid => Txid}.
+
+dispatch_registry_json(Item) ->
+    [
+        <<"{">>,
+        <<"\"id\":">>, nullable_json_string(maps:get(id, Item, <<>>)),
+        <<",\"status\":">>, nullable_json_string(maps:get(status, Item, <<>>)),
+        <<",\"provider\":">>, nullable_json_string(maps:get(provider, Item, <<>>)),
+        <<",\"intent\":">>, nullable_json_string(maps:get(intent, Item, <<>>)),
+        <<",\"prompt_hash\":">>, nullable_json_string(maps:get(prompt_hash, Item, <<>>)),
+        <<",\"lane_id\":">>, nullable_json_string(maps:get(lane_id, Item, <<>>)),
+        <<",\"intent_id\":">>, nullable_json_string(maps:get(intent_id, Item, <<>>)),
+        <<",\"actor_id\":">>, nullable_json_string(maps:get(actor_id, Item, <<>>)),
+        <<",\"org_id\":">>, nullable_json_string(maps:get(org_id, Item, <<>>)),
+        <<",\"space_id\":">>, nullable_json_string(maps:get(space_id, Item, <<>>)),
+        <<",\"project_id\":">>, nullable_json_string(maps:get(project_id, Item, <<>>)),
+        <<",\"started_at\":">>, nullable_json_string(maps:get(started_at, Item, <<>>)),
+        <<",\"ended_at\":">>, nullable_json_string(maps:get(ended_at, Item, <<>>)),
+        <<",\"outcome\":">>, nullable_json_string(maps:get(outcome, Item, <<>>)),
+        <<",\"updated_at\":">>, nullable_json_string(maps:get(ts, Item, <<>>)),
+        <<"}">>
+    ].
+
+apply_execution_event({Txid, Kind, Ts, Payload}, Acc) ->
+    ExecutionId = extract_json_string(Payload, <<"execution_id">>),
+    case ExecutionId of
+        <<>> -> Acc;
+        _ ->
+            Existing = maps:get(ExecutionId, Acc, execution_default(ExecutionId)),
+            Updated = update_execution(Existing, Kind, Ts, Txid, Payload),
+            Acc#{ExecutionId => Updated}
+    end.
+
+execution_default(ExecutionId) ->
+    #{
+        id => ExecutionId,
+        status => <<"unknown">>,
+        dispatch_id => <<>>,
+        provider => <<>>,
+        kind_label => <<>>,
+        name => <<>>,
+        started_at => <<>>,
+        completed_at => <<>>,
+        exit_code => <<>>,
+        duration_ms => <<>>,
+        error_class => <<>>,
+        error_message => <<>>,
+        session_file_path => <<>>,
+        prompt_hash => <<>>,
+        ts => <<>>,
+        txid => 0
+    }.
+
+update_execution(Existing, <<"execution.started">>, Ts, Txid, Payload) ->
+    Existing#{
+        status => <<"started">>,
+        dispatch_id => first_nonempty([extract_json_string(Payload, <<"dispatch_id">>), maps:get(dispatch_id, Existing, <<>>)]),
+        provider => first_nonempty([extract_json_string(Payload, <<"provider">>), maps:get(provider, Existing, <<>>)]),
+        kind_label => first_nonempty([extract_json_string(Payload, <<"kind">>), maps:get(kind_label, Existing, <<>>)]),
+        name => first_nonempty([extract_json_string(Payload, <<"name">>), maps:get(name, Existing, <<>>)]),
+        started_at => Ts,
+        ts => Ts,
+        txid => Txid
+    };
+update_execution(Existing, <<"execution.completed">>, Ts, Txid, Payload) ->
+    Existing#{
+        status => <<"completed">>,
+        provider => first_nonempty([extract_json_string(Payload, <<"provider">>), maps:get(provider, Existing, <<>>)]),
+        completed_at => Ts,
+        exit_code => extract_json_string(Payload, <<"exit_code">>),
+        duration_ms => extract_json_string(Payload, <<"duration_ms">>),
+        session_file_path => extract_json_string(Payload, <<"session_file_path">>),
+        prompt_hash => extract_json_string(Payload, <<"prompt_hash">>),
+        ts => Ts,
+        txid => Txid
+    };
+update_execution(Existing, <<"execution.ended">>, Ts, Txid, Payload) ->
+    Existing#{
+        status => <<"ended">>,
+        completed_at => Ts,
+        duration_ms => extract_json_string(Payload, <<"duration_ms">>),
+        ts => Ts,
+        txid => Txid
+    };
+update_execution(Existing, <<"execution.failed">>, Ts, Txid, Payload) ->
+    Existing#{
+        status => <<"failed">>,
+        completed_at => Ts,
+        exit_code => extract_json_string(Payload, <<"exit_code">>),
+        error_class => extract_json_string(Payload, <<"error_class">>),
+        error_message => extract_json_string(Payload, <<"message">>),
+        ts => Ts,
+        txid => Txid
+    };
+update_execution(Existing, <<"execution.timeout">>, Ts, Txid, Payload) ->
+    Existing#{
+        status => <<"timeout">>,
+        completed_at => Ts,
+        exit_code => extract_json_string(Payload, <<"exit_code">>),
+        duration_ms => extract_json_string(Payload, <<"duration_ms">>),
+        ts => Ts,
+        txid => Txid
+    };
+update_execution(Existing, <<"execution.interrupted_by_restart">>, Ts, Txid, _Payload) ->
+    Existing#{
+        status => <<"interrupted">>,
+        completed_at => Ts,
+        ts => Ts,
+        txid => Txid
+    };
+update_execution(Existing, _Kind, Ts, Txid, _Payload) ->
+    Existing#{ts => Ts, txid => Txid}.
+
+execution_registry_json(Item) ->
+    [
+        <<"{">>,
+        <<"\"id\":">>, nullable_json_string(maps:get(id, Item, <<>>)),
+        <<",\"status\":">>, nullable_json_string(maps:get(status, Item, <<>>)),
+        <<",\"dispatch_id\":">>, nullable_json_string(maps:get(dispatch_id, Item, <<>>)),
+        <<",\"provider\":">>, nullable_json_string(maps:get(provider, Item, <<>>)),
+        <<",\"kind\":">>, nullable_json_string(maps:get(kind_label, Item, <<>>)),
+        <<",\"name\":">>, nullable_json_string(maps:get(name, Item, <<>>)),
+        <<",\"started_at\":">>, nullable_json_string(maps:get(started_at, Item, <<>>)),
+        <<",\"completed_at\":">>, nullable_json_string(maps:get(completed_at, Item, <<>>)),
+        <<",\"exit_code\":">>, nullable_json_string(maps:get(exit_code, Item, <<>>)),
+        <<",\"duration_ms\":">>, nullable_json_string(maps:get(duration_ms, Item, <<>>)),
+        <<",\"error_class\":">>, nullable_json_string(maps:get(error_class, Item, <<>>)),
+        <<",\"error_message\":">>, nullable_json_string(maps:get(error_message, Item, <<>>)),
+        <<",\"session_file_path\":">>, nullable_json_string(maps:get(session_file_path, Item, <<>>)),
+        <<",\"prompt_hash\":">>, nullable_json_string(maps:get(prompt_hash, Item, <<>>)),
+        <<",\"updated_at\":">>, nullable_json_string(maps:get(ts, Item, <<>>)),
+        <<"}">>
+    ].
+
+apply_tool_event({Txid, Kind, Ts, Payload}, Acc) ->
+    %% Tool events have no canonical "tool_call_id" — use (execution_id, tool_name, started_at)
+    %% to group invoked/returned/errored. For the first slice we simply accept that one
+    %% tool invocation without a unique id will collapse if it shares the same name+exec.
+    ExecutionId = extract_json_string(Payload, <<"execution_id">>),
+    ToolName = extract_json_string(Payload, <<"tool_name">>),
+    Key = iolist_to_binary([ExecutionId, <<"#">>, ToolName, <<"#">>, integer_to_binary(Txid)]),
+    case {ExecutionId, ToolName} of
+        {<<>>, _} -> Acc;
+        {_, <<>>} -> Acc;
+        _ ->
+            case Kind of
+                <<"tool.invoked">> ->
+                    Item = #{
+                        id => Key,
+                        execution_id => ExecutionId,
+                        tool_name => ToolName,
+                        provider => extract_json_string(Payload, <<"provider">>),
+                        server_name => extract_json_string(Payload, <<"server_name">>),
+                        capability => extract_json_string(Payload, <<"capability">>),
+                        status => <<"invoked">>,
+                        started_at => Ts,
+                        completed_at => <<>>,
+                        result_summary => <<>>,
+                        error_class => <<>>,
+                        error_message => <<>>,
+                        ts => Ts,
+                        txid => Txid
+                    },
+                    Acc#{Key => Item};
+                <<"tool.returned">> ->
+                    %% Match latest invoked-without-returned for this exec+tool.
+                    {AccUpd, Matched} = maps:fold(
+                        fun(K, V, {AccIn, MatchedIn}) ->
+                            case MatchedIn of
+                                true -> {AccIn#{K => V}, true};
+                                false ->
+                                    case maps:get(execution_id, V, <<>>) =:= ExecutionId
+                                        andalso maps:get(tool_name, V, <<>>) =:= ToolName
+                                        andalso maps:get(status, V, <<>>) =:= <<"invoked">>
+                                    of
+                                        true ->
+                                            {AccIn#{K => V#{
+                                                status => <<"returned">>,
+                                                completed_at => Ts,
+                                                result_summary => extract_json_string(Payload, <<"result_summary">>),
+                                                ts => Ts,
+                                                txid => Txid
+                                            }}, true};
+                                        false -> {AccIn#{K => V}, false}
+                                    end
+                            end
+                        end,
+                        {#{}, false},
+                        Acc
+                    ),
+                    case Matched of
+                        true -> AccUpd;
+                        false ->
+                            Item = #{
+                                id => Key,
+                                execution_id => ExecutionId,
+                                tool_name => ToolName,
+                                provider => extract_json_string(Payload, <<"provider">>),
+                                server_name => <<>>,
+                                capability => <<>>,
+                                status => <<"returned">>,
+                                started_at => Ts,
+                                completed_at => Ts,
+                                result_summary => extract_json_string(Payload, <<"result_summary">>),
+                                error_class => <<>>,
+                                error_message => <<>>,
+                                ts => Ts,
+                                txid => Txid
+                            },
+                            Acc#{Key => Item}
+                    end;
+                <<"tool.errored">> ->
+                    {AccUpd, Matched} = maps:fold(
+                        fun(K, V, {AccIn, MatchedIn}) ->
+                            case MatchedIn of
+                                true -> {AccIn#{K => V}, true};
+                                false ->
+                                    case maps:get(execution_id, V, <<>>) =:= ExecutionId
+                                        andalso maps:get(tool_name, V, <<>>) =:= ToolName
+                                        andalso maps:get(status, V, <<>>) =:= <<"invoked">>
+                                    of
+                                        true ->
+                                            {AccIn#{K => V#{
+                                                status => <<"errored">>,
+                                                completed_at => Ts,
+                                                error_class => extract_json_string(Payload, <<"error_class">>),
+                                                error_message => extract_json_string(Payload, <<"message">>),
+                                                ts => Ts,
+                                                txid => Txid
+                                            }}, true};
+                                        false -> {AccIn#{K => V}, false}
+                                    end
+                            end
+                        end,
+                        {#{}, false},
+                        Acc
+                    ),
+                    case Matched of
+                        true -> AccUpd;
+                        false ->
+                            Item = #{
+                                id => Key,
+                                execution_id => ExecutionId,
+                                tool_name => ToolName,
+                                provider => <<>>,
+                                server_name => <<>>,
+                                capability => <<>>,
+                                status => <<"errored">>,
+                                started_at => Ts,
+                                completed_at => Ts,
+                                result_summary => <<>>,
+                                error_class => extract_json_string(Payload, <<"error_class">>),
+                                error_message => extract_json_string(Payload, <<"message">>),
+                                ts => Ts,
+                                txid => Txid
+                            },
+                            Acc#{Key => Item}
+                    end;
+                _ -> Acc
+            end
+    end.
+
+sort_by_started(Items) ->
+    lists:sort(
+        fun(A, B) ->
+            maps:get(started_at, A, <<>>) =< maps:get(started_at, B, <<>>)
+        end,
+        Items
+    ).
+
+tool_timeline_json(Item) ->
+    [
+        <<"{">>,
+        <<"\"id\":">>, nullable_json_string(maps:get(id, Item, <<>>)),
+        <<",\"execution_id\":">>, nullable_json_string(maps:get(execution_id, Item, <<>>)),
+        <<",\"tool_name\":">>, nullable_json_string(maps:get(tool_name, Item, <<>>)),
+        <<",\"provider\":">>, nullable_json_string(maps:get(provider, Item, <<>>)),
+        <<",\"server_name\":">>, nullable_json_string(maps:get(server_name, Item, <<>>)),
+        <<",\"capability\":">>, nullable_json_string(maps:get(capability, Item, <<>>)),
+        <<",\"status\":">>, nullable_json_string(maps:get(status, Item, <<>>)),
+        <<",\"started_at\":">>, nullable_json_string(maps:get(started_at, Item, <<>>)),
+        <<",\"completed_at\":">>, nullable_json_string(maps:get(completed_at, Item, <<>>)),
+        <<",\"result_summary\":">>, nullable_json_string(maps:get(result_summary, Item, <<>>)),
+        <<",\"error_class\":">>, nullable_json_string(maps:get(error_class, Item, <<>>)),
+        <<",\"error_message\":">>, nullable_json_string(maps:get(error_message, Item, <<>>)),
+        <<"}">>
+    ].
+
+first_nonempty([]) -> <<>>;
+first_nonempty([<<>> | Rest]) -> first_nonempty(Rest);
+first_nonempty([V | _]) -> V.

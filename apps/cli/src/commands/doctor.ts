@@ -339,4 +339,38 @@ function emitWorkspacePretty(report: WorkspaceAuditReport): void {
 	}
 	emitPretty("");
 	emitPretty(`status:           ${report.ok ? "clean" : "drift detected"}`);
+	if (!report.ok) {
+		const hints = workspaceManagementHints(report);
+		if (hints.length > 0) {
+			emitPretty("");
+			emitPretty("fix-me hints (see `ema workspace ...`):");
+			for (const h of hints) emitPretty(`  → ${h}`);
+		}
+	}
+}
+
+// Map audit categories that are management-actionable onto `ema workspace`
+// commands. Pure UX hint — does not change audit semantics.
+function workspaceManagementHints(report: WorkspaceAuditReport): string[] {
+	const hints = new Set<string>();
+	for (const m of report.modules) {
+		if (m.findings.length === 0) continue;
+		switch (m.category) {
+			case "stale-worktrees":
+				hints.add("ema workspace worktree prune --apply");
+				break;
+			case "branch-hygiene":
+				hints.add("ema workspace branch clean --with-branches --apply");
+				break;
+			case "push-lag":
+				hints.add("ema workspace remote sync (review ahead/behind; --with-remotes to push)");
+				break;
+			case "active-projects-symmetry":
+				hints.add("ema workspace pair (review orphan-active / dormant-project findings)");
+				break;
+			default:
+				break;
+		}
+	}
+	return Array.from(hints);
 }
